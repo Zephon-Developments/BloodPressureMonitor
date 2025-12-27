@@ -5,16 +5,14 @@ import 'views/home_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize database
   final databaseService = DatabaseService();
   await databaseService.initDatabase();
-  
+
   runApp(
     MultiProvider(
-      providers: [
-        Provider<DatabaseService>.value(value: databaseService),
-      ],
+      providers: [Provider<DatabaseService>.value(value: databaseService)],
       child: const MyApp(),
     ),
   );

@@ -8,7 +8,7 @@ class DatabaseService {
   static const String _databaseName = 'blood_pressure.db';
   static const String _tableName = 'readings';
   static const int _databaseVersion = 1;
-  
+
   // Database password for encryption
   // WARNING: DEVELOPMENT/DEMO ONLY - REPLACE IN PRODUCTION
   // This placeholder password must be replaced before production deployment.
@@ -89,7 +89,7 @@ class DatabaseService {
     if (reading.id == null) {
       throw ArgumentError('Cannot update reading without an id');
     }
-    
+
     final db = await database;
     return await db.update(
       _tableName,
@@ -101,11 +101,7 @@ class DatabaseService {
 
   Future<int> deleteReading(int id) async {
     final db = await database;
-    return await db.delete(
-      _tableName,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    return await db.delete(_tableName, where: 'id = ?', whereArgs: [id]);
   }
 
   Future<void> close() async {

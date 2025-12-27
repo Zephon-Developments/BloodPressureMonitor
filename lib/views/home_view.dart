@@ -10,9 +10,9 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => BloodPressureViewModel(
-        context.read<DatabaseService>(),
-      )..loadReadings(),
+      create: (context) =>
+          BloodPressureViewModel(context.read<DatabaseService>())
+            ..loadReadings(),
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Blood Pressure Monitor'),
@@ -79,9 +79,7 @@ class HomeView extends StatelessWidget {
           onPressed: () {
             // TODO: Navigate to add reading screen
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Add reading feature coming soon!'),
-              ),
+              const SnackBar(content: Text('Add reading feature coming soon!')),
             );
           },
           child: const Icon(Icons.add),
