@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import '../services/database_service.dart';
 import '../viewmodels/blood_pressure_viewmodel.dart';
 
@@ -61,7 +62,7 @@ class HomeView extends StatelessWidget {
                       children: [
                         Text('Pulse: ${reading.pulse} bpm'),
                         Text(
-                          'Recorded: ${reading.timestamp.toString().split('.')[0]}',
+                          'Recorded: ${DateFormat('yyyy-MM-dd HH:mm').format(reading.timestamp)}',
                         ),
                         if (reading.notes != null && reading.notes!.isNotEmpty)
                           Text('Notes: ${reading.notes}'),
