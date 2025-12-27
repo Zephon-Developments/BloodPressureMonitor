@@ -10,45 +10,92 @@ on:
 jobs:
   build-and-test:
     runs-on: [ self-hosted, Linux ]
-    
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup Flutter
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # ---------------------------------------------------------
+    # Flutter SDK (beta channel)
+    # ---------------------------------------------------------
+    - name: Setup Flutter (beta)
       uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.38.5'
-        channel: 'stable'
+        channel: 'beta'
         architecture: x64
 
-    - name: Debug Android SDK
-      run: |
-        echo "ANDROID_HOME=$ANDROID_HOME"
-        echo "PATH=$PATH"
-        which sdkmanager || echo "sdkmanager NOT FOUND"
-        which adb || echo "adb NOT FOUND"
-        ls -R $ANDROID_HOME || echo "ANDROID_HOME directory missing"
-    
+    # ---------------------------------------------------------
+    # Cache: Pub packages
+    # ---------------------------------------------------------
+    - name: Cache Pub
+      uses: actions/cache@v4
+      with:
+        path: ~/.pub-cache
+        key: pub-cache-${{ hashFiles('pubspec.lock') }}
+
+    # ---------------------------------------------------------
+    # Cache: Gradle
+    # ---------------------------------------------------------
+    - name: Cache Gradle
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: gradle-${{ hashFiles('android/gradle/wrapper/gradle-wrapper.properties') }}
+
+    # ---------------------------------------------------------
+    # Cache: Android SDK (platforms + build-tools)
+    # ---------------------------------------------------------
+    - name: Cache Android SDK
+      uses: actions/cache@v4
+      with:
+        path: |
+          /opt/android-sdk/platforms
+          /opt/android-sdk/build-tools
+        key: android-sdk-${{ hashFiles('android/app/build.gradle') }}
+
+    # ---------------------------------------------------------
+    # Flutter environment fix for Git
+    # ---------------------------------------------------------
     - name: Allow Flutter SDK directory for Git
       run: |
         export HOME=/home/runneruser
         git config --global --add safe.directory "${{ env.FLUTTER_ROOT }}"
-        
+
+    # ---------------------------------------------------------
+    # Install dependencies
+    # ---------------------------------------------------------
     - name: Get dependencies
       run: flutter pub get
-    
+
+    # ---------------------------------------------------------
+    # Formatting
+    # ---------------------------------------------------------
     - name: Verify formatting
       run: dart format --set-exit-if-changed .
-    
+
+    # ---------------------------------------------------------
+    # Static analysis
+    # ---------------------------------------------------------
     - name: Analyze project source
       run: flutter analyze
-    
+
+    # ---------------------------------------------------------
+    # Tests
+    # ---------------------------------------------------------
     - name: Run tests
       run: flutter test
-    
-    - name: Build APK
+
+    # ---------------------------------------------------------
+    # Build APK
+    # ---------------------------------------------------------
+    - name: Build APK (release)
       run: flutter build apk --release
-      
+
+    # ---------------------------------------------------------
+    # Build iOS (only on macOS runners)
+    # ---------------------------------------------------------
     - name: Build iOS (if applicable)
-      run: flutter build ios --release --no-codesign
       if: runner.os == 'macOS'
+      run: flutter build ios --release --no-codesign
