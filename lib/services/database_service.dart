@@ -10,13 +10,14 @@ class DatabaseService {
   static const int _databaseVersion = 1;
   
   // Database password for encryption
-  // WARNING: This is hardcoded for development/demo purposes only.
-  // PRODUCTION: Replace with secure storage implementation:
+  // WARNING: DEVELOPMENT/DEMO ONLY - REPLACE IN PRODUCTION
+  // This placeholder password must be replaced before production deployment.
+  // PRODUCTION: Implement secure password management:
   // 1. Add flutter_secure_storage dependency
   // 2. Generate unique password per installation
   // 3. Store password in secure storage
-  // See SECURITY.md for implementation details
-  static const String _password = 'your_secure_password_here';
+  // See SECURITY.md for complete implementation details
+  static const String _password = 'REPLACE_IN_PRODUCTION';
 
   Future<Database> get database async {
     if (_database != null) return _database!;

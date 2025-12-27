@@ -3,7 +3,7 @@ bool isValidBloodPressure(int systolic, int diastolic) {
          diastolic > 0 && 
          systolic < 300 && 
          diastolic < 200 &&
-         systolic > diastolic;
+         systolic >= diastolic;  // Allow equal values for edge cases
 }
 
 bool isValidPulse(int pulse) {
