@@ -34,6 +34,14 @@ jobs:
         architecture: x64
 
     # ---------------------------------------------------------
+    # Ensure SDK directory is writable
+    # ---------------------------------------------------------
+    - name: Fix Android SDK permissions
+      run: |
+        sudo chown -R $USER:$USER /opt/android-sdk || true
+        sudo chmod -R 755 /opt/android-sdk || true
+
+    # ---------------------------------------------------------
     # Cache: Pub packages
     # ---------------------------------------------------------
     - name: Cache Pub
