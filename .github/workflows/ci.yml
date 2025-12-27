@@ -21,7 +21,7 @@ jobs:
     - name: Setup Flutter (beta)
       uses: subosito/flutter-action@v2
       with:
-        channel: 'beta'
+        channel: 'master'
         architecture: x64
 
     # ---------------------------------------------------------
