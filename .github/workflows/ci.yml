@@ -13,11 +13,6 @@ jobs:
     
     steps:
     - uses: actions/checkout@v4
-
-    - name: Allow Flutter SDK directory for Git
-      run: |
-        export HOME=/home/runneruser
-        git config --global --add safe.directory "$FLUTTER_ROOT"
     
     - name: Setup Flutter
       uses: subosito/flutter-action@v2
@@ -26,6 +21,11 @@ jobs:
         channel: 'stable'
         architecture: x64
     
+    - name: Allow Flutter SDK directory for Git
+      run: |
+        export HOME=/home/runneruser
+        git config --global --add safe.directory "$FLUTTER_ROOT"
+        
     - name: Get dependencies
       run: flutter pub get
     
