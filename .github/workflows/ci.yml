@@ -16,6 +16,15 @@ jobs:
       uses: actions/checkout@v4
 
     # ---------------------------------------------------------
+    # Java 17 Setup (required for AGP 8.3+)
+    # ---------------------------------------------------------
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    # ---------------------------------------------------------
     # Flutter SDK (beta channel)
     # ---------------------------------------------------------
     - name: Setup Flutter (beta)
