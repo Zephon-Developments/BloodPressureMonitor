@@ -86,6 +86,10 @@ class DatabaseService {
   }
 
   Future<int> updateReading(BloodPressureReading reading) async {
+    if (reading.id == null) {
+      throw ArgumentError('Cannot update reading without an id');
+    }
+    
     final db = await database;
     return await db.update(
       _tableName,
