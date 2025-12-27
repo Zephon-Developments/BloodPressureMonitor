@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../services/database_service.dart';
-import '../viewmodels/blood_pressure_viewmodel.dart';
-import '../utils/date_formats.dart';
+import 'package:blood_pressure_monitor/services/database_service.dart';
+import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
+import 'package:blood_pressure_monitor/utils/date_formats.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});

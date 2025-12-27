@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'services/database_service.dart';
-import 'views/home_view.dart';
+import 'package:blood_pressure_monitor/services/database_service.dart';
+import 'package:blood_pressure_monitor/views/home_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

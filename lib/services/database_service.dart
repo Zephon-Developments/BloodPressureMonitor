@@ -1,7 +1,7 @@
 import 'package:sqflite_sqlcipher/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import '../models/blood_pressure_reading.dart';
+import 'package:blood_pressure_monitor/models/blood_pressure_reading.dart';
 
 class DatabaseService {
   static Database? _database;

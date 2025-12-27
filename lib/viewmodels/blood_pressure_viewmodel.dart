@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import '../models/blood_pressure_reading.dart';
-import '../services/database_service.dart';
+import 'package:blood_pressure_monitor/models/blood_pressure_reading.dart';
+import 'package:blood_pressure_monitor/services/database_service.dart';
 
 class BloodPressureViewModel extends ChangeNotifier {
   final DatabaseService _databaseService;
