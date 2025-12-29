@@ -13,7 +13,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class SecurePasswordManager {
   static const _storage = FlutterSecureStorage();
   static const _passwordKey = 'db_encryption_password';
-  
+
   // Lock to prevent race conditions during password generation
   static Completer<void>? _currentOperation;
 
@@ -21,7 +21,7 @@ class SecurePasswordManager {
   ///
   /// The password is generated once per installation and stored securely.
   /// Subsequent calls retrieve the same password from secure storage.
-  /// 
+  ///
   /// This method is thread-safe and prevents race conditions during concurrent
   /// password generation attempts.
   static Future<String> getOrCreatePassword() async {
@@ -29,25 +29,25 @@ class SecurePasswordManager {
     if (_currentOperation != null) {
       await _currentOperation!.future;
     }
-    
+
     // Check if password exists first
     String? password = await _storage.read(key: _passwordKey);
     if (password != null) {
       return password;
     }
-    
+
     // Create a new operation lock
     _currentOperation = Completer<void>();
-    
+
     try {
       // Double-check password doesn't exist (another thread may have created it)
       password = await _storage.read(key: _passwordKey);
-      
+
       if (password == null) {
         password = _generateSecurePassword();
         await _storage.write(key: _passwordKey, value: password);
       }
-      
+
       return password;
     } finally {
       // Release the lock
