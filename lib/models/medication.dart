@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 /// Medication model representing a drug that a profile takes.
 ///
-/// Medications can be grouped together and have intake records.
+/// Medications can be grouped together and have intake records tracked.
+/// Schedule metadata is stored as JSON to support flexible scheduling formats.
 class Medication {
   /// Unique identifier for the medication.
   final int? id;
@@ -8,17 +11,30 @@ class Medication {
   /// Profile this medication belongs to.
   final int profileId;
 
-  /// Name of the medication.
+  /// Name of the medication (required).
   final String name;
 
-  /// Dosage information (e.g., "10mg", "2 tablets").
+  /// Optional dosage information (e.g., "10mg", "2 tablets").
   final String? dosage;
 
-  /// Optional schedule metadata (e.g., "8:00 AM daily").
-  final String? schedule;
+  /// Optional unit for dosage (e.g., "mg", "tablets", "mL").
+  final String? unit;
 
-  /// Optional notes about the medication.
-  final String? notes;
+  /// Optional frequency description (e.g., "twice daily", "as needed").
+  final String? frequency;
+
+  /// Optional schedule metadata as JSON string.
+  ///
+  /// Format: `{"v": 1, "frequency": "daily", "times": ["08:00", "20:00"],
+  /// "daysOfWeek": [1,2,3,4,5,6,7], "graceMinutesLate": 15,
+  /// "graceMinutesMissed": 60}`
+  final String? scheduleMetadata;
+
+  /// Whether this medication is active (soft delete flag).
+  final bool isActive;
+
+  /// Timestamp when this medication was created (ISO8601 with offset).
+  final DateTime createdAt;
 
   /// Creates a new [Medication] instance.
   Medication({
@@ -26,9 +42,12 @@ class Medication {
     required this.profileId,
     required this.name,
     this.dosage,
-    this.schedule,
-    this.notes,
-  });
+    this.unit,
+    this.frequency,
+    this.scheduleMetadata,
+    this.isActive = true,
+    DateTime? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now();
 
   /// Creates a [Medication] from a database map.
   factory Medication.fromMap(Map<String, dynamic> map) {
@@ -37,8 +56,11 @@ class Medication {
       profileId: map['profileId'] as int,
       name: map['name'] as String,
       dosage: map['dosage'] as String?,
-      schedule: map['schedule'] as String?,
-      notes: map['notes'] as String?,
+      unit: map['unit'] as String?,
+      frequency: map['frequency'] as String?,
+      scheduleMetadata: map['scheduleMetadata'] as String?,
+      isActive: (map['isActive'] as int?) == 1,
+      createdAt: DateTime.parse(map['createdAt'] as String),
     );
   }
 
@@ -49,8 +71,11 @@ class Medication {
       'profileId': profileId,
       'name': name,
       'dosage': dosage,
-      'schedule': schedule,
-      'notes': notes,
+      'unit': unit,
+      'frequency': frequency,
+      'scheduleMetadata': scheduleMetadata,
+      'isActive': isActive ? 1 : 0,
+      'createdAt': createdAt.toIso8601String(),
     };
   }
 
@@ -60,16 +85,22 @@ class Medication {
     int? profileId,
     String? name,
     String? dosage,
-    String? schedule,
-    String? notes,
+    String? unit,
+    String? frequency,
+    String? scheduleMetadata,
+    bool? isActive,
+    DateTime? createdAt,
   }) {
     return Medication(
       id: id ?? this.id,
       profileId: profileId ?? this.profileId,
       name: name ?? this.name,
       dosage: dosage ?? this.dosage,
-      schedule: schedule ?? this.schedule,
-      notes: notes ?? this.notes,
+      unit: unit ?? this.unit,
+      frequency: frequency ?? this.frequency,
+      scheduleMetadata: scheduleMetadata ?? this.scheduleMetadata,
+      isActive: isActive ?? this.isActive,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 
@@ -82,24 +113,38 @@ class Medication {
         other.profileId == profileId &&
         other.name == name &&
         other.dosage == dosage &&
-        other.schedule == schedule &&
-        other.notes == notes;
+        other.unit == unit &&
+        other.frequency == frequency &&
+        other.scheduleMetadata == scheduleMetadata &&
+        other.isActive == isActive &&
+        other.createdAt == createdAt;
   }
 
   @override
   int get hashCode {
-    return Object.hash(id, profileId, name, dosage, schedule, notes);
+    return Object.hash(
+      id,
+      profileId,
+      name,
+      dosage,
+      unit,
+      frequency,
+      scheduleMetadata,
+      isActive,
+      createdAt,
+    );
   }
 
   @override
   String toString() {
-    return 'Medication(id: $id, name: $name, dosage: $dosage)';
+    return 'Medication(id: $id, name: $name, dosage: $dosage, unit: $unit)';
   }
 }
 
 /// Medication group for quick logging of multiple medications together.
 ///
 /// Example: "Morning meds" group containing several medications.
+/// Member medication IDs are stored as a sorted JSON array for consistency.
 class MedicationGroup {
   /// Unique identifier for the group.
   final int? id;
@@ -110,58 +155,78 @@ class MedicationGroup {
   /// Name of the group (e.g., "Morning meds").
   final String name;
 
-  /// IDs of medications in this group.
-  final List<int> medicationIds;
+  /// IDs of medications in this group (sorted and unique).
+  final List<int> memberMedicationIds;
+
+  /// Timestamp when this group was created (ISO8601 with offset).
+  final DateTime createdAt;
 
   /// Creates a new [MedicationGroup] instance.
+  ///
+  /// Automatically sorts and deduplicates [memberMedicationIds].
   MedicationGroup({
     this.id,
     required this.profileId,
     required this.name,
-    required this.medicationIds,
-  });
+    required List<int> memberMedicationIds,
+    DateTime? createdAt,
+  })  : memberMedicationIds = _normalizeMemberIds(memberMedicationIds),
+        createdAt = createdAt ?? DateTime.now();
+
+  /// Normalizes member IDs by removing duplicates and sorting.
+  static List<int> _normalizeMemberIds(List<int> ids) {
+    final uniqueIds = ids.toSet().toList();
+    uniqueIds.sort();
+    return uniqueIds;
+  }
 
   /// Creates a [MedicationGroup] from a database map.
   ///
-  /// The [medicationIds] are stored as a comma-separated string in the database.
+  /// The [memberMedicationIds] are stored as a JSON array string.
   factory MedicationGroup.fromMap(Map<String, dynamic> map) {
-    final idsString = map['medicationIds'] as String;
+    final idsString = map['memberMedicationIds'] as String;
     final ids = idsString.isEmpty
         ? <int>[]
-        : idsString.split(',').map((e) => int.parse(e)).toList();
+        : (jsonDecode(idsString) as List).cast<int>();
 
     return MedicationGroup(
       id: map['id'] as int?,
       profileId: map['profileId'] as int,
       name: map['name'] as String,
-      medicationIds: ids,
+      memberMedicationIds: ids,
+      createdAt: DateTime.parse(map['createdAt'] as String),
     );
   }
 
   /// Converts this [MedicationGroup] to a database map.
   ///
-  /// The [medicationIds] are stored as a comma-separated string.
+  /// The [memberMedicationIds] are stored as a JSON array string.
   Map<String, dynamic> toMap() {
     return {
       if (id != null) 'id': id,
       'profileId': profileId,
       'name': name,
-      'medicationIds': medicationIds.join(','),
+      'memberMedicationIds': jsonEncode(memberMedicationIds),
+      'createdAt': createdAt.toIso8601String(),
     };
   }
 
   /// Creates a copy of this [MedicationGroup] with the given fields replaced.
+  ///
+  /// Automatically normalizes [memberMedicationIds] if provided.
   MedicationGroup copyWith({
     int? id,
     int? profileId,
     String? name,
-    List<int>? medicationIds,
+    List<int>? memberMedicationIds,
+    DateTime? createdAt,
   }) {
     return MedicationGroup(
       id: id ?? this.id,
       profileId: profileId ?? this.profileId,
       name: name ?? this.name,
-      medicationIds: medicationIds ?? this.medicationIds,
+      memberMedicationIds: memberMedicationIds ?? this.memberMedicationIds,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 
@@ -173,17 +238,25 @@ class MedicationGroup {
         other.id == id &&
         other.profileId == profileId &&
         other.name == name &&
-        _listEquals(other.medicationIds, medicationIds);
+        _listEquals(other.memberMedicationIds, memberMedicationIds) &&
+        other.createdAt == createdAt;
   }
 
   @override
   int get hashCode {
-    return Object.hash(id, profileId, name, Object.hashAll(medicationIds));
+    return Object.hash(
+      id,
+      profileId,
+      name,
+      Object.hashAll(memberMedicationIds),
+      createdAt,
+    );
   }
 
   @override
   String toString() {
-    return 'MedicationGroup(id: $id, name: $name, meds: ${medicationIds.length})';
+    return 'MedicationGroup(id: $id, name: $name, '
+        'meds: ${memberMedicationIds.length})';
   }
 
   bool _listEquals(List a, List b) {
@@ -196,18 +269,29 @@ class MedicationGroup {
 }
 
 /// Record of a medication intake at a specific time.
+///
+/// Supports tracking both individual and group intakes, with optional
+/// scheduling information for late/missed classification.
 class MedicationIntake {
   /// Unique identifier for the intake record.
   final int? id;
 
-  /// Profile this intake belongs to.
-  final int profileId;
-
   /// ID of the medication taken.
   final int medicationId;
 
-  /// Timestamp when the medication was taken (UTC).
+  /// Profile this intake belongs to.
+  final int profileId;
+
+  /// Timestamp when the medication was taken (ISO8601 with offset).
   final DateTime takenAt;
+
+  /// Local time zone offset in minutes at time of intake.
+  final int localOffsetMinutes;
+
+  /// Optional scheduled time for this intake (ISO8601).
+  ///
+  /// Used to calculate late/missed status relative to schedule.
+  final DateTime? scheduledFor;
 
   /// Optional group ID if this was part of a group intake.
   final int? groupId;
@@ -218,20 +302,27 @@ class MedicationIntake {
   /// Creates a new [MedicationIntake] instance.
   MedicationIntake({
     this.id,
-    required this.profileId,
     required this.medicationId,
+    required this.profileId,
     required this.takenAt,
+    int? localOffsetMinutes,
+    this.scheduledFor,
     this.groupId,
     this.note,
-  });
+  }) : localOffsetMinutes =
+            localOffsetMinutes ?? takenAt.timeZoneOffset.inMinutes;
 
   /// Creates a [MedicationIntake] from a database map.
   factory MedicationIntake.fromMap(Map<String, dynamic> map) {
     return MedicationIntake(
       id: map['id'] as int?,
-      profileId: map['profileId'] as int,
       medicationId: map['medicationId'] as int,
+      profileId: map['profileId'] as int,
       takenAt: DateTime.parse(map['takenAt'] as String),
+      localOffsetMinutes: map['localOffsetMinutes'] as int,
+      scheduledFor: map['scheduledFor'] != null
+          ? DateTime.parse(map['scheduledFor'] as String)
+          : null,
       groupId: map['groupId'] as int?,
       note: map['note'] as String?,
     );
@@ -241,9 +332,11 @@ class MedicationIntake {
   Map<String, dynamic> toMap() {
     return {
       if (id != null) 'id': id,
-      'profileId': profileId,
       'medicationId': medicationId,
+      'profileId': profileId,
       'takenAt': takenAt.toIso8601String(),
+      'localOffsetMinutes': localOffsetMinutes,
+      if (scheduledFor != null) 'scheduledFor': scheduledFor!.toIso8601String(),
       'groupId': groupId,
       'note': note,
     };
@@ -252,17 +345,21 @@ class MedicationIntake {
   /// Creates a copy of this [MedicationIntake] with the given fields replaced.
   MedicationIntake copyWith({
     int? id,
-    int? profileId,
     int? medicationId,
+    int? profileId,
     DateTime? takenAt,
+    int? localOffsetMinutes,
+    DateTime? scheduledFor,
     int? groupId,
     String? note,
   }) {
     return MedicationIntake(
       id: id ?? this.id,
-      profileId: profileId ?? this.profileId,
       medicationId: medicationId ?? this.medicationId,
+      profileId: profileId ?? this.profileId,
       takenAt: takenAt ?? this.takenAt,
+      localOffsetMinutes: localOffsetMinutes ?? this.localOffsetMinutes,
+      scheduledFor: scheduledFor ?? this.scheduledFor,
       groupId: groupId ?? this.groupId,
       note: note ?? this.note,
     );
@@ -274,20 +371,47 @@ class MedicationIntake {
 
     return other is MedicationIntake &&
         other.id == id &&
-        other.profileId == profileId &&
         other.medicationId == medicationId &&
+        other.profileId == profileId &&
         other.takenAt == takenAt &&
+        other.localOffsetMinutes == localOffsetMinutes &&
+        other.scheduledFor == scheduledFor &&
         other.groupId == groupId &&
         other.note == note;
   }
 
   @override
   int get hashCode {
-    return Object.hash(id, profileId, medicationId, takenAt, groupId, note);
+    return Object.hash(
+      id,
+      medicationId,
+      profileId,
+      takenAt,
+      localOffsetMinutes,
+      scheduledFor,
+      groupId,
+      note,
+    );
   }
 
   @override
   String toString() {
-    return 'MedicationIntake(id: $id, medId: $medicationId, at: $takenAt)';
+    return 'MedicationIntake(id: $id, medId: $medicationId, '
+        'at: $takenAt, group: $groupId)';
   }
+}
+
+/// Status of a medication intake relative to its schedule.
+enum IntakeStatus {
+  /// Taken within the scheduled time window.
+  onTime,
+
+  /// Taken late but within the grace period.
+  late,
+
+  /// Taken after the missed grace period.
+  missed,
+
+  /// No schedule information available.
+  unscheduled,
 }
