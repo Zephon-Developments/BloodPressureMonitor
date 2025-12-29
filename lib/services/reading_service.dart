@@ -180,7 +180,14 @@ class ReadingService {
     // Filter out false positives from LIKE query (e.g., "stress" matching "stressed")
     return maps
         .map((map) => Reading.fromMap(map))
-        .where((reading) => reading.tags?.contains(tag) ?? false)
+        .where(
+          (reading) =>
+              reading.tags
+                  ?.split(',')
+                  .map((t) => t.trim())
+                  .contains(tag) ??
+              false,
+        )
         .toList();
   }
 }
