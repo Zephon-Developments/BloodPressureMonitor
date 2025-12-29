@@ -4,11 +4,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:blood_pressure_monitor/services/auth_service.dart';
 import 'package:blood_pressure_monitor/services/averaging_service.dart';
+import 'package:blood_pressure_monitor/services/correlation_service.dart';
 import 'package:blood_pressure_monitor/services/database_service.dart';
 import 'package:blood_pressure_monitor/services/profile_service.dart';
 import 'package:blood_pressure_monitor/services/reading_service.dart';
+import 'package:blood_pressure_monitor/services/sleep_service.dart';
+import 'package:blood_pressure_monitor/services/weight_service.dart';
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/lock_viewmodel.dart';
+import 'package:blood_pressure_monitor/viewmodels/sleep_viewmodel.dart';
+import 'package:blood_pressure_monitor/viewmodels/weight_viewmodel.dart';
 import 'package:blood_pressure_monitor/views/home_view.dart';
 import 'package:blood_pressure_monitor/views/lock/lock_screen.dart';
 
@@ -22,6 +27,20 @@ void main() async {
   final databaseService = DatabaseService();
   await databaseService.database;
 
+  // Initialize shared services once to keep dependencies narrow
+  final readingService = ReadingService(databaseService: databaseService);
+  final averagingService = AveragingService(
+    databaseService: databaseService,
+    readingService: readingService,
+  );
+  final weightService = WeightService(databaseService);
+  final sleepService = SleepService(databaseService);
+  final correlationService = CorrelationService(
+    readingService: readingService,
+    weightService: weightService,
+    sleepService: sleepService,
+  );
+
   // Initialize auth service
   final authService = AuthService(prefs: prefs);
 
@@ -30,8 +49,11 @@ void main() async {
       providers: [
         Provider<DatabaseService>.value(value: databaseService),
         Provider<ProfileService>(create: (_) => ProfileService()),
-        Provider<ReadingService>(create: (_) => ReadingService()),
-        Provider<AveragingService>(create: (_) => AveragingService()),
+        Provider<ReadingService>.value(value: readingService),
+        Provider<AveragingService>.value(value: averagingService),
+        Provider<WeightService>.value(value: weightService),
+        Provider<SleepService>.value(value: sleepService),
+        Provider<CorrelationService>.value(value: correlationService),
         Provider<SharedPreferences>.value(value: prefs),
         Provider<AuthService>.value(value: authService),
         ChangeNotifierProvider<LockViewModel>(
@@ -44,6 +66,16 @@ void main() async {
           create: (context) => BloodPressureViewModel(
             context.read<ReadingService>(),
             context.read<AveragingService>(),
+          ),
+        ),
+        ChangeNotifierProvider<WeightViewModel>(
+          create: (context) => WeightViewModel(
+            context.read<WeightService>(),
+          ),
+        ),
+        ChangeNotifierProvider<SleepViewModel>(
+          create: (context) => SleepViewModel(
+            context.read<SleepService>(),
           ),
         ),
       ],

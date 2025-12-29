@@ -1,0 +1,80 @@
+import 'package:flutter/material.dart';
+
+import 'package:blood_pressure_monitor/views/readings/add_reading_view.dart';
+import 'package:blood_pressure_monitor/views/sleep/sleep_history_view.dart';
+import 'package:blood_pressure_monitor/views/weight/weight_history_view.dart';
+
+/// Quick action buttons for the home screen.
+///
+/// Provides primary action (Add Reading) and secondary actions
+/// for quick navigation.
+class QuickActions extends StatelessWidget {
+  /// Creates a quick actions widget.
+  const QuickActions({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Quick Actions',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (context) => const AddReadingView(),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.add),
+              label: const Text('Add Blood Pressure Reading'),
+              style: FilledButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (context) => const WeightHistoryView(),
+                ),
+              );
+            },
+            icon: const Icon(Icons.monitor_weight),
+            label: const Text('View Weight History'),
+            style: OutlinedButton.styleFrom(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+            ),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (context) => const SleepHistoryView(),
+                ),
+              );
+            },
+            icon: const Icon(Icons.bedtime),
+            label: const Text('View Sleep History'),
+            style: OutlinedButton.styleFrom(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

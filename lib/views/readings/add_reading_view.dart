@@ -1,0 +1,287 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'package:blood_pressure_monitor/models/reading.dart';
+import 'package:blood_pressure_monitor/utils/validators.dart';
+import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
+import 'package:blood_pressure_monitor/views/readings/widgets/reading_form_advanced.dart';
+import 'package:blood_pressure_monitor/views/readings/widgets/reading_form_basic.dart';
+import 'package:blood_pressure_monitor/views/readings/widgets/session_control_widget.dart';
+import 'package:blood_pressure_monitor/widgets/common/expandable_section.dart';
+import 'package:blood_pressure_monitor/widgets/common/loading_button.dart';
+import 'package:blood_pressure_monitor/widgets/common/validation_message_widget.dart';
+
+/// Screen for adding a new blood pressure reading.
+///
+/// Provides basic fields (systolic, diastolic, pulse, timestamp) and
+/// an advanced section for additional details (arm, posture, notes, tags).
+/// Validates input using medical bounds and supports override confirmations.
+class AddReadingView extends StatefulWidget {
+  /// Creates an add reading view.
+  const AddReadingView({super.key});
+
+  @override
+  State<AddReadingView> createState() => _AddReadingViewState();
+}
+
+class _AddReadingViewState extends State<AddReadingView> {
+  final _formKey = GlobalKey<FormState>();
+  final _systolicController = TextEditingController();
+  final _diastolicController = TextEditingController();
+  final _pulseController = TextEditingController();
+  final _notesController = TextEditingController();
+  final _tagsController = TextEditingController();
+
+  DateTime _selectedDateTime = DateTime.now();
+  String? _selectedArm;
+  String? _selectedPosture;
+  bool _startNewSession = false;
+  bool _isSubmitting = false;
+  ValidationResult? _validationResult;
+  bool _showOverrideConfirmation = false;
+
+  @override
+  void dispose() {
+    _systolicController.dispose();
+    _diastolicController.dispose();
+    _pulseController.dispose();
+    _notesController.dispose();
+    _tagsController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _selectDateTime() async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: _selectedDateTime,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+
+    if (date == null || !mounted) return;
+
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(_selectedDateTime),
+    );
+
+    if (time == null || !mounted) return;
+
+    setState(() {
+      _selectedDateTime = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        time.hour,
+        time.minute,
+      );
+    });
+  }
+
+  Future<void> _submitReading({bool confirmOverride = false}) async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    setState(() {
+      _isSubmitting = true;
+      _showOverrideConfirmation = false;
+    });
+
+    final viewModel = context.read<BloodPressureViewModel>();
+
+    final reading = Reading(
+      profileId: 1, // TODO: Use actual profile ID from profile selector
+      takenAt: _selectedDateTime,
+      localOffsetMinutes: _selectedDateTime.timeZoneOffset.inMinutes,
+      systolic: int.parse(_systolicController.text),
+      diastolic: int.parse(_diastolicController.text),
+      pulse: int.parse(_pulseController.text),
+      arm: _selectedArm,
+      posture: _selectedPosture,
+      note: _notesController.text.trim().isEmpty
+          ? null
+          : _notesController.text.trim(),
+      tags: _tagsController.text.trim().isEmpty
+          ? null
+          : _tagsController.text.trim(),
+    );
+
+    final result = await viewModel.addReading(
+      reading,
+      confirmOverride: confirmOverride,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _isSubmitting = false;
+      _validationResult = result;
+    });
+
+    if (result.level == ValidationLevel.warning && !confirmOverride) {
+      // Show override confirmation dialog
+      setState(() {
+        _showOverrideConfirmation = true;
+      });
+    } else if (result.level == ValidationLevel.valid ||
+        (result.level == ValidationLevel.warning && confirmOverride)) {
+      // Success - show snackbar and navigate back
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Reading added successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.of(context).pop();
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Add Reading'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      ),
+      body: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Validation message banner
+              if (_validationResult != null &&
+                  _validationResult!.level != ValidationLevel.valid &&
+                  _validationResult!.message != null)
+                ValidationMessageWidget(
+                  message: _validationResult!.message!,
+                  isError: _validationResult!.level == ValidationLevel.error,
+                ),
+
+              if (_showOverrideConfirmation)
+                Card(
+                  color: Theme.of(context).colorScheme.errorContainer,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Override Confirmation Required',
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onErrorContainer,
+                                  ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _validationResult?.message ?? '',
+                          style: TextStyle(
+                            color:
+                                Theme.of(context).colorScheme.onErrorContainer,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _showOverrideConfirmation = false;
+                                  });
+                                },
+                                child: const Text('Cancel'),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: FilledButton(
+                                onPressed: () => _submitReading(
+                                  confirmOverride: true,
+                                ),
+                                child: const Text('Confirm Override'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+              const SizedBox(height: 16),
+
+              // Basic fields
+              ReadingFormBasic(
+                systolicController: _systolicController,
+                diastolicController: _diastolicController,
+                pulseController: _pulseController,
+                selectedDateTime: _selectedDateTime,
+                onDateTimeChanged: _selectDateTime,
+              ),
+
+              const SizedBox(height: 16),
+
+              // Advanced section (expandable)
+              ExpandableSection(
+                title: 'Advanced Options',
+                children: [
+                  ReadingFormAdvanced(
+                    notesController: _notesController,
+                    tagsController: _tagsController,
+                    selectedArm: _selectedArm,
+                    selectedPosture: _selectedPosture,
+                    onArmChanged: (arm) {
+                      setState(() {
+                        _selectedArm = arm;
+                      });
+                    },
+                    onPostureChanged: (posture) {
+                      setState(() {
+                        _selectedPosture = posture;
+                      });
+                    },
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 16),
+
+              // Session control
+              SessionControlWidget(
+                startNewSession: _startNewSession,
+                onChanged: (value) {
+                  setState(() {
+                    _startNewSession = value;
+                  });
+                },
+              ),
+
+              const SizedBox(height: 24),
+
+              // Submit button
+              LoadingButton(
+                onPressed: _isSubmitting || _showOverrideConfirmation
+                    ? null
+                    : () => _submitReading(),
+                isLoading: _isSubmitting,
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: const Text('Save Reading'),
+              ),
+
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
