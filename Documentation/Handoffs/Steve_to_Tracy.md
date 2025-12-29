@@ -1,213 +1,135 @@
-# Handoff: Steve to Tracy
-## Phase 3 Planning Request - Medication Management
+# Handoff: Steve → Tracy
 
-**Date:** December 29, 2025  
-**From:** Steve (Workflow Conductor)  
-**To:** Tracy (Planning Architect)  
-**Phase:** 3 - Medication Management
+**Date:** 2025-12-29  
+**Phase:** Phase 4 - Weight & Sleep  
+**Status:** Planning Required  
 
 ---
 
 ## Context
 
-Phases 1, 2A, and 2B are now complete and merged to `main`:
-- ✅ **Phase 1**: Core data layer with encrypted SQLite
-- ✅ **Phase 2A**: Averaging engine (96.15% test coverage)
-- ✅ **Phase 2B**: Validation & ViewModel integration (124 tests passing)
+Phase 3 (Medication Management) has been successfully completed and merged into main. We are now ready to proceed with Phase 4: Weight & Sleep tracking.
 
-We're ready to proceed to **Phase 3: Medication Management**.
+## Phase 4 Objectives
+
+Implement comprehensive weight and sleep data management to support correlation with blood pressure readings.
+
+### Scope (from Implementation Schedule)
+
+**Weight & Sleep Entry storage + basic retrieval**
+
+**Key Requirements:**
+1. **WeightEntry CRUD**: 
+   - Weight measurements with timestamps
+   - Optional contextual notes: salt intake, exercise, stress level, sleep quality
+   - Support for multiple units (kg, lbs) with conversion
+   
+2. **SleepEntry CRUD/Import**:
+   - Manual entry capability
+   - Device import hook for future integration
+   - Store locally with source metadata (manual vs imported)
+   - Track sleep duration, quality, and timing
+   
+3. **Basic Correlation Hooks**:
+   - Enable correlation with morning BP readings
+   - No advice generation yet - just data association
+   - Prepare infrastructure for future analytics
+
+4. **Data Handling**:
+   - Robust date/time parsing
+   - Proper timezone handling
+   - Support for import from common formats
+
+### Dependencies
+- Phase 1 schema (already complete - database infrastructure exists)
+- No dependencies on Phases 2 or 3
+
+### Acceptance Criteria
+- Data persists correctly and can be retrieved
+- Analyzer clean (0 issues)
+- Test coverage ≥85% for services
+- Rollback point: Keep UI hooks disabled if needed
 
 ---
 
 ## Current State
 
-### Available Infrastructure
-- **Database**: Encrypted SQLite with tables for Medication, MedicationGroup, and MedicationIntake already defined in schema
-- **Services**: `DatabaseService` with dependency injection support
-- **Testing**: In-memory database testing pattern established with `sqflite_common_ffi`
-- **Validation**: Three-tier validation system (valid/warning/error) ready for extension
-- **ViewModel Pattern**: MVVM established with Provider state management
+### Database Schema
+The database is currently at **version 2** with the following medication-related tables:
+- Medication
+- MedicationGroup  
+- MedicationIntake
 
-### Existing Schema (from Phase 1)
-```sql
--- Medication table (already exists)
-CREATE TABLE Medication (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  profileId INTEGER NOT NULL,
-  name TEXT NOT NULL,
-  dosage TEXT,
-  unit TEXT,
-  frequency TEXT,
-  scheduleMetadata TEXT,
-  createdAt TEXT NOT NULL,
-  FOREIGN KEY (profileId) REFERENCES Profile(id) ON DELETE CASCADE
-)
+### Existing Models & Services
+- ✅ Profile (CRUD complete)
+- ✅ Reading, ReadingGroup (CRUD + averaging complete)
+- ✅ Medication, MedicationGroup, MedicationIntake (CRUD complete)
+- ⏳ WeightEntry (model exists, needs service implementation)
+- ⏳ SleepEntry (model exists, needs service implementation)
 
--- MedicationGroup table (already exists)
-CREATE TABLE MedicationGroup (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  profileId INTEGER NOT NULL,
-  name TEXT NOT NULL,
-  memberMedicationIds TEXT NOT NULL,
-  createdAt TEXT NOT NULL,
-  FOREIGN KEY (profileId) REFERENCES Profile(id) ON DELETE CASCADE
-)
-
--- MedicationIntake table (already exists)
-CREATE TABLE MedicationIntake (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  medicationId INTEGER NOT NULL,
-  profileId INTEGER NOT NULL,
-  takenAt TEXT NOT NULL,
-  localOffsetMinutes INTEGER NOT NULL,
-  scheduledFor TEXT,
-  groupId INTEGER,
-  note TEXT,
-  FOREIGN KEY (medicationId) REFERENCES Medication(id) ON DELETE CASCADE,
-  FOREIGN KEY (profileId) REFERENCES Profile(id) ON DELETE CASCADE,
-  FOREIGN KEY (groupId) REFERENCES MedicationGroup(id) ON DELETE SET NULL
-)
-```
+### Standards & Patterns to Follow
+Refer to [Documentation/Standards/Coding_Standards.md](../Standards/Coding_Standards.md) for:
+- Model structure with `toMap`/`fromMap`/`copyWith`
+- Service patterns with validation
+- Test coverage requirements
+- JSDoc documentation standards
 
 ---
 
-## Scope for Phase 3
+## Task for Tracy
 
-From the Implementation Schedule:
+**Please create a detailed implementation plan for Phase 4 that includes:**
 
-### Objectives
-1. Implement CRUD operations for Medication, MedicationGroup, and MedicationIntake
-2. Enable group intake logging (single action logs multiple medications)
-3. Track late/missed context relative to optional schedule metadata
-4. Prepare for future correlation with blood pressure readings
+1. **Schema Updates**
+   - Determine if WeightEntry and SleepEntry tables already exist or need to be added
+   - Define migration path to database version 3 (if needed)
+   - Specify indexes for efficient queries
+   - Define foreign key relationships
 
-### Must Have
-- **Medication CRUD**: Create, read, update, delete medications
-- **MedicationGroup CRUD**: Create and manage medication groups
-- **Intake Logging**: Log individual and group intakes with timestamps
-- **Schedule Context**: Optional schedule metadata with late/missed tracking
-- **Tests**: ≥85% coverage for all services
-- **Code Quality**: 0 analyzer warnings, proper DartDoc
+2. **Models**
+   - Review and enhance WeightEntry model if needed
+   - Review and enhance SleepEntry model if needed
+   - Define unit conversion logic
+   - Specify metadata structure for import sources
 
-### Should Have
-- Data models with proper serialization (toMap/fromMap)
-- Dependency injection for testability
-- Correlation hooks for linking intakes to blood pressure readings
-- Proper error handling and validation
+3. **Validators**
+   - Weight validation (reasonable bounds, unit handling)
+   - Sleep duration validation (reasonable bounds)
+   - Date/time validation for entries
 
-### Nice to Have
-- Medication search/filtering by profile
-- Intake history retrieval by date range
-- Reminder metadata (for future Phase with reminders)
+4. **Services**
+   - WeightService: CRUD operations, unit conversions, queries by date range
+   - SleepService: CRUD operations, import parsing, queries by date range
+   - Correlation utilities: link entries to morning BP readings
 
-### Out of Scope (for Phase 3)
-- UI components (deferred to Phase 6+)
-- Reminder notifications (separate phase)
-- Medication interaction checking
-- Dosage validation rules
-- Import/export functionality
+5. **Testing Strategy**
+   - Unit tests for models
+   - Service tests covering CRUD operations
+   - Validation tests
+   - Import parsing tests
+   - Correlation tests
 
----
-
-## Planning Requirements
-
-Please create a detailed plan for Phase 3 that includes:
-
-### 1. Data Models
-- `Medication` class with all properties, toMap/fromMap, equality
-- `MedicationGroup` class with member tracking
-- `MedicationIntake` class with schedule context
-
-### 2. Services Architecture
-- `MedicationService` for medication CRUD
-- `MedicationGroupService` for group management
-- `MedicationIntakeService` for intake logging
-- Consider: Should group intake be a method on `MedicationIntakeService` or a separate concern?
-
-### 3. Testing Strategy
-- Unit tests for each model's serialization
-- Integration tests using in-memory database (following Phase 2B pattern)
-- Test cases for:
-  - Individual medication CRUD
-  - Group creation and member management
-  - Individual intake logging
-  - Group intake logging (atomic operation for multiple meds)
-  - Late/missed intake detection
-  - Correlation hooks for linking to readings
-
-### 4. Implementation Approach
-- Step-by-step implementation order
-- Dependencies between components
-- Rollback/feature flag strategy if needed
-
-### 5. Acceptance Criteria
-- Clear, testable acceptance criteria for each component
-- Performance considerations for large medication lists
-- Data integrity rules (cascading deletes, constraints)
+6. **Rollback Strategy**
+   - How to isolate this feature during development
+   - Feature flags if needed
 
 ---
 
-## Technical Considerations
+## Deliverables
 
-### Questions for Tracy to Address
+Once you have analyzed the requirements and current codebase:
 
-1. **Group Intake Atomicity**: Should group intake use a database transaction to ensure all intakes are logged atomically, or is best-effort acceptable?
-
-2. **Schedule Metadata Format**: What format should `scheduleMetadata` use? JSON string? Consider:
-   - Time of day (e.g., "08:00", "20:00")
-   - Frequency (e.g., "daily", "twice-daily", "as-needed")
-   - Days of week for non-daily schedules
-
-3. **Late/Missed Context**: How should we calculate "late" vs "missed"?
-   - Threshold for considering an intake "late" (e.g., within 2 hours of scheduled time)
-   - When does a scheduled intake become "missed" (e.g., after 4 hours)?
-   - Should this be configurable or hard-coded?
-
-4. **Correlation Design**: How should medications link to blood pressure readings?
-   - Via `medsContext` field on Reading (already exists - comma-separated intake IDs)?
-   - Should correlation happen at intake-time or be computed on-demand?
-   - Should we build correlation into Phase 3 or defer to ViewModel integration?
-
-5. **Validation**: Do medications need validation (e.g., name length, dosage format)?
-   - If yes, should we use the existing three-tier ValidationResult pattern?
-   - Or is simple null/empty checking sufficient for Phase 3?
+1. Create a detailed plan in `Documentation/Plans/Phase-4-Weight-Sleep.md`
+2. Update `Documentation/Handoffs/Tracy_to_Clive.md` with the plan summary for Clive's review
+3. Include:
+   - Detailed task breakdown
+   - Schema migration strategy
+   - Testing approach
+   - Risk assessment
+   - Timeline estimate
 
 ---
 
-## Success Criteria
-
-Phase 3 is successful when:
-1. All medication, group, and intake models are implemented with ≥90% test coverage
-2. All CRUD services are implemented with ≥85% test coverage
-3. Group intake logging works atomically (all or nothing)
-4. Late/missed context is trackable (even if UI doesn't display it yet)
-5. Correlation hooks are in place for future integration with blood pressure readings
-6. 0 analyzer warnings, all tests passing
-7. Clive approves the implementation
-
----
-
-## References
-
-- **Implementation Schedule**: [Documentation/Plans/Implementation_Schedule.md](../Plans/Implementation_Schedule.md)
-- **Database Schema**: [lib/services/database_service.dart](../../lib/services/database_service.dart)
-- **Phase 2B Pattern**: [Documentation/Handoffs/Claudette_to_Clive.md](Claudette_to_Clive.md)
-- **Coding Standards**: [Documentation/Standards/Coding_Standards.md](../Standards/Coding_Standards.md)
-
----
-
-## Next Steps
-
-1. Create detailed Phase 3 plan at `Documentation/Plans/Phase-3-Medication-Management.md`
-2. Define data models with DartDoc
-3. Outline service interfaces and responsibilities
-4. Specify test cases and acceptance criteria
-5. Create handoff to Clive for plan review at `Documentation/Handoffs/Tracy_to_Clive.md`
-
----
-
-**Action Required**: Please create the Phase 3 plan and hand off to Clive for review.
-
-— Steve  
+**Steve**  
 *Workflow Conductor*
 

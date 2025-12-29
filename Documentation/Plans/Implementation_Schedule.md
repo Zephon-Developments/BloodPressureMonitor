@@ -7,7 +7,7 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - [x] Phase 1: Core Data Layer ✅ **COMPLETE** (Dec 29, 2025)
 - [x] Phase 2A: Averaging Engine ✅ **COMPLETE** (Dec 29, 2025)
 - [x] Phase 2B: Validation & ViewModel Integration ✅ **COMPLETE** (Dec 29, 2025)
-- [ ] Phase 3: Medication Management
+- [x] Phase 3: Medication Management ✅ **COMPLETE** (Dec 29, 2025)
 - [ ] Phase 4: Weight & Sleep
 - [ ] Phase 5: App Security Gate
 - [ ] Phase 6: UI Foundation
@@ -61,18 +61,18 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - ✅ Tests ≥85% viewmodels (88%+ achieved); analyzer clean.
 **Status**: Merged to main Dec 29, 2025
 
-### Phase 3: Medication Management
+### Phase 3: Medication Management ✅ COMPLETE
 **Scope**: Medication list, groups, intake logging with timestamps, schedule metadata.
 **Tasks**
-- CRUD for Medication, MedicationGroup, MedicationIntake.
-- Group intake: single action logs multiple meds with individual intake records.
-- Late/missed context relative to optional schedule metadata.
-- Unit tests for intake associations, group logging, and schedule context.
+- ✅ CRUD for Medication, MedicationGroup, MedicationIntake.
+- ✅ Group intake: single action logs multiple meds with individual intake records.
+- ✅ Late/missed context relative to optional schedule metadata.
+- ✅ Unit tests for intake associations, group logging, and schedule context.
 **Dependencies**: Phase 1 schema; Phase 2 optional for correlation later.
 **Acceptance**
-- Intakes persisted with timestamps and optional groupId; correlation ready.
-- Tests ≥85% for services; analyzer clean.
-**Rollback point**: Feature flag for medication UI; services stable.
+- ✅ Intakes persisted with timestamps and optional groupId; correlation ready.
+- ✅ Tests ≥85% for services; analyzer clean.
+**Status**: Merged to main Dec 29, 2025
 
 ### Phase 4: Weight & Sleep
 **Scope**: WeightEntry and SleepEntry storage + basic retrieval.
