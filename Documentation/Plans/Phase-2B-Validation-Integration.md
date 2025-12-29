@@ -38,12 +38,13 @@ bool isValidPulse(int pulse) {
 **Required Changes**:
 - Add strict validation with medical bounds
 - Add warning-level validation for borderline values
-- Add override confirmation support
+- Add override confirmation support (warning = soft block, error = hard block)
 
 **New API**:
 ```dart
 enum ValidationLevel { valid, warning, error }
 
+/// requiresConfirmation = true only when level == warning; error blocks save.
 class ValidationResult {
   final ValidationLevel level;
   final String? message;
@@ -54,11 +55,21 @@ ValidationResult validateBloodPressure(int systolic, int diastolic);
 ValidationResult validatePulse(int pulse);
 ```
 
-**Validation Rules**:
-- **Systolic**: 70–250 mmHg (error outside), 90–180 mmHg (warning outside normal)
-- **Diastolic**: 40–150 mmHg (error outside), 60–100 mmHg (warning outside normal)
-- **Pulse**: 30–200 bpm (error outside), 60–100 bpm (warning outside normal)
-- **Relationship**: Systolic must be ≥ Diastolic
+**Behavioral Definitions**:
+- `ValidationLevel.error`: hard block; persistence must not occur.
+- `ValidationLevel.warning`: soft block; persistence allowed only with user
+  confirmation (e.g., confirmation dialog sets `confirmOverride = true`).
+- `ValidationLevel.valid`: no block.
+
+**Explicit Ranges**:
+- Systolic: `<70 error`, `70–89 warning`, `90–180 valid`, `181–250 warning`,
+  `>250 error`.
+- Diastolic: `<40 error`, `40–59 warning`, `60–100 valid`, `101–150 warning`,
+  `>150 error`.
+- Pulse: `<30 error`, `30–59 warning`, `60–100 valid`, `101–200 warning`,
+  `>200 error`.
+- Relationship: systolic < diastolic → `error`; systolic == diastolic →
+  `warning`.
 
 ### 2. ViewModel Integration (`lib/viewmodels/blood_pressure_viewmodel.dart`)
 
@@ -79,7 +90,7 @@ Future<void> addReading(Reading reading) async {
 - Inject `AveragingService` via constructor
 - Trigger automatic grouping after CRUD operations
 - Validate readings before persistence
-- Handle validation override flow
+- Handle validation override flow and surface `ValidationResult` to UI
 
 **New Implementation**:
 ```dart
@@ -87,6 +98,7 @@ class BloodPressureViewModel extends ChangeNotifier {
   final ReadingService _readingService;
   final AveragingService _averagingService;
   final int _profileId;
+  ValidationResult? _lastValidation; // surfaced to UI via getter
   
   BloodPressureViewModel(
     this._readingService,
@@ -94,28 +106,45 @@ class BloodPressureViewModel extends ChangeNotifier {
     int profileId = 1,
   }) : _profileId = profileId;
 
-  Future<void> addReading(Reading reading, {bool confirmOverride = false}) async {
-    // Validate
+  ValidationResult? get lastValidation => _lastValidation;
+
+  Future<ValidationResult> addReading(
+    Reading reading, {
+    bool confirmOverride = false,
+  }) async {
     final validation = validateReading(reading);
-    if (validation.level == ValidationLevel.error && !confirmOverride) {
+    _lastValidation = validation;
+    if (validation.level == ValidationLevel.error) {
       _error = validation.message;
       notifyListeners();
-      return;
+      return validation;
+    }
+    if (validation.level == ValidationLevel.warning && !confirmOverride) {
+      _error = validation.message;
+      notifyListeners();
+      return validation; // UI should prompt for confirmation
     }
 
     try {
       final id = await _readingService.createReading(reading);
       final persistedReading = await _readingService.getReading(id);
       
-      // Trigger averaging
       if (persistedReading != null) {
-        await _averagingService.createOrUpdateGroupsForReading(persistedReading);
+        await _averagingService.createOrUpdateGroupsForReading(
+          persistedReading,
+        );
       }
       
       await loadReadings();
+      return validation;
     } catch (e) {
       _error = 'Failed to add reading: $e';
       notifyListeners();
+      return ValidationResult(
+        level: ValidationLevel.error,
+        message: _error,
+        requiresConfirmation: false,
+      );
     }
   }
   
