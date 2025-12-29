@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:blood_pressure_monitor/services/database_service.dart';
+import 'package:blood_pressure_monitor/services/profile_service.dart';
+import 'package:blood_pressure_monitor/services/reading_service.dart';
 import 'package:blood_pressure_monitor/views/home_view.dart';
 
 void main() async {
@@ -8,11 +10,15 @@ void main() async {
 
   // Initialize database
   final databaseService = DatabaseService();
-  await databaseService.initDatabase();
+  await databaseService.database;
 
   runApp(
     MultiProvider(
-      providers: [Provider<DatabaseService>.value(value: databaseService)],
+      providers: [
+        Provider<DatabaseService>.value(value: databaseService),
+        Provider<ProfileService>(create: (_) => ProfileService()),
+        Provider<ReadingService>(create: (_) => ReadingService()),
+      ],
       child: const MyApp(),
     ),
   );
