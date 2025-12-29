@@ -5,7 +5,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_sqlcipher/sqflite.dart';
 
-import 'secure_password_manager.dart';
+import 'package:blood_pressure_monitor/services/secure_password_manager.dart';
 
 /// Database service providing encrypted local storage for health data.
 ///
@@ -40,7 +40,7 @@ class DatabaseService {
       // Log error details for diagnostics and fail initialization explicitly
       stderr.writeln('Error retrieving secure database password: $e');
       stderr.writeln(stackTrace);
-      throw DatabaseException(
+      throw StateError(
         'Failed to initialize encrypted database: could not retrieve secure password.',
       );
     }
