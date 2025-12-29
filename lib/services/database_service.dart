@@ -15,7 +15,7 @@ import 'package:blood_pressure_monitor/services/secure_password_manager.dart';
 class DatabaseService {
   static Database? _database;
   static const String _databaseName = 'blood_pressure.db';
-  static const int _databaseVersion = 2;
+  static const int _databaseVersion = 3;
 
   final Database? _testDatabase;
 
@@ -176,28 +176,51 @@ class DatabaseService {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         profileId INTEGER NOT NULL,
         takenAt TEXT NOT NULL,
-        weight REAL NOT NULL,
-        saltNote TEXT,
-        exerciseNote TEXT,
-        sleepQuality TEXT,
+        localOffsetMinutes INTEGER NOT NULL,
+        weightValue REAL NOT NULL,
+        unit TEXT NOT NULL,
+        notes TEXT,
+        saltIntake TEXT,
+        exerciseLevel TEXT,
         stressLevel TEXT,
+        sleepQuality TEXT,
+        source TEXT NOT NULL DEFAULT 'manual',
+        sourceMetadata TEXT,
+        createdAt TEXT NOT NULL,
         FOREIGN KEY (profileId) REFERENCES Profile(id) ON DELETE CASCADE
       )
+    ''');
+
+    await db.execute('''
+      CREATE INDEX idx_weightentry_profile_time 
+      ON WeightEntry(profileId, takenAt DESC)
     ''');
 
     await db.execute('''
       CREATE TABLE SleepEntry (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         profileId INTEGER NOT NULL,
-        nightOf TEXT NOT NULL,
-        totalSleepMinutes INTEGER NOT NULL,
-        timeInBedMinutes INTEGER NOT NULL,
-        wakeCount INTEGER NOT NULL,
-        sleepScore REAL,
-        source TEXT NOT NULL,
-        importedAt TEXT NOT NULL,
+        startedAt TEXT NOT NULL,
+        endedAt TEXT,
+        durationMinutes INTEGER NOT NULL,
+        quality INTEGER,
+        localOffsetMinutes INTEGER NOT NULL,
+        source TEXT NOT NULL DEFAULT 'manual',
+        sourceMetadata TEXT,
+        notes TEXT,
+        createdAt TEXT NOT NULL,
         FOREIGN KEY (profileId) REFERENCES Profile(id) ON DELETE CASCADE
       )
+    ''');
+
+    await db.execute('''
+      CREATE INDEX idx_sleepentry_profile_time 
+      ON SleepEntry(profileId, endedAt DESC)
+    ''');
+
+    await db.execute('''
+      CREATE INDEX idx_sleepentry_profile_started 
+      ON SleepEntry(profileId, startedAt)
     ''');
 
     await db.execute('''
@@ -241,6 +264,106 @@ class DatabaseService {
       await db.execute(
         'ALTER TABLE MedicationIntake ADD COLUMN scheduledFor TEXT',
       );
+    }
+
+    if (oldVersion < 3) {
+      // Migration from v2 to v3: Update WeightEntry and SleepEntry schema
+      await db.transaction((txn) async {
+        // Migrate WeightEntry table
+        await txn.execute('''
+          CREATE TABLE WeightEntry_new (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            profileId INTEGER NOT NULL,
+            takenAt TEXT NOT NULL,
+            localOffsetMinutes INTEGER NOT NULL,
+            weightValue REAL NOT NULL,
+            unit TEXT NOT NULL,
+            notes TEXT,
+            saltIntake TEXT,
+            exerciseLevel TEXT,
+            stressLevel TEXT,
+            sleepQuality TEXT,
+            source TEXT NOT NULL DEFAULT 'manual',
+            sourceMetadata TEXT,
+            createdAt TEXT NOT NULL,
+            FOREIGN KEY (profileId) REFERENCES Profile(id) ON DELETE CASCADE
+          )
+        ''');
+
+        // Copy existing data, mapping old columns to new schema
+        await txn.execute('''
+          INSERT INTO WeightEntry_new 
+            (id, profileId, takenAt, localOffsetMinutes, weightValue, unit, 
+             saltIntake, exerciseLevel, sleepQuality, stressLevel, source, createdAt)
+          SELECT 
+            id, profileId, takenAt, 
+            0, -- default localOffsetMinutes
+            weight, 'kg', -- weight as weightValue, default unit kg
+            saltNote, exerciseNote, sleepQuality, stressLevel,
+            'manual', -- default source
+            takenAt -- use takenAt as createdAt for existing entries
+          FROM WeightEntry
+        ''');
+
+        await txn.execute('DROP TABLE WeightEntry');
+        await txn.execute('ALTER TABLE WeightEntry_new RENAME TO WeightEntry');
+
+        await txn.execute('''
+          CREATE INDEX idx_weightentry_profile_time 
+          ON WeightEntry(profileId, takenAt DESC)
+        ''');
+
+        // Migrate SleepEntry table
+        await txn.execute('''
+          CREATE TABLE SleepEntry_new (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            profileId INTEGER NOT NULL,
+            startedAt TEXT NOT NULL,
+            endedAt TEXT,
+            durationMinutes INTEGER NOT NULL,
+            quality INTEGER,
+            localOffsetMinutes INTEGER NOT NULL,
+            source TEXT NOT NULL DEFAULT 'manual',
+            sourceMetadata TEXT,
+            notes TEXT,
+            createdAt TEXT NOT NULL,
+            FOREIGN KEY (profileId) REFERENCES Profile(id) ON DELETE CASCADE
+          )
+        ''');
+
+        // Copy existing data, mapping old columns to new schema
+        await txn.execute('''
+          INSERT INTO SleepEntry_new 
+            (id, profileId, startedAt, endedAt, durationMinutes, quality,
+             localOffsetMinutes, source, createdAt)
+          SELECT 
+            id, profileId,
+            nightOf || 'T22:00:00.000Z', -- construct startedAt from nightOf
+            NULL, -- no endedAt available
+            totalSleepMinutes, -- map to durationMinutes
+            CASE 
+              WHEN sleepScore IS NOT NULL THEN MAX(1, MIN(5, CAST((sleepScore / 20.0) + 0.5 AS INTEGER)))
+              ELSE NULL
+            END, -- convert 0-100 score to 1-5 quality with clamping
+            0, -- default localOffsetMinutes
+            source, -- preserve existing source
+            importedAt -- use importedAt as createdAt
+          FROM SleepEntry
+        ''');
+
+        await txn.execute('DROP TABLE SleepEntry');
+        await txn.execute('ALTER TABLE SleepEntry_new RENAME TO SleepEntry');
+
+        await txn.execute('''
+          CREATE INDEX idx_sleepentry_profile_time 
+          ON SleepEntry(profileId, endedAt DESC)
+        ''');
+
+        await txn.execute('''
+          CREATE INDEX idx_sleepentry_profile_started 
+          ON SleepEntry(profileId, startedAt)
+        ''');
+      });
     }
   }
 
