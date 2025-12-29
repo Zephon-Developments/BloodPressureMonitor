@@ -6,11 +6,13 @@ import 'package:blood_pressure_monitor/services/auth_service.dart';
 import 'package:blood_pressure_monitor/services/averaging_service.dart';
 import 'package:blood_pressure_monitor/services/correlation_service.dart';
 import 'package:blood_pressure_monitor/services/database_service.dart';
+import 'package:blood_pressure_monitor/services/history_service.dart';
 import 'package:blood_pressure_monitor/services/profile_service.dart';
 import 'package:blood_pressure_monitor/services/reading_service.dart';
 import 'package:blood_pressure_monitor/services/sleep_service.dart';
 import 'package:blood_pressure_monitor/services/weight_service.dart';
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
+import 'package:blood_pressure_monitor/viewmodels/history_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/lock_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/sleep_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/weight_viewmodel.dart';
@@ -33,6 +35,10 @@ void main() async {
     databaseService: databaseService,
     readingService: readingService,
   );
+  final historyService = HistoryService(
+    databaseService: databaseService,
+    readingService: readingService,
+  );
   final weightService = WeightService(databaseService);
   final sleepService = SleepService(databaseService);
   final correlationService = CorrelationService(
@@ -51,6 +57,7 @@ void main() async {
         Provider<ProfileService>(create: (_) => ProfileService()),
         Provider<ReadingService>.value(value: readingService),
         Provider<AveragingService>.value(value: averagingService),
+        Provider<HistoryService>.value(value: historyService),
         Provider<WeightService>.value(value: weightService),
         Provider<SleepService>.value(value: sleepService),
         Provider<CorrelationService>.value(value: correlationService),
@@ -66,6 +73,11 @@ void main() async {
           create: (context) => BloodPressureViewModel(
             context.read<ReadingService>(),
             context.read<AveragingService>(),
+          ),
+        ),
+        ChangeNotifierProvider<HistoryViewModel>(
+          create: (context) => HistoryViewModel(
+            context.read<HistoryService>(),
           ),
         ),
         ChangeNotifierProvider<WeightViewModel>(

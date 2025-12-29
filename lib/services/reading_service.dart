@@ -194,4 +194,25 @@ class ReadingService {
         )
         .toList();
   }
+
+  /// Retrieves readings whose ids are contained in [ids].
+  ///
+  /// Returns results without guaranteeing order, so callers should sort
+  /// when a specific order is required. An empty list of ids returns an
+  /// empty list.
+  Future<List<Reading>> getReadingsByIds(List<int> ids) async {
+    if (ids.isEmpty) {
+      return <Reading>[];
+    }
+
+    final db = await _databaseService.database;
+    final placeholders = List<String>.filled(ids.length, '?').join(',');
+    final rows = await db.query(
+      'Reading',
+      where: 'id IN ($placeholders)',
+      whereArgs: ids,
+    );
+
+    return rows.map(Reading.fromMap).toList();
+  }
 }
