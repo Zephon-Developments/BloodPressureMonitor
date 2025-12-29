@@ -184,7 +184,6 @@ class Reading {
   }
 }
 
-
 /// Averaged group of readings within a 30-minute window.
 ///
 /// Multiple readings taken within 30 minutes are grouped together

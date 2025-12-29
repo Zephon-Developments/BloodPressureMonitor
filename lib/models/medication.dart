@@ -97,7 +97,6 @@ class Medication {
   }
 }
 
-
 /// Medication group for quick logging of multiple medications together.
 ///
 /// Example: "Morning meds" group containing several medications.
@@ -195,7 +194,6 @@ class MedicationGroup {
     return true;
   }
 }
-
 
 /// Record of a medication intake at a specific time.
 class MedicationIntake {

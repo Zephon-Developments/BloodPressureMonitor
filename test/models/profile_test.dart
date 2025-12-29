@@ -215,7 +215,8 @@ void main() {
       final diffIcon = base.copyWith(avatarIcon: '🌟');
       final diffYear = base.copyWith(yearOfBirth: 2001);
       final diffUnits = base.copyWith(preferredUnits: 'kPa');
-      final diffDate = base.copyWith(createdAt: testDate.add(const Duration(days: 1)));
+      final diffDate =
+          base.copyWith(createdAt: testDate.add(const Duration(days: 1)));
 
       expect(base, isNot(equals(diffName)));
       expect(base, isNot(equals(diffColor)));

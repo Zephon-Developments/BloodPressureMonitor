@@ -14,7 +14,7 @@ class DatabaseService {
   static Database? _database;
   static const String _databaseName = 'blood_pressure.db';
   static const int _databaseVersion = 1;
-  
+
   // WARNING: DEVELOPMENT/DEMO ONLY - REPLACE IN PRODUCTION
   // PRODUCTION: Implement secure password management:
   // 1. Add flutter_secure_storage dependency
