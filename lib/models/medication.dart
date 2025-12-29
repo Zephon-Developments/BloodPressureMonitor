@@ -26,9 +26,12 @@ class Medication {
   /// Optional schedule metadata as JSON string.
   ///
   /// Format: `{"v": 1, "frequency": "daily", "times": ["08:00", "20:00"],
-  /// "daysOfWeek": [1,2,3,4,5,6,7], "graceMinutesLate": 120,
-  /// "graceMinutesMissed": 240}`
+  /// "daysOfWeek": [1,2,3,4,5,6,7], "graceMinutesLate": 15,
+  /// "graceMinutesMissed": 60}`
   final String? scheduleMetadata;
+
+  /// Whether this medication is active (soft delete flag).
+  final bool isActive;
 
   /// Timestamp when this medication was created (ISO8601 with offset).
   final DateTime createdAt;
@@ -42,6 +45,7 @@ class Medication {
     this.unit,
     this.frequency,
     this.scheduleMetadata,
+    this.isActive = true,
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
 
@@ -55,6 +59,7 @@ class Medication {
       unit: map['unit'] as String?,
       frequency: map['frequency'] as String?,
       scheduleMetadata: map['scheduleMetadata'] as String?,
+      isActive: (map['isActive'] as int?) == 1,
       createdAt: DateTime.parse(map['createdAt'] as String),
     );
   }
@@ -69,6 +74,7 @@ class Medication {
       'unit': unit,
       'frequency': frequency,
       'scheduleMetadata': scheduleMetadata,
+      'isActive': isActive ? 1 : 0,
       'createdAt': createdAt.toIso8601String(),
     };
   }
@@ -82,6 +88,7 @@ class Medication {
     String? unit,
     String? frequency,
     String? scheduleMetadata,
+    bool? isActive,
     DateTime? createdAt,
   }) {
     return Medication(
@@ -92,6 +99,7 @@ class Medication {
       unit: unit ?? this.unit,
       frequency: frequency ?? this.frequency,
       scheduleMetadata: scheduleMetadata ?? this.scheduleMetadata,
+      isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -108,6 +116,7 @@ class Medication {
         other.unit == unit &&
         other.frequency == frequency &&
         other.scheduleMetadata == scheduleMetadata &&
+        other.isActive == isActive &&
         other.createdAt == createdAt;
   }
 
@@ -121,6 +130,7 @@ class Medication {
       unit,
       frequency,
       scheduleMetadata,
+      isActive,
       createdAt,
     );
   }

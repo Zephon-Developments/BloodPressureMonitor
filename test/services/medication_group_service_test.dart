@@ -40,6 +40,7 @@ void main() {
               unit TEXT,
               frequency TEXT,
               scheduleMetadata TEXT,
+              isActive INTEGER NOT NULL DEFAULT 1,
               createdAt TEXT NOT NULL,
               FOREIGN KEY (profileId) REFERENCES Profile(id) ON DELETE CASCADE
             )

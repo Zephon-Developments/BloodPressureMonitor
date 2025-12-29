@@ -149,7 +149,7 @@ class MedicationGroupService {
 
     final results = await db.query(
       'Medication',
-      columns: ['id', 'profileId'],
+      columns: ['id', 'profileId', 'isActive'],
       where: 'id IN ($placeholders)',
       whereArgs: medicationIds,
     );
@@ -161,6 +161,18 @@ class MedicationGroupService {
           medicationIds.where((id) => !foundIds.contains(id)).toList();
       throw ArgumentError(
         'Medications not found: ${missingIds.join(', ')}',
+      );
+    }
+
+    // Check all medications are active
+    final inactiveMeds = results.where((r) {
+      return (r['isActive'] as int) != 1;
+    }).toList();
+
+    if (inactiveMeds.isNotEmpty) {
+      final inactiveIds = inactiveMeds.map((r) => r['id']).join(', ');
+      throw ArgumentError(
+        'Medications $inactiveIds are inactive and cannot be added to groups',
       );
     }
 

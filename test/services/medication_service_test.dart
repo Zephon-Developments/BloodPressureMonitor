@@ -43,6 +43,7 @@ void main() {
               unit TEXT,
               frequency TEXT,
               scheduleMetadata TEXT,
+              isActive INTEGER NOT NULL DEFAULT 1,
               createdAt TEXT NOT NULL,
               FOREIGN KEY (profileId) REFERENCES Profile(id) ON DELETE CASCADE
             )
@@ -303,7 +304,7 @@ void main() {
   });
 
   group('MedicationService - Delete', () {
-    test('deletes medication by id', () async {
+    test('soft-deletes medication by setting isActive to false', () async {
       final created = await medService.createMedication(
         Medication(profileId: 1, name: 'Aspirin'),
       );
@@ -312,8 +313,21 @@ void main() {
 
       expect(deleted, isTrue);
 
+      // Medication should still exist but be inactive
       final retrieved = await medService.getMedication(created.id!);
-      expect(retrieved, isNull);
+      expect(retrieved, isNotNull);
+      expect(retrieved!.isActive, isFalse);
+
+      // Should not appear in default active list
+      final activeList = await medService.listMedicationsByProfile(1);
+      expect(activeList.any((m) => m.id == created.id), isFalse);
+
+      // Should appear in list with includeInactive
+      final fullList = await medService.listMedicationsByProfile(
+        1,
+        includeInactive: true,
+      );
+      expect(fullList.any((m) => m.id == created.id), isTrue);
     });
 
     test('returns false when deleting non-existent medication', () async {

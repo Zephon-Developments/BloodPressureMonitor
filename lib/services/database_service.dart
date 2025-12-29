@@ -133,6 +133,7 @@ class DatabaseService {
         unit TEXT,
         frequency TEXT,
         scheduleMetadata TEXT,
+        isActive INTEGER NOT NULL DEFAULT 1,
         createdAt TEXT NOT NULL,
         FOREIGN KEY (profileId) REFERENCES Profile(id) ON DELETE CASCADE
       )
@@ -222,6 +223,9 @@ class DatabaseService {
       );
       await db.execute(
         'ALTER TABLE Medication ADD COLUMN scheduleMetadata TEXT',
+      );
+      await db.execute(
+        'ALTER TABLE Medication ADD COLUMN isActive INTEGER NOT NULL DEFAULT 1',
       );
       await db.execute(
         'ALTER TABLE Medication ADD COLUMN createdAt TEXT NOT NULL DEFAULT ""',

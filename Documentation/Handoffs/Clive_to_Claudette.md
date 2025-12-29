@@ -1,74 +1,53 @@
-# Handoff: Clive to Claudette
-## Phase 3 Implementation – Medication Management
+# Handoff: Clive → Claudette
 
-**Date:** December 29, 2025  
-**From:** Clive (Review Specialist)  
-**To:** Claudette (Implementer)  
-**Phase:** 3 - Medication Management
+**Date:** 2025-12-29  
+**Phase:** Phase 3 - Medication Management Review (Round 2)  
+**Status:** ⚠️ MINOR ALIGNMENT ISSUES - Follow-up Required  
 
 ---
 
-## Context
+## Review Summary
 
-The planning for **Phase 3: Medication Management** is complete and approved. You are now tasked with the implementation. This phase builds on the core data layer (Phase 1) and the validation/ViewModel patterns established in Phase 2B.
+The core blockers regarding soft delete and data integrity have been successfully addressed. The implementation is now much safer and aligns with the project's health data preservation requirements. All 107 tests pass and the analyzer is clean.
 
-## Objectives
+However, there are a few minor discrepancies between the approved plan, the handoff documentation, and the actual code that need to be aligned before final approval.
 
-1. Implement CRUD operations for `Medication`, `MedicationGroup`, and `MedicationIntake`.
-2. Implement atomic group intake logging using database transactions.
-3. Implement late/missed intake classification logic based on schedule metadata.
-4. Provide correlation hooks for future integration with blood pressure readings.
+### 1. Alignment Issues (Follow-up Required)
 
-## Reference Materials
+#### **A. Correlation Window Default**
+- **Issue:** `MedicationIntakeService.findIntakesAround` uses a default window of `Duration(hours: 2)`.
+- **Discrepancy:** The approved plan and your handoff claim a 30-minute window.
+- **Requirement:** Update the default parameter to `Duration(minutes: 30)` to match the plan.
 
-- **Implementation Plan**: [Documentation/Plans/Phase-3-Medication-Management.md](../Plans/Phase-3-Medication-Management.md)
-- **Review Summary**: [reviews/2025-12-29-clive-phase-3-plan-review.md](../../reviews/2025-12-29-clive-phase-3-plan-review.md)
-- **Coding Standards**: [Documentation/Standards/Coding_Standards.md](../Standards/Coding_Standards.md)
+#### **B. Status Calculation Thresholds**
+- **Issue:** `MedicationIntakeService.calculateStatus` uses defaults of 120/240 minutes for late/missed status.
+- **Discrepancy:** The approved plan and your handoff claim 15-minute and 1-hour (60 min) thresholds.
+- **Requirement:** Update the default values in `calculateStatus` to 15 and 60 respectively.
 
-## Key Implementation Details
+#### **C. Search Filtering**
+- **Issue:** `MedicationService.searchMedicationsByName` does not filter by `isActive`.
+- **Requirement:** Update the query to include `AND isActive = 1` by default, consistent with `listMedicationsByProfile`.
 
-### 1. Data Models
-- Implement `Medication`, `MedicationGroup`, and `MedicationIntake` in `lib/models/`.
-- Ensure `toMap`/`fromMap`, equality, and `copyWith` are implemented.
-- `MedicationGroup.memberMedicationIds` should be stored as a JSON array string.
-- `Medication.scheduleMetadata` should be a JSON string following the approved format in the plan.
+#### **D. Group Membership Integrity**
+- **Issue:** `MedicationGroupService._validateMembershipIntegrity` does not check if medications are active.
+- **Requirement:** Ensure that only active medications can be added to groups by adding `AND isActive = 1` to the integrity check query.
 
-### 3. Services
-- **`MedicationService`**: Standard CRUD. Use `ValidationResult` for field validation.
-- **`MedicationGroupService`**: CRUD + membership management. Enforce same-profile constraints.
-- **`MedicationIntakeService`**: 
-    - `logIntake`: Single entry.
-    - `logGroupIntake`: **Must use a database transaction** for atomicity.
-    - `listIntakes`: Filtered by profile/date/medication.
-    - `calculateStatus`: Helper to determine `onTime|late|missed|unscheduled`.
+### 2. Documentation Cleanup
 
-### 4. Testing Requirements
-- **Unit Tests**: Model serialization and metadata parsing.
-- **Integration Tests**: Use `sqflite_common_ffi` for in-memory database testing.
-- **Coverage Targets**: 
-    - Models/Utils: ≥90%
-    - Services: ≥85%
-- **Specific Test Cases**: Ensure you test the transaction rollback for group intakes by forcing a failure on the second or third medication in a group.
-
-## Success Criteria
-
-- All 3 services implemented and fully tested.
-- 0 analyzer warnings.
-- All tests passing.
-- DartDoc present for all public members.
-- Code formatted according to project standards.
+#### **A. Model JSDoc**
+- **Issue:** The JSDoc for `Medication.scheduleMetadata` still uses 120/240 in its example.
+- **Requirement:** Update the example to use the 15/60 thresholds for consistency.
 
 ---
 
-## Next Steps
+## Next Steps for Claudette
 
-1. Create a new feature branch: `feature/phase-3-medication-management`.
-2. Follow the sequenced implementation steps in the plan.
-3. Once complete, run all tests and analyzer.
-4. Hand off back to **Clive** for review.
+1.  **Align Defaults:** Update `findIntakesAround` and `calculateStatus` defaults.
+2.  **Apply Filters:** Add `isActive` checks to `searchMedicationsByName` and `_validateMembershipIntegrity`.
+3.  **Update JSDoc:** Align the example metadata in the model.
+4.  **Verify Tests:** Ensure these changes don't break existing tests (you may need to update test expectations if they relied on the 2h/120m/240m defaults).
+5.  **Resubmit:** Update the handoff document and notify Clive.
 
-**Suggested Prompt to continue:**
-"Claudette, please implement Phase 3: Medication Management as per the handoff from Clive in Documentation/Handoffs/Clive_to_Claudette.md."
+---
 
-— Clive  
-*Review Specialist*
+**Clive: Almost there. Once these alignment issues are fixed, I will green-light for integration.**
