@@ -325,3 +325,108 @@ ValidationResult validateGroupName(String name) {
 
   return const ValidationResult.valid();
 }
+
+/// Validates weight value and unit.
+///
+/// Rules for kg:
+/// - Weight must be between 25 and 310 kg
+///
+/// Rules for lbs:
+/// - Weight must be between 55 and 670 lbs
+///
+/// Returns a [ValidationResult] indicating the validation status.
+ValidationResult validateWeight(double weightValue, String unit) {
+  if (weightValue <= 0) {
+    return const ValidationResult.error('Weight must be greater than zero');
+  }
+
+  final unitLower = unit.toLowerCase();
+
+  if (unitLower == 'kg') {
+    if (weightValue < 25) {
+      return const ValidationResult.warning(
+        'Weight is unusually low (< 25 kg). Please confirm.',
+      );
+    }
+    if (weightValue > 310) {
+      return const ValidationResult.error(
+        'Weight cannot exceed 310 kg',
+      );
+    }
+  } else if (unitLower == 'lbs') {
+    if (weightValue < 55) {
+      return const ValidationResult.warning(
+        'Weight is unusually low (< 55 lbs). Please confirm.',
+      );
+    }
+    if (weightValue > 670) {
+      return const ValidationResult.error(
+        'Weight cannot exceed 670 lbs',
+      );
+    }
+  } else {
+    return const ValidationResult.error(
+      'Invalid unit. Must be "kg" or "lbs".',
+    );
+  }
+
+  return const ValidationResult.valid();
+}
+
+/// Validates sleep duration.
+///
+/// Rules:
+/// - Duration must be between 60 and 1440 minutes (1-24 hours)
+///
+/// Returns a [ValidationResult] indicating the validation status.
+ValidationResult validateSleepDuration(int durationMinutes) {
+  if (durationMinutes < 60) {
+    return const ValidationResult.warning(
+      'Sleep duration is unusually short (< 1 hour). Please confirm.',
+    );
+  }
+
+  if (durationMinutes > 1440) {
+    return const ValidationResult.error(
+      'Sleep duration cannot exceed 24 hours (1440 minutes)',
+    );
+  }
+
+  return const ValidationResult.valid();
+}
+
+/// Validates sleep quality rating.
+///
+/// Rules:
+/// - Quality must be between 1 and 5 if provided
+///
+/// Returns a [ValidationResult] indicating the validation status.
+ValidationResult validateSleepQuality(int? quality) {
+  if (quality == null) {
+    return const ValidationResult.valid();
+  }
+
+  if (quality < 1 || quality > 5) {
+    return const ValidationResult.error(
+      'Sleep quality must be between 1 and 5',
+    );
+  }
+
+  return const ValidationResult.valid();
+}
+
+/// Validates sleep start and end times.
+///
+/// Rules:
+/// - If endedAt is provided, it must be after startedAt
+///
+/// Returns a [ValidationResult] indicating the validation status.
+ValidationResult validateSleepTimes(DateTime startedAt, DateTime? endedAt) {
+  if (endedAt != null && !endedAt.isAfter(startedAt)) {
+    return const ValidationResult.error(
+      'Sleep end time must be after start time',
+    );
+  }
+
+  return const ValidationResult.valid();
+}
