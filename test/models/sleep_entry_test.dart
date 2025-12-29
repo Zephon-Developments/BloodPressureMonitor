@@ -9,14 +9,19 @@ void main() {
     });
 
     test('fromDbString parses correctly', () {
-      expect(SleepSourceExtension.fromDbString('manual'), equals(SleepSource.manual));
-      expect(SleepSourceExtension.fromDbString('import'), equals(SleepSource.import));
-      expect(SleepSourceExtension.fromDbString('MANUAL'), equals(SleepSource.manual));
-      expect(SleepSourceExtension.fromDbString('IMPORT'), equals(SleepSource.import));
+      expect(SleepSourceExtension.fromDbString('manual'),
+          equals(SleepSource.manual));
+      expect(SleepSourceExtension.fromDbString('import'),
+          equals(SleepSource.import));
+      expect(SleepSourceExtension.fromDbString('MANUAL'),
+          equals(SleepSource.manual));
+      expect(SleepSourceExtension.fromDbString('IMPORT'),
+          equals(SleepSource.import));
     });
 
     test('fromDbString defaults to manual for unknown values', () {
-      expect(SleepSourceExtension.fromDbString('unknown'), equals(SleepSource.manual));
+      expect(SleepSourceExtension.fromDbString('unknown'),
+          equals(SleepSource.manual));
     });
   });
 
@@ -24,7 +29,8 @@ void main() {
     final testStart = DateTime(2025, 12, 28, 22, 0);
     final testEnd = DateTime(2025, 12, 29, 6, 30);
 
-    test('creates instance with required fields and auto-calculates duration', () {
+    test('creates instance with required fields and auto-calculates duration',
+        () {
       final entry = SleepEntry(
         profileId: 1,
         startedAt: testStart,
@@ -37,7 +43,8 @@ void main() {
       expect(entry.endedAt, equals(testEnd));
       expect(entry.durationMinutes, equals(510)); // 8.5 hours
       expect(entry.source, equals(SleepSource.manual));
-      expect(entry.localOffsetMinutes, equals(testEnd.timeZoneOffset.inMinutes));
+      expect(
+          entry.localOffsetMinutes, equals(testEnd.timeZoneOffset.inMinutes));
       expect(entry.createdAt, isNotNull);
     });
 
@@ -90,7 +97,8 @@ void main() {
       expect(entry.durationMinutes, equals(480));
     });
 
-    test('duration defaults to 0 when neither endedAt nor duration provided', () {
+    test('duration defaults to 0 when neither endedAt nor duration provided',
+        () {
       final entry = SleepEntry(
         profileId: 1,
         startedAt: testStart,

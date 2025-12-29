@@ -181,26 +181,32 @@ void main() {
     });
 
     test('listWeightEntries returns all entries for profile', () async {
-      await weightService.createWeightEntry(WeightEntry(
-        profileId: 1,
-        takenAt: DateTime(2025, 12, 27, 8, 0),
-        weightValue: 70.0,
-        unit: WeightUnit.kg,
-      ),);
+      await weightService.createWeightEntry(
+        WeightEntry(
+          profileId: 1,
+          takenAt: DateTime(2025, 12, 27, 8, 0),
+          weightValue: 70.0,
+          unit: WeightUnit.kg,
+        ),
+      );
 
-      await weightService.createWeightEntry(WeightEntry(
-        profileId: 1,
-        takenAt: DateTime(2025, 12, 28, 8, 0),
-        weightValue: 70.5,
-        unit: WeightUnit.kg,
-      ),);
+      await weightService.createWeightEntry(
+        WeightEntry(
+          profileId: 1,
+          takenAt: DateTime(2025, 12, 28, 8, 0),
+          weightValue: 70.5,
+          unit: WeightUnit.kg,
+        ),
+      );
 
-      await weightService.createWeightEntry(WeightEntry(
-        profileId: 1,
-        takenAt: DateTime(2025, 12, 29, 8, 0),
-        weightValue: 71.0,
-        unit: WeightUnit.kg,
-      ),);
+      await weightService.createWeightEntry(
+        WeightEntry(
+          profileId: 1,
+          takenAt: DateTime(2025, 12, 29, 8, 0),
+          weightValue: 71.0,
+          unit: WeightUnit.kg,
+        ),
+      );
 
       final entries = await weightService.listWeightEntries(profileId: 1);
 
@@ -212,26 +218,32 @@ void main() {
     });
 
     test('listWeightEntries filters by date range', () async {
-      await weightService.createWeightEntry(WeightEntry(
-        profileId: 1,
-        takenAt: DateTime(2025, 12, 27, 8, 0),
-        weightValue: 70.0,
-        unit: WeightUnit.kg,
-      ),);
+      await weightService.createWeightEntry(
+        WeightEntry(
+          profileId: 1,
+          takenAt: DateTime(2025, 12, 27, 8, 0),
+          weightValue: 70.0,
+          unit: WeightUnit.kg,
+        ),
+      );
 
-      await weightService.createWeightEntry(WeightEntry(
-        profileId: 1,
-        takenAt: DateTime(2025, 12, 28, 8, 0),
-        weightValue: 70.5,
-        unit: WeightUnit.kg,
-      ),);
+      await weightService.createWeightEntry(
+        WeightEntry(
+          profileId: 1,
+          takenAt: DateTime(2025, 12, 28, 8, 0),
+          weightValue: 70.5,
+          unit: WeightUnit.kg,
+        ),
+      );
 
-      await weightService.createWeightEntry(WeightEntry(
-        profileId: 1,
-        takenAt: DateTime(2025, 12, 29, 8, 0),
-        weightValue: 71.0,
-        unit: WeightUnit.kg,
-      ),);
+      await weightService.createWeightEntry(
+        WeightEntry(
+          profileId: 1,
+          takenAt: DateTime(2025, 12, 29, 8, 0),
+          weightValue: 71.0,
+          unit: WeightUnit.kg,
+        ),
+      );
 
       final entries = await weightService.listWeightEntries(
         profileId: 1,
@@ -245,26 +257,32 @@ void main() {
     });
 
     test('getLatestWeightEntry returns most recent entry', () async {
-      await weightService.createWeightEntry(WeightEntry(
-        profileId: 1,
-        takenAt: DateTime(2025, 12, 27, 8, 0),
-        weightValue: 70.0,
-        unit: WeightUnit.kg,
-      ),);
+      await weightService.createWeightEntry(
+        WeightEntry(
+          profileId: 1,
+          takenAt: DateTime(2025, 12, 27, 8, 0),
+          weightValue: 70.0,
+          unit: WeightUnit.kg,
+        ),
+      );
 
-      await weightService.createWeightEntry(WeightEntry(
-        profileId: 1,
-        takenAt: DateTime(2025, 12, 29, 8, 0),
-        weightValue: 71.0,
-        unit: WeightUnit.kg,
-      ),);
+      await weightService.createWeightEntry(
+        WeightEntry(
+          profileId: 1,
+          takenAt: DateTime(2025, 12, 29, 8, 0),
+          weightValue: 71.0,
+          unit: WeightUnit.kg,
+        ),
+      );
 
-      await weightService.createWeightEntry(WeightEntry(
-        profileId: 1,
-        takenAt: DateTime(2025, 12, 28, 8, 0),
-        weightValue: 70.5,
-        unit: WeightUnit.kg,
-      ),);
+      await weightService.createWeightEntry(
+        WeightEntry(
+          profileId: 1,
+          takenAt: DateTime(2025, 12, 28, 8, 0),
+          weightValue: 70.5,
+          unit: WeightUnit.kg,
+        ),
+      );
 
       final latest = await weightService.getLatestWeightEntry(1);
 
@@ -376,20 +394,24 @@ void main() {
       final readingTime = DateTime(2025, 12, 29, 10, 0);
 
       // Weight at 9:45 (15 mins before - nearer)
-      await weightService.createWeightEntry(WeightEntry(
-        profileId: 1,
-        takenAt: DateTime(2025, 12, 29, 9, 45),
-        weightValue: 70.0,
-        unit: WeightUnit.kg,
-      ),);
+      await weightService.createWeightEntry(
+        WeightEntry(
+          profileId: 1,
+          takenAt: DateTime(2025, 12, 29, 9, 45),
+          weightValue: 70.0,
+          unit: WeightUnit.kg,
+        ),
+      );
 
       // Weight at 10:30 (30 mins after - further)
-      await weightService.createWeightEntry(WeightEntry(
-        profileId: 1,
-        takenAt: DateTime(2025, 12, 29, 10, 30),
-        weightValue: 70.5,
-        unit: WeightUnit.kg,
-      ),);
+      await weightService.createWeightEntry(
+        WeightEntry(
+          profileId: 1,
+          takenAt: DateTime(2025, 12, 29, 10, 30),
+          weightValue: 70.5,
+          unit: WeightUnit.kg,
+        ),
+      );
 
       final found = await weightService.findWeightForReading(
         profileId: 1,
@@ -404,12 +426,14 @@ void main() {
       final readingTime = DateTime(2025, 12, 29, 10, 0);
 
       // Weight at 8:00 (2 hours before, outside 1h window)
-      await weightService.createWeightEntry(WeightEntry(
-        profileId: 1,
-        takenAt: DateTime(2025, 12, 29, 8, 0),
-        weightValue: 70.0,
-        unit: WeightUnit.kg,
-      ),);
+      await weightService.createWeightEntry(
+        WeightEntry(
+          profileId: 1,
+          takenAt: DateTime(2025, 12, 29, 8, 0),
+          weightValue: 70.0,
+          unit: WeightUnit.kg,
+        ),
+      );
 
       final found = await weightService.findWeightForReading(
         profileId: 1,
@@ -424,12 +448,14 @@ void main() {
       final readingTime = DateTime(2025, 12, 29, 0, 30);
 
       // Weight on previous day at 23:45 (45 mins before, within 1h window)
-      await weightService.createWeightEntry(WeightEntry(
-        profileId: 1,
-        takenAt: DateTime(2025, 12, 28, 23, 45),
-        weightValue: 70.0,
-        unit: WeightUnit.kg,
-      ),);
+      await weightService.createWeightEntry(
+        WeightEntry(
+          profileId: 1,
+          takenAt: DateTime(2025, 12, 28, 23, 45),
+          weightValue: 70.0,
+          unit: WeightUnit.kg,
+        ),
+      );
 
       final found = await weightService.findWeightForReading(
         profileId: 1,
@@ -444,12 +470,14 @@ void main() {
       final readingTime = DateTime(2025, 12, 29, 10, 0);
 
       // Weight at 8:30 (1.5 hours before)
-      await weightService.createWeightEntry(WeightEntry(
-        profileId: 1,
-        takenAt: DateTime(2025, 12, 29, 8, 30),
-        weightValue: 70.0,
-        unit: WeightUnit.kg,
-      ),);
+      await weightService.createWeightEntry(
+        WeightEntry(
+          profileId: 1,
+          takenAt: DateTime(2025, 12, 29, 8, 30),
+          weightValue: 70.0,
+          unit: WeightUnit.kg,
+        ),
+      );
 
       final found = await weightService.findWeightForReading(
         profileId: 1,
