@@ -217,7 +217,8 @@ void main() {
           pulse: 70,
         );
 
-        final result = await viewModel.addReading(reading, confirmOverride: true);
+        final result =
+            await viewModel.addReading(reading, confirmOverride: true);
 
         expect(result.level, ValidationLevel.warning);
         expect(viewModel.readings.length, 1);
@@ -233,7 +234,8 @@ void main() {
           pulse: 70,
         );
 
-        final result = await viewModel.addReading(reading, confirmOverride: true);
+        final result =
+            await viewModel.addReading(reading, confirmOverride: true);
 
         expect(result.level, ValidationLevel.error);
         expect(viewModel.readings, isEmpty);
@@ -329,8 +331,8 @@ void main() {
         final id = await readingService.createReading(reading);
         final updatedReading = reading.copyWith(id: id, systolic: 185);
 
-        final result =
-            await viewModel.updateReading(updatedReading, confirmOverride: true);
+        final result = await viewModel.updateReading(updatedReading,
+            confirmOverride: true);
 
         expect(result.level, ValidationLevel.warning);
         await viewModel.loadReadings();
