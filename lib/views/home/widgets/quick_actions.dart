@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:blood_pressure_monitor/views/readings/add_reading_view.dart';
+import 'package:blood_pressure_monitor/views/sleep/sleep_history_view.dart';
+import 'package:blood_pressure_monitor/views/weight/weight_history_view.dart';
 
 /// Quick action buttons for the home screen.
 ///
@@ -37,6 +39,38 @@ class QuickActions extends StatelessWidget {
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (context) => const WeightHistoryView(),
+                ),
+              );
+            },
+            icon: const Icon(Icons.monitor_weight),
+            label: const Text('View Weight History'),
+            style: OutlinedButton.styleFrom(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+            ),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (context) => const SleepHistoryView(),
+                ),
+              );
+            },
+            icon: const Icon(Icons.bedtime),
+            label: const Text('View Sleep History'),
+            style: OutlinedButton.styleFrom(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
             ),
           ),
         ],
