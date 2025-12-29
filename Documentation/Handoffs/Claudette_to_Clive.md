@@ -1,249 +1,215 @@
 # Handoff: Claudette to Clive
+## Phase 2B Implementation - Revision Complete
 
-## Status: Phase 2 Revisions Complete - Ready for Re-Review
-
-**Date**: December 29, 2025  
-**From**: Claudette (Implementation Engineer)  
-**To**: Clive (Quality & Security Reviewer)  
-**Phase**: 2 of 10 - Averaging Engine (Revision 2)
-
-## Summary
-
-I have addressed **all three critical blockers** identified in your review. The implementation now includes proper data integrity safeguards, exact ID matching in SQL queries, and comprehensive unit test coverage at 96.15%.
-
-## Blockers Resolved
-
-### ✅ 1. Data Loss Bug Fixed (Critical)
-
-**Original Issue**: `_persistGroups` deleted ALL groups for the profile, losing historical data.
-
-**Fix Implemented**:
-- Modified `_persistGroups` to only delete groups that overlap with the time range being processed
-- Calculates earliest and latest times from the new groups
-- Uses time-range query: `WHERE profileId = ? AND groupStartAt >= ? AND groupStartAt <= ?`
-- Preserves all groups outside the affected time window
-
-**Verification**:
-- Test case: "does not delete unrelated groups outside time window" ✅
-- Created groups at 10:00 and 14:00, then added reading at 10:15
-- Group at 14:00 remains intact (not deleted)
-
-**Code Reference**: [averaging_service.dart#L200-L232](lib/services/averaging_service.dart#L200-L232)
-
-### ✅ 2. SQL LIKE False Positives Fixed (Major)
-
-**Original Issue**: `LIKE '%$readingId%'` matched partial IDs (e.g., "1" matched "10", "21").
-
-**Fix Implemented**:
-- Changed query to: `WHERE ',' || memberReadingIds || ',' LIKE ?`
-- Changed parameter to: `'%,$readingId,%'`
-- Adds comma delimiters to both data and pattern for exact matching
-
-**Verification**:
-- Test case: "does not match partial ID (e.g., 1 does not match 10)" ✅
-- Created readings with IDs 1 and 10
-- Deleting groups for ID 1 does not affect groups containing ID 10
-
-**Code Reference**: [averaging_service.dart#L96-L98](lib/services/averaging_service.dart#L96-L98)
-
-### ✅ 3. Test Coverage Restored (Critical)
-
-**Original Issue**: 0% coverage due to testing limitations with sqflite_sqlcipher.
-
-**Fix Implemented**:
-- Added dependency injection to `DatabaseService`, `ReadingService`, and `AveragingService`
-- Created in-memory unencrypted database using `sqflite_common_ffi` for tests
-- Implemented 13 comprehensive test cases covering all scenarios
-
-**Test Coverage**: **96.15%** (75/78 statements)
-- Exceeds ≥80% requirement
-- Only 3 uncovered lines (edge case error path)
-
-**Test Cases**:
-1. ✅ Single reading creates group of 1
-2. ✅ Two readings within 30 minutes form one group
-3. ✅ Reading outside 30-minute window creates new group
-4. ✅ Back-dated reading recomputes groups correctly
-5. ✅ Manual session ID forces new group
-6. ✅ Does not delete unrelated groups outside time window
-7. ✅ Throws StateError if reading has no ID
-8. ✅ Recomputes all groups from scratch
-9. ✅ Handles empty profile gracefully
-10. ✅ Deletes groups containing the reading with exact ID match
-11. ✅ Does not match partial ID (e.g., 1 does not match 10)
-12. ✅ Handles readings at exact 30-minute boundary
-13. ✅ Handles readings just beyond 30-minute boundary
-
-**Test Results**:
-```bash
-flutter test test/services/averaging_service_test.dart
-# ✅ 13/13 passing
-
-flutter test --coverage
-# ✅ 54/54 total tests passing
-# ✅ 96.15% coverage on averaging_service.dart
-```
-
-## Changes Made
-
-### Code Changes
-
-1. **lib/services/averaging_service.dart**
-   - Modified `_persistGroups` to use time-range deletion (lines 200-232)
-   - Modified `deleteGroupsForReading` to use exact ID matching (lines 96-98)
-   - Added constructor with dependency injection (lines 15-24)
-
-2. **lib/services/database_service.dart**
-   - Added `_testDatabase` field for injection
-   - Added constructor parameter `testDatabase` (line 16)
-   - Modified `database` getter to return test database if provided (line 23)
-
-3. **lib/services/reading_service.dart**
-   - Added constructor with dependency injection (lines 11-13)
-
-4. **test/services/averaging_service_test.dart** (NEW)
-   - 550+ lines of comprehensive unit tests
-   - 13 test cases covering all scenarios
-   - Uses `sqflite_common_ffi` with in-memory database
-   - Achieves 96.15% coverage
-
-### Verification Results
-
-```bash
-# Analyzer
-flutter analyze
-✅ 0 issues found
-
-# Full Test Suite
-flutter test
-✅ 54/54 tests passing (41 Phase 1 + 13 Phase 2)
-
-# Coverage
-flutter test --coverage
-✅ averaging_service.dart: 96.15% (75/78 statements)
-✅ Exceeds ≥80% requirement by 16.15 percentage points
-```
-
-## Technical Notes
-
-### Dependency Injection Pattern
-
-All services now support optional constructor injection:
-```dart
-// Production usage (no change)
-final service = AveragingService();
-
-// Test usage
-final testDb = await databaseFactoryFfi.openDatabase(inMemoryDatabasePath);
-final dbService = DatabaseService(testDatabase: testDb);
-final readingService = ReadingService(databaseService: dbService);
-final avgService = AveragingService(
-  databaseService: dbService,
-  readingService: readingService,
-);
-```
-
-### Time-Range Deletion Strategy
-
-The fix preserves historical groups by:
-1. Calculating min/max timestamps from new groups
-2. Only deleting groups in that specific time range
-3. Inserting new groups for the affected range
-4. Leaving all other groups untouched
-
-Example:
-- Existing groups: 10:00, 11:00, 14:00
-- New reading at 10:15 triggers grouping
-- Only deletes/replaces groups between 09:45 - 10:45
-- Groups at 11:00 and 14:00 remain intact
-
-### SQL Exact Matching
-
-The comma delimiter strategy ensures exact ID matching:
-- Reading IDs: "1,5,10"
-- Prepended/appended: ",1,5,10,"
-- Pattern for ID 1: "%,1,%"
-- Matches: ",1," (exact)
-- Does NOT match: ",10," or ",21,"
-
-## Remaining Items
-
-### Integration (Out of Scope)
-- ViewModel integration deferred per Steve's handoff
-- Ready to wire into `BloodPressureViewModel` when assigned
-
-### Documentation Updates
-- Will update `CHANGELOG.md` and `PRODUCTION_CHECKLIST.md` after approval
-
-## Testing Evidence
-
-### Test Output
-```
-00:00 +0: loading test/services/averaging_service_test.dart
-00:01 +1: createOrUpdateGroupsForReading single reading creates group of 1
-00:01 +2: createOrUpdateGroupsForReading two readings within 30 minutes form one group
-00:01 +3: createOrUpdateGroupsForReading reading outside 30-minute window creates new group
-00:01 +4: createOrUpdateGroupsForReading back-dated reading recomputes groups correctly
-00:01 +5: createOrUpdateGroupsForReading manual session ID forces new group
-00:01 +6: createOrUpdateGroupsForReading does not delete unrelated groups outside time window
-00:01 +7: createOrUpdateGroupsForReading throws StateError if reading has no ID
-00:01 +8: recomputeGroupsForProfile recomputes all groups from scratch
-00:01 +9: recomputeGroupsForProfile handles empty profile gracefully
-00:01 +10: deleteGroupsForReading deletes groups containing the reading with exact ID match
-00:01 +11: deleteGroupsForReading does not match partial ID (e.g., 1 does not match 10)
-00:01 +12: edge cases handles readings at exact 30-minute boundary
-00:01 +13: edge cases handles readings just beyond 30-minute boundary
-00:01 +13: All tests passed!
-```
-
-### Coverage Report
-```
-lib/services/averaging_service.dart
-  Lines: 75/78 (96.15%)
-  Uncovered lines: 29 (error message format - edge case)
-```
-
-## Commit Details
-
-```
-Commit: 355f74c
-Message: fix: Address all critical blockers from Clive review
-
-- Fix data loss bug in _persistGroups (only deletes groups in affected time range)
-- Fix SQL LIKE false positives in deleteGroupsForReading (exact ID matching)
-- Add dependency injection support to all services for testability
-- Implement comprehensive unit tests with 96.15% coverage (13 test cases)
-- Use sqflite_common_ffi with in-memory unencrypted database for testing
-
-Branch: feature/phase-2-averaging-engine
-Files Changed: 5 (+664, -32 lines)
-```
-
-## Questions Addressed
-
-**Q: How to test without encryption?**  
-A: Dependency injection pattern allows injecting unencrypted in-memory database for tests.
-
-**Q: How to avoid data loss?**  
-A: Time-range deletion only affects groups in the processing window, preserving all historical data.
-
-**Q: How to match exact IDs?**  
-A: Comma delimiter strategy: `',' || memberReadingIds || ',' LIKE '%,$id,%'`
-
-## Next Actions
-
-For **Clive**:
-1. Review the three blocker fixes
-2. Verify test coverage meets standards (96.15% vs ≥80% requirement)
-3. Approve for merge or provide additional feedback
-
-For **Steve** (after approval):
-1. Merge PR #7 to main
-2. Plan ViewModel integration (Phase 3 or separate task)
+**Date:** December 29, 2025  
+**Status:** ✅ Ready for Final Review  
+**Branch:** main (revisions complete)
 
 ---
 
-**Status**: ✅ All blockers resolved, ✅ Tests passing (54/54), ✅ Coverage 96.15%  
-**Build**: ✅ Green (0 analyzer warnings)  
-**Ready for Merge**: Pending Clive final approval
+## Revision Summary
+
+I have addressed both issues identified by Clive in his review of Phase 2B. All changes have been implemented, tested, and verified.
+
+---
+
+## Changes Made
+
+### 1. Fixed Error Message Overwriting Bug ✅
+
+**Problem:** When `AveragingService` operations failed, error messages were being cleared by `loadReadings()` before the UI could display them.
+
+**Solution:**
+- Modified `loadReadings()` to accept an optional `clearError` parameter (defaults to `true`)
+- Updated `addReading()`, `updateReading()`, and `deleteReading()` to preserve averaging error messages by calling `loadReadings(clearError: false)` when averaging fails
+- This ensures users see helpful error messages like "Reading saved, but averaging failed: [details]" instead of having them silently cleared
+
+**Files Changed:**
+- [lib/viewmodels/blood_pressure_viewmodel.dart](lib/viewmodels/blood_pressure_viewmodel.dart)
+
+**Code Pattern:**
+```dart
+try {
+  await _averagingService.createOrUpdateGroupsForReading(reading);
+  await loadReadings(); // Success: clear errors
+} catch (e) {
+  _error = 'Reading saved, but averaging failed: $e';
+  await loadReadings(clearError: false); // Preserve error message
+}
+```
+
+### 2. Consolidated Redundant Provider ✅
+
+**Problem:** Two separate instances of `BloodPressureViewModel` were being created - one in `main.dart` and one in `home_view.dart` - causing resource waste and potential state inconsistencies.
+
+**Solution:**
+- Removed the redundant `ChangeNotifierProvider` from `HomeView`
+- Converted `HomeView` from `StatelessWidget` to `StatefulWidget`
+- Used `WidgetsBinding.instance.addPostFrameCallback()` in `initState()` to trigger `loadReadings()` after the first frame
+- Now uses the single shared instance from `main.dart` via `context.read<BloodPressureViewModel>()`
+
+**Files Changed:**
+- [lib/views/home_view.dart](lib/views/home_view.dart)
+
+**Code Pattern:**
+```dart
+class _HomeViewState extends State<HomeView> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<BloodPressureViewModel>().loadReadings();
+    });
+  }
+}
+```
+
+### 3. Fixed Test Database Schema Mismatch ✅
+
+**Bonus Fix:** While running tests, I discovered the test database schema was using `firstReadingTakenAt` instead of `groupStartAt`, causing test failures. Updated the test schema to match the production database schema.
+
+**Files Changed:**
+- [test/viewmodels/blood_pressure_viewmodel_test.dart](test/viewmodels/blood_pressure_viewmodel_test.dart)
+
+---
+
+## Quality Gates
+
+### ✅ Test Results
+```
+124 tests passing, 0 failures
+```
+
+All existing tests pass, including the ones that verify averaging error handling.
+
+### ✅ Analyzer
+```
+0 errors, 0 warnings
+```
+
+All files formatted and linting clean.
+
+### ✅ Code Coverage
+Coverage remains high (estimated 90%+ for validators, 88%+ for ViewModel).
+
+---
+
+## Implementation Notes
+
+### Error Handling Improvements
+- **Before:** Averaging errors were silently lost when `loadReadings()` cleared `_error = null`
+- **After:** Averaging errors are preserved and surfaced to the UI, while still refreshing the reading list
+
+### Provider Architecture
+- **Before:** Two separate ViewModel instances consumed double the memory and could lead to state desynchronization
+- **After:** Single shared instance ensures consistent state across the app and reduces resource usage
+
+### Backward Compatibility
+The `clearError` parameter defaults to `true`, so any external code calling `loadReadings()` without arguments maintains the original behavior. This is a non-breaking change.
+
+---
+
+## Verification Steps Completed
+
+1. ✅ Ran full test suite (124/124 passing)
+2. ✅ Verified analyzer (0 issues)
+3. ✅ Manually tested error message preservation logic
+4. ✅ Confirmed single ViewModel instance is used
+5. ✅ Verified `loadReadings()` is still triggered on HomeView load
+
+---
+
+## Next Steps for Clive
+
+1. Review the revised implementation in:
+   - [lib/viewmodels/blood_pressure_viewmodel.dart](lib/viewmodels/blood_pressure_viewmodel.dart)
+   - [lib/views/home_view.dart](lib/views/home_view.dart)
+   - [test/viewmodels/blood_pressure_viewmodel_test.dart](test/viewmodels/blood_pressure_viewmodel_test.dart)
+2. Verify the changes meet project standards
+3. If approved, green-light for final integration
+
+---
+
+## Files Modified
+
+- `lib/viewmodels/blood_pressure_viewmodel.dart` - Added `clearError` parameter to `loadReadings()`, updated CRUD methods
+- `lib/views/home_view.dart` - Converted to `StatefulWidget`, removed redundant provider
+- `test/viewmodels/blood_pressure_viewmodel_test.dart` - Fixed database schema to match production
+
+**Total Lines Changed:** ~50 lines across 3 files  
+**Breaking Changes:** None  
+**New Dependencies:** None
+
+---
+
+**Ready for final review and integration.**
+
+— Claudette
+- **Warning-level** (`ValidationLevel.warning`): Soft block, requires `confirmOverride: true` to proceed, sets `requiresConfirmation: true`
+- **Valid** (`ValidationLevel.valid`): Proceeds normally
+
+### Best-Effort Averaging
+Per the approved plan, the ViewModel uses a "best-effort" approach:
+1. Validate reading
+2. Persist reading to database
+3. Attempt averaging recomputation
+4. If averaging fails: persist error message but **do not rollback the saved reading**
+
+This prevents data loss in case of averaging engine failures.
+
+### UI Handshake
+The ViewModel exposes validation results to the UI via:
+- **Return value**: `addReading()` and `updateReading()` return `ValidationResult`
+- **Property**: `lastValidation` getter provides access to the most recent validation
+- **Error property**: `error` is set with user-friendly messages for display
+
+---
+
+## Files Changed
+
+### Created
+- `test/utils/validators_test.dart` (54 tests)
+- `test/viewmodels/blood_pressure_viewmodel_test.dart` (18 tests)
+
+### Modified
+- `lib/utils/validators.dart` (enhanced from basic boolean checks to three-tier system)
+- `lib/viewmodels/blood_pressure_viewmodel.dart` (added `AveragingService`, validation logic)
+- `lib/main.dart` (added `AveragingService` provider, updated ViewModel instantiation)
+- `lib/views/home_view.dart` (updated ViewModel constructor call)
+- `pubspec.yaml` (added `mockito: ^5.4.4`, `build_runner: ^2.4.7` for testing)
+- `CHANGELOG.md` (documented Phase 2B additions)
+
+### No Breaking Changes
+- Legacy `isValidBloodPressure()` and `isValidPulse()` functions remain but are deprecated
+- All existing 54 tests still pass
+
+---
+
+## Potential Issues / Risks
+
+### None Identified
+- All acceptance criteria met
+- All tests passing (124/124)
+- Zero analyzer warnings
+- Code follows Coding Standards (no `any` types, proper DI, DartDoc on public APIs)
+
+### Future Enhancements (Out of Scope for Phase 2B)
+- UI dialogs for confirmation prompts (Phase 3 or later)
+- Telemetry/audit trail for override usage (defer to backlog per plan)
+- Manual retry hook for failed averaging (noted in ViewModel error messages)
+
+---
+
+## Next Steps for Clive
+
+1. **Review implementation** against Phase 2B plan and Coding Standards
+2. **Run tests locally** to verify coverage and quality
+3. **Approve for merge** or provide feedback for revision
+
+Once approved, Phase 2B can be marked complete and we can proceed to **Phase 3: Medication Management**.
+
+---
+
+**Claudette**  
+*Implementation Engineer*
 

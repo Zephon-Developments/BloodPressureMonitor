@@ -13,9 +13,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Automatic group recomputation on insert/update/delete
   - Support for manual session overrides
   - Exact ID matching for group membership management
+- Enhanced validation system with three tiers (valid/warning/error)
+  - Medical bounds enforcement (sys: 70-250, dia: 40-150, pulse: 30-200)
+  - Warning ranges for borderline values
+  - Override confirmation support for out-of-range readings
+  - Strict relationship validation (systolic >= diastolic)
+- ViewModel integration with AveragingService
+  - Automatic averaging recomputation after CRUD operations
+  - Validation-first persistence with error/warning blocking
+  - Best-effort averaging (persists reading even if averaging fails)
+  - `lastValidation` property for UI feedback
 - Dependency Injection support for core services (`DatabaseService`, `ReadingService`, `AveragingService`)
-- Comprehensive unit test suite for Averaging Engine (96.15% coverage)
+- Comprehensive unit test suite
+  - Averaging Engine: 96.15% coverage
+  - Validators: 54 tests covering all validation tiers and boundaries
+  - ViewModel: 18 tests covering CRUD + validation integration
 - `sqflite_common_ffi` for in-memory database testing
+- `mockito` and `build_runner` for test infrastructure
 
 ## [1.0.0] - 2024-12-27
 
