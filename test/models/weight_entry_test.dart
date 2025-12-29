@@ -33,7 +33,9 @@ void main() {
 
     test('fromDbString defaults to kg for unknown values', () {
       expect(
-          WeightUnitExtension.fromDbString('unknown'), equals(WeightUnit.kg));
+        WeightUnitExtension.fromDbString('unknown'),
+        equals(WeightUnit.kg),
+      );
     });
   });
 
@@ -55,7 +57,9 @@ void main() {
       expect(entry.unit, equals(WeightUnit.kg));
       expect(entry.source, equals('manual'));
       expect(
-          entry.localOffsetMinutes, equals(testTime.timeZoneOffset.inMinutes));
+        entry.localOffsetMinutes,
+        equals(testTime.timeZoneOffset.inMinutes),
+      );
       expect(entry.createdAt, isNotNull);
     });
 
