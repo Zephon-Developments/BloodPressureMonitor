@@ -466,14 +466,16 @@ void main() {
 
       // Create 9 more readings to ensure we get ID 10
       for (int i = 0; i < 9; i++) {
-        await readingService.createReading(Reading(
-          profileId: 1,
-          systolic: 120 + i,
-          diastolic: 80,
-          pulse: 70,
-          takenAt: DateTime(2024, 1, 1, 12, i),
-          localOffsetMinutes: -300,
-        ),);
+        await readingService.createReading(
+          Reading(
+            profileId: 1,
+            systolic: 120 + i,
+            diastolic: 80,
+            pulse: 70,
+            takenAt: DateTime(2024, 1, 1, 12, i),
+            localOffsetMinutes: -300,
+          ),
+        );
       }
 
       // Create reading with ID 10 (in different time window)
@@ -504,8 +506,11 @@ void main() {
       final remaining = groups.where(
         (g) => (g['memberReadingIds'] as String).contains('$readingId10'),
       );
-      expect(remaining.length, 1,
-          reason: 'Group containing ID 10 should still exist',);
+      expect(
+        remaining.length,
+        1,
+        reason: 'Group containing ID 10 should still exist',
+      );
     });
   });
 
@@ -541,8 +546,11 @@ void main() {
       );
 
       final groups = await testDb.query('ReadingGroup');
-      expect(groups.length, 1,
-          reason: 'Readings exactly 30 min apart should group',);
+      expect(
+        groups.length,
+        1,
+        reason: 'Readings exactly 30 min apart should group',
+      );
     });
 
     test('handles readings just beyond 30-minute boundary', () async {
@@ -576,8 +584,11 @@ void main() {
       );
 
       final groups = await testDb.query('ReadingGroup');
-      expect(groups.length, 2,
-          reason: 'Readings > 30 min apart should not group',);
+      expect(
+        groups.length,
+        2,
+        reason: 'Readings > 30 min apart should not group',
+      );
     });
   });
 }
