@@ -182,10 +182,7 @@ class ReadingService {
         .map((map) => Reading.fromMap(map))
         .where(
           (reading) =>
-              reading.tags
-                  ?.split(',')
-                  .map((t) => t.trim())
-                  .contains(tag) ??
+              reading.tags?.split(',').map((t) => t.trim()).contains(tag) ??
               false,
         )
         .toList();
