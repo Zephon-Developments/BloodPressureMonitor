@@ -5,6 +5,8 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_sqlcipher/sqflite.dart';
 
+import 'secure_password_manager.dart';
+
 /// Database service providing encrypted local storage for health data.
 ///
 /// Uses sqflite_sqlcipher for AES-256 encryption of sensitive blood pressure,
@@ -14,14 +16,6 @@ class DatabaseService {
   static Database? _database;
   static const String _databaseName = 'blood_pressure.db';
   static const int _databaseVersion = 1;
-
-  // WARNING: DEVELOPMENT/DEMO ONLY - REPLACE IN PRODUCTION
-  // PRODUCTION: Implement secure password management:
-  // 1. Add flutter_secure_storage dependency
-  // 2. Generate unique password per installation
-  // 3. Store password in secure storage
-  // See SECURITY.md for complete implementation details
-  static const String _password = 'REPLACE_IN_PRODUCTION';
 
   /// Gets the singleton database instance, initializing if necessary.
   ///
@@ -38,10 +32,13 @@ class DatabaseService {
         await getApplicationDocumentsDirectory();
     final String path = join(documentsDirectory.path, _databaseName);
 
+    // Get secure password from platform secure storage
+    final String password = await SecurePasswordManager.getOrCreatePassword();
+
     return await openDatabase(
       path,
       version: _databaseVersion,
-      password: _password,
+      password: password,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
