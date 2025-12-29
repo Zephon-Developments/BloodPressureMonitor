@@ -9,19 +9,29 @@ void main() {
     });
 
     test('fromDbString parses correctly', () {
-      expect(SleepSourceExtension.fromDbString('manual'),
-          equals(SleepSource.manual));
-      expect(SleepSourceExtension.fromDbString('import'),
-          equals(SleepSource.import));
-      expect(SleepSourceExtension.fromDbString('MANUAL'),
-          equals(SleepSource.manual));
-      expect(SleepSourceExtension.fromDbString('IMPORT'),
-          equals(SleepSource.import));
+      expect(
+        SleepSourceExtension.fromDbString('manual'),
+        equals(SleepSource.manual),
+      );
+      expect(
+        SleepSourceExtension.fromDbString('import'),
+        equals(SleepSource.import),
+      );
+      expect(
+        SleepSourceExtension.fromDbString('MANUAL'),
+        equals(SleepSource.manual),
+      );
+      expect(
+        SleepSourceExtension.fromDbString('IMPORT'),
+        equals(SleepSource.import),
+      );
     });
 
     test('fromDbString defaults to manual for unknown values', () {
-      expect(SleepSourceExtension.fromDbString('unknown'),
-          equals(SleepSource.manual));
+      expect(
+        SleepSourceExtension.fromDbString('unknown'),
+        equals(SleepSource.manual),
+      );
     });
   });
 
@@ -44,7 +54,9 @@ void main() {
       expect(entry.durationMinutes, equals(510)); // 8.5 hours
       expect(entry.source, equals(SleepSource.manual));
       expect(
-          entry.localOffsetMinutes, equals(testEnd.timeZoneOffset.inMinutes));
+        entry.localOffsetMinutes,
+        equals(testEnd.timeZoneOffset.inMinutes),
+      );
       expect(entry.createdAt, isNotNull);
     });
 
