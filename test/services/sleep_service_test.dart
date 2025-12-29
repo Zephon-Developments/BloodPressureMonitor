@@ -201,23 +201,29 @@ void main() {
     });
 
     test('listSleepEntries returns all entries for profile', () async {
-      await sleepService.createSleepEntry(SleepEntry(
-        profileId: 1,
-        startedAt: DateTime(2025, 12, 26, 22, 0),
-        endedAt: DateTime(2025, 12, 27, 6, 0),
-      ),);
+      await sleepService.createSleepEntry(
+        SleepEntry(
+          profileId: 1,
+          startedAt: DateTime(2025, 12, 26, 22, 0),
+          endedAt: DateTime(2025, 12, 27, 6, 0),
+        ),
+      );
 
-      await sleepService.createSleepEntry(SleepEntry(
-        profileId: 1,
-        startedAt: DateTime(2025, 12, 27, 22, 0),
-        endedAt: DateTime(2025, 12, 28, 6, 0),
-      ),);
+      await sleepService.createSleepEntry(
+        SleepEntry(
+          profileId: 1,
+          startedAt: DateTime(2025, 12, 27, 22, 0),
+          endedAt: DateTime(2025, 12, 28, 6, 0),
+        ),
+      );
 
-      await sleepService.createSleepEntry(SleepEntry(
-        profileId: 1,
-        startedAt: DateTime(2025, 12, 28, 22, 0),
-        endedAt: DateTime(2025, 12, 29, 6, 0),
-      ),);
+      await sleepService.createSleepEntry(
+        SleepEntry(
+          profileId: 1,
+          startedAt: DateTime(2025, 12, 28, 22, 0),
+          endedAt: DateTime(2025, 12, 29, 6, 0),
+        ),
+      );
 
       final entries = await sleepService.listSleepEntries(profileId: 1);
 
@@ -229,23 +235,29 @@ void main() {
     });
 
     test('listSleepEntries filters by date range', () async {
-      await sleepService.createSleepEntry(SleepEntry(
-        profileId: 1,
-        startedAt: DateTime(2025, 12, 26, 22, 0),
-        endedAt: DateTime(2025, 12, 27, 6, 0),
-      ),);
+      await sleepService.createSleepEntry(
+        SleepEntry(
+          profileId: 1,
+          startedAt: DateTime(2025, 12, 26, 22, 0),
+          endedAt: DateTime(2025, 12, 27, 6, 0),
+        ),
+      );
 
-      await sleepService.createSleepEntry(SleepEntry(
-        profileId: 1,
-        startedAt: DateTime(2025, 12, 27, 22, 0),
-        endedAt: DateTime(2025, 12, 28, 6, 0),
-      ),);
+      await sleepService.createSleepEntry(
+        SleepEntry(
+          profileId: 1,
+          startedAt: DateTime(2025, 12, 27, 22, 0),
+          endedAt: DateTime(2025, 12, 28, 6, 0),
+        ),
+      );
 
-      await sleepService.createSleepEntry(SleepEntry(
-        profileId: 1,
-        startedAt: DateTime(2025, 12, 28, 22, 0),
-        endedAt: DateTime(2025, 12, 29, 6, 0),
-      ),);
+      await sleepService.createSleepEntry(
+        SleepEntry(
+          profileId: 1,
+          startedAt: DateTime(2025, 12, 28, 22, 0),
+          endedAt: DateTime(2025, 12, 29, 6, 0),
+        ),
+      );
 
       final entries = await sleepService.listSleepEntries(
         profileId: 1,
@@ -351,11 +363,13 @@ void main() {
       final readingTime = DateTime(2025, 12, 29, 8, 0);
 
       // Sleep ending at 6:30 AM (1.5 hours before reading)
-      await sleepService.createSleepEntry(SleepEntry(
-        profileId: 1,
-        startedAt: DateTime(2025, 12, 28, 22, 0),
-        endedAt: DateTime(2025, 12, 29, 6, 30),
-      ),);
+      await sleepService.createSleepEntry(
+        SleepEntry(
+          profileId: 1,
+          startedAt: DateTime(2025, 12, 28, 22, 0),
+          endedAt: DateTime(2025, 12, 29, 6, 30),
+        ),
+      );
 
       final found = await sleepService.findSleepForMorningReading(
         profileId: 1,
@@ -370,11 +384,13 @@ void main() {
       final readingTime = DateTime(2025, 12, 29, 8, 0);
 
       // Sleep ending at 12:00 PM previous day (20 hours before, outside 18h window)
-      await sleepService.createSleepEntry(SleepEntry(
-        profileId: 1,
-        startedAt: DateTime(2025, 12, 28, 4, 0),
-        endedAt: DateTime(2025, 12, 28, 12, 0),
-      ),);
+      await sleepService.createSleepEntry(
+        SleepEntry(
+          profileId: 1,
+          startedAt: DateTime(2025, 12, 28, 4, 0),
+          endedAt: DateTime(2025, 12, 28, 12, 0),
+        ),
+      );
 
       final found = await sleepService.findSleepForMorningReading(
         profileId: 1,
@@ -389,11 +405,13 @@ void main() {
       final readingTime = DateTime(2025, 12, 29, 8, 0);
 
       // Sleep ending at 12:00 PM previous day (20 hours before)
-      await sleepService.createSleepEntry(SleepEntry(
-        profileId: 1,
-        startedAt: DateTime(2025, 12, 28, 4, 0),
-        endedAt: DateTime(2025, 12, 28, 12, 0),
-      ),);
+      await sleepService.createSleepEntry(
+        SleepEntry(
+          profileId: 1,
+          startedAt: DateTime(2025, 12, 28, 4, 0),
+          endedAt: DateTime(2025, 12, 28, 12, 0),
+        ),
+      );
 
       final found = await sleepService.findSleepForMorningReading(
         profileId: 1,
@@ -408,11 +426,13 @@ void main() {
       final readingTime = DateTime(2025, 12, 29, 8, 0);
 
       // Ongoing sleep (no endedAt)
-      await sleepService.createSleepEntry(SleepEntry(
-        profileId: 1,
-        startedAt: DateTime(2025, 12, 28, 22, 0),
-        durationMinutes: 480,
-      ),);
+      await sleepService.createSleepEntry(
+        SleepEntry(
+          profileId: 1,
+          startedAt: DateTime(2025, 12, 28, 22, 0),
+          durationMinutes: 480,
+        ),
+      );
 
       final found = await sleepService.findSleepForMorningReading(
         profileId: 1,
@@ -427,18 +447,22 @@ void main() {
       final readingTime = DateTime(2025, 12, 29, 8, 0);
 
       // Earlier sleep
-      await sleepService.createSleepEntry(SleepEntry(
-        profileId: 1,
-        startedAt: DateTime(2025, 12, 28, 14, 0),
-        endedAt: DateTime(2025, 12, 28, 16, 0),
-      ),);
+      await sleepService.createSleepEntry(
+        SleepEntry(
+          profileId: 1,
+          startedAt: DateTime(2025, 12, 28, 14, 0),
+          endedAt: DateTime(2025, 12, 28, 16, 0),
+        ),
+      );
 
       // Later sleep (should be returned)
-      await sleepService.createSleepEntry(SleepEntry(
-        profileId: 1,
-        startedAt: DateTime(2025, 12, 28, 22, 0),
-        endedAt: DateTime(2025, 12, 29, 6, 30),
-      ),);
+      await sleepService.createSleepEntry(
+        SleepEntry(
+          profileId: 1,
+          startedAt: DateTime(2025, 12, 28, 22, 0),
+          endedAt: DateTime(2025, 12, 29, 6, 30),
+        ),
+      );
 
       final found = await sleepService.findSleepForMorningReading(
         profileId: 1,
@@ -463,13 +487,15 @@ void main() {
     });
 
     test('isDuplicate returns true when duplicate exists', () async {
-      await sleepService.createSleepEntry(SleepEntry(
-        profileId: 1,
-        startedAt: DateTime(2025, 12, 28, 22, 0),
-        durationMinutes: 480,
-        source: SleepSource.import,
-        sourceMetadata: '{"device":"fitbit"}',
-      ),);
+      await sleepService.createSleepEntry(
+        SleepEntry(
+          profileId: 1,
+          startedAt: DateTime(2025, 12, 28, 22, 0),
+          durationMinutes: 480,
+          source: SleepSource.import,
+          sourceMetadata: '{"device":"fitbit"}',
+        ),
+      );
 
       final isDupe = await sleepService.isDuplicate(
         profileId: 1,
@@ -482,13 +508,15 @@ void main() {
     });
 
     test('isDuplicate checks sourceMetadata when provided', () async {
-      await sleepService.createSleepEntry(SleepEntry(
-        profileId: 1,
-        startedAt: DateTime(2025, 12, 28, 22, 0),
-        durationMinutes: 480,
-        source: SleepSource.import,
-        sourceMetadata: '{"device":"fitbit"}',
-      ),);
+      await sleepService.createSleepEntry(
+        SleepEntry(
+          profileId: 1,
+          startedAt: DateTime(2025, 12, 28, 22, 0),
+          durationMinutes: 480,
+          source: SleepSource.import,
+          sourceMetadata: '{"device":"fitbit"}',
+        ),
+      );
 
       // Different metadata - not a duplicate
       final isDupe = await sleepService.isDuplicate(
@@ -502,12 +530,14 @@ void main() {
     });
 
     test('isDuplicate works without sourceMetadata', () async {
-      await sleepService.createSleepEntry(SleepEntry(
-        profileId: 1,
-        startedAt: DateTime(2025, 12, 28, 22, 0),
-        durationMinutes: 480,
-        source: SleepSource.manual,
-      ),);
+      await sleepService.createSleepEntry(
+        SleepEntry(
+          profileId: 1,
+          startedAt: DateTime(2025, 12, 28, 22, 0),
+          durationMinutes: 480,
+          source: SleepSource.manual,
+        ),
+      );
 
       final isDupe = await sleepService.isDuplicate(
         profileId: 1,
@@ -519,12 +549,14 @@ void main() {
     });
 
     test('isDuplicate distinguishes between profiles', () async {
-      await sleepService.createSleepEntry(SleepEntry(
-        profileId: 1,
-        startedAt: DateTime(2025, 12, 28, 22, 0),
-        durationMinutes: 480,
-        source: SleepSource.manual,
-      ),);
+      await sleepService.createSleepEntry(
+        SleepEntry(
+          profileId: 1,
+          startedAt: DateTime(2025, 12, 28, 22, 0),
+          durationMinutes: 480,
+          source: SleepSource.manual,
+        ),
+      );
 
       // Different profile - not a duplicate
       final isDupe = await sleepService.isDuplicate(
