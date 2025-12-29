@@ -36,7 +36,7 @@ class HomeView extends StatelessWidget {
             if (viewModel.readings.isEmpty) {
               return const Center(
                 child: Text(
-                    'No readings yet Louise. But we will add readings soon!'),
+                    'No readings yet Louise. But we will add readings soon!',),
               );
             }
 
