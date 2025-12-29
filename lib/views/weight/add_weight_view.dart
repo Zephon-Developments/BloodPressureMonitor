@@ -1,0 +1,308 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+
+import 'package:blood_pressure_monitor/models/health_data.dart';
+import 'package:blood_pressure_monitor/utils/date_formats.dart';
+import 'package:blood_pressure_monitor/utils/validators.dart';
+import 'package:blood_pressure_monitor/viewmodels/weight_viewmodel.dart';
+import 'package:blood_pressure_monitor/widgets/common/custom_text_field.dart';
+import 'package:blood_pressure_monitor/widgets/common/loading_button.dart';
+import 'package:blood_pressure_monitor/widgets/common/validation_message_widget.dart';
+
+/// Screen for logging a manual weight entry with contextual lifestyle notes.
+class AddWeightView extends StatefulWidget {
+  /// Creates an [AddWeightView].
+  const AddWeightView({super.key});
+
+  @override
+  State<AddWeightView> createState() => _AddWeightViewState();
+}
+
+class _AddWeightViewState extends State<AddWeightView> {
+  final _formKey = GlobalKey<FormState>();
+  final _weightController = TextEditingController();
+  final _notesController = TextEditingController();
+  DateTime _recordedAt = DateTime.now();
+  WeightUnit _unit = WeightUnit.kg;
+  String? _saltLevel;
+  String? _exerciseLevel;
+  int? _stressRating;
+  bool _submitted = false;
+
+  static const List<String> _saltLevels = <String>['Low', 'Medium', 'High'];
+  static const List<String> _exerciseLevels = <String>[
+    'None',
+    'Light',
+    'Moderate',
+    'Intense',
+  ];
+
+  @override
+  void dispose() {
+    _weightController.dispose();
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final viewModel = context.watch<WeightViewModel>();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Add Weight Entry'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      ),
+      body: Form(
+        key: _formKey,
+        autovalidateMode:
+            _submitted ? AutovalidateMode.always : AutovalidateMode.disabled,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (viewModel.error != null)
+                ValidationMessageWidget(
+                  message: viewModel.error!,
+                  isError: true,
+                ),
+              const SizedBox(height: 12),
+              CustomTextField(
+                label: 'Weight',
+                controller: _weightController,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.allow(
+                    RegExp(r'^[0-9]*[.]?[0-9]*'),
+                  ),
+                ],
+                helperText: _unit == WeightUnit.kg
+                    ? 'Enter value in kilograms (25-310 kg)'
+                    : 'Enter value in pounds (55-670 lbs)',
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Enter a weight value';
+                  }
+                  final parsed = double.tryParse(value);
+                  if (parsed == null) {
+                    return 'Invalid number';
+                  }
+                  final validation = validateWeight(parsed, _unit.toDbString());
+                  if (validation.level == ValidationLevel.error) {
+                    return validation.message ?? 'Invalid weight';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              Text('Unit', style: Theme.of(context).textTheme.labelLarge),
+              const SizedBox(height: 8),
+              SegmentedButton<WeightUnit>(
+                segments: const <ButtonSegment<WeightUnit>>[
+                  ButtonSegment<WeightUnit>(
+                    value: WeightUnit.kg,
+                    label: Text('Kilograms'),
+                  ),
+                  ButtonSegment<WeightUnit>(
+                    value: WeightUnit.lbs,
+                    label: Text('Pounds'),
+                  ),
+                ],
+                selected: <WeightUnit>{_unit},
+                onSelectionChanged: (selection) {
+                  setState(() {
+                    _unit = selection.first;
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                leading: const Icon(Icons.access_time),
+                title: Text(DateFormats.shortDateTime.format(_recordedAt)),
+                subtitle: const Text('Tap to change date & time'),
+                onTap: _pickDateTime,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(
+                    color: Theme.of(context).colorScheme.outlineVariant,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              _buildDropdown(
+                label: 'Salt Intake',
+                value: _saltLevel,
+                items: _saltLevels,
+                onChanged: (value) => setState(() => _saltLevel = value),
+              ),
+              const SizedBox(height: 16),
+              _buildDropdown(
+                label: 'Exercise Level',
+                value: _exerciseLevel,
+                items: _exerciseLevels,
+                onChanged: (value) => setState(() => _exerciseLevel = value),
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<int>(
+                decoration: const InputDecoration(
+                  labelText: 'Stress Rating',
+                  border: OutlineInputBorder(),
+                ),
+                initialValue: _stressRating,
+                items: List<DropdownMenuItem<int>>.generate(5, (index) {
+                  final value = index + 1;
+                  return DropdownMenuItem<int>(
+                    value: value,
+                    child: Text('$value - ${_stressLabel(value)}'),
+                  );
+                }),
+                onChanged: (value) => setState(() => _stressRating = value),
+                hint: const Text('Optional'),
+              ),
+              const SizedBox(height: 16),
+              CustomTextField(
+                label: 'Notes',
+                controller: _notesController,
+                maxLines: 4,
+                helperText: 'Optional context (up to 500 characters)',
+                validator: (value) {
+                  if (value != null && value.length > 500) {
+                    return 'Notes cannot exceed 500 characters';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 24),
+              LoadingButton(
+                onPressed: viewModel.isSubmitting ? null : _submit,
+                isLoading: viewModel.isSubmitting,
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: const Text('Save Weight Entry'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDropdown({
+    required String label,
+    required String? value,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return DropdownButtonFormField<String?>(
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+      ),
+      initialValue: value,
+      items: <DropdownMenuItem<String?>>[
+        const DropdownMenuItem<String?>(value: null, child: Text('Optional')),
+        ...items.map(
+          (option) => DropdownMenuItem<String?>(
+            value: option,
+            child: Text(option),
+          ),
+        ),
+      ],
+      onChanged: onChanged,
+    );
+  }
+
+  String _stressLabel(int rating) {
+    switch (rating) {
+      case 1:
+        return 'Very Low';
+      case 2:
+        return 'Low';
+      case 3:
+        return 'Moderate';
+      case 4:
+        return 'High';
+      case 5:
+        return 'Very High';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  Future<void> _pickDateTime() async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: _recordedAt,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now().add(const Duration(days: 1)),
+    );
+
+    if (!mounted || date == null) {
+      return;
+    }
+
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(_recordedAt),
+    );
+
+    if (!mounted || time == null) {
+      return;
+    }
+
+    setState(() {
+      _recordedAt = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        time.hour,
+        time.minute,
+      );
+    });
+  }
+
+  Future<void> _submit() async {
+    setState(() {
+      _submitted = true;
+    });
+
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    final parsedWeight = double.parse(_weightController.text);
+    final viewModel = context.read<WeightViewModel>();
+    final error = await viewModel.saveWeightEntry(
+      weightValue: parsedWeight,
+      unit: _unit,
+      recordedAt: _recordedAt,
+      notes: _notesController.text,
+      saltIntake: _saltLevel,
+      exerciseLevel: _exerciseLevel,
+      stressLevel: _stressRating?.toString(),
+    );
+
+    if (!mounted) {
+      return;
+    }
+
+    if (error == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Weight entry saved'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      Navigator.of(context).pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error)),
+      );
+    }
+  }
+}
