@@ -149,13 +149,21 @@ void main() {
       expect(find.byType(RadioListTile<int>), findsWidgets);
     });
 
-    testWidgets('shows security information', (tester) async {
-      // Skip: Widget tree not rendering in mock - covered by manual testing
-    }, skip: true,);
+    testWidgets(
+      'shows security information',
+      (tester) async {
+        // Skip: Widget tree not rendering in mock - covered by manual testing
+      },
+      skip: true,
+    );
 
-    testWidgets('shows failed attempts warning when present', (tester) async {
-      // Skip: Widget tree not rendering in mock - covered by manual testing
-    }, skip: true,);
+    testWidgets(
+      'shows failed attempts warning when present',
+      (tester) async {
+        // Skip: Widget tree not rendering in mock - covered by manual testing
+      },
+      skip: true,
+    );
 
     testWidgets('hides failed attempts warning when zero', (tester) async {
       when(mockLockViewModel.state).thenReturn(

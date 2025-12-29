@@ -48,9 +48,12 @@ void main() {
     });
 
     test('setPin stores hash and salt in secure storage', () async {
-      when(mockSecureStorage.write(
-              key: anyNamed('key'), value: anyNamed('value'),),)
-          .thenAnswer((_) async => {});
+      when(
+        mockSecureStorage.write(
+          key: anyNamed('key'),
+          value: anyNamed('value'),
+        ),
+      ).thenAnswer((_) async => {});
 
       await authService.setPin('1234');
 
@@ -61,9 +64,12 @@ void main() {
     });
 
     test('setPin resets failed attempts', () async {
-      when(mockSecureStorage.write(
-              key: anyNamed('key'), value: anyNamed('value'),),)
-          .thenAnswer((_) async => {});
+      when(
+        mockSecureStorage.write(
+          key: anyNamed('key'),
+          value: anyNamed('value'),
+        ),
+      ).thenAnswer((_) async => {});
 
       // Set some failed attempts
       await prefs.setInt('failed_attempts', 3);
@@ -76,20 +82,27 @@ void main() {
 
     test('verifyPin returns true for correct PIN', () async {
       // First set a PIN
-      when(mockSecureStorage.write(
-              key: anyNamed('key'), value: anyNamed('value'),),)
-          .thenAnswer((_) async => {});
+      when(
+        mockSecureStorage.write(
+          key: anyNamed('key'),
+          value: anyNamed('value'),
+        ),
+      ).thenAnswer((_) async => {});
       await authService.setPin('1234');
 
       // Capture the hash and salt that were written
-      final hashCapture = verify(mockSecureStorage.write(
-              key: 'pin_hash', value: captureAnyNamed('value'),),)
-          .captured
-          .last as String;
-      final saltCapture = verify(mockSecureStorage.write(
-              key: 'pin_salt', value: captureAnyNamed('value'),),)
-          .captured
-          .last as String;
+      final hashCapture = verify(
+        mockSecureStorage.write(
+          key: 'pin_hash',
+          value: captureAnyNamed('value'),
+        ),
+      ).captured.last as String;
+      final saltCapture = verify(
+        mockSecureStorage.write(
+          key: 'pin_salt',
+          value: captureAnyNamed('value'),
+        ),
+      ).captured.last as String;
 
       // Mock the read to return the captured values
       when(mockSecureStorage.read(key: 'pin_hash'))
@@ -127,19 +140,26 @@ void main() {
 
     test('verifyPin resets failed attempts on success', () async {
       // Set up a PIN
-      when(mockSecureStorage.write(
-              key: anyNamed('key'), value: anyNamed('value'),),)
-          .thenAnswer((_) async => {});
+      when(
+        mockSecureStorage.write(
+          key: anyNamed('key'),
+          value: anyNamed('value'),
+        ),
+      ).thenAnswer((_) async => {});
       await authService.setPin('1234');
 
-      final hashCapture = verify(mockSecureStorage.write(
-              key: 'pin_hash', value: captureAnyNamed('value'),),)
-          .captured
-          .last as String;
-      final saltCapture = verify(mockSecureStorage.write(
-              key: 'pin_salt', value: captureAnyNamed('value'),),)
-          .captured
-          .last as String;
+      final hashCapture = verify(
+        mockSecureStorage.write(
+          key: 'pin_hash',
+          value: captureAnyNamed('value'),
+        ),
+      ).captured.last as String;
+      final saltCapture = verify(
+        mockSecureStorage.write(
+          key: 'pin_salt',
+          value: captureAnyNamed('value'),
+        ),
+      ).captured.last as String;
 
       when(mockSecureStorage.read(key: 'pin_hash'))
           .thenAnswer((_) async => hashCapture);
@@ -284,13 +304,17 @@ void main() {
     test('getLockoutExpiry returns correct timestamp during lockout', () async {
       final expectedExpiry = DateTime.now().add(const Duration(minutes: 5));
       await prefs.setInt(
-          'lockout_until', expectedExpiry.millisecondsSinceEpoch,);
+        'lockout_until',
+        expectedExpiry.millisecondsSinceEpoch,
+      );
 
       final expiry = await authService.getLockoutExpiry();
 
       expect(expiry, isNotNull);
-      expect(expiry!.millisecondsSinceEpoch,
-          expectedExpiry.millisecondsSinceEpoch,);
+      expect(
+        expiry!.millisecondsSinceEpoch,
+        expectedExpiry.millisecondsSinceEpoch,
+      );
     });
   });
 
@@ -376,10 +400,12 @@ void main() {
       await prefs.setBool('biometric_enabled', true);
       when(mockLocalAuth.getAvailableBiometrics())
           .thenAnswer((_) async => [BiometricType.face]);
-      when(mockLocalAuth.authenticate(
-        localizedReason: anyNamed('localizedReason'),
-        options: anyNamed('options'),
-      ),).thenAnswer((_) async => true);
+      when(
+        mockLocalAuth.authenticate(
+          localizedReason: anyNamed('localizedReason'),
+          options: anyNamed('options'),
+        ),
+      ).thenAnswer((_) async => true);
 
       final result = await authService.authenticateWithBiometrics();
 
@@ -390,20 +416,24 @@ void main() {
       final result = await authService.authenticateWithBiometrics();
 
       expect(result, false);
-      verifyNever(mockLocalAuth.authenticate(
-        localizedReason: anyNamed('localizedReason'),
-        options: anyNamed('options'),
-      ),);
+      verifyNever(
+        mockLocalAuth.authenticate(
+          localizedReason: anyNamed('localizedReason'),
+          options: anyNamed('options'),
+        ),
+      );
     });
 
     test('authenticateWithBiometrics returns false on exception', () async {
       await prefs.setBool('biometric_enabled', true);
       when(mockLocalAuth.getAvailableBiometrics())
           .thenAnswer((_) async => [BiometricType.face]);
-      when(mockLocalAuth.authenticate(
-        localizedReason: anyNamed('localizedReason'),
-        options: anyNamed('options'),
-      ),).thenThrow(Exception('Auth failed'));
+      when(
+        mockLocalAuth.authenticate(
+          localizedReason: anyNamed('localizedReason'),
+          options: anyNamed('options'),
+        ),
+      ).thenThrow(Exception('Auth failed'));
 
       final result = await authService.authenticateWithBiometrics();
 
@@ -413,15 +443,20 @@ void main() {
 
   group('PBKDF2 Implementation', () {
     test('PIN hashing uses different salts for same PIN', () async {
-      when(mockSecureStorage.write(
-              key: anyNamed('key'), value: anyNamed('value'),),)
-          .thenAnswer((_) async => {});
+      when(
+        mockSecureStorage.write(
+          key: anyNamed('key'),
+          value: anyNamed('value'),
+        ),
+      ).thenAnswer((_) async => {});
 
       await authService.setPin('1234');
-      final salt1 = verify(mockSecureStorage.write(
-              key: 'pin_salt', value: captureAnyNamed('value'),),)
-          .captured
-          .last as String;
+      final salt1 = verify(
+        mockSecureStorage.write(
+          key: 'pin_salt',
+          value: captureAnyNamed('value'),
+        ),
+      ).captured.last as String;
 
       // Create a new instance to set PIN again
       final authService2 = AuthService(
@@ -431,28 +466,37 @@ void main() {
       );
 
       await authService2.setPin('1234');
-      final salt2 = verify(mockSecureStorage.write(
-              key: 'pin_salt', value: captureAnyNamed('value'),),)
-          .captured
-          .last as String;
+      final salt2 = verify(
+        mockSecureStorage.write(
+          key: 'pin_salt',
+          value: captureAnyNamed('value'),
+        ),
+      ).captured.last as String;
 
       expect(salt1, isNot(equals(salt2)));
     });
 
     test('Same PIN with same salt produces same hash', () async {
-      when(mockSecureStorage.write(
-              key: anyNamed('key'), value: anyNamed('value'),),)
-          .thenAnswer((_) async => {});
+      when(
+        mockSecureStorage.write(
+          key: anyNamed('key'),
+          value: anyNamed('value'),
+        ),
+      ).thenAnswer((_) async => {});
 
       await authService.setPin('1234');
-      final hash1 = verify(mockSecureStorage.write(
-              key: 'pin_hash', value: captureAnyNamed('value'),),)
-          .captured
-          .last as String;
-      final salt = verify(mockSecureStorage.write(
-              key: 'pin_salt', value: captureAnyNamed('value'),),)
-          .captured
-          .last as String;
+      final hash1 = verify(
+        mockSecureStorage.write(
+          key: 'pin_hash',
+          value: captureAnyNamed('value'),
+        ),
+      ).captured.last as String;
+      final salt = verify(
+        mockSecureStorage.write(
+          key: 'pin_salt',
+          value: captureAnyNamed('value'),
+        ),
+      ).captured.last as String;
 
       // Mock reads to return the captured salt
       when(mockSecureStorage.read(key: 'pin_salt'))
