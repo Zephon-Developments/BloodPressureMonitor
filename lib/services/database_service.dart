@@ -33,7 +33,17 @@ class DatabaseService {
     final String path = join(documentsDirectory.path, _databaseName);
 
     // Get secure password from platform secure storage
-    final String password = await SecurePasswordManager.getOrCreatePassword();
+    String password;
+    try {
+      password = await SecurePasswordManager.getOrCreatePassword();
+    } on Exception catch (e, stackTrace) {
+      // Log error details for diagnostics and fail initialization explicitly
+      stderr.writeln('Error retrieving secure database password: $e');
+      stderr.writeln(stackTrace);
+      throw DatabaseException(
+        'Failed to initialize encrypted database: could not retrieve secure password.',
+      );
+    }
 
     return await openDatabase(
       path,
