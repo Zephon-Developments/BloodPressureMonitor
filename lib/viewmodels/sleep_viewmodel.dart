@@ -1,0 +1,134 @@
+import 'package:flutter/foundation.dart';
+
+import 'package:blood_pressure_monitor/models/health_data.dart';
+import 'package:blood_pressure_monitor/services/sleep_service.dart';
+
+/// ViewModel for manual sleep tracking workflows.
+///
+/// Provides CRUD helpers with loading/submission state, allowing UI widgets
+/// to bind to reactive sleep data.
+class SleepViewModel extends ChangeNotifier {
+  /// Creates a [SleepViewModel].
+  SleepViewModel(this._sleepService, {int profileId = 1})
+      : _profileId = profileId;
+
+  final SleepService _sleepService;
+  final int _profileId;
+
+  List<SleepEntry> _entries = <SleepEntry>[];
+  bool _isLoading = false;
+  bool _isSubmitting = false;
+  String? _error;
+
+  /// Current sleep sessions sorted by most recent end time.
+  List<SleepEntry> get entries => List<SleepEntry>.unmodifiable(_entries);
+
+  /// Whether entries are being loaded.
+  bool get isLoading => _isLoading;
+
+  /// Whether a mutation is running.
+  bool get isSubmitting => _isSubmitting;
+
+  /// Latest error suitable for user display.
+  String? get error => _error;
+
+  /// Loads sleep entries for the configured profile.
+  Future<void> loadEntries({DateTime? from, DateTime? to}) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      _entries = await _sleepService.listSleepEntries(
+        profileId: _profileId,
+        from: from,
+        to: to,
+      );
+      _error = null;
+    } catch (e) {
+      _error = 'Failed to load sleep entries: $e';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Persists a sleep entry and refreshes the list.
+  ///
+  /// Returns `null` on success or an error message on failure.
+  Future<String?> saveSleepEntry({
+    int? id,
+    required DateTime start,
+    required DateTime end,
+    int? quality,
+    String? notes,
+  }) async {
+    _isSubmitting = true;
+    notifyListeners();
+
+    try {
+      final entry = SleepEntry(
+        id: id,
+        profileId: _profileId,
+        startedAt: start,
+        endedAt: end,
+        quality: quality,
+        notes: _normalize(notes),
+      );
+
+      if (id == null) {
+        await _sleepService.createSleepEntry(entry);
+      } else {
+        await _sleepService.updateSleepEntry(entry);
+      }
+
+      await loadEntries();
+      return null;
+    } on ArgumentError catch (e) {
+      _error = e.message?.toString() ?? 'Invalid sleep entry';
+      notifyListeners();
+      return _error;
+    } catch (e) {
+      _error = 'Failed to save sleep entry: $e';
+      notifyListeners();
+      return _error;
+    } finally {
+      _isSubmitting = false;
+      notifyListeners();
+    }
+  }
+
+  /// Deletes a sleep entry.
+  Future<String?> deleteSleepEntry(int id) async {
+    try {
+      final deleted = await _sleepService.deleteSleepEntry(id);
+      if (!deleted) {
+        _error = 'Sleep entry not found';
+        notifyListeners();
+        return _error;
+      }
+      await loadEntries();
+      return null;
+    } catch (e) {
+      _error = 'Failed to delete sleep entry: $e';
+      notifyListeners();
+      return _error;
+    }
+  }
+
+  /// Clears the current error after it has been displayed.
+  void clearError() {
+    if (_error == null) {
+      return;
+    }
+    _error = null;
+    notifyListeners();
+  }
+
+  String? _normalize(String? value) {
+    if (value == null) {
+      return null;
+    }
+    final trimmed = value.trim();
+    return trimmed.isEmpty ? null : trimmed;
+  }
+}

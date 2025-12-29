@@ -10,7 +10,7 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - [x] Phase 3: Medication Management ✅ **COMPLETE** (Dec 29, 2025)
 - [x] Phase 4: Weight & Sleep ✅ **COMPLETE** (Dec 29, 2025)
 - [x] Phase 5: App Security Gate ✅ **COMPLETE** (Dec 29, 2025)
-- [ ] Phase 6: UI Foundation
+- [x] Phase 6: UI Foundation ✅ **COMPLETE** (Dec 29, 2025)
 - [ ] Phase 7: History (Avg-first with expansion)
 - [ ] Phase 8: Charts & Analytics
 - [ ] Phase 9: Export & Reports
@@ -86,29 +86,30 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - Data persists and fetches; analyzer clean; tests ≥85% services.
 **Rollback point**: Keep UI hooks off if needed.
 
-### Phase 5: App Security Gate
+### Phase 5: App Security Gate ✅ COMPLETE
 **Scope**: App-level PIN/biometric lock; auto-lock on idle; no per-profile PINs.
 **Tasks**
-- Secure credential storage (PIN/biometric) using platform-appropriate secure storage.
-- Idle timer + resume lock.
-- Unit/widget tests for lock/unlock flow (mocking platform where possible).
+- ✅ Secure credential storage (PIN/biometric) using platform-appropriate secure storage.
+- ✅ Idle timer + resume lock.
+- ✅ Unit/widget tests for lock/unlock flow (mocking platform where possible).
 **Dependencies**: Phases 1–4 not strictly required; can be parallel. Needs navigation shell.
 **Acceptance**
-- Lock enforced on launch/return; bypass impossible without auth.
-- Analyzer clean; targeted tests passing.
-**Rollback point**: Feature flag; default locked-paths disabled only in dev.
+- ✅ Lock enforced on launch/return; bypass impossible without auth.
+- ✅ Analyzer clean; targeted tests passing.
+**Status**: Merged to main Dec 29, 2025
 
-### Phase 6: UI Foundation (Home, Add Reading)
+### Phase 6: UI Foundation (Home, Add Reading) ✅ COMPLETE
 **Scope**: Base navigation, profile switcher, add-reading form (manual entry with advanced section), reminder stub.
 **Tasks**
-- Home/dashboard shell with profile selector and quick add.
-- Add Reading form with validation, advanced expander (arm, posture, notes, tags), link to quick medication intake.
-- Wire to services (create reading, session override trigger).
-- Widget tests for form validation and submission.
+- ✅ Home/dashboard shell with profile selector and quick add.
+- ✅ Add Reading form with validation, advanced expander (arm, posture, notes, tags), link to quick medication intake.
+- ✅ Wire to services (create reading, session override trigger).
+- ✅ Widget tests for form validation and submission.
 **Dependencies**: Phases 1–2.
 **Acceptance**
-- Create/read readings end-to-end; analyzer clean; widget tests ≥70% for new widgets.
-**Rollback point**: Hide navigation to unfinished screens.
+- ✅ Create/read readings end-to-end; analyzer clean; widget tests ≥70% for new widgets.
+- ✅ 555/555 tests passing; zero static analysis issues.
+**Status**: Ready for PR merge to main Dec 29, 2025
 
 ### Phase 7: History (Avg-first with expansion)
 **Scope**: History list showing averaged rows primary; expand to raw readings.
