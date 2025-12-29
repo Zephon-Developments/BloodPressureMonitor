@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Averaging Engine for blood pressure readings
+  - 30-minute rolling window grouping algorithm
+  - Automatic group recomputation on insert/update/delete
+  - Support for manual session overrides
+  - Exact ID matching for group membership management
+- Dependency Injection support for core services (`DatabaseService`, `ReadingService`, `AveragingService`)
+- Comprehensive unit test suite for Averaging Engine (96.15% coverage)
+- `sqflite_common_ffi` for in-memory database testing
+
 ## [1.0.0] - 2024-12-27
 
 ### Added
