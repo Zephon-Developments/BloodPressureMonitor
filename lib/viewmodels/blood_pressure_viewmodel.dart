@@ -1,16 +1,18 @@
 import 'package:flutter/foundation.dart';
-import 'package:blood_pressure_monitor/models/blood_pressure_reading.dart';
-import 'package:blood_pressure_monitor/services/database_service.dart';
+import 'package:blood_pressure_monitor/models/reading.dart';
+import 'package:blood_pressure_monitor/services/reading_service.dart';
 
 class BloodPressureViewModel extends ChangeNotifier {
-  final DatabaseService _databaseService;
-  List<BloodPressureReading> _readings = [];
+  final ReadingService _readingService;
+  final int _profileId;
+  List<Reading> _readings = [];
   bool _isLoading = false;
   String? _error;
 
-  BloodPressureViewModel(this._databaseService);
+  BloodPressureViewModel(this._readingService, {int profileId = 1})
+      : _profileId = profileId;
 
-  List<BloodPressureReading> get readings => _readings;
+  List<Reading> get readings => _readings;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -20,7 +22,7 @@ class BloodPressureViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _readings = await _databaseService.getAllReadings();
+      _readings = await _readingService.getReadingsByProfile(_profileId);
     } catch (e) {
       _error = 'Failed to load readings: $e';
     } finally {
@@ -29,9 +31,9 @@ class BloodPressureViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> addReading(BloodPressureReading reading) async {
+  Future<void> addReading(Reading reading) async {
     try {
-      await _databaseService.insertReading(reading);
+      await _readingService.createReading(reading);
       await loadReadings();
     } catch (e) {
       _error = 'Failed to add reading: $e';
@@ -39,9 +41,9 @@ class BloodPressureViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> updateReading(BloodPressureReading reading) async {
+  Future<void> updateReading(Reading reading) async {
     try {
-      await _databaseService.updateReading(reading);
+      await _readingService.updateReading(reading);
       await loadReadings();
     } catch (e) {
       _error = 'Failed to update reading: $e';
@@ -51,7 +53,7 @@ class BloodPressureViewModel extends ChangeNotifier {
 
   Future<void> deleteReading(int id) async {
     try {
-      await _databaseService.deleteReading(id);
+      await _readingService.deleteReading(id);
       await loadReadings();
     } catch (e) {
       _error = 'Failed to delete reading: $e';
