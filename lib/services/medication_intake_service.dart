@@ -158,13 +158,13 @@ class MedicationIntakeService {
   /// Parameters:
   /// - [profileId]: Profile ID to search within
   /// - [anchor]: Center point of the time window
-  /// - [window]: Duration before and after anchor to include
+  /// - [window]: Duration before and after anchor to include (default: 30 minutes)
   ///
   /// Returns intakes ordered by proximity to anchor time.
   Future<List<MedicationIntake>> findIntakesAround({
     required int profileId,
     required DateTime anchor,
-    Duration window = const Duration(hours: 2),
+    Duration window = const Duration(minutes: 30),
   }) async {
     final from = anchor.subtract(window);
     final to = anchor.add(window);
@@ -192,7 +192,7 @@ class MedicationIntakeService {
 
     final intakeMap = {
       for (final result in results)
-        result['id'] as int: MedicationIntake.fromMap(result)
+        result['id'] as int: MedicationIntake.fromMap(result),
     };
 
     return ids
@@ -222,8 +222,8 @@ class MedicationIntakeService {
 
     try {
       final schedule = jsonDecode(scheduleMetadata) as Map<String, dynamic>;
-      final graceMinutesLate = schedule['graceMinutesLate'] as int? ?? 120;
-      final graceMinutesMissed = schedule['graceMinutesMissed'] as int? ?? 240;
+      final graceMinutesLate = schedule['graceMinutesLate'] as int? ?? 15;
+      final graceMinutesMissed = schedule['graceMinutesMissed'] as int? ?? 60;
 
       final difference =
           intake.takenAt.difference(intake.scheduledFor!).inMinutes;

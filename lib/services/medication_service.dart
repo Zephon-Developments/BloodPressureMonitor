@@ -70,12 +70,20 @@ class MedicationService {
 
   /// Lists all medications for a given profile.
   ///
+  /// By default, only active medications are returned.
+  /// Set [includeInactive] to true to include soft-deleted medications.
+  ///
   /// Returns medications ordered by name alphabetically.
-  Future<List<Medication>> listMedicationsByProfile(int profileId) async {
+  Future<List<Medication>> listMedicationsByProfile(
+    int profileId, {
+    bool includeInactive = false,
+  }) async {
     final db = await _databaseService.database;
+    final where =
+        includeInactive ? 'profileId = ?' : 'profileId = ? AND isActive = 1';
     final results = await db.query(
       'Medication',
-      where: 'profileId = ?',
+      where: where,
       whereArgs: [profileId],
       orderBy: 'name ASC',
     );
@@ -85,6 +93,8 @@ class MedicationService {
 
   /// Searches medications by name substring (case-insensitive).
   ///
+  /// Only returns active medications by default.
+  ///
   /// Returns medications for the given profile matching the search term.
   Future<List<Medication>> searchMedicationsByName({
     required int profileId,
@@ -93,7 +103,7 @@ class MedicationService {
     final db = await _databaseService.database;
     final results = await db.query(
       'Medication',
-      where: 'profileId = ? AND name LIKE ?',
+      where: 'profileId = ? AND name LIKE ? AND isActive = 1',
       whereArgs: [profileId, '%$searchTerm%'],
       orderBy: 'name ASC',
     );
@@ -150,15 +160,17 @@ class MedicationService {
     return medication;
   }
 
-  /// Deletes a medication by ID.
+  /// Soft-deletes a medication by setting isActive to false.
   ///
-  /// Related intake records will remain but will reference a deleted medication.
+  /// This preserves historical intake records while hiding the medication
+  /// from active lists.
   ///
-  /// Returns `true` if a medication was deleted, `false` otherwise.
+  /// Returns `true` if a medication was soft-deleted, `false` otherwise.
   Future<bool> deleteMedication(int id) async {
     final db = await _databaseService.database;
-    final count = await db.delete(
+    final count = await db.update(
       'Medication',
+      {'isActive': 0},
       where: 'id = ?',
       whereArgs: [id],
     );

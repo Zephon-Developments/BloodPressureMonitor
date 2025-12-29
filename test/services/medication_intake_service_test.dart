@@ -40,6 +40,7 @@ void main() {
               unit TEXT,
               frequency TEXT,
               scheduleMetadata TEXT,
+              isActive INTEGER NOT NULL DEFAULT 1,
               createdAt TEXT NOT NULL,
               FOREIGN KEY (profileId) REFERENCES Profile(id) ON DELETE CASCADE
             )
@@ -225,9 +226,12 @@ void main() {
       final afterCount = (await intakeService.listIntakes(profileId: 1)).length;
       // Either both created (+2) or transaction rolled back (+0)
       final delta = afterCount - initialCount;
-      expect([0, 2].contains(delta), isTrue,
-          reason:
-              'Transaction should be atomic: either both succeed or both fail');
+      expect(
+        [0, 2].contains(delta),
+        isTrue,
+        reason:
+            'Transaction should be atomic: either both succeed or both fail',
+      );
     });
   });
 
@@ -235,16 +239,20 @@ void main() {
     test('lists all intakes for profile', () async {
       final now = DateTime.now();
 
-      await intakeService.logIntake(MedicationIntake(
-        medicationId: 1,
-        profileId: 1,
-        takenAt: now,
-      ));
-      await intakeService.logIntake(MedicationIntake(
-        medicationId: 2,
-        profileId: 1,
-        takenAt: now.add(const Duration(hours: 1)),
-      ));
+      await intakeService.logIntake(
+        MedicationIntake(
+          medicationId: 1,
+          profileId: 1,
+          takenAt: now,
+        ),
+      );
+      await intakeService.logIntake(
+        MedicationIntake(
+          medicationId: 2,
+          profileId: 1,
+          takenAt: now.add(const Duration(hours: 1)),
+        ),
+      );
 
       final intakes = await intakeService.listIntakes(profileId: 1);
 
@@ -259,21 +267,27 @@ void main() {
       final day2 = DateTime(2025, 12, 26, 8, 0);
       final day3 = DateTime(2025, 12, 27, 8, 0);
 
-      await intakeService.logIntake(MedicationIntake(
-        medicationId: 1,
-        profileId: 1,
-        takenAt: day1,
-      ));
-      await intakeService.logIntake(MedicationIntake(
-        medicationId: 1,
-        profileId: 1,
-        takenAt: day2,
-      ));
-      await intakeService.logIntake(MedicationIntake(
-        medicationId: 1,
-        profileId: 1,
-        takenAt: day3,
-      ));
+      await intakeService.logIntake(
+        MedicationIntake(
+          medicationId: 1,
+          profileId: 1,
+          takenAt: day1,
+        ),
+      );
+      await intakeService.logIntake(
+        MedicationIntake(
+          medicationId: 1,
+          profileId: 1,
+          takenAt: day2,
+        ),
+      );
+      await intakeService.logIntake(
+        MedicationIntake(
+          medicationId: 1,
+          profileId: 1,
+          takenAt: day3,
+        ),
+      );
 
       final intakes = await intakeService.listIntakes(
         profileId: 1,
@@ -288,16 +302,20 @@ void main() {
     test('filters intakes by medication', () async {
       final now = DateTime.now();
 
-      await intakeService.logIntake(MedicationIntake(
-        medicationId: 1,
-        profileId: 1,
-        takenAt: now,
-      ));
-      await intakeService.logIntake(MedicationIntake(
-        medicationId: 2,
-        profileId: 1,
-        takenAt: now,
-      ));
+      await intakeService.logIntake(
+        MedicationIntake(
+          medicationId: 1,
+          profileId: 1,
+          takenAt: now,
+        ),
+      );
+      await intakeService.logIntake(
+        MedicationIntake(
+          medicationId: 2,
+          profileId: 1,
+          takenAt: now,
+        ),
+      );
 
       final intakes = await intakeService.listIntakes(
         profileId: 1,
@@ -317,11 +335,13 @@ void main() {
         profileId: 1,
         takenAt: now,
       );
-      await intakeService.logIntake(MedicationIntake(
-        medicationId: 3,
-        profileId: 1,
-        takenAt: now,
-      ));
+      await intakeService.logIntake(
+        MedicationIntake(
+          medicationId: 3,
+          profileId: 1,
+          takenAt: now,
+        ),
+      );
 
       final intakes = await intakeService.listIntakes(
         profileId: 1,
@@ -347,16 +367,20 @@ void main() {
 
       final now = DateTime.now();
 
-      await intakeService.logIntake(MedicationIntake(
-        medicationId: 1,
-        profileId: 1,
-        takenAt: now,
-      ));
-      await intakeService.logIntake(MedicationIntake(
-        medicationId: 4,
-        profileId: 2,
-        takenAt: now,
-      ));
+      await intakeService.logIntake(
+        MedicationIntake(
+          medicationId: 1,
+          profileId: 1,
+          takenAt: now,
+        ),
+      );
+      await intakeService.logIntake(
+        MedicationIntake(
+          medicationId: 4,
+          profileId: 2,
+          takenAt: now,
+        ),
+      );
 
       final profile1Intakes = await intakeService.listIntakes(profileId: 1);
       final profile2Intakes = await intakeService.listIntakes(profileId: 2);
@@ -372,21 +396,27 @@ void main() {
     test('finds intakes around anchor time', () async {
       final anchor = DateTime(2025, 12, 29, 12, 0);
 
-      await intakeService.logIntake(MedicationIntake(
-        medicationId: 1,
-        profileId: 1,
-        takenAt: anchor.subtract(const Duration(hours: 1)),
-      ));
-      await intakeService.logIntake(MedicationIntake(
-        medicationId: 2,
-        profileId: 1,
-        takenAt: anchor.add(const Duration(hours: 1)),
-      ));
-      await intakeService.logIntake(MedicationIntake(
-        medicationId: 3,
-        profileId: 1,
-        takenAt: anchor.add(const Duration(hours: 3)),
-      ));
+      await intakeService.logIntake(
+        MedicationIntake(
+          medicationId: 1,
+          profileId: 1,
+          takenAt: anchor.subtract(const Duration(hours: 1)),
+        ),
+      );
+      await intakeService.logIntake(
+        MedicationIntake(
+          medicationId: 2,
+          profileId: 1,
+          takenAt: anchor.add(const Duration(hours: 1)),
+        ),
+      );
+      await intakeService.logIntake(
+        MedicationIntake(
+          medicationId: 3,
+          profileId: 1,
+          takenAt: anchor.add(const Duration(hours: 3)),
+        ),
+      );
 
       final intakes = await intakeService.findIntakesAround(
         profileId: 1,
@@ -403,21 +433,27 @@ void main() {
     test('retrieves intakes by IDs', () async {
       final now = DateTime.now();
 
-      final intake1 = await intakeService.logIntake(MedicationIntake(
-        medicationId: 1,
-        profileId: 1,
-        takenAt: now,
-      ));
-      final intake2 = await intakeService.logIntake(MedicationIntake(
-        medicationId: 2,
-        profileId: 1,
-        takenAt: now,
-      ));
-      await intakeService.logIntake(MedicationIntake(
-        medicationId: 3,
-        profileId: 1,
-        takenAt: now,
-      ));
+      final intake1 = await intakeService.logIntake(
+        MedicationIntake(
+          medicationId: 1,
+          profileId: 1,
+          takenAt: now,
+        ),
+      );
+      final intake2 = await intakeService.logIntake(
+        MedicationIntake(
+          medicationId: 2,
+          profileId: 1,
+          takenAt: now,
+        ),
+      );
+      await intakeService.logIntake(
+        MedicationIntake(
+          medicationId: 3,
+          profileId: 1,
+          takenAt: now,
+        ),
+      );
 
       final intakes =
           await intakeService.intakesByIds([intake1.id!, intake2.id!]);
@@ -430,11 +466,13 @@ void main() {
     test('handles missing IDs gracefully', () async {
       final now = DateTime.now();
 
-      final intake1 = await intakeService.logIntake(MedicationIntake(
-        medicationId: 1,
-        profileId: 1,
-        takenAt: now,
-      ));
+      final intake1 = await intakeService.logIntake(
+        MedicationIntake(
+          medicationId: 1,
+          profileId: 1,
+          takenAt: now,
+        ),
+      );
 
       final intakes = await intakeService.intakesByIds([intake1.id!, 999]);
 
@@ -553,7 +591,7 @@ void main() {
 
     test('uses default grace windows if not specified', () async {
       final scheduledFor = DateTime(2025, 12, 29, 8, 0);
-      final takenAt = DateTime(2025, 12, 29, 10, 0);
+      final takenAt = DateTime(2025, 12, 29, 8, 10);
 
       final intake = MedicationIntake(
         medicationId: 1,
@@ -567,17 +605,19 @@ void main() {
         scheduleMetadata: '{"v":1}',
       );
 
-      expect(status, IntakeStatus.onTime); // Within default 120min
+      expect(status, IntakeStatus.onTime); // Within default 15min
     });
   });
 
   group('MedicationIntakeService - Delete', () {
     test('deletes intake by id', () async {
-      final logged = await intakeService.logIntake(MedicationIntake(
-        medicationId: 1,
-        profileId: 1,
-        takenAt: DateTime.now(),
-      ));
+      final logged = await intakeService.logIntake(
+        MedicationIntake(
+          medicationId: 1,
+          profileId: 1,
+          takenAt: DateTime.now(),
+        ),
+      );
 
       final deleted = await intakeService.deleteIntake(logged.id!);
 

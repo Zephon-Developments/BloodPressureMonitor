@@ -16,6 +16,7 @@ void main() {
       expect(med.unit, isNull);
       expect(med.frequency, isNull);
       expect(med.scheduleMetadata, isNull);
+      expect(med.isActive, isTrue);
       expect(med.createdAt, isNotNull);
     });
 
@@ -29,6 +30,7 @@ void main() {
         unit: 'mg',
         frequency: 'daily',
         scheduleMetadata: '{"v":1}',
+        isActive: false,
         createdAt: createdAt,
       );
 
@@ -39,6 +41,7 @@ void main() {
       expect(med.unit, 'mg');
       expect(med.frequency, 'daily');
       expect(med.scheduleMetadata, '{"v":1}');
+      expect(med.isActive, isFalse);
       expect(med.createdAt, createdAt);
     });
 
@@ -52,6 +55,7 @@ void main() {
         unit: 'mg',
         frequency: 'daily',
         scheduleMetadata: '{"v":1}',
+        isActive: false,
         createdAt: createdAt,
       );
 
@@ -64,6 +68,7 @@ void main() {
       expect(map['unit'], 'mg');
       expect(map['frequency'], 'daily');
       expect(map['scheduleMetadata'], '{"v":1}');
+      expect(map['isActive'], 0);
       expect(map['createdAt'], createdAt.toIso8601String());
     });
 
@@ -76,6 +81,7 @@ void main() {
         'unit': 'mg',
         'frequency': 'daily',
         'scheduleMetadata': '{"v":1}',
+        'isActive': 0,
         'createdAt': '2025-12-29T00:00:00.000',
       };
 
@@ -88,6 +94,7 @@ void main() {
       expect(med.unit, 'mg');
       expect(med.frequency, 'daily');
       expect(med.scheduleMetadata, '{"v":1}');
+      expect(med.isActive, isFalse);
       expect(med.createdAt, DateTime(2025, 12, 29));
     });
 
@@ -100,6 +107,7 @@ void main() {
         unit: 'mg',
         frequency: 'daily',
         scheduleMetadata: '{"v":1}',
+        isActive: false,
         createdAt: DateTime(2025, 12, 29),
       );
 
@@ -116,15 +124,18 @@ void main() {
         name: 'Aspirin',
         dosage: '100',
         unit: 'mg',
+        isActive: true,
       );
 
-      final updated = med.copyWith(dosage: '200', unit: 'tablets');
+      final updated =
+          med.copyWith(dosage: '200', unit: 'tablets', isActive: false);
 
       expect(updated.id, 1);
       expect(updated.profileId, 1);
       expect(updated.name, 'Aspirin');
       expect(updated.dosage, '200');
       expect(updated.unit, 'tablets');
+      expect(updated.isActive, isFalse);
     });
 
     test('equality compares all fields', () {
