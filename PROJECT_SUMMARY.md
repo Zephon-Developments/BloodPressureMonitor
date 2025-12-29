@@ -19,6 +19,9 @@ A production-ready Flutter application for recording and tracking blood pressure
 
 **Services** (`lib/services/`)
 - `database_service.dart` - SQLite with SQLCipher encryption
+- `reading_service.dart` - CRUD for blood pressure readings
+- `averaging_service.dart` - 30-minute rolling window averaging engine
+- `profile_service.dart` - Profile management
 
 **Utils** (`lib/utils/`)
 - `validators.dart` - Input validation (medically accurate)
@@ -31,7 +34,8 @@ A production-ready Flutter application for recording and tracking blood pressure
 
 **Tests** (`test/`)
 - `models/blood_pressure_reading_test.dart` - Model unit tests
-- Infrastructure ready for widget and integration tests
+- `services/averaging_service_test.dart` - Averaging engine logic tests (96.15% coverage)
+- Infrastructure ready for widget and integration tests using `sqflite_common_ffi`
 
 ### 📚 Documentation (11 files)
 

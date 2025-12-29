@@ -222,7 +222,8 @@ void main() {
       await averagingService.createOrUpdateGroupsForReading(persistedReading2!);
 
       // Verify two separate groups exist
-      var groups = await testDb.query('ReadingGroup', orderBy: 'groupStartAt ASC');
+      var groups =
+          await testDb.query('ReadingGroup', orderBy: 'groupStartAt ASC');
       expect(groups.length, 2);
 
       // Add back-dated reading between the two
@@ -334,7 +335,8 @@ void main() {
       await averagingService.createOrUpdateGroupsForReading(persistedReading3!);
 
       // Verify second group at 14:00 is still intact
-      final groupsAfter = await testDb.query('ReadingGroup', orderBy: 'groupStartAt ASC');
+      final groupsAfter =
+          await testDb.query('ReadingGroup', orderBy: 'groupStartAt ASC');
       expect(groupsAfter.length, 2);
       expect(groupsAfter[0]['memberReadingIds'], '$readingId1,$readingId3');
       expect(groupsAfter[1]['memberReadingIds'], '$readingId2'); // Unchanged
@@ -403,7 +405,8 @@ void main() {
     test('handles empty profile gracefully', () async {
       await averagingService.recomputeGroupsForProfile(999);
 
-      final groups = await testDb.query('ReadingGroup', where: 'profileId = 999');
+      final groups =
+          await testDb.query('ReadingGroup', where: 'profileId = 999');
       expect(groups.length, 0);
     });
   });
@@ -501,7 +504,8 @@ void main() {
       final remaining = groups.where(
         (g) => (g['memberReadingIds'] as String).contains('$readingId10'),
       );
-      expect(remaining.length, 1, reason: 'Group containing ID 10 should still exist');
+      expect(remaining.length, 1,
+          reason: 'Group containing ID 10 should still exist');
     });
   });
 
@@ -537,7 +541,8 @@ void main() {
       );
 
       final groups = await testDb.query('ReadingGroup');
-      expect(groups.length, 1, reason: 'Readings exactly 30 min apart should group');
+      expect(groups.length, 1,
+          reason: 'Readings exactly 30 min apart should group');
     });
 
     test('handles readings just beyond 30-minute boundary', () async {
@@ -571,7 +576,8 @@ void main() {
       );
 
       final groups = await testDb.query('ReadingGroup');
-      expect(groups.length, 2, reason: 'Readings > 30 min apart should not group');
+      expect(groups.length, 2,
+          reason: 'Readings > 30 min apart should not group');
     });
   });
 }
