@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:blood_pressure_monitor/services/database_service.dart';
+import 'package:blood_pressure_monitor/services/reading_service.dart';
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
 import 'package:blood_pressure_monitor/utils/date_formats.dart';
 
@@ -11,7 +11,7 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) =>
-          BloodPressureViewModel(context.read<DatabaseService>())
+          BloodPressureViewModel(context.read<ReadingService>())
             ..loadReadings(),
       child: Scaffold(
         appBar: AppBar(
@@ -62,10 +62,10 @@ class HomeView extends StatelessWidget {
                       children: [
                         Text('Pulse: ${reading.pulse} bpm'),
                         Text(
-                          'Recorded: ${DateFormats.standardDateTime.format(reading.timestamp)}',
+                          'Recorded: ${DateFormats.standardDateTime.format(reading.takenAt)}',
                         ),
-                        if (reading.notes != null && reading.notes!.isNotEmpty)
-                          Text('Notes: ${reading.notes}'),
+                        if (reading.note != null && reading.note!.isNotEmpty)
+                          Text('Notes: ${reading.note}'),
                       ],
                     ),
                     isThreeLine: true,
