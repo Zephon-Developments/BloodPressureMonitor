@@ -125,7 +125,6 @@ class WeightEntry {
   }
 }
 
-
 /// Sleep entry model for tracking sleep data from manual input or device import.
 ///
 /// Stores total sleep time, time in bed, wake count, and optional sleep score.
@@ -261,7 +260,6 @@ class SleepEntry {
     return 'SleepEntry(id: $id, night: $nightOf, sleep: ${totalSleepMinutes}min)';
   }
 }
-
 
 /// Reminder model for scheduling blood pressure reading reminders.
 ///
