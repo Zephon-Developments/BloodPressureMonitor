@@ -1,7 +1,61 @@
+/// Weight unit for measurements.
+enum WeightUnit {
+  /// Kilograms
+  kg,
+
+  /// Pounds
+  lbs,
+}
+
+/// Extension on WeightUnit for conversion utilities.
+extension WeightUnitExtension on WeightUnit {
+  /// Converts weight value to kilograms.
+  double toKg(double value) {
+    switch (this) {
+      case WeightUnit.kg:
+        return value;
+      case WeightUnit.lbs:
+        return value * 0.453592;
+    }
+  }
+
+  /// Converts weight value from kilograms to this unit.
+  double fromKg(double kgValue) {
+    switch (this) {
+      case WeightUnit.kg:
+        return kgValue;
+      case WeightUnit.lbs:
+        return kgValue / 0.453592;
+    }
+  }
+
+  /// Returns the string representation for database storage.
+  String toDbString() {
+    switch (this) {
+      case WeightUnit.kg:
+        return 'kg';
+      case WeightUnit.lbs:
+        return 'lbs';
+    }
+  }
+
+  /// Parses a WeightUnit from database string.
+  static WeightUnit fromDbString(String value) {
+    switch (value.toLowerCase()) {
+      case 'kg':
+        return WeightUnit.kg;
+      case 'lbs':
+        return WeightUnit.lbs;
+      default:
+        return WeightUnit.kg; // Default fallback
+    }
+  }
+}
+
 /// Weight entry model for tracking weight and lifestyle factors.
 ///
 /// Supports optional contextual notes about salt intake, exercise,
-/// sleep quality, and stress levels.
+/// sleep quality, and stress levels. Stores weight with unit information.
 class WeightEntry {
   /// Unique identifier for the weight entry.
   final int? id;
@@ -9,35 +63,61 @@ class WeightEntry {
   /// Profile this entry belongs to.
   final int profileId;
 
-  /// Timestamp when the weight was recorded (UTC).
+  /// Timestamp when the weight was recorded (with timezone).
   final DateTime takenAt;
 
-  /// Weight value in kilograms.
-  final double weight;
+  /// Local timezone offset in minutes at time of measurement.
+  final int localOffsetMinutes;
+
+  /// Weight value (stored as entered, with unit).
+  final double weightValue;
+
+  /// Unit of measurement for the weight.
+  final WeightUnit unit;
+
+  /// Optional general notes.
+  final String? notes;
 
   /// Optional note about salt intake.
-  final String? saltNote;
+  final String? saltIntake;
 
-  /// Optional note about exercise.
-  final String? exerciseNote;
+  /// Optional note about exercise level.
+  final String? exerciseLevel;
+
+  /// Optional stress level rating (e.g., "low", "medium", "high").
+  final String? stressLevel;
 
   /// Optional sleep quality rating (e.g., "poor", "fair", "good").
   final String? sleepQuality;
 
-  /// Optional stress level rating (e.g., "low", "medium", "high").
-  final String? stressLevel;
+  /// Source of this entry (manual or import).
+  final String source;
+
+  /// Optional source metadata (JSON string for import details).
+  final String? sourceMetadata;
+
+  /// Timestamp when this entry was created.
+  final DateTime createdAt;
 
   /// Creates a new [WeightEntry] instance.
   WeightEntry({
     this.id,
     required this.profileId,
     required this.takenAt,
-    required this.weight,
-    this.saltNote,
-    this.exerciseNote,
-    this.sleepQuality,
+    int? localOffsetMinutes,
+    required this.weightValue,
+    required this.unit,
+    this.notes,
+    this.saltIntake,
+    this.exerciseLevel,
     this.stressLevel,
-  });
+    this.sleepQuality,
+    this.source = 'manual',
+    this.sourceMetadata,
+    DateTime? createdAt,
+  })  : localOffsetMinutes =
+            localOffsetMinutes ?? takenAt.timeZoneOffset.inMinutes,
+        createdAt = createdAt ?? DateTime.now();
 
   /// Creates a [WeightEntry] from a database map.
   factory WeightEntry.fromMap(Map<String, dynamic> map) {
@@ -45,11 +125,17 @@ class WeightEntry {
       id: map['id'] as int?,
       profileId: map['profileId'] as int,
       takenAt: DateTime.parse(map['takenAt'] as String),
-      weight: map['weight'] as double,
-      saltNote: map['saltNote'] as String?,
-      exerciseNote: map['exerciseNote'] as String?,
-      sleepQuality: map['sleepQuality'] as String?,
+      localOffsetMinutes: map['localOffsetMinutes'] as int,
+      weightValue: map['weightValue'] as double,
+      unit: WeightUnitExtension.fromDbString(map['unit'] as String),
+      notes: map['notes'] as String?,
+      saltIntake: map['saltIntake'] as String?,
+      exerciseLevel: map['exerciseLevel'] as String?,
       stressLevel: map['stressLevel'] as String?,
+      sleepQuality: map['sleepQuality'] as String?,
+      source: map['source'] as String? ?? 'manual',
+      sourceMetadata: map['sourceMetadata'] as String?,
+      createdAt: DateTime.parse(map['createdAt'] as String),
     );
   }
 
@@ -59,34 +145,58 @@ class WeightEntry {
       if (id != null) 'id': id,
       'profileId': profileId,
       'takenAt': takenAt.toIso8601String(),
-      'weight': weight,
-      'saltNote': saltNote,
-      'exerciseNote': exerciseNote,
-      'sleepQuality': sleepQuality,
+      'localOffsetMinutes': localOffsetMinutes,
+      'weightValue': weightValue,
+      'unit': unit.toDbString(),
+      'notes': notes,
+      'saltIntake': saltIntake,
+      'exerciseLevel': exerciseLevel,
       'stressLevel': stressLevel,
+      'sleepQuality': sleepQuality,
+      'source': source,
+      'sourceMetadata': sourceMetadata,
+      'createdAt': createdAt.toIso8601String(),
     };
   }
+
+  /// Gets weight value in kilograms (converts if needed).
+  double get weightInKg => unit.toKg(weightValue);
+
+  /// Gets weight value in pounds (converts if needed).
+  double get weightInLbs => WeightUnit.lbs.fromKg(weightInKg);
 
   /// Creates a copy of this [WeightEntry] with the given fields replaced.
   WeightEntry copyWith({
     int? id,
     int? profileId,
     DateTime? takenAt,
-    double? weight,
-    String? saltNote,
-    String? exerciseNote,
-    String? sleepQuality,
+    int? localOffsetMinutes,
+    double? weightValue,
+    WeightUnit? unit,
+    String? notes,
+    String? saltIntake,
+    String? exerciseLevel,
     String? stressLevel,
+    String? sleepQuality,
+    String? source,
+    String? sourceMetadata,
+    DateTime? createdAt,
   }) {
     return WeightEntry(
       id: id ?? this.id,
       profileId: profileId ?? this.profileId,
       takenAt: takenAt ?? this.takenAt,
-      weight: weight ?? this.weight,
-      saltNote: saltNote ?? this.saltNote,
-      exerciseNote: exerciseNote ?? this.exerciseNote,
-      sleepQuality: sleepQuality ?? this.sleepQuality,
+      localOffsetMinutes: localOffsetMinutes ?? this.localOffsetMinutes,
+      weightValue: weightValue ?? this.weightValue,
+      unit: unit ?? this.unit,
+      notes: notes ?? this.notes,
+      saltIntake: saltIntake ?? this.saltIntake,
+      exerciseLevel: exerciseLevel ?? this.exerciseLevel,
       stressLevel: stressLevel ?? this.stressLevel,
+      sleepQuality: sleepQuality ?? this.sleepQuality,
+      source: source ?? this.source,
+      sourceMetadata: sourceMetadata ?? this.sourceMetadata,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 
@@ -98,11 +208,17 @@ class WeightEntry {
         other.id == id &&
         other.profileId == profileId &&
         other.takenAt == takenAt &&
-        other.weight == weight &&
-        other.saltNote == saltNote &&
-        other.exerciseNote == exerciseNote &&
+        other.localOffsetMinutes == localOffsetMinutes &&
+        other.weightValue == weightValue &&
+        other.unit == unit &&
+        other.notes == notes &&
+        other.saltIntake == saltIntake &&
+        other.exerciseLevel == exerciseLevel &&
+        other.stressLevel == stressLevel &&
         other.sleepQuality == sleepQuality &&
-        other.stressLevel == stressLevel;
+        other.source == source &&
+        other.sourceMetadata == sourceMetadata &&
+        other.createdAt == createdAt;
   }
 
   @override
@@ -111,23 +227,63 @@ class WeightEntry {
       id,
       profileId,
       takenAt,
-      weight,
-      saltNote,
-      exerciseNote,
-      sleepQuality,
+      localOffsetMinutes,
+      weightValue,
+      unit,
+      notes,
+      saltIntake,
+      exerciseLevel,
       stressLevel,
+      sleepQuality,
+      source,
+      sourceMetadata,
+      createdAt,
     );
   }
 
   @override
   String toString() {
-    return 'WeightEntry(id: $id, weight: ${weight}kg, at: $takenAt)';
+    return 'WeightEntry(id: $id, weight: $weightValue${unit.toDbString()}, at: $takenAt)';
+  }
+}
+
+/// Sleep data source.
+enum SleepSource {
+  /// Manually entered by user
+  manual,
+
+  /// Imported from device/app
+  import,
+}
+
+/// Extension on SleepSource for database conversion.
+extension SleepSourceExtension on SleepSource {
+  /// Returns the string representation for database storage.
+  String toDbString() {
+    switch (this) {
+      case SleepSource.manual:
+        return 'manual';
+      case SleepSource.import:
+        return 'import';
+    }
+  }
+
+  /// Parses a SleepSource from database string.
+  static SleepSource fromDbString(String value) {
+    switch (value.toLowerCase()) {
+      case 'manual':
+        return SleepSource.manual;
+      case 'import':
+        return SleepSource.import;
+      default:
+        return SleepSource.manual; // Default fallback
+    }
   }
 }
 
 /// Sleep entry model for tracking sleep data from manual input or device import.
 ///
-/// Stores total sleep time, time in bed, wake count, and optional sleep score.
+/// Stores sleep duration, quality, timing, and source information.
 class SleepEntry {
   /// Unique identifier for the sleep entry.
   final int? id;
@@ -135,52 +291,74 @@ class SleepEntry {
   /// Profile this entry belongs to.
   final int profileId;
 
-  /// Date of the night this sleep data represents (e.g., "2025-12-28").
-  final String nightOf;
+  /// Timestamp when sleep started (with timezone).
+  final DateTime startedAt;
 
-  /// Total sleep time in minutes.
-  final int totalSleepMinutes;
+  /// Timestamp when sleep ended (with timezone).
+  final DateTime? endedAt;
 
-  /// Total time in bed in minutes.
-  final int timeInBedMinutes;
+  /// Total sleep duration in minutes.
+  ///
+  /// Can be explicitly set for imported summaries, or calculated from times.
+  final int durationMinutes;
 
-  /// Number of times woken during the night.
-  final int wakeCount;
+  /// Optional sleep quality rating (1-5 scale).
+  final int? quality;
 
-  /// Optional sleep score or efficiency percentage (0-100).
-  final double? sleepScore;
+  /// Local timezone offset in minutes at time of sleep end.
+  final int localOffsetMinutes;
 
-  /// Source of the data (e.g., "manual", "device:FitBit").
-  final String source;
+  /// Source of this entry.
+  final SleepSource source;
 
-  /// Timestamp when this data was imported/entered (UTC).
-  final DateTime importedAt;
+  /// Optional source metadata (JSON string for import details).
+  final String? sourceMetadata;
+
+  /// Optional notes about the sleep.
+  final String? notes;
+
+  /// Timestamp when this entry was created.
+  final DateTime createdAt;
 
   /// Creates a new [SleepEntry] instance.
+  ///
+  /// If [endedAt] is provided and [durationMinutes] is not, duration will be
+  /// calculated automatically. For import summaries, duration can be provided
+  /// explicitly without [endedAt].
   SleepEntry({
     this.id,
     required this.profileId,
-    required this.nightOf,
-    required this.totalSleepMinutes,
-    required this.timeInBedMinutes,
-    required this.wakeCount,
-    this.sleepScore,
-    required this.source,
-    DateTime? importedAt,
-  }) : importedAt = importedAt ?? DateTime.now().toUtc();
+    required this.startedAt,
+    this.endedAt,
+    int? durationMinutes,
+    this.quality,
+    int? localOffsetMinutes,
+    this.source = SleepSource.manual,
+    this.sourceMetadata,
+    this.notes,
+    DateTime? createdAt,
+  })  : durationMinutes = durationMinutes ??
+            (endedAt != null ? endedAt.difference(startedAt).inMinutes : 0),
+        localOffsetMinutes = localOffsetMinutes ??
+            (endedAt ?? startedAt).timeZoneOffset.inMinutes,
+        createdAt = createdAt ?? DateTime.now();
 
   /// Creates a [SleepEntry] from a database map.
   factory SleepEntry.fromMap(Map<String, dynamic> map) {
     return SleepEntry(
       id: map['id'] as int?,
       profileId: map['profileId'] as int,
-      nightOf: map['nightOf'] as String,
-      totalSleepMinutes: map['totalSleepMinutes'] as int,
-      timeInBedMinutes: map['timeInBedMinutes'] as int,
-      wakeCount: map['wakeCount'] as int,
-      sleepScore: map['sleepScore'] as double?,
-      source: map['source'] as String,
-      importedAt: DateTime.parse(map['importedAt'] as String),
+      startedAt: DateTime.parse(map['startedAt'] as String),
+      endedAt: map['endedAt'] != null
+          ? DateTime.parse(map['endedAt'] as String)
+          : null,
+      durationMinutes: map['durationMinutes'] as int,
+      quality: map['quality'] as int?,
+      localOffsetMinutes: map['localOffsetMinutes'] as int,
+      source: SleepSourceExtension.fromDbString(map['source'] as String),
+      sourceMetadata: map['sourceMetadata'] as String?,
+      notes: map['notes'] as String?,
+      createdAt: DateTime.parse(map['createdAt'] as String),
     );
   }
 
@@ -189,13 +367,15 @@ class SleepEntry {
     return {
       if (id != null) 'id': id,
       'profileId': profileId,
-      'nightOf': nightOf,
-      'totalSleepMinutes': totalSleepMinutes,
-      'timeInBedMinutes': timeInBedMinutes,
-      'wakeCount': wakeCount,
-      'sleepScore': sleepScore,
-      'source': source,
-      'importedAt': importedAt.toIso8601String(),
+      'startedAt': startedAt.toIso8601String(),
+      'endedAt': endedAt?.toIso8601String(),
+      'durationMinutes': durationMinutes,
+      'quality': quality,
+      'localOffsetMinutes': localOffsetMinutes,
+      'source': source.toDbString(),
+      'sourceMetadata': sourceMetadata,
+      'notes': notes,
+      'createdAt': createdAt.toIso8601String(),
     };
   }
 
@@ -203,24 +383,28 @@ class SleepEntry {
   SleepEntry copyWith({
     int? id,
     int? profileId,
-    String? nightOf,
-    int? totalSleepMinutes,
-    int? timeInBedMinutes,
-    int? wakeCount,
-    double? sleepScore,
-    String? source,
-    DateTime? importedAt,
+    DateTime? startedAt,
+    DateTime? endedAt,
+    int? durationMinutes,
+    int? quality,
+    int? localOffsetMinutes,
+    SleepSource? source,
+    String? sourceMetadata,
+    String? notes,
+    DateTime? createdAt,
   }) {
     return SleepEntry(
       id: id ?? this.id,
       profileId: profileId ?? this.profileId,
-      nightOf: nightOf ?? this.nightOf,
-      totalSleepMinutes: totalSleepMinutes ?? this.totalSleepMinutes,
-      timeInBedMinutes: timeInBedMinutes ?? this.timeInBedMinutes,
-      wakeCount: wakeCount ?? this.wakeCount,
-      sleepScore: sleepScore ?? this.sleepScore,
+      startedAt: startedAt ?? this.startedAt,
+      endedAt: endedAt ?? this.endedAt,
+      durationMinutes: durationMinutes ?? this.durationMinutes,
+      quality: quality ?? this.quality,
+      localOffsetMinutes: localOffsetMinutes ?? this.localOffsetMinutes,
       source: source ?? this.source,
-      importedAt: importedAt ?? this.importedAt,
+      sourceMetadata: sourceMetadata ?? this.sourceMetadata,
+      notes: notes ?? this.notes,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 
@@ -231,13 +415,15 @@ class SleepEntry {
     return other is SleepEntry &&
         other.id == id &&
         other.profileId == profileId &&
-        other.nightOf == nightOf &&
-        other.totalSleepMinutes == totalSleepMinutes &&
-        other.timeInBedMinutes == timeInBedMinutes &&
-        other.wakeCount == wakeCount &&
-        other.sleepScore == sleepScore &&
+        other.startedAt == startedAt &&
+        other.endedAt == endedAt &&
+        other.durationMinutes == durationMinutes &&
+        other.quality == quality &&
+        other.localOffsetMinutes == localOffsetMinutes &&
         other.source == source &&
-        other.importedAt == importedAt;
+        other.sourceMetadata == sourceMetadata &&
+        other.notes == notes &&
+        other.createdAt == createdAt;
   }
 
   @override
@@ -245,19 +431,21 @@ class SleepEntry {
     return Object.hash(
       id,
       profileId,
-      nightOf,
-      totalSleepMinutes,
-      timeInBedMinutes,
-      wakeCount,
-      sleepScore,
+      startedAt,
+      endedAt,
+      durationMinutes,
+      quality,
+      localOffsetMinutes,
       source,
-      importedAt,
+      sourceMetadata,
+      notes,
+      createdAt,
     );
   }
 
   @override
   String toString() {
-    return 'SleepEntry(id: $id, night: $nightOf, sleep: ${totalSleepMinutes}min)';
+    return 'SleepEntry(id: $id, duration: ${durationMinutes}min, ended: $endedAt)';
   }
 }
 
