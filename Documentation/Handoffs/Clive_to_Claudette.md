@@ -1,36 +1,48 @@
 # Handoff: Clive to Claudette
 
-## Status: Phase 1 Security Review & Fixes Required
+## Status: Phase 2 Review - REJECTED (Blockers Identified)
 
-I have reviewed the codebase following the failed PR and the partial implementation of security enhancements. While the `SecurePasswordManager` is a significant improvement, there are several blockers and cleanup items that must be addressed before we can re-attempt the merge into `main`.
+**Date**: December 29, 2025  
+**From**: Clive (Reviewer)  
+**To**: Claudette (Implementer)  
+**Phase**: 2 - Averaging Engine
 
-### Blockers & Critical Issues
+## Review Summary
 
-1.  **Compilation Error in `DatabaseService`**:
-    *   **File**: [lib/services/database_service.dart](lib/services/database_service.dart#L43)
-    *   **Issue**: Attempting to instantiate `DatabaseException`, which is an abstract class in the `sqflite` package.
-    *   **Fix**: Replace `throw DatabaseException(...)` with a concrete exception type, such as `StateError` or a custom `DatabaseInitializationException`.
+The implementation of the `AveragingService` shows a strong understanding of the requirements and excellent documentation standards. However, there are two critical logic bugs that would cause data loss and incorrect deletions in production, and the lack of test coverage violates our core coding standards.
 
-2.  **Lint Warnings**:
-    *   **File**: [lib/services/database_service.dart](lib/services/database_service.dart#L8)
-    *   **Issue**: `always_use_package_imports` violation.
-    *   **Fix**: Change `import 'secure_password_manager.dart';` to `import 'package:blood_pressure_monitor/services/secure_password_manager.dart';`.
+## Blockers
 
-### Documentation Updates
+### 1. Data Loss in `_persistGroups` (Critical)
+The current implementation of `createOrUpdateGroupsForReading` fetches a local window of readings but then calls `_persistGroups`, which performs a `DELETE FROM ReadingGroup WHERE profileId = ?`.
+- **Issue**: This wipes out the entire history of groups for the profile and replaces them with only the groups found in the ±30 minute window.
+- **Fix**: `_persistGroups` must only delete groups that overlap with the time window being processed, or `createOrUpdateGroupsForReading` must be careful to only update/delete specific group IDs.
 
-1.  **Update Production Checklist**:
-    *   **File**: [PRODUCTION_CHECKLIST.md](PRODUCTION_CHECKLIST.md)
-    *   **Issue**: Section 1 still lists "Using placeholder password" as a critical ❌ item.
-    *   **Fix**: Update the status to ✅ and reflect that `SecurePasswordManager` is now handling the database encryption key.
+### 2. SQL `LIKE` False Positives (Major)
+In `deleteGroupsForReading`, you are using `LIKE %$readingId%`.
+- **Issue**: A search for ID `1` will match `10`, `11`, `21`, etc.
+- **Fix**: Since `memberReadingIds` is a comma-separated string, you must use a more precise matching strategy (e.g., checking for `,1,`, `1,`, or `,1`) or, preferably, implement a proper join table `ReadingGroupMember` to avoid string parsing in SQL.
 
-### Verification Tasks
+### 3. Test Coverage (Critical)
+0% coverage is unacceptable for core business logic.
+- **Issue**: `sqflite_sqlcipher` testing limitations.
+- **Fix**: You do not need encryption to test the averaging logic. Refactor `DatabaseService` to accept a `Database` instance or a factory. In tests, use `sqflite_common_ffi` with an in-memory, **unencrypted** database to verify the grouping algorithm.
 
-1.  **Run Analyzer**: Ensure `flutter analyze` returns zero issues.
-2.  **Run Tests**: Ensure all 41 tests pass (`flutter test`). The compilation error currently prevents tests from running.
+## Follow-up Tasks
 
-### Next Steps
+1. **Fix Data Integrity**: Ensure `createOrUpdateGroupsForReading` does not delete unrelated groups.
+2. **Fix Deletion Logic**: Ensure `deleteGroupsForReading` only targets the specific reading ID.
+3. **Restore Tests**: Implement unit tests using an unencrypted mock database. Target ≥80% coverage.
+4. **Update Docs**: Update `CHANGELOG.md` and `PRODUCTION_CHECKLIST.md`.
 
-Once these fixes are applied and verified, please prepare a new handoff for me so I can green-light the PR for merge.
+## Guidance
+
+For the `LIKE` issue, if you stick with the string approach, use:
+`where: "',' || memberReadingIds || ',' LIKE ?"`, `whereArgs: ['%,$readingId,%']`
+This ensures you only match the full ID.
+
+Please address these blockers and resubmit for review.
 
 ---
-*Clive*
+**Clive**  
+*Quality & Security Gatekeeper*

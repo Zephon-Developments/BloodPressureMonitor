@@ -15,8 +15,19 @@ import 'package:sqflite_sqlcipher/sqflite.dart';
 /// await service.createOrUpdateGroupsForReading(newReading);
 /// ```
 class AveragingService {
-  final DatabaseService _databaseService = DatabaseService();
-  final ReadingService _readingService = ReadingService();
+  final DatabaseService _databaseService;
+  final ReadingService _readingService;
+
+  /// Creates an AveragingService with optional dependency injection.
+  ///
+  /// Parameters:
+  /// - [databaseService]: Optional database service for testing
+  /// - [readingService]: Optional reading service for testing
+  AveragingService({
+    DatabaseService? databaseService,
+    ReadingService? readingService,
+  })  : _databaseService = databaseService ?? DatabaseService(),
+        _readingService = readingService ?? ReadingService();
 
   /// Creates or updates reading groups after a new reading is added.
   ///
@@ -96,11 +107,11 @@ class AveragingService {
   Future<void> deleteGroupsForReading(int readingId) async {
     final db = await _databaseService.database;
 
-    // Find groups containing this reading
+    // Find groups containing this reading (use comma delimiters for exact match)
     final groups = await db.query(
       'ReadingGroup',
-      where: 'memberReadingIds LIKE ?',
-      whereArgs: ['%$readingId%'],
+      where: "',' || memberReadingIds || ',' LIKE ?",
+      whereArgs: ['%,$readingId,%'],
     );
 
     // Delete each group that contains this reading
@@ -205,21 +216,37 @@ class AveragingService {
 
   /// Persists reading groups to the database.
   ///
-  /// Replaces all existing groups for the profile with the new groups.
+  /// Only deletes and replaces groups that overlap with the time range
+  /// of the provided groups, preserving all other historical groups.
   ///
   /// Parameters:
   /// - [profileId]: The profile these groups belong to
   /// - [groups]: List of groups to persist
   Future<void> _persistGroups(int profileId, List<ReadingGroup> groups) async {
+    if (groups.isEmpty) return;
+
     final db = await _databaseService.database;
+
+    // Calculate the time range covered by the new groups
+    final earliestTime = groups
+        .map((g) => g.groupStartAt)
+        .reduce((a, b) => a.isBefore(b) ? a : b);
+    final latestTime = groups
+        .map((g) => g.groupStartAt)
+        .reduce((a, b) => a.isAfter(b) ? a : b)
+        .add(const Duration(minutes: 30));
 
     // Use a transaction for atomic updates
     await db.transaction((txn) async {
-      // Delete existing groups for this profile
+      // Delete only groups that overlap with the time range being processed
       await txn.delete(
         'ReadingGroup',
-        where: 'profileId = ?',
-        whereArgs: [profileId],
+        where: 'profileId = ? AND groupStartAt >= ? AND groupStartAt <= ?',
+        whereArgs: [
+          profileId,
+          earliestTime.toIso8601String(),
+          latestTime.toIso8601String(),
+        ],
       );
 
       // Insert new groups

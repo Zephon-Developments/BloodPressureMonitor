@@ -8,7 +8,14 @@ import 'package:blood_pressure_monitor/services/database_service.dart';
 /// by profile and time ranges. Readings are used by the averaging engine to
 /// generate ReadingGroup analytics.
 class ReadingService {
-  final DatabaseService _databaseService = DatabaseService();
+  final DatabaseService _databaseService;
+
+  /// Creates a ReadingService with optional dependency injection.
+  ///
+  /// Parameters:
+  /// - [databaseService]: Optional database service for testing
+  ReadingService({DatabaseService? databaseService})
+      : _databaseService = databaseService ?? DatabaseService();
 
   /// Creates a new reading in the database.
   ///
