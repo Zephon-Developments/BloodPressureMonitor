@@ -27,7 +27,7 @@ Phase 4 (Weight & Sleep Tracking - Data Layer) has been successfully implemented
 
 ### Deployment Status
 - ✅ **Branch:** `feature/phase-4-weight-sleep`
-- ✅ **Committed:** 9aab711 (feat: implement weight & sleep tracking data layer)
+- ✅ **Committed:** 9aab711, 04cb725
 - ✅ **Pushed to Remote:** ✓
 - ⏳ **Pull Request:** Ready for creation and manual merge
 
@@ -111,36 +111,5 @@ The following documents have been archived to `Documentation/archive/handoffs/ph
 
 ---
 
-## Implementation Highlights
-
-### Database Migration (v2 → v3)
-- **Transactional Safety:** All changes wrapped in transaction for atomicity
-- **Data Preservation:** Existing weight and sleep data migrated to new schema
-- **Quality Clamping:** Sleep scores properly mapped from 0-100 to 1-5 with rounding
-- **Indexes:** Optimized for time-based queries and correlations
-
-### Weight Tracking
-- **Unit Flexibility:** Store in kg or lbs, convert automatically for display
-- **Lifestyle Factors:** Track salt intake, exercise, stress, and sleep quality alongside weight
-- **Correlation:** Find nearest weight within same-day ±1h window for BP readings
-- **Source Tracking:** Distinguish manual entries from imports
-
-### Sleep Tracking
-- **Flexible Input:** Support both start/end times or explicit duration
-- **Quality Rating:** 1-5 scale for sleep quality assessment
-- **Morning Correlation:** Find sleep ending within 18h before morning BP reading
-- **Import Support:** Deduplication prevents duplicate entries from fitness trackers
-- **Source Tracking:** Manual vs imported entries with metadata support
-
-### Code Quality
-- **Strong Typing:** No inappropriate use of `dynamic` or `any`
-- **Documentation:** Complete JSDoc/DartDoc for all public APIs
-- **Validation:** Comprehensive input validation with error/warning levels
-- **Testing:** 131 new tests covering models, services, validators, and edge cases
-- **Standards Compliance:** All code follows CODING_STANDARDS.md guidelines
-
----
-
 **Steve**  
 *Workflow Conductor*
-
