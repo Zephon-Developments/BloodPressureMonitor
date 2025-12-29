@@ -9,11 +9,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 /// secure storage (iOS Keychain, Android Keystore). Generates a unique
 /// password per installation using cryptographically secure random generation.
 class SecurePasswordManager {
-  static const _storage = FlutterSecureStorage(
-    aOptions: AndroidOptions(
-      encryptedSharedPreferences: true,
-    ),
-  );
+  static const _storage = FlutterSecureStorage();
   static const _passwordKey = 'db_encryption_password';
 
   /// Gets the database password, generating and storing a new one if needed.
