@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_sqlcipher/sqflite.dart';
@@ -47,20 +48,79 @@ class DatabaseService {
       password = await SecurePasswordManager.getOrCreatePassword();
     } on Exception catch (e, stackTrace) {
       // Log error details for diagnostics and fail initialization explicitly
-      stderr.writeln('Error retrieving secure database password: $e');
-      stderr.writeln(stackTrace);
+      debugPrint('Error retrieving secure database password: $e');
+      debugPrint(stackTrace.toString());
       throw StateError(
         'Failed to initialize encrypted database: could not retrieve secure password.',
       );
     }
 
-    return await openDatabase(
-      path,
-      version: _databaseVersion,
-      password: password,
-      onCreate: _onCreate,
-      onUpgrade: _onUpgrade,
-    );
+    // Check if database file exists
+    final dbFile = File(path);
+    final bool dbExists = await dbFile.exists();
+
+    if (dbExists) {
+      // Try to open with secure password first
+      try {
+        return await openDatabase(
+          path,
+          version: _databaseVersion,
+          password: password,
+          onCreate: _onCreate,
+          onUpgrade: _onUpgrade,
+        );
+      } on Exception catch (_) {
+        // Failed to open with secure password, try migration from placeholder
+        debugPrint(
+          'Attempting database migration from placeholder password...',
+        );
+        return await _migrateFromPlaceholderPassword(path, password);
+      }
+    } else {
+      // New database, use secure password
+      return await openDatabase(
+        path,
+        version: _databaseVersion,
+        password: password,
+        onCreate: _onCreate,
+        onUpgrade: _onUpgrade,
+      );
+    }
+  }
+
+  /// Migrates database from placeholder password to secure password.
+  ///
+  /// Attempts to open database with old placeholder password and rekey to
+  /// the new secure password. This is a one-time migration for existing users.
+  Future<Database> _migrateFromPlaceholderPassword(
+    String path,
+    String newPassword,
+  ) async {
+    const String placeholderPassword = 'placeholder_password';
+
+    try {
+      // Try to open with old placeholder password
+      final db = await openDatabase(
+        path,
+        version: _databaseVersion,
+        password: placeholderPassword,
+        onUpgrade: _onUpgrade,
+      );
+
+      // Successfully opened with placeholder, now rekey to secure password
+      debugPrint('Database opened with placeholder password, rekeying...');
+      await db.execute("PRAGMA rekey = '${newPassword.replaceAll("'", "''")}'");
+      debugPrint('Database successfully rekeyed to secure password.');
+
+      return db;
+    } on Exception catch (e, stackTrace) {
+      // Migration failed, database is likely corrupted or uses unknown password
+      debugPrint('Failed to migrate database: $e');
+      debugPrint(stackTrace.toString());
+      throw StateError(
+        'Database migration failed. The database may be corrupted or use an unknown password.',
+      );
+    }
   }
 
   /// Creates the database schema on first run.

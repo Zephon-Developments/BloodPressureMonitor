@@ -53,7 +53,8 @@ class AppLockState {
   }
 
   /// Checks if the app is currently locked out due to failed attempts.
-  bool get isLockedOut => lockoutExpiry != null && DateTime.now().isBefore(lockoutExpiry!);
+  bool get isLockedOut =>
+      lockoutExpiry != null && DateTime.now().isBefore(lockoutExpiry!);
 
   /// Gets the remaining lockout time in seconds, or 0 if not locked out.
   int get lockoutRemainingSeconds {

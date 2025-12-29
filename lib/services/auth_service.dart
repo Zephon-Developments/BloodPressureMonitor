@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -179,18 +179,23 @@ class AuthService {
   /// failed attempt count.
   Future<bool> authenticateWithBiometrics() async {
     if (!await isBiometricEnabled()) {
+      debugPrint('Biometric authentication skipped: not enabled');
       return false;
     }
 
     try {
-      return await _localAuth.authenticate(
+      debugPrint('Attempting biometric authentication...');
+      final result = await _localAuth.authenticate(
         localizedReason: 'Authenticate to unlock Blood Pressure Monitor',
         options: const AuthenticationOptions(
           stickyAuth: true,
-          biometricOnly: true,
+          biometricOnly: false, // Allow device PIN fallback if biometric fails
         ),
       );
-    } on Exception {
+      debugPrint('Biometric authentication result: $result');
+      return result;
+    } catch (e) {
+      debugPrint('Biometric authentication error: $e');
       return false;
     }
   }

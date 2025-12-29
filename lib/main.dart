@@ -69,22 +69,87 @@ class MyApp extends StatelessWidget {
 }
 
 /// Navigation gate that enforces lock screen when app is locked.
-class _LockGate extends StatelessWidget {
+///
+/// Also includes a privacy screen overlay that prevents sensitive data from
+/// being visible in the app switcher when backgrounded.
+class _LockGate extends StatefulWidget {
   const _LockGate();
+
+  @override
+  State<_LockGate> createState() => _LockGateState();
+}
+
+class _LockGateState extends State<_LockGate> with WidgetsBindingObserver {
+  bool _showPrivacyScreen = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    setState(() {
+      // Show privacy screen when app is backgrounded/inactive to prevent
+      // sensitive data from being visible in the app switcher
+      _showPrivacyScreen = state == AppLifecycleState.paused ||
+          state == AppLifecycleState.inactive ||
+          state == AppLifecycleState.hidden;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final lockViewModel = context.watch<LockViewModel>();
 
+    Widget mainContent;
     if (lockViewModel.state.isLocked) {
-      return const LockScreenView();
+      mainContent = const LockScreenView();
+    } else {
+      mainContent = GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () => lockViewModel.recordActivity(),
+        onPanUpdate: (_) => lockViewModel.recordActivity(),
+        child: const HomeView(),
+      );
     }
 
-    return GestureDetector(
-      behavior: HitTestBehavior.translucent,
-      onTap: () => lockViewModel.recordActivity(),
-      onPanUpdate: (_) => lockViewModel.recordActivity(),
-      child: const HomeView(),
-    );
+    // Overlay privacy screen when app is backgrounded
+    if (_showPrivacyScreen) {
+      return Stack(
+        children: [
+          mainContent,
+          Container(
+            color: Theme.of(context).colorScheme.surface,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.favorite,
+                    size: 80,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Blood Pressure Monitor',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return mainContent;
   }
 }
