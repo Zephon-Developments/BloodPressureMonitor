@@ -8,8 +8,8 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - [x] Phase 2A: Averaging Engine ✅ **COMPLETE** (Dec 29, 2025)
 - [x] Phase 2B: Validation & ViewModel Integration ✅ **COMPLETE** (Dec 29, 2025)
 - [x] Phase 3: Medication Management ✅ **COMPLETE** (Dec 29, 2025)
-- [ ] Phase 4: Weight & Sleep
-- [ ] Phase 5: App Security Gate
+- [x] Phase 4: Weight & Sleep ✅ **COMPLETE** (Dec 29, 2025)
+- [x] Phase 5: App Security Gate ✅ **COMPLETE** (Dec 29, 2025)
 - [ ] Phase 6: UI Foundation
 - [ ] Phase 7: History (Avg-first with expansion)
 - [ ] Phase 8: Charts & Analytics

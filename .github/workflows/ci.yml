@@ -78,7 +78,8 @@ jobs:
     - name: Allow Flutter SDK directory for Git
       run: |
         export HOME=/home/runneruser
-        git config --global --add safe.directory "${{ env.FLUTTER_ROOT }}"
+        FLUTTER_SDK_PATH=$(dirname $(dirname $(which flutter)))
+        git config --global --add safe.directory "$FLUTTER_SDK_PATH"
 
     # ---------------------------------------------------------
     # Install dependencies
