@@ -42,7 +42,8 @@ android {
 
     defaultConfig {
         applicationId "com.zephon.blood_pressure_monitor"
-        minSdkVersion flutter.minSdkVersion
+        // Minimum SDK 23 required for biometric authentication
+        minSdkVersion 23
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

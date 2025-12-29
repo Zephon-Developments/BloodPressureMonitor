@@ -12,47 +12,43 @@ Currently supported versions for security updates:
 
 ### Data Encryption
 
-- **SQLCipher Encryption**: All local data is encrypted using SQLCipher
-- Database password should be stored securely in production
+- **SQLCipher Encryption**: All local data is encrypted using AES-256 encryption via SQLCipher
+- **Per-Installation Password**: Each installation generates a unique, cryptographically secure database password (48 bytes, 384 bits of entropy)
+- **Secure Storage**: Database password stored in platform-specific secure storage (iOS Keychain, Android Keystore)
+- **Automatic Migration**: Seamless migration from legacy placeholder password to secure password
 - No data is transmitted over the network
 - All data remains on the device
 
-### Secure Storage Recommendations
+### Authentication & Access Control
 
-For production deployments, implement these security enhancements:
+1. **PIN Protection**
+   - PBKDF2-based PIN hashing with 10,000 iterations (HMAC-SHA256)
+   - 32-byte cryptographically secure salt per PIN
+   - Hash and salt stored in platform secure storage
+   - Never stored in plaintext
 
-1. **Database Password Management**
-   - Use `flutter_secure_storage` to store the database password
-   - Generate a unique password per installation
-   - Never hardcode passwords in source code
+2. **Biometric Authentication**
+   - Support for Face ID, Fingerprint, and other platform biometrics
+   - Requires PIN to be set first (PIN is fallback)
+   - Automatic biometric revocation detection
+   - Falls back to PIN when device biometrics are removed
 
-2. **Example Implementation**:
-   ```dart
-   import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-   
-   class SecurePasswordManager {
-     static const _storage = FlutterSecureStorage();
-     static const _passwordKey = 'db_password';
-     
-     static Future<String> getOrCreatePassword() async {
-       String? password = await _storage.read(key: _passwordKey);
-       
-       if (password == null) {
-         // Generate a secure random password
-         password = _generateSecurePassword();
-         await _storage.write(key: _passwordKey, value: password);
-       }
-       
-       return password;
-     }
-     
-     static String _generateSecurePassword() {
-       // Implement secure password generation
-       // Use crypto libraries for proper randomness
-       return /* generated password */;
-     }
-   }
-   ```
+3. **Lockout Policy**
+   - Progressive lockout on failed PIN attempts:
+     - 5 failed attempts: 30 second lockout
+     - 10 failed attempts: 5 minute lockout
+     - 15+ failed attempts: 30 minute lockout (capped)
+   - Lockout timers persist across app restarts
+
+4. **Auto-Lock**
+   - Configurable idle timeout (1, 2, 5, 10, or 30 minutes)
+   - Default timeout: 2 minutes
+   - Immediate lock when app is backgrounded
+   - Activity tracking resets idle timer
+
+5. **Privacy Screen**
+   - App switcher shows logo overlay instead of sensitive data
+   - Prevents medical information leakage in task switcher
 
 ### Data Privacy
 

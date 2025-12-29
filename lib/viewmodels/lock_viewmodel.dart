@@ -1,7 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:blood_pressure_monitor/models/lock_state.dart' show AppLockState;
+import 'package:blood_pressure_monitor/models/lock_state.dart'
+    show AppLockState;
 import 'package:blood_pressure_monitor/services/auth_service.dart';
 import 'package:blood_pressure_monitor/services/idle_timer_service.dart';
 
@@ -26,7 +27,7 @@ class LockViewModel extends ChangeNotifier with WidgetsBindingObserver {
       prefs: _prefs,
       onIdleTimeout: lock,
     );
-    
+
     WidgetsBinding.instance.addObserver(this);
     _loadInitialState();
   }
@@ -119,20 +120,35 @@ class LockViewModel extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   /// Locks the app.
+  ///
+  /// Only locks if a PIN is set. If no PIN is configured, the app
+  /// remains unlocked (security is opt-in).
   void lock() {
+    if (!_state.isPinSet) {
+      return; // Don't lock if no PIN is set
+    }
     _state = _state.copyWith(isLocked: true);
     _idleTimerService.stopMonitoring();
     notifyListeners();
   }
 
   /// Sets a new PIN.
+  ///
+  /// If this is the initial PIN setup (app was unlocked), the app
+  /// remains unlocked. If called from locked state, user must still unlock.
   Future<void> setPin(String pin) async {
+    final wasUnlocked = !_state.isLocked;
     await _authService.setPin(pin);
     _state = _state.copyWith(
       isPinSet: true,
+      isLocked: false, // Unlock after setting PIN
       failedAttempts: 0,
       lockoutExpiry: null,
     );
+    // Start monitoring if we just unlocked
+    if (wasUnlocked || !_state.isLocked) {
+      _idleTimerService.startMonitoring();
+    }
     notifyListeners();
   }
 

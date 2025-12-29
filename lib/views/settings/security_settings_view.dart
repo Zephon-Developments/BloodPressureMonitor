@@ -49,14 +49,13 @@ class _SecuritySettingsViewState extends State<SecuritySettingsView> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    state.isPinSet
-                        ? 'PIN is currently set'
-                        : 'No PIN set',
+                    state.isPinSet ? 'PIN is currently set' : 'No PIN set',
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   const SizedBox(height: 16),
                   FilledButton.icon(
-                    onPressed: () => _showChangePinDialog(context, lockViewModel),
+                    onPressed: () =>
+                        _showChangePinDialog(context, lockViewModel),
                     icon: const Icon(Icons.lock_outline),
                     label: Text(state.isPinSet ? 'Change PIN' : 'Set PIN'),
                   ),
@@ -90,9 +89,8 @@ class _SecuritySettingsViewState extends State<SecuritySettingsView> {
                           ? (value) => _toggleBiometric(lockViewModel, value)
                           : null,
                       title: const Text('Enable Biometric'),
-                      subtitle: state.isPinSet
-                          ? null
-                          : const Text('Set a PIN first'),
+                      subtitle:
+                          state.isPinSet ? null : const Text('Set a PIN first'),
                     ),
                   ],
                 ),
@@ -180,9 +178,12 @@ class _SecuritySettingsViewState extends State<SecuritySettingsView> {
     return Column(
       children: timeoutOptions.map((option) {
         final (minutes, label) = option;
+        // ignore: deprecated_member_use
         return RadioListTile<int>(
           value: minutes,
+          // ignore: deprecated_member_use
           groupValue: state.idleTimeoutMinutes,
+          // ignore: deprecated_member_use
           onChanged: (value) {
             if (value != null) {
               lockViewModel.setIdleTimeout(value);
@@ -308,7 +309,10 @@ class _SecuritySettingsViewState extends State<SecuritySettingsView> {
     );
   }
 
-  Future<void> _toggleBiometric(LockViewModel lockViewModel, bool enabled) async {
+  Future<void> _toggleBiometric(
+    LockViewModel lockViewModel,
+    bool enabled,
+  ) async {
     await lockViewModel.setBiometricEnabled(enabled);
 
     if (!mounted) return;

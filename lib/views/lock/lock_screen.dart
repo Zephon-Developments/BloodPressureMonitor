@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:blood_pressure_monitor/models/lock_state.dart';
 import 'package:blood_pressure_monitor/viewmodels/lock_viewmodel.dart';
 
 /// Lock screen for PIN and biometric authentication.
@@ -14,7 +15,8 @@ class LockScreenView extends StatefulWidget {
   State<LockScreenView> createState() => _LockScreenViewState();
 }
 
-class _LockScreenViewState extends State<LockScreenView> with WidgetsBindingObserver {
+class _LockScreenViewState extends State<LockScreenView>
+    with WidgetsBindingObserver {
   String _pin = '';
   String? _errorMessage;
 
@@ -33,7 +35,8 @@ class _LockScreenViewState extends State<LockScreenView> with WidgetsBindingObse
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // Clear entered PIN when app is backgrounded for security
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
       setState(() {
         _pin = '';
         _errorMessage = null;
@@ -114,7 +117,7 @@ class _LockScreenViewState extends State<LockScreenView> with WidgetsBindingObse
     );
   }
 
-  Widget _buildLockoutWarning(state) {
+  Widget _buildLockoutWarning(AppLockState state) {
     final remaining = state.lockoutRemainingSeconds;
     final minutes = remaining ~/ 60;
     final seconds = remaining % 60;
@@ -173,7 +176,7 @@ class _LockScreenViewState extends State<LockScreenView> with WidgetsBindingObse
     );
   }
 
-  Widget _buildKeypad(LockViewModel lockViewModel, state) {
+  Widget _buildKeypad(LockViewModel lockViewModel, AppLockState state) {
     return SizedBox(
       width: 300,
       child: Column(
@@ -190,7 +193,11 @@ class _LockScreenViewState extends State<LockScreenView> with WidgetsBindingObse
     );
   }
 
-  Widget _buildKeypadRow(List<String> keys, LockViewModel lockViewModel, state) {
+  Widget _buildKeypadRow(
+    List<String> keys,
+    LockViewModel lockViewModel,
+    AppLockState state,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: keys.map((key) {
@@ -207,7 +214,11 @@ class _LockScreenViewState extends State<LockScreenView> with WidgetsBindingObse
     );
   }
 
-  Widget _buildNumberButton(String number, LockViewModel lockViewModel, state) {
+  Widget _buildNumberButton(
+    String number,
+    LockViewModel lockViewModel,
+    AppLockState state,
+  ) {
     return SizedBox(
       width: 80,
       height: 80,
@@ -215,7 +226,8 @@ class _LockScreenViewState extends State<LockScreenView> with WidgetsBindingObse
         onPressed: () => _onNumberPressed(number, lockViewModel, state),
         style: TextButton.styleFrom(
           shape: const CircleBorder(),
-          backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+          backgroundColor:
+              Theme.of(context).colorScheme.surfaceContainerHighest,
         ),
         child: Text(
           number,
@@ -249,7 +261,11 @@ class _LockScreenViewState extends State<LockScreenView> with WidgetsBindingObse
     );
   }
 
-  void _onNumberPressed(String number, LockViewModel lockViewModel, state) async {
+  void _onNumberPressed(
+    String number,
+    LockViewModel lockViewModel,
+    AppLockState state,
+  ) async {
     if (_pin.length >= 6) return;
 
     setState(() {
@@ -272,12 +288,15 @@ class _LockScreenViewState extends State<LockScreenView> with WidgetsBindingObse
     });
   }
 
-  Future<void> _submitPin(LockViewModel lockViewModel, state) async {
+  Future<void> _submitPin(
+    LockViewModel lockViewModel,
+    AppLockState state,
+  ) async {
     final pin = _pin;
 
     if (!state.isPinSet) {
-      // Setting up initial PIN - would need confirmation flow
-      // For now, just set it
+      // Setting up initial PIN - this unlocks the app immediately
+      // PIN changes with confirmation flow are handled in SecuritySettingsView
       await lockViewModel.setPin(pin);
       setState(() {
         _pin = '';
@@ -299,7 +318,8 @@ class _LockScreenViewState extends State<LockScreenView> with WidgetsBindingObse
         } else if (attempts >= 10) {
           _errorMessage = 'Incorrect PIN. ${15 - attempts} attempts remaining.';
         } else if (attempts >= 5) {
-          _errorMessage = 'Incorrect PIN. ${10 - attempts} attempts until lockout.';
+          _errorMessage =
+              'Incorrect PIN. ${10 - attempts} attempts until lockout.';
         } else {
           _errorMessage = 'Incorrect PIN';
         }
@@ -314,7 +334,8 @@ class _LockScreenViewState extends State<LockScreenView> with WidgetsBindingObse
 
     if (!success) {
       setState(() {
-        _errorMessage = 'Biometric authentication failed';
+        _errorMessage =
+            'Authentication cancelled or failed. Please try again or use PIN.';
       });
     }
   }
