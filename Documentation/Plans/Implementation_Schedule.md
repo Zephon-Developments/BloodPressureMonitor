@@ -5,7 +5,8 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 
 ## Progress Tracking
 - [x] Phase 1: Core Data Layer ✅ **COMPLETE** (Dec 29, 2025)
-- [ ] Phase 2: Reading Capture & Averaging
+- [x] Phase 2A: Averaging Engine ✅ **COMPLETE** (Dec 29, 2025)
+- [ ] Phase 2B: Validation & ViewModel Integration
 - [ ] Phase 3: Medication Management
 - [ ] Phase 4: Weight & Sleep
 - [ ] Phase 5: App Security Gate
@@ -33,18 +34,32 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - Analyzer clean.
 **Rollback point**: Schema + models + service skeleton behind feature flags (no UI impact yet).
 
-### Phase 2: Reading Capture & Averaging
-**Scope**: Reading CRUD, 30-minute rolling grouping + manual session override, validation.
+### Phase 2A: Averaging Engine ✅ COMPLETE
+**Scope**: 30-minute rolling grouping + manual session override.
 **Tasks**
-- Implement Reading service methods: add/read/list/delete.
-- Averaging engine: rolling 30-min window per profile; manual "start new session" to force new group.
-- Validation bounds (70–250 sys, 40–150 dia, 30–200 pulse) with override confirmation hooks.
-- Unit tests for grouping (back-dated, deletion, DST/offset), validation, and toggling raw vs averaged.
+- ✅ Implement Reading service methods: add/read/list/delete.
+- ✅ Averaging engine: rolling 30-min window per profile; manual "start new session" to force new group.
+- ✅ Unit tests for grouping (back-dated, deletion, DST/offset).
 **Dependencies**: Phase 1 schema/services.
 **Acceptance**
-- Grouping logic matches spec; recomputes on insert/update/delete/back-date.
-- Tests ≥85% services/viewmodels; analyzer clean.
-**Rollback point**: Service-level feature toggle; UI still minimal.
+- ✅ Grouping logic matches spec; recomputes on insert/update/delete/back-date.
+- ✅ Tests ≥85% services (96.15% achieved); analyzer clean.
+**Status**: Merged to main Dec 29, 2025
+
+### Phase 2B: Validation & ViewModel Integration
+**Scope**: Validation bounds, ViewModel integration, automatic averaging triggers.
+**Tasks**
+- Enhance validators with proper bounds (70–250 sys, 40–150 dia, 30–200 pulse).
+- Add override confirmation hooks for out-of-range values.
+- Wire AveragingService into BloodPressureViewModel.
+- Auto-trigger grouping on create/update/delete operations.
+- Unit tests for validation bounds and ViewModel integration.
+**Dependencies**: Phase 2A.
+**Acceptance**
+- Validation enforces medical bounds with override capability.
+- CRUD operations automatically trigger averaging recomputation.
+- Tests ≥85% viewmodels; analyzer clean.
+**Rollback point**: Service-level feature toggle; validation warnings only.
 
 ### Phase 3: Medication Management
 **Scope**: Medication list, groups, intake logging with timestamps, schedule metadata.
