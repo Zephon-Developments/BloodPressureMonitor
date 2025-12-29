@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
 import 'package:blood_pressure_monitor/utils/date_formats.dart';
+import 'package:blood_pressure_monitor/views/settings/security_settings_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -26,6 +27,19 @@ class _HomeViewState extends State<HomeView> {
       appBar: AppBar(
         title: const Text('Blood Pressure Monitor'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: 'Security Settings',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (context) => const SecuritySettingsView(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Consumer<BloodPressureViewModel>(
         builder: (context, viewModel, child) {
@@ -45,7 +59,7 @@ class _HomeViewState extends State<HomeView> {
           if (viewModel.readings.isEmpty) {
             return const Center(
               child: Text(
-                'No readings yet Louise. But we will add readings soon!',
+                'Soon you will be able to track your blood pressure readings here!',
               ),
             );
           }

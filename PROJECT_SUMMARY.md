@@ -98,6 +98,15 @@ A production-ready Flutter application for recording and tracking blood pressure
 - Proper error handling
 - Medical accuracy in validation
 - Centralized formatting
+
+### ✅ App Security (Phase 5)
+- PBKDF2-based PIN hashing (10,000 iterations)
+- Biometric authentication (Fingerprint/Face ID)
+- Tiered lockout policy (5/10/15 attempts)
+- Configurable idle timeout and auto-lock
+- App switcher privacy screen
+- Secure database password management with automatic migration
+- Android 14 compatibility (FragmentActivity)
 - No code duplication
 
 ### ✅ Security
