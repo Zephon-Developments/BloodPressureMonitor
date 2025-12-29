@@ -6,7 +6,7 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 ## Progress Tracking
 - [x] Phase 1: Core Data Layer ✅ **COMPLETE** (Dec 29, 2025)
 - [x] Phase 2A: Averaging Engine ✅ **COMPLETE** (Dec 29, 2025)
-- [ ] Phase 2B: Validation & ViewModel Integration
+- [x] Phase 2B: Validation & ViewModel Integration ✅ **COMPLETE** (Dec 29, 2025)
 - [ ] Phase 3: Medication Management
 - [ ] Phase 4: Weight & Sleep
 - [ ] Phase 5: App Security Gate
@@ -46,20 +46,20 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - ✅ Tests ≥85% services (96.15% achieved); analyzer clean.
 **Status**: Merged to main Dec 29, 2025
 
-### Phase 2B: Validation & ViewModel Integration
+### Phase 2B: Validation & ViewModel Integration ✅ COMPLETE
 **Scope**: Validation bounds, ViewModel integration, automatic averaging triggers.
 **Tasks**
-- Enhance validators with proper bounds (70–250 sys, 40–150 dia, 30–200 pulse).
-- Add override confirmation hooks for out-of-range values.
-- Wire AveragingService into BloodPressureViewModel.
-- Auto-trigger grouping on create/update/delete operations.
-- Unit tests for validation bounds and ViewModel integration.
+- ✅ Enhance validators with proper bounds (70–250 sys, 40–150 dia, 30–200 pulse).
+- ✅ Add override confirmation hooks for out-of-range values.
+- ✅ Wire AveragingService into BloodPressureViewModel.
+- ✅ Auto-trigger grouping on create/update/delete operations.
+- ✅ Unit tests for validation bounds and ViewModel integration.
 **Dependencies**: Phase 2A.
 **Acceptance**
-- Validation enforces medical bounds with override capability.
-- CRUD operations automatically trigger averaging recomputation.
-- Tests ≥85% viewmodels; analyzer clean.
-**Rollback point**: Service-level feature toggle; validation warnings only.
+- ✅ Validation enforces medical bounds with override capability.
+- ✅ CRUD operations automatically trigger averaging recomputation.
+- ✅ Tests ≥85% viewmodels (88%+ achieved); analyzer clean.
+**Status**: Merged to main Dec 29, 2025
 
 ### Phase 3: Medication Management
 **Scope**: Medication list, groups, intake logging with timestamps, schedule metadata.
