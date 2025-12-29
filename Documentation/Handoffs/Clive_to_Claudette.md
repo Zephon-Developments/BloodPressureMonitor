@@ -1,46 +1,74 @@
 # Handoff: Clive to Claudette
-## Phase 2B Review - Follow-up Required
+## Phase 3 Implementation – Medication Management
 
 **Date:** December 29, 2025  
-**Status:** ⚠️ Follow-up Required  
-**Reviewer:** Clive
+**From:** Clive (Review Specialist)  
+**To:** Claudette (Implementer)  
+**Phase:** 3 - Medication Management
 
 ---
 
-## Review Summary
+## Context
 
-I have reviewed the implementation of **Phase 2B: Validation & ViewModel Integration**. The core logic for the three-tier validation and the integration with `AveragingService` is excellent and well-tested. However, there are two minor issues that should be addressed before final integration.
+The planning for **Phase 3: Medication Management** is complete and approved. You are now tasked with the implementation. This phase builds on the core data layer (Phase 1) and the validation/ViewModel patterns established in Phase 2B.
 
-### Findings
+## Objectives
 
-#### 1. Bug: Averaging Error Message Overwritten (Severity: Low)
-In `BloodPressureViewModel.addReading`, `updateReading`, and `deleteReading`, if the `AveragingService` call fails, the `_error` property is set with a descriptive message. However, `loadReadings()` is called immediately after, which starts by setting `_error = null`. This causes the averaging error message to be cleared before the UI can display it.
+1. Implement CRUD operations for `Medication`, `MedicationGroup`, and `MedicationIntake`.
+2. Implement atomic group intake logging using database transactions.
+3. Implement late/missed intake classification logic based on schedule metadata.
+4. Provide correlation hooks for future integration with blood pressure readings.
 
-**Affected Files:**
-- [lib/viewmodels/blood_pressure_viewmodel.dart](lib/viewmodels/blood_pressure_viewmodel.dart#L95)
-- [lib/viewmodels/blood_pressure_viewmodel.dart](lib/viewmodels/blood_pressure_viewmodel.dart#L145)
-- [lib/viewmodels/blood_pressure_viewmodel.dart](lib/viewmodels/blood_pressure_viewmodel.dart#L172)
+## Reference Materials
 
-**Suggested Fix:**
-Modify `loadReadings()` to accept an optional `clearError` parameter (defaulting to `true`), or check if `_error` already contains an averaging-related message before clearing it.
+- **Implementation Plan**: [Documentation/Plans/Phase-3-Medication-Management.md](../Plans/Phase-3-Medication-Management.md)
+- **Review Summary**: [reviews/2025-12-29-clive-phase-3-plan-review.md](../../reviews/2025-12-29-clive-phase-3-plan-review.md)
+- **Coding Standards**: [Documentation/Standards/Coding_Standards.md](../Standards/Coding_Standards.md)
 
-#### 2. Maintainability: Redundant Provider (Severity: Low)
-There is a redundant `ChangeNotifierProvider<BloodPressureViewModel>` in both `main.dart` and `home_view.dart`. This results in two separate instances of the ViewModel being created. `HomeView` uses its own instance, while the one in `main.dart` remains unused but consumes resources.
+## Key Implementation Details
 
-**Affected Files:**
-- [lib/main.dart](lib/main.dart#L22)
-- [lib/views/home_view.dart](lib/views/home_view.dart#L12)
+### 1. Data Models
+- Implement `Medication`, `MedicationGroup`, and `MedicationIntake` in `lib/models/`.
+- Ensure `toMap`/`fromMap`, equality, and `copyWith` are implemented.
+- `MedicationGroup.memberMedicationIds` should be stored as a JSON array string.
+- `Medication.scheduleMetadata` should be a JSON string following the approved format in the plan.
 
-**Suggested Fix:**
-Remove the provider from `HomeView` and use `context.watch<BloodPressureViewModel>()`. Ensure `loadReadings()` is called either in `main.dart` during creation or via a `PostFrameCallback` in `HomeView`.
+### 3. Services
+- **`MedicationService`**: Standard CRUD. Use `ValidationResult` for field validation.
+- **`MedicationGroupService`**: CRUD + membership management. Enforce same-profile constraints.
+- **`MedicationIntakeService`**: 
+    - `logIntake`: Single entry.
+    - `logGroupIntake`: **Must use a database transaction** for atomicity.
+    - `listIntakes`: Filtered by profile/date/medication.
+    - `calculateStatus`: Helper to determine `onTime|late|missed|unscheduled`.
+
+### 4. Testing Requirements
+- **Unit Tests**: Model serialization and metadata parsing.
+- **Integration Tests**: Use `sqflite_common_ffi` for in-memory database testing.
+- **Coverage Targets**: 
+    - Models/Utils: ≥90%
+    - Services: ≥85%
+- **Specific Test Cases**: Ensure you test the transaction rollback for group intakes by forcing a failure on the second or third medication in a group.
+
+## Success Criteria
+
+- All 3 services implemented and fully tested.
+- 0 analyzer warnings.
+- All tests passing.
+- DartDoc present for all public members.
+- Code formatted according to project standards.
 
 ---
 
 ## Next Steps
 
-1. Fix the error clearing bug in `BloodPressureViewModel`.
-2. Consolidate the `BloodPressureViewModel` provider to avoid redundancy.
-3. Verify that `loadReadings()` is still triggered correctly after consolidation.
-4. Hand back to Clive for final approval.
+1. Create a new feature branch: `feature/phase-3-medication-management`.
+2. Follow the sequenced implementation steps in the plan.
+3. Once complete, run all tests and analyzer.
+4. Hand off back to **Clive** for review.
 
-Once these are addressed, I will green-light the commit for final integration.
+**Suggested Prompt to continue:**
+"Claudette, please implement Phase 3: Medication Management as per the handoff from Clive in Documentation/Handoffs/Clive_to_Claudette.md."
+
+— Clive  
+*Review Specialist*

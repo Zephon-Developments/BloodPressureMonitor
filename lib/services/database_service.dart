@@ -15,7 +15,7 @@ import 'package:blood_pressure_monitor/services/secure_password_manager.dart';
 class DatabaseService {
   static Database? _database;
   static const String _databaseName = 'blood_pressure.db';
-  static const int _databaseVersion = 1;
+  static const int _databaseVersion = 2;
 
   final Database? _testDatabase;
 
@@ -130,8 +130,10 @@ class DatabaseService {
         profileId INTEGER NOT NULL,
         name TEXT NOT NULL,
         dosage TEXT,
-        schedule TEXT,
-        notes TEXT,
+        unit TEXT,
+        frequency TEXT,
+        scheduleMetadata TEXT,
+        createdAt TEXT NOT NULL,
         FOREIGN KEY (profileId) REFERENCES Profile(id) ON DELETE CASCADE
       )
     ''');
@@ -141,7 +143,8 @@ class DatabaseService {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         profileId INTEGER NOT NULL,
         name TEXT NOT NULL,
-        medicationIds TEXT NOT NULL,
+        memberMedicationIds TEXT NOT NULL,
+        createdAt TEXT NOT NULL,
         FOREIGN KEY (profileId) REFERENCES Profile(id) ON DELETE CASCADE
       )
     ''');
@@ -149,13 +152,15 @@ class DatabaseService {
     await db.execute('''
       CREATE TABLE MedicationIntake (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        profileId INTEGER NOT NULL,
         medicationId INTEGER NOT NULL,
+        profileId INTEGER NOT NULL,
         takenAt TEXT NOT NULL,
+        localOffsetMinutes INTEGER NOT NULL,
+        scheduledFor TEXT,
         groupId INTEGER,
         note TEXT,
-        FOREIGN KEY (profileId) REFERENCES Profile(id) ON DELETE CASCADE,
         FOREIGN KEY (medicationId) REFERENCES Medication(id) ON DELETE CASCADE,
+        FOREIGN KEY (profileId) REFERENCES Profile(id) ON DELETE CASCADE,
         FOREIGN KEY (groupId) REFERENCES MedicationGroup(id) ON DELETE SET NULL
       )
     ''');
@@ -207,7 +212,32 @@ class DatabaseService {
 
   /// Handles database migrations between versions.
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    // Future migrations will be added here as schema evolves
+    if (oldVersion < 2) {
+      // Migration from v1 to v2: Add medication management fields
+      await db.execute(
+        'ALTER TABLE Medication ADD COLUMN unit TEXT',
+      );
+      await db.execute(
+        'ALTER TABLE Medication ADD COLUMN frequency TEXT',
+      );
+      await db.execute(
+        'ALTER TABLE Medication ADD COLUMN scheduleMetadata TEXT',
+      );
+      await db.execute(
+        'ALTER TABLE Medication ADD COLUMN createdAt TEXT NOT NULL DEFAULT ""',
+      );
+
+      await db.execute(
+        'ALTER TABLE MedicationGroup ADD COLUMN createdAt TEXT NOT NULL DEFAULT ""',
+      );
+
+      await db.execute(
+        'ALTER TABLE MedicationIntake ADD COLUMN localOffsetMinutes INTEGER NOT NULL DEFAULT 0',
+      );
+      await db.execute(
+        'ALTER TABLE MedicationIntake ADD COLUMN scheduledFor TEXT',
+      );
+    }
   }
 
   /// Closes the database connection.
