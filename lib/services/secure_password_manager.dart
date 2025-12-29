@@ -33,11 +33,11 @@ class SecurePasswordManager {
 
   /// Generates a cryptographically secure random password.
   ///
-  /// Creates a 64-character password using Base64-encoded random bytes,
-  /// providing sufficient entropy for AES-256 encryption.
+  /// Creates a Base64-encoded password from 48 bytes of random data,
+  /// providing 384 bits of entropy for AES-256 encryption.
   static String _generateSecurePassword() {
     final random = Random.secure();
-    final bytes = Uint8List(48); // 48 bytes = 64 base64 chars
+    final bytes = Uint8List(48); // 48 bytes provides 384 bits of entropy
 
     for (int i = 0; i < bytes.length; i++) {
       bytes[i] = random.nextInt(256);
