@@ -1,46 +1,53 @@
-# Handoff: Clive to Claudette
-## Phase 2B Review - Follow-up Required
+# Handoff: Clive → Claudette
 
-**Date:** December 29, 2025  
-**Status:** ⚠️ Follow-up Required  
-**Reviewer:** Clive
+**Date:** 2025-12-29  
+**Phase:** Phase 3 - Medication Management Review (Round 2)  
+**Status:** ⚠️ MINOR ALIGNMENT ISSUES - Follow-up Required  
 
 ---
 
 ## Review Summary
 
-I have reviewed the implementation of **Phase 2B: Validation & ViewModel Integration**. The core logic for the three-tier validation and the integration with `AveragingService` is excellent and well-tested. However, there are two minor issues that should be addressed before final integration.
+The core blockers regarding soft delete and data integrity have been successfully addressed. The implementation is now much safer and aligns with the project's health data preservation requirements. All 107 tests pass and the analyzer is clean.
 
-### Findings
+However, there are a few minor discrepancies between the approved plan, the handoff documentation, and the actual code that need to be aligned before final approval.
 
-#### 1. Bug: Averaging Error Message Overwritten (Severity: Low)
-In `BloodPressureViewModel.addReading`, `updateReading`, and `deleteReading`, if the `AveragingService` call fails, the `_error` property is set with a descriptive message. However, `loadReadings()` is called immediately after, which starts by setting `_error = null`. This causes the averaging error message to be cleared before the UI can display it.
+### 1. Alignment Issues (Follow-up Required)
 
-**Affected Files:**
-- [lib/viewmodels/blood_pressure_viewmodel.dart](lib/viewmodels/blood_pressure_viewmodel.dart#L95)
-- [lib/viewmodels/blood_pressure_viewmodel.dart](lib/viewmodels/blood_pressure_viewmodel.dart#L145)
-- [lib/viewmodels/blood_pressure_viewmodel.dart](lib/viewmodels/blood_pressure_viewmodel.dart#L172)
+#### **A. Correlation Window Default**
+- **Issue:** `MedicationIntakeService.findIntakesAround` uses a default window of `Duration(hours: 2)`.
+- **Discrepancy:** The approved plan and your handoff claim a 30-minute window.
+- **Requirement:** Update the default parameter to `Duration(minutes: 30)` to match the plan.
 
-**Suggested Fix:**
-Modify `loadReadings()` to accept an optional `clearError` parameter (defaulting to `true`), or check if `_error` already contains an averaging-related message before clearing it.
+#### **B. Status Calculation Thresholds**
+- **Issue:** `MedicationIntakeService.calculateStatus` uses defaults of 120/240 minutes for late/missed status.
+- **Discrepancy:** The approved plan and your handoff claim 15-minute and 1-hour (60 min) thresholds.
+- **Requirement:** Update the default values in `calculateStatus` to 15 and 60 respectively.
 
-#### 2. Maintainability: Redundant Provider (Severity: Low)
-There is a redundant `ChangeNotifierProvider<BloodPressureViewModel>` in both `main.dart` and `home_view.dart`. This results in two separate instances of the ViewModel being created. `HomeView` uses its own instance, while the one in `main.dart` remains unused but consumes resources.
+#### **C. Search Filtering**
+- **Issue:** `MedicationService.searchMedicationsByName` does not filter by `isActive`.
+- **Requirement:** Update the query to include `AND isActive = 1` by default, consistent with `listMedicationsByProfile`.
 
-**Affected Files:**
-- [lib/main.dart](lib/main.dart#L22)
-- [lib/views/home_view.dart](lib/views/home_view.dart#L12)
+#### **D. Group Membership Integrity**
+- **Issue:** `MedicationGroupService._validateMembershipIntegrity` does not check if medications are active.
+- **Requirement:** Ensure that only active medications can be added to groups by adding `AND isActive = 1` to the integrity check query.
 
-**Suggested Fix:**
-Remove the provider from `HomeView` and use `context.watch<BloodPressureViewModel>()`. Ensure `loadReadings()` is called either in `main.dart` during creation or via a `PostFrameCallback` in `HomeView`.
+### 2. Documentation Cleanup
+
+#### **A. Model JSDoc**
+- **Issue:** The JSDoc for `Medication.scheduleMetadata` still uses 120/240 in its example.
+- **Requirement:** Update the example to use the 15/60 thresholds for consistency.
 
 ---
 
-## Next Steps
+## Next Steps for Claudette
 
-1. Fix the error clearing bug in `BloodPressureViewModel`.
-2. Consolidate the `BloodPressureViewModel` provider to avoid redundancy.
-3. Verify that `loadReadings()` is still triggered correctly after consolidation.
-4. Hand back to Clive for final approval.
+1.  **Align Defaults:** Update `findIntakesAround` and `calculateStatus` defaults.
+2.  **Apply Filters:** Add `isActive` checks to `searchMedicationsByName` and `_validateMembershipIntegrity`.
+3.  **Update JSDoc:** Align the example metadata in the model.
+4.  **Verify Tests:** Ensure these changes don't break existing tests (you may need to update test expectations if they relied on the 2h/120m/240m defaults).
+5.  **Resubmit:** Update the handoff document and notify Clive.
 
-Once these are addressed, I will green-light the commit for final integration.
+---
+
+**Clive: Almost there. Once these alignment issues are fixed, I will green-light for integration.**

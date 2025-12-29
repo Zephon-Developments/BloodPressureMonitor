@@ -223,3 +223,105 @@ bool isValidPulse(int pulse) {
   final result = validatePulse(pulse);
   return result.level == ValidationLevel.valid;
 }
+
+/// Validates medication name.
+///
+/// Rules:
+/// - Name must not be empty
+/// - Name length must be ≤ 120 characters
+///
+/// Returns a [ValidationResult] indicating the validation status.
+ValidationResult validateMedicationName(String name) {
+  if (name.trim().isEmpty) {
+    return const ValidationResult.error('Medication name is required');
+  }
+
+  if (name.length > 120) {
+    return const ValidationResult.error(
+      'Medication name must be 120 characters or less',
+    );
+  }
+
+  return const ValidationResult.valid();
+}
+
+/// Validates medication dosage text.
+///
+/// Rules:
+/// - Dosage length must be ≤ 120 characters if provided
+///
+/// Returns a [ValidationResult] indicating the validation status.
+ValidationResult validateMedicationDosage(String? dosage) {
+  if (dosage == null || dosage.isEmpty) {
+    return const ValidationResult.valid();
+  }
+
+  if (dosage.length > 120) {
+    return const ValidationResult.error(
+      'Dosage must be 120 characters or less',
+    );
+  }
+
+  return const ValidationResult.valid();
+}
+
+/// Validates medication unit text.
+///
+/// Rules:
+/// - Unit length must be ≤ 50 characters if provided
+///
+/// Returns a [ValidationResult] indicating the validation status.
+ValidationResult validateMedicationUnit(String? unit) {
+  if (unit == null || unit.isEmpty) {
+    return const ValidationResult.valid();
+  }
+
+  if (unit.length > 50) {
+    return const ValidationResult.error(
+      'Unit must be 50 characters or less',
+    );
+  }
+
+  return const ValidationResult.valid();
+}
+
+/// Validates medication frequency text.
+///
+/// Rules:
+/// - Frequency length must be ≤ 120 characters if provided
+///
+/// Returns a [ValidationResult] indicating the validation status.
+ValidationResult validateMedicationFrequency(String? frequency) {
+  if (frequency == null || frequency.isEmpty) {
+    return const ValidationResult.valid();
+  }
+
+  if (frequency.length > 120) {
+    return const ValidationResult.error(
+      'Frequency must be 120 characters or less',
+    );
+  }
+
+  return const ValidationResult.valid();
+}
+
+/// Validates medication group name.
+///
+/// Rules:
+/// - Name must not be empty
+/// - Name length must be ≤ 120 characters
+///
+/// Returns a [ValidationResult] indicating the validation status.
+ValidationResult validateGroupName(String name) {
+  if (name.trim().isEmpty) {
+    return const ValidationResult.error('Group name is required');
+  }
+
+  if (name.length > 120) {
+    return const ValidationResult.error(
+      'Group name must be 120 characters or less',
+    );
+  }
+
+  return const ValidationResult.valid();
+}
