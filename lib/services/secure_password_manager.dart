@@ -15,7 +15,6 @@ class SecurePasswordManager {
   static const _passwordKey = 'db_encryption_password';
   
   // Lock to prevent race conditions during password generation
-  static final _lock = Completer<void>()..complete();
   static Completer<void>? _currentOperation;
 
   /// Gets the database password, generating and storing a new one if needed.
