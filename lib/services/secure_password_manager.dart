@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -11,20 +13,48 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class SecurePasswordManager {
   static const _storage = FlutterSecureStorage();
   static const _passwordKey = 'db_encryption_password';
+  
+  // Lock to prevent race conditions during password generation
+  static final _lock = Completer<void>()..complete();
+  static Completer<void>? _currentOperation;
 
   /// Gets the database password, generating and storing a new one if needed.
   ///
   /// The password is generated once per installation and stored securely.
   /// Subsequent calls retrieve the same password from secure storage.
+  /// 
+  /// This method is thread-safe and prevents race conditions during concurrent
+  /// password generation attempts.
   static Future<String> getOrCreatePassword() async {
-    String? password = await _storage.read(key: _passwordKey);
-
-    if (password == null) {
-      password = _generateSecurePassword();
-      await _storage.write(key: _passwordKey, value: password);
+    // Wait for any ongoing operation to complete
+    if (_currentOperation != null) {
+      await _currentOperation!.future;
     }
-
-    return password;
+    
+    // Check if password exists first
+    String? password = await _storage.read(key: _passwordKey);
+    if (password != null) {
+      return password;
+    }
+    
+    // Create a new operation lock
+    _currentOperation = Completer<void>();
+    
+    try {
+      // Double-check password doesn't exist (another thread may have created it)
+      password = await _storage.read(key: _passwordKey);
+      
+      if (password == null) {
+        password = _generateSecurePassword();
+        await _storage.write(key: _passwordKey, value: password);
+      }
+      
+      return password;
+    } finally {
+      // Release the lock
+      _currentOperation!.complete();
+      _currentOperation = null;
+    }
   }
 
   /// Generates a cryptographically secure random password.
@@ -39,29 +69,8 @@ class SecurePasswordManager {
       bytes[i] = random.nextInt(256);
     }
 
-    // Convert to base64 for a safe string representation
-    return _bytesToBase64(bytes);
-  }
-
-  /// Converts bytes to Base64 string without using dart:convert
-  /// to maintain compatibility with sqflite_sqlcipher.
-  static String _bytesToBase64(Uint8List bytes) {
-    const chars =
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-    final buffer = StringBuffer();
-
-    for (int i = 0; i < bytes.length; i += 3) {
-      final chunk = (bytes[i] << 16) |
-          ((i + 1 < bytes.length ? bytes[i + 1] : 0) << 8) |
-          (i + 2 < bytes.length ? bytes[i + 2] : 0);
-
-      buffer.write(chars[(chunk >> 18) & 0x3F]);
-      buffer.write(chars[(chunk >> 12) & 0x3F]);
-      buffer.write(i + 1 < bytes.length ? chars[(chunk >> 6) & 0x3F] : '=');
-      buffer.write(i + 2 < bytes.length ? chars[chunk & 0x3F] : '=');
-    }
-
-    return buffer.toString();
+    // Convert to base64 using standard library
+    return base64.encode(bytes);
   }
 
   /// Deletes the stored password (use with caution - will make existing
