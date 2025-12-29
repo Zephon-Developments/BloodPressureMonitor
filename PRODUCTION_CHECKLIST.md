@@ -20,12 +20,31 @@
 
 **Testing**:
 
-- [ ] Test on fresh install (password generation)
-- [ ] Test on app restart (password retrieval)
-- [ ] Test database encryption works correctly
-- [ ] Verify password persists across app updates
+- ✅ Test on fresh install (password generation)
+- ✅ Test on app restart (password retrieval)
+- ✅ Test database encryption works correctly
+- ✅ Verify password persists across app updates
 
-### 2. Branch Protection
+### 2. App Lock & Biometrics (Phase 5)
+
+**Current Status**: ✅ **COMPLETE**
+**Implementation**: `AuthService`, `LockViewModel`, `LockScreenView`
+
+**Features**:
+- ✅ PBKDF2 PIN hashing (10,000 iterations)
+- ✅ Biometric integration with fallback
+- ✅ Tiered lockout policy
+- ✅ Idle timeout auto-lock
+- ✅ Privacy screen (App Switcher)
+
+**Testing**:
+- ✅ PIN verification and hashing
+- ✅ Biometric prompt and fallback (Verified on Android 14)
+- ✅ Lockout timers and persistence
+- ✅ Idle timer triggers
+- ✅ Privacy screen overlay
+
+### 3. Branch Protection
 
 **Action Required**: Configure GitHub branch protection rules
 
@@ -50,12 +69,12 @@ Steps:
 
 ## Testing Requirements
 
-- [ ] All unit tests passing
+- ✅ All unit tests passing (469 tests)
 - [ ] Widget tests implemented and passing
 - [ ] Integration tests implemented and passing
-- [ ] Manual testing on real devices completed
+- ✅ Manual testing on real devices completed (Nokia XR20 Android 14)
 - [ ] Performance testing completed
-- [ ] Security audit completed
+- ✅ Security audit completed (Clive Review)
 
 ## App Store Requirements
 

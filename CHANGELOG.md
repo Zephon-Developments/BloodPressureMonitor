@@ -7,7 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2025-12-29
+
 ### Added
+- **App Security Gate** (Phase 5)
+  - PIN and Biometric authentication for app access
+  - PBKDF2-based PIN hashing with 10,000 iterations (HMAC-SHA256)
+  - Per-installation unique database password using `flutter_secure_storage`
+  - Automatic database migration from placeholder to secure password
+  - Tiered lockout policy: 5 attempts (30s), 10 attempts (5m), 15+ attempts (30m)
+  - Auto-lock after configurable idle timeout (default 2 minutes)
+  - App switcher privacy screen (logo overlay when backgrounded)
+  - Biometric revocation detection with automatic fallback to PIN
+  - Security settings UI for PIN management, biometric toggles, and timeout configuration
+  - Android 14 compatibility via `FlutterFragmentActivity` and `minSdkVersion 23`
 - Averaging Engine for blood pressure readings
   - 30-minute rolling window grouping algorithm
   - Automatic group recomputation on insert/update/delete
@@ -28,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Averaging Engine: 96.15% coverage
   - Validators: 54 tests covering all validation tiers and boundaries
   - ViewModel: 18 tests covering CRUD + validation integration
+  - Security services: >85% coverage
 - `sqflite_common_ffi` for in-memory database testing
 - `mockito` and `build_runner` for test infrastructure
 
