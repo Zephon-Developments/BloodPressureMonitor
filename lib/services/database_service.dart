@@ -17,10 +17,19 @@ class DatabaseService {
   static const String _databaseName = 'blood_pressure.db';
   static const int _databaseVersion = 1;
 
+  final Database? _testDatabase;
+
+  /// Creates a DatabaseService with optional test database injection.
+  ///
+  /// Parameters:
+  /// - [testDatabase]: Optional database instance for testing (bypasses encryption)
+  DatabaseService({Database? testDatabase}) : _testDatabase = testDatabase;
+
   /// Gets the singleton database instance, initializing if necessary.
   ///
   /// The database is encrypted with AES-256 using sqflite_sqlcipher.
   Future<Database> get database async {
+    if (_testDatabase != null) return _testDatabase!;
     if (_database != null) return _database!;
     _database = await _initDatabase();
     return _database!;
