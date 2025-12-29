@@ -275,48 +275,55 @@ void main() {
     }
 
     test('validates normal reading as valid', () {
-      final reading = createTestReading(systolic: 120, diastolic: 80, pulse: 70);
+      final reading =
+          createTestReading(systolic: 120, diastolic: 80, pulse: 70);
       final result = validateReading(reading);
       expect(result.level, ValidationLevel.valid);
     });
 
     test('returns error if blood pressure has error', () {
-      final reading = createTestReading(systolic: 300, diastolic: 80, pulse: 70);
+      final reading =
+          createTestReading(systolic: 300, diastolic: 80, pulse: 70);
       final result = validateReading(reading);
       expect(result.level, ValidationLevel.error);
       expect(result.message, contains('Systolic'));
     });
 
     test('returns error if pulse has error', () {
-      final reading = createTestReading(systolic: 120, diastolic: 80, pulse: 220);
+      final reading =
+          createTestReading(systolic: 120, diastolic: 80, pulse: 220);
       final result = validateReading(reading);
       expect(result.level, ValidationLevel.error);
       expect(result.message, contains('Pulse'));
     });
 
     test('returns error for blood pressure over pulse error', () {
-      final reading = createTestReading(systolic: 80, diastolic: 120, pulse: 220);
+      final reading =
+          createTestReading(systolic: 80, diastolic: 120, pulse: 220);
       final result = validateReading(reading);
       expect(result.level, ValidationLevel.error);
       expect(result.message, contains('Systolic'));
     });
 
     test('returns warning if blood pressure has warning', () {
-      final reading = createTestReading(systolic: 185, diastolic: 80, pulse: 70);
+      final reading =
+          createTestReading(systolic: 185, diastolic: 80, pulse: 70);
       final result = validateReading(reading);
       expect(result.level, ValidationLevel.warning);
       expect(result.message, contains('Systolic'));
     });
 
     test('returns warning if pulse has warning', () {
-      final reading = createTestReading(systolic: 120, diastolic: 80, pulse: 150);
+      final reading =
+          createTestReading(systolic: 120, diastolic: 80, pulse: 150);
       final result = validateReading(reading);
       expect(result.level, ValidationLevel.warning);
       expect(result.message, contains('Pulse'));
     });
 
     test('combines warning messages when both BP and pulse warn', () {
-      final reading = createTestReading(systolic: 185, diastolic: 80, pulse: 150);
+      final reading =
+          createTestReading(systolic: 185, diastolic: 80, pulse: 150);
       final result = validateReading(reading);
       expect(result.level, ValidationLevel.warning);
       expect(result.message, contains('Systolic'));
