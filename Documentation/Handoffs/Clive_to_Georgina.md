@@ -1,33 +1,38 @@
-# Handoff: Clive to Georgina (Phase 4 Review Follow-up #2)
+# Handoff: Clive to Georgina (Phase 7 Review Follow-ups)
 
-## Status: ❌ Blocked
+**Date**: 2025-12-29  
+**From**: Clive (Review Specialist)  
+**To**: Georgina (Implementation Engineer)  
+**Task**: Phase 7 - History Coverage & Logic Refinement  
+**Status**: ❌ **BLOCKERS IDENTIFIED**
 
-The Phase 4 implementation (Weight & Sleep Tracking) remains incomplete. The blockers identified in the previous review have not been addressed.
+## Review Findings
 
-## Remaining Blockers
+### 1. Coverage Blockers
+The implementation falls short of the project's coverage requirements:
+- **HistoryService**: Current coverage is **51.81%** (Target: ≥80%). The \_filterGroupsByTags\ logic and tag-filtering edge cases are not fully exercised.
+- **HistoryView**: Current coverage is **53.15%** (Aggregate for \iews/history/\ is **~68.8%**, Target: ≥70%). Handlers for refresh, custom range selection, and tag editing are currently untested.
 
-### 1. Test Coverage (STILL MISSING)
-- **Requirement:** ≥80% coverage for all new logic.
-- **Missing Tests:**
-    - \	est/viewmodels/weight_viewmodel_test.dart\
-    - \	est/viewmodels/sleep_viewmodel_test.dart\
-    - \	est/services/correlation_service_test.dart\
-    - Widget tests for \AddWeightView\ and \AddSleepView\.
+### 2. Logic Concerns
+- **Pagination & Filtering**: In \HistoryService.fetchGroupedHistory\, filtering occurs after the DB limit is applied. This can result in returning fewer than \limit\ items (or zero) even when more matches exist in the database. While the UI is scrollable, this is a sub-optimal UX. Consider if the service should attempt to \"fill\" the page or if we accept this limitation for Phase 7.
 
-### 2. Dependency Injection & Integration (STILL MISSING)
-- **Requirement:** Features must be reachable and functional.
-- **Missing in \lib/main.dart\:**
-    - \Provider<WeightService>\
-    - \Provider<SleepService>\
-    - \Provider<CorrelationService>\
-    - \ChangeNotifierProvider<WeightViewModel>\
-    - \ChangeNotifierProvider<SleepViewModel>\
-- **Missing in \lib/views/home/widgets/quick_actions.dart\:**
-    - Navigation buttons for Weight and Sleep tracking.
+### 3. Style & Documentation
+- **Line Length**: Several import lines in \history_view.dart\ exceed 80 characters. Please wrap or shorten where possible to maintain strict compliance.
+- **ViewModel Docs**: Verified and approved.
 
-### 3. Verification
-- **Task:** Run \lutter analyze\ and ensure zero warnings.
-- **Task:** Run \lutter test\ and ensure all tests pass.
+## Required Actions
+1. **Expand \	est/services/history_service_test.dart\**:
+   - Add tests for \etchGroupedHistory\ with tags.
+   - Add tests for \etchRawHistory\ with multiple tags and no-match scenarios.
+2. **Expand \	est/views/history/history_view_test.dart\**:
+   - Add \	estWidgets\ for Pull-to-Refresh (\_handleRefresh\).
+   - Add \	estWidgets\ for the Date Range Picker (\_handleCustomRange\).
+   - Add \	estWidgets\ for the Tag Filter Dialog (\_handleEditTags\).
+3. **Address Pagination UX**: Provide a brief justification if we are keeping the current \"filter-after-fetch\" logic, or implement a \"fetch-until-limit\" loop in the service.
 
-## Notes
-Georgina, you acknowledged the requirements in your last response but did not execute the file changes or test creations. Please proceed with the actual implementation of these items so the feature can be integrated.
+Please notify me once coverage targets are met.
+
+---
+**Clive**  
+Review Specialist  
+2025-12-29
