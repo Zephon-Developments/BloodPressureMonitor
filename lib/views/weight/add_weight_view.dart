@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:blood_pressure_monitor/models/health_data.dart';
 import 'package:blood_pressure_monitor/utils/date_formats.dart';
+import 'package:blood_pressure_monitor/utils/provider_extensions.dart';
 import 'package:blood_pressure_monitor/utils/validators.dart';
 import 'package:blood_pressure_monitor/viewmodels/weight_viewmodel.dart';
 import 'package:blood_pressure_monitor/widgets/common/custom_text_field.dart';
@@ -13,7 +14,10 @@ import 'package:blood_pressure_monitor/widgets/common/validation_message_widget.
 /// Screen for logging a manual weight entry with contextual lifestyle notes.
 class AddWeightView extends StatefulWidget {
   /// Creates an [AddWeightView].
-  const AddWeightView({super.key});
+  const AddWeightView({super.key, this.editingEntry});
+
+  /// Entry being edited, if any.
+  final WeightEntry? editingEntry;
 
   @override
   State<AddWeightView> createState() => _AddWeightViewState();
@@ -38,6 +42,25 @@ class _AddWeightViewState extends State<AddWeightView> {
     'Intense',
   ];
 
+  bool get _isEditing => widget.editingEntry != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final editing = widget.editingEntry;
+    if (editing != null) {
+      _recordedAt = editing.takenAt;
+      _unit = editing.unit;
+      _weightController.text = editing.weightValue.toString();
+      _notesController.text = editing.notes ?? '';
+      _saltLevel = editing.saltIntake;
+      _exerciseLevel = editing.exerciseLevel;
+      _stressRating = editing.stressLevel == null
+          ? null
+          : int.tryParse(editing.stressLevel!);
+    }
+  }
+
   @override
   void dispose() {
     _weightController.dispose();
@@ -51,7 +74,7 @@ class _AddWeightViewState extends State<AddWeightView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Weight Entry'),
+        title: Text(_isEditing ? 'Edit Weight Entry' : 'Add Weight Entry'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: Form(
@@ -183,7 +206,9 @@ class _AddWeightViewState extends State<AddWeightView> {
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                child: const Text('Save Weight Entry'),
+                child: Text(
+                  _isEditing ? 'Update Weight Entry' : 'Save Weight Entry',
+                ),
               ),
             ],
           ),
@@ -278,6 +303,7 @@ class _AddWeightViewState extends State<AddWeightView> {
     final parsedWeight = double.parse(_weightController.text);
     final viewModel = context.read<WeightViewModel>();
     final error = await viewModel.saveWeightEntry(
+      id: widget.editingEntry?.id,
       weightValue: parsedWeight,
       unit: _unit,
       recordedAt: _recordedAt,
@@ -292,13 +318,16 @@ class _AddWeightViewState extends State<AddWeightView> {
     }
 
     if (error == null) {
+      context.refreshAnalyticsData();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Weight entry saved'),
+        SnackBar(
+          content: Text(
+            _isEditing ? 'Weight entry updated' : 'Weight entry saved',
+          ),
           backgroundColor: Colors.green,
         ),
       );
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(error)),

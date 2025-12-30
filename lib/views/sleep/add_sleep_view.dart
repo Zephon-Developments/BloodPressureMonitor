@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:blood_pressure_monitor/models/health_data.dart';
 import 'package:blood_pressure_monitor/utils/date_formats.dart';
+import 'package:blood_pressure_monitor/utils/provider_extensions.dart';
 import 'package:blood_pressure_monitor/viewmodels/sleep_viewmodel.dart';
 import 'package:blood_pressure_monitor/widgets/common/custom_text_field.dart';
 import 'package:blood_pressure_monitor/widgets/common/loading_button.dart';
@@ -10,7 +12,10 @@ import 'package:blood_pressure_monitor/widgets/common/validation_message_widget.
 /// Screen for manually logging a sleep session.
 class AddSleepView extends StatefulWidget {
   /// Creates an [AddSleepView].
-  const AddSleepView({super.key});
+  const AddSleepView({super.key, this.editingEntry});
+
+  /// Entry being edited when not null.
+  final SleepEntry? editingEntry;
 
   @override
   State<AddSleepView> createState() => _AddSleepViewState();
@@ -25,6 +30,23 @@ class _AddSleepViewState extends State<AddSleepView> {
   int? _quality;
   bool _submitted = false;
 
+  bool get _isEditing => widget.editingEntry != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final editing = widget.editingEntry;
+    if (editing != null) {
+      final started = editing.startedAt.toLocal();
+      final ended = (editing.endedAt ?? editing.startedAt).toLocal();
+      _sleepDate = DateTime(started.year, started.month, started.day);
+      _startTime = TimeOfDay.fromDateTime(started);
+      _endTime = TimeOfDay.fromDateTime(ended);
+      _quality = editing.quality;
+      _notesController.text = editing.notes ?? '';
+    }
+  }
+
   @override
   void dispose() {
     _notesController.dispose();
@@ -38,7 +60,7 @@ class _AddSleepViewState extends State<AddSleepView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Log Sleep Session'),
+        title: Text(_isEditing ? 'Edit Sleep Session' : 'Log Sleep Session'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: Form(
@@ -119,7 +141,9 @@ class _AddSleepViewState extends State<AddSleepView> {
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                child: const Text('Save Sleep Session'),
+                child: Text(
+                  _isEditing ? 'Update Sleep Session' : 'Save Sleep Session',
+                ),
               ),
             ],
           ),
@@ -242,6 +266,7 @@ class _AddSleepViewState extends State<AddSleepView> {
 
     final viewModel = context.read<SleepViewModel>();
     final error = await viewModel.saveSleepEntry(
+      id: widget.editingEntry?.id,
       start: start,
       end: end,
       quality: _quality,
@@ -253,13 +278,16 @@ class _AddSleepViewState extends State<AddSleepView> {
     }
 
     if (error == null) {
+      context.refreshAnalyticsData();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Sleep session saved'),
+        SnackBar(
+          content: Text(
+            _isEditing ? 'Sleep session updated' : 'Sleep session saved',
+          ),
           backgroundColor: Colors.green,
         ),
       );
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(error)),

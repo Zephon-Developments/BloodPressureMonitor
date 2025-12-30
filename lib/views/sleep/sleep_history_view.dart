@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 
 import 'package:blood_pressure_monitor/models/health_data.dart';
 import 'package:blood_pressure_monitor/utils/date_formats.dart';
+import 'package:blood_pressure_monitor/utils/provider_extensions.dart';
 import 'package:blood_pressure_monitor/viewmodels/sleep_viewmodel.dart';
 import 'package:blood_pressure_monitor/views/sleep/add_sleep_view.dart';
+import 'package:blood_pressure_monitor/widgets/common/confirm_delete_dialog.dart';
 
 /// Displays the history of recorded sleep sessions.
 class SleepHistoryView extends StatefulWidget {
@@ -121,12 +123,31 @@ class _SleepEntryCard extends StatelessWidget {
                   duration,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
-                Text(
-                  'Ended $end',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.copyWith(color: Theme.of(context).hintColor),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Ended $end',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.copyWith(color: Theme.of(context).hintColor),
+                    ),
+                    PopupMenuButton<_SleepEntryAction>(
+                      tooltip: 'Sleep actions',
+                      onSelected: (action) => _handleAction(context, action),
+                      itemBuilder: (context) => const [
+                        PopupMenuItem<_SleepEntryAction>(
+                          value: _SleepEntryAction.edit,
+                          child: Text('Edit'),
+                        ),
+                        PopupMenuItem<_SleepEntryAction>(
+                          value: _SleepEntryAction.delete,
+                          child: Text('Delete'),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -172,7 +193,72 @@ class _SleepEntryCard extends StatelessWidget {
         return 'Imported';
     }
   }
+
+  Future<void> _handleAction(
+    BuildContext context,
+    _SleepEntryAction action,
+  ) async {
+    switch (action) {
+      case _SleepEntryAction.edit:
+        await _editEntry(context);
+        break;
+      case _SleepEntryAction.delete:
+        await _deleteEntry(context);
+        break;
+    }
+  }
+
+  Future<void> _editEntry(BuildContext context) async {
+    final updated = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => AddSleepView(editingEntry: entry),
+      ),
+    );
+
+    if (updated == true && context.mounted) {
+      context.refreshAnalyticsData();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Sleep session updated')),
+      );
+    }
+  }
+
+  Future<void> _deleteEntry(BuildContext context) async {
+    if (entry.id == null) {
+      return;
+    }
+
+    final confirmed = await ConfirmDeleteDialog.show(
+      context,
+      title: 'Delete sleep session?',
+      message:
+          'This will delete the sleep session ending at ${DateFormats.shortDateTime.format(entry.endedAt ?? entry.startedAt)}.',
+    );
+
+    if (!confirmed || !context.mounted) {
+      return;
+    }
+
+    final viewModel = context.read<SleepViewModel>();
+    final error = await viewModel.deleteSleepEntry(entry.id!);
+    if (!context.mounted) {
+      return;
+    }
+
+    if (error == null) {
+      context.refreshAnalyticsData();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Sleep session deleted')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error)),
+      );
+    }
+  }
 }
+
+enum _SleepEntryAction { edit, delete }
 
 class _Chip extends StatelessWidget {
   const _Chip({required this.label});

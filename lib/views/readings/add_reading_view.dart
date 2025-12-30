@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'package:blood_pressure_monitor/models/reading.dart';
 import 'package:blood_pressure_monitor/utils/validators.dart';
+import 'package:blood_pressure_monitor/utils/provider_extensions.dart';
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
 import 'package:blood_pressure_monitor/views/readings/widgets/reading_form_advanced.dart';
 import 'package:blood_pressure_monitor/views/readings/widgets/reading_form_basic.dart';
@@ -17,8 +18,11 @@ import 'package:blood_pressure_monitor/widgets/common/validation_message_widget.
 /// an advanced section for additional details (arm, posture, notes, tags).
 /// Validates input using medical bounds and supports override confirmations.
 class AddReadingView extends StatefulWidget {
-  /// Creates an add reading view.
-  const AddReadingView({super.key});
+  /// Creates an add/update reading view.
+  const AddReadingView({super.key, this.editingReading});
+
+  /// Reading being edited. When null the view operates in add mode.
+  final Reading? editingReading;
 
   @override
   State<AddReadingView> createState() => _AddReadingViewState();
@@ -39,6 +43,24 @@ class _AddReadingViewState extends State<AddReadingView> {
   bool _isSubmitting = false;
   ValidationResult? _validationResult;
   bool _showOverrideConfirmation = false;
+
+  bool get _isEditing => widget.editingReading != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final editing = widget.editingReading;
+    if (editing != null) {
+      _selectedDateTime = editing.takenAt;
+      _systolicController.text = editing.systolic.toString();
+      _diastolicController.text = editing.diastolic.toString();
+      _pulseController.text = editing.pulse.toString();
+      _notesController.text = editing.note ?? '';
+      _tagsController.text = editing.tags ?? '';
+      _selectedArm = editing.arm;
+      _selectedPosture = editing.posture;
+    }
+  }
 
   @override
   void dispose() {
@@ -91,7 +113,9 @@ class _AddReadingViewState extends State<AddReadingView> {
     final viewModel = context.read<BloodPressureViewModel>();
 
     final reading = Reading(
-      profileId: 1, // TODO: Use actual profile ID from profile selector
+      id: widget.editingReading?.id,
+      profileId: widget.editingReading?.profileId ??
+          1, // TODO: Use actual profile ID from profile selector
       takenAt: _selectedDateTime,
       localOffsetMinutes: _selectedDateTime.timeZoneOffset.inMinutes,
       systolic: int.parse(_systolicController.text),
@@ -107,10 +131,15 @@ class _AddReadingViewState extends State<AddReadingView> {
           : _tagsController.text.trim(),
     );
 
-    final result = await viewModel.addReading(
-      reading,
-      confirmOverride: confirmOverride,
-    );
+    final result = _isEditing
+        ? await viewModel.updateReading(
+            reading,
+            confirmOverride: confirmOverride,
+          )
+        : await viewModel.addReading(
+            reading,
+            confirmOverride: confirmOverride,
+          );
 
     if (!mounted) return;
 
@@ -128,13 +157,18 @@ class _AddReadingViewState extends State<AddReadingView> {
         (result.level == ValidationLevel.warning && confirmOverride)) {
       // Success - show snackbar and navigate back
       if (mounted) {
+        context.refreshAnalyticsData();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Reading added successfully'),
+          SnackBar(
+            content: Text(
+              _isEditing
+                  ? 'Reading updated successfully'
+                  : 'Reading added successfully',
+            ),
             backgroundColor: Colors.green,
           ),
         );
-        Navigator.of(context).pop();
+        Navigator.of(context).pop(true);
       }
     }
   }
@@ -143,7 +177,7 @@ class _AddReadingViewState extends State<AddReadingView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Reading'),
+        title: Text(_isEditing ? 'Edit Reading' : 'Add Reading'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
       body: Form(
@@ -253,17 +287,17 @@ class _AddReadingViewState extends State<AddReadingView> {
 
               const SizedBox(height: 16),
 
-              // Session control
-              SessionControlWidget(
-                startNewSession: _startNewSession,
-                onChanged: (value) {
-                  setState(() {
-                    _startNewSession = value;
-                  });
-                },
-              ),
-
-              const SizedBox(height: 24),
+              if (!_isEditing) ...[
+                SessionControlWidget(
+                  startNewSession: _startNewSession,
+                  onChanged: (value) {
+                    setState(() {
+                      _startNewSession = value;
+                    });
+                  },
+                ),
+                const SizedBox(height: 24),
+              ],
 
               // Submit button
               LoadingButton(
@@ -274,7 +308,7 @@ class _AddReadingViewState extends State<AddReadingView> {
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                child: const Text('Save Reading'),
+                child: Text(_isEditing ? 'Update Reading' : 'Save Reading'),
               ),
 
               const SizedBox(height: 16),
