@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 
+import 'package:blood_pressure_monitor/models/reading.dart';
 import 'package:blood_pressure_monitor/utils/date_formats.dart';
+import 'package:blood_pressure_monitor/utils/provider_extensions.dart';
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
+import 'package:blood_pressure_monitor/views/readings/add_reading_view.dart';
+import 'package:blood_pressure_monitor/widgets/common/confirm_delete_dialog.dart';
 
 /// Displays the most recent blood pressure readings.
 ///
@@ -11,6 +16,58 @@ import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart'
 class RecentReadingsCard extends StatelessWidget {
   /// Creates a recent readings card.
   const RecentReadingsCard({super.key});
+
+  Future<void> _handleEdit(BuildContext context, Reading reading) async {
+    final updated = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => AddReadingView(editingReading: reading),
+      ),
+    );
+
+    if (updated == true && context.mounted) {
+      context.refreshAnalyticsData();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Reading updated'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    }
+  }
+
+  Future<void> _handleDelete(
+    BuildContext context,
+    BloodPressureViewModel viewModel,
+    Reading reading,
+  ) async {
+    if (reading.id == null) {
+      return;
+    }
+
+    final confirmed = await ConfirmDeleteDialog.show(
+      context,
+      title: 'Delete reading?',
+      message:
+          'This will permanently remove the reading from ${DateFormats.standardDateTime.format(reading.takenAt)}.',
+      confirmLabel: 'Delete',
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    await viewModel.deleteReading(reading.id!);
+    if (!context.mounted) {
+      return;
+    }
+
+    context.refreshAnalyticsData();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Reading deleted'),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,26 +165,67 @@ class RecentReadingsCard extends StatelessWidget {
                   ),
                   itemBuilder: (context, index) {
                     final reading = recentReadings[index];
-                    return ListTile(
-                      leading: Icon(
-                        Icons.favorite,
-                        color: Theme.of(context).colorScheme.error,
+                    return Slidable(
+                      key: ValueKey('reading-${reading.id ?? index}'),
+                      endActionPane: ActionPane(
+                        motion: const DrawerMotion(),
+                        extentRatio: 0.25,
+                        children: [
+                          CustomSlidableAction(
+                            onPressed: (_) => _handleDelete(
+                              context,
+                              viewModel,
+                              reading,
+                            ),
+                            backgroundColor:
+                                Theme.of(context).colorScheme.error,
+                            child: Semantics(
+                              button: true,
+                              label: 'Delete reading',
+                              hint:
+                                  'Opens a confirmation dialog for this reading',
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.delete,
+                                    color:
+                                        Theme.of(context).colorScheme.onError,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'DELETE',
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(context).colorScheme.onError,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      title: Text(
-                        '${reading.systolic}/${reading.diastolic}',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                      child: ListTile(
+                        leading: Icon(
+                          Icons.favorite,
+                          color: Theme.of(context).colorScheme.error,
                         ),
+                        title: Text(
+                          '${reading.systolic}/${reading.diastolic}',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        subtitle: Text(
+                          'Pulse: ${reading.pulse} bpm • '
+                          '${DateFormats.standardDateTime.format(reading.takenAt)}',
+                        ),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => _handleEdit(context, reading),
                       ),
-                      subtitle: Text(
-                        'Pulse: ${reading.pulse} bpm • '
-                        '${DateFormats.standardDateTime.format(reading.takenAt)}',
-                      ),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () {
-                        // TODO: Navigate to reading details or history
-                      },
                     );
                   },
                 ),

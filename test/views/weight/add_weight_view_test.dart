@@ -74,17 +74,45 @@ void main() {
     verify(mockWeightService.createWeightEntry(any)).called(1);
     expect(find.byType(AddWeightView), findsNothing);
   });
+
+  testWidgets('prefills and updates existing entry', (tester) async {
+    when(mockWeightService.updateWeightEntry(any)).thenAnswer(
+      (invocation) async => invocation.positionalArguments.first as WeightEntry,
+    );
+
+    await _pumpAddWeightView(
+      tester,
+      viewModel,
+      editingEntry: sampleEntry,
+    );
+
+    expect(find.text('Edit Weight Entry'), findsOneWidget);
+
+    final weightField = find.widgetWithText(TextFormField, 'Weight');
+    final textField = tester.widget<TextFormField>(weightField);
+    expect(textField.controller!.text, '70.0');
+
+    final saveButton = find.text('Update Weight Entry');
+    await tester.ensureVisible(saveButton);
+    await tester.tap(saveButton);
+    await tester.pumpAndSettle();
+
+    verify(mockWeightService.updateWeightEntry(any)).called(1);
+  });
 }
 
 Future<void> _pumpAddWeightView(
   WidgetTester tester,
-  WeightViewModel viewModel,
-) async {
+  WeightViewModel viewModel, {
+  WeightEntry? editingEntry,
+}) async {
   await tester.pumpWidget(
     ChangeNotifierProvider<WeightViewModel>.value(
       value: viewModel,
-      child: const MaterialApp(
-        home: _RouteLauncher(child: AddWeightView()),
+      child: MaterialApp(
+        home: _RouteLauncher(
+          child: AddWeightView(editingEntry: editingEntry),
+        ),
       ),
     ),
   );

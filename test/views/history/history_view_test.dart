@@ -141,6 +141,55 @@ void main() {
     expect(find.textContaining('Pulse ${reading.pulse}'), findsOneWidget);
   });
 
+  testWidgets('raw reading tap shows action sheet', (tester) async {
+    when(
+      mockHistoryService.fetchGroupedHistory(
+        profileId: anyNamed('profileId'),
+        start: anyNamed('start'),
+        end: anyNamed('end'),
+        before: anyNamed('before'),
+        limit: anyNamed('limit'),
+        tags: anyNamed('tags'),
+      ),
+    ).thenAnswer((_) async => <ReadingGroup>[]);
+
+    final reading = Reading(
+      id: 5,
+      profileId: 1,
+      systolic: 122,
+      diastolic: 78,
+      pulse: 64,
+      takenAt: now.subtract(const Duration(days: 2)),
+      localOffsetMinutes: 0,
+      tags: 'fasting, stressed',
+    );
+
+    when(
+      mockHistoryService.fetchRawHistory(
+        profileId: anyNamed('profileId'),
+        start: anyNamed('start'),
+        end: anyNamed('end'),
+        before: anyNamed('before'),
+        limit: anyNamed('limit'),
+        tags: anyNamed('tags'),
+      ),
+    ).thenAnswer((_) async => <Reading>[reading]);
+
+    await tester.pumpWidget(createSubject());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Raw'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(
+      find.widgetWithText(ListTile, '${reading.systolic}/${reading.diastolic}'),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Edit reading'), findsOneWidget);
+    expect(find.text('fasting'), findsOneWidget);
+  });
+
   testWidgets('expanding a group shows child readings', (tester) async {
     final group = buildGroup(1, now.subtract(const Duration(days: 1)), '1,2');
     when(
@@ -169,6 +218,34 @@ void main() {
 
     expect(find.textContaining('118/76'), findsOneWidget);
     verify(mockHistoryService.fetchGroupMembers(group)).called(1);
+  });
+
+  testWidgets('expanded group displays per-reading actions', (tester) async {
+    final group = buildGroup(3, now.subtract(const Duration(days: 1)), '4');
+    when(
+      mockHistoryService.fetchGroupedHistory(
+        profileId: anyNamed('profileId'),
+        start: anyNamed('start'),
+        end: anyNamed('end'),
+        before: anyNamed('before'),
+        limit: anyNamed('limit'),
+        tags: anyNamed('tags'),
+      ),
+    ).thenAnswer((_) async => <ReadingGroup>[group]);
+
+    when(mockHistoryService.fetchGroupMembers(group)).thenAnswer((_) async {
+      return <Reading>[
+        buildReading(99, now.subtract(const Duration(hours: 5))),
+      ];
+    });
+
+    await tester.pumpWidget(createSubject());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('1 readings'));
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('Reading actions'), findsOneWidget);
   });
 
   testWidgets('scrolling near bottom triggers pagination', (tester) async {

@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 
 import 'package:blood_pressure_monitor/models/health_data.dart';
 import 'package:blood_pressure_monitor/utils/date_formats.dart';
+import 'package:blood_pressure_monitor/utils/provider_extensions.dart';
 import 'package:blood_pressure_monitor/viewmodels/weight_viewmodel.dart';
 import 'package:blood_pressure_monitor/views/weight/add_weight_view.dart';
+import 'package:blood_pressure_monitor/widgets/common/confirm_delete_dialog.dart';
 
 /// Displays the chronological history of weight entries with lifestyle context.
 class WeightHistoryView extends StatefulWidget {
@@ -112,15 +114,30 @@ class _WeightEntryCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  '${kg.toStringAsFixed(1)} kg · ${lbs.toStringAsFixed(1)} lbs',
-                  style: Theme.of(context).textTheme.titleMedium,
+                Expanded(
+                  child: Text(
+                    '${kg.toStringAsFixed(1)} kg · ${lbs.toStringAsFixed(1)} lbs',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                 ),
                 Text(
                   DateFormats.shortDateTime.format(entry.takenAt),
                   style: Theme.of(context).textTheme.bodySmall,
+                ),
+                PopupMenuButton<_WeightEntryAction>(
+                  tooltip: 'Weight actions',
+                  onSelected: (action) => _handleAction(context, action),
+                  itemBuilder: (context) => const [
+                    PopupMenuItem<_WeightEntryAction>(
+                      value: _WeightEntryAction.edit,
+                      child: Text('Edit'),
+                    ),
+                    PopupMenuItem<_WeightEntryAction>(
+                      value: _WeightEntryAction.delete,
+                      child: Text('Delete'),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -146,7 +163,71 @@ class _WeightEntryCard extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> _handleAction(
+    BuildContext context,
+    _WeightEntryAction action,
+  ) async {
+    switch (action) {
+      case _WeightEntryAction.edit:
+        await _editEntry(context);
+        break;
+      case _WeightEntryAction.delete:
+        await _deleteEntry(context);
+        break;
+    }
+  }
+
+  Future<void> _editEntry(BuildContext context) async {
+    final updated = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (_) => AddWeightView(editingEntry: entry),
+      ),
+    );
+    if (updated == true && context.mounted) {
+      context.refreshAnalyticsData();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Weight entry updated')),
+      );
+    }
+  }
+
+  Future<void> _deleteEntry(BuildContext context) async {
+    if (entry.id == null) {
+      return;
+    }
+
+    final confirmed = await ConfirmDeleteDialog.show(
+      context,
+      title: 'Delete weight entry?',
+      message:
+          'This will permanently remove the weight entry from ${DateFormats.shortDateTime.format(entry.takenAt)}.',
+    );
+
+    if (!confirmed || !context.mounted) {
+      return;
+    }
+
+    final viewModel = context.read<WeightViewModel>();
+    final error = await viewModel.deleteWeightEntry(entry.id!);
+    if (!context.mounted) {
+      return;
+    }
+
+    if (error == null) {
+      context.refreshAnalyticsData();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Weight entry deleted')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error)),
+      );
+    }
+  }
 }
+
+enum _WeightEntryAction { edit, delete }
 
 class _Chip extends StatelessWidget {
   const _Chip({required this.label});
