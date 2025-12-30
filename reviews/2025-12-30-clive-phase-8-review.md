@@ -27,9 +27,10 @@ Phase 8 (Charts & Analytics) has been successfully implemented and verified. All
 - Corrected `fl_chart` API usage (`BetweenBarsData` parameter).
 - Resolved all static analysis warnings (unused imports, unnecessary casts, deprecated `withOpacity`).
 - Enforced `const` constructors where applicable.
+- **Resolved regression in `home_view_test.dart`** by providing `AnalyticsViewModel` and its mock service to the test widget tree.
 
 ## Testing & Quality
-- **Unit Tests**: 9 tests passed across `AnalyticsService` and `AnalyticsViewModel`.
+- **Unit Tests**: 604/604 tests passed successfully.
 - **Static Analysis**: `flutter analyze` reports "No issues found!".
 - **Performance**: Heavy computations (StdDev) are offloaded to isolates using `compute`.
 - **Documentation**: Public APIs are documented with JSDoc-style comments.
