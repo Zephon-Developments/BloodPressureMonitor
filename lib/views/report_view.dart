@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
+import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/report_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/analytics_viewmodel.dart';
 // For date range selection if needed
@@ -164,14 +165,44 @@ class _ReportViewState extends State<ReportView> {
   }
 
   Future<void> _generateReport(ReportViewModel reportVm) async {
+    // Get active profile from ActiveProfileViewModel before async operations
+    final activeProfile = context.read<ActiveProfileViewModel>();
+
     // 1. Capture the chart as an image
     Uint8List? chartImage;
     try {
-      RenderRepaintBoundary boundary =
-          _chartKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-      ByteData? byteData =
-          await image.toByteData(format: ui.ImageByteFormat.png);
+      // Add null safety check for context
+      final chartContext = _chartKey.currentContext;
+      if (chartContext == null) {
+        reportVm.clearError();
+        // Set a user-friendly error message
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Chart not ready. Please wait a moment and try again.',
+            ),
+          ),
+        );
+        return;
+      }
+
+      final boundary =
+          chartContext.findRenderObject() as RenderRepaintBoundary?;
+      if (boundary == null) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Unable to capture chart. Please try again.',
+            ),
+          ),
+        );
+        return;
+      }
+
+      final image = await boundary.toImage(pixelRatio: 3.0);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       chartImage = byteData?.buffer.asUint8List();
     } catch (e) {
       debugPrint('Error capturing chart: $e');
@@ -179,8 +210,8 @@ class _ReportViewState extends State<ReportView> {
 
     // 2. Generate the report
     await reportVm.generateReport(
-      profileId: 1, // Default profile
-      profileName: 'User',
+      profileId: activeProfile.activeProfileId,
+      profileName: activeProfile.activeProfileName,
       startDate: _startDate,
       endDate: _endDate,
       chartImages: chartImage != null ? [chartImage] : null,

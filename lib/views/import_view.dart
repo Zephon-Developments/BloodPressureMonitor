@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/import_viewmodel.dart';
 import 'package:blood_pressure_monitor/models/export_import.dart';
 
@@ -120,23 +121,28 @@ class ImportView extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.green.withValues(alpha: 0.1),
+                      color: _getImportResultColor(viewModel.importResult!)
+                          .withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.green),
+                      border: Border.all(
+                        color: _getImportResultColor(viewModel.importResult!),
+                      ),
                     ),
                     child: Column(
                       children: [
-                        const Icon(
-                          Icons.check_circle,
-                          color: Colors.green,
+                        Icon(
+                          _getImportResultIcon(viewModel.importResult!),
+                          color: _getImportResultColor(viewModel.importResult!),
                           size: 48,
                         ),
                         const SizedBox(height: 8),
-                        const Text(
-                          'Import Successful!',
+                        Text(
+                          _getImportResultTitle(viewModel.importResult!),
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
+                            color:
+                                _getImportResultColor(viewModel.importResult!),
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -157,6 +163,52 @@ class ImportView extends StatelessWidget {
                             'Duplicates Skipped: ${viewModel.importResult!.duplicatesSkipped}',
                             style: const TextStyle(fontStyle: FontStyle.italic),
                           ),
+                        if (viewModel.importResult!.errors.isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          const Divider(),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Errors:',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Container(
+                            constraints: const BoxConstraints(maxHeight: 150),
+                            child: SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: viewModel.importResult!.errors
+                                    .map(
+                                      (error) => Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 2,
+                                        ),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Text('• '),
+                                            Expanded(
+                                              child: Text(
+                                                error.toString(),
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.red,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                              ),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -196,6 +248,9 @@ class ImportView extends StatelessWidget {
     BuildContext context,
     ImportViewModel viewModel,
   ) async {
+    // Get active profile from ActiveProfileViewModel before any async operations
+    final activeProfile = context.read<ActiveProfileViewModel>();
+
     if (viewModel.overwriteExisting) {
       final confirm = await showDialog<bool>(
         context: context,
@@ -222,15 +277,69 @@ class ImportView extends StatelessWidget {
     }
 
     final success = await viewModel.importData(
-      profileId: 1,
+      profileId: activeProfile.activeProfileId,
       conflictMode: viewModel.overwriteExisting
           ? ImportConflictMode.overwrite
           : ImportConflictMode.append,
     );
-    if (success && context.mounted) {
+    if (success) {
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Import completed successfully')),
       );
+    }
+  }
+
+  /// Determines the appropriate title based on import result status.
+  String _getImportResultTitle(ImportResult result) {
+    final hasErrors = result.errors.isNotEmpty;
+    final hasImports = result.readingsImported > 0 ||
+        result.weightsImported > 0 ||
+        result.sleepLogsImported > 0 ||
+        result.medicationsImported > 0;
+
+    if (!hasErrors && hasImports) {
+      return 'Import Successful!';
+    } else if (hasErrors && hasImports) {
+      return 'Import Completed with Errors';
+    } else if (hasErrors && !hasImports) {
+      return 'Import Failed';
+    } else {
+      return 'No Data Imported';
+    }
+  }
+
+  /// Determines the appropriate icon based on import result status.
+  IconData _getImportResultIcon(ImportResult result) {
+    final hasErrors = result.errors.isNotEmpty;
+    final hasImports = result.readingsImported > 0 ||
+        result.weightsImported > 0 ||
+        result.sleepLogsImported > 0 ||
+        result.medicationsImported > 0;
+
+    if (!hasErrors && hasImports) {
+      return Icons.check_circle;
+    } else if (hasErrors && hasImports) {
+      return Icons.warning;
+    } else {
+      return Icons.error;
+    }
+  }
+
+  /// Determines the appropriate color based on import result status.
+  Color _getImportResultColor(ImportResult result) {
+    final hasErrors = result.errors.isNotEmpty;
+    final hasImports = result.readingsImported > 0 ||
+        result.weightsImported > 0 ||
+        result.sleepLogsImported > 0 ||
+        result.medicationsImported > 0;
+
+    if (!hasErrors && hasImports) {
+      return Colors.green;
+    } else if (hasErrors && hasImports) {
+      return Colors.orange;
+    } else {
+      return Colors.red;
     }
   }
 }
