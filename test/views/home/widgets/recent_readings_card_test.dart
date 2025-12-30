@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
@@ -152,6 +153,27 @@ void main() {
 
       // Should have dividers between items (3 readings = 2 dividers)
       expect(find.byType(Divider), findsNWidgets(2));
+    });
+
+    testWidgets('wraps each reading in a Slidable for delete actions',
+        (WidgetTester tester) async {
+      final reading = Reading(
+        id: 99,
+        profileId: 1,
+        systolic: 118,
+        diastolic: 78,
+        pulse: 68,
+        takenAt: DateTime(2025, 1, 2, 9, 15),
+        localOffsetMinutes: 0,
+      );
+
+      when(mockViewModel.isLoading).thenReturn(false);
+      when(mockViewModel.error).thenReturn(null);
+      when(mockViewModel.readings).thenReturn([reading]);
+
+      await tester.pumpWidget(createWidget());
+
+      expect(find.byType(Slidable), findsOneWidget);
     });
   });
 }
