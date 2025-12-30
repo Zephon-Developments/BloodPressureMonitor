@@ -5,7 +5,9 @@ import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 
 import 'package:blood_pressure_monitor/models/lock_state.dart';
+import 'package:blood_pressure_monitor/models/reading.dart';
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
+import 'package:blood_pressure_monitor/viewmodels/history_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/lock_viewmodel.dart';
 import 'package:blood_pressure_monitor/views/home_view.dart';
 import 'package:blood_pressure_monitor/views/readings/add_reading_view.dart';
@@ -13,20 +15,55 @@ import 'package:blood_pressure_monitor/views/settings/security_settings_view.dar
 
 @GenerateMocks([BloodPressureViewModel, LockViewModel])
 import 'home_view_test.mocks.dart';
+import '../test_mocks.mocks.dart' show MockHistoryService;
 
 void main() {
   group('HomeView Widget Tests', () {
     late MockBloodPressureViewModel mockViewModel;
     late MockLockViewModel mockLockViewModel;
+    late MockHistoryService mockHistoryService;
+    late HistoryViewModel historyViewModel;
 
     setUp(() {
       mockViewModel = MockBloodPressureViewModel();
       mockLockViewModel = MockLockViewModel();
+      mockHistoryService = MockHistoryService();
       when(mockViewModel.loadReadings()).thenAnswer((_) async {});
       when(mockViewModel.isLoading).thenReturn(false);
       when(mockViewModel.error).thenReturn(null);
       when(mockViewModel.readings).thenReturn([]);
       when(mockLockViewModel.state).thenReturn(AppLockState.initial());
+      when(
+        mockHistoryService.fetchGroupedHistory(
+          profileId: anyNamed('profileId'),
+          start: anyNamed('start'),
+          end: anyNamed('end'),
+          before: anyNamed('before'),
+          limit: anyNamed('limit'),
+          tags: anyNamed('tags'),
+        ),
+      ).thenAnswer((_) async => <ReadingGroup>[]);
+      when(
+        mockHistoryService.fetchRawHistory(
+          profileId: anyNamed('profileId'),
+          start: anyNamed('start'),
+          end: anyNamed('end'),
+          before: anyNamed('before'),
+          limit: anyNamed('limit'),
+          tags: anyNamed('tags'),
+        ),
+      ).thenAnswer((_) async => <Reading>[]);
+      when(mockHistoryService.fetchGroupMembers(any)).thenAnswer(
+        (_) async => <Reading>[],
+      );
+      historyViewModel = HistoryViewModel(
+        mockHistoryService,
+        clock: () => DateTime.utc(2025, 1, 1),
+      );
+    });
+
+    tearDown(() {
+      historyViewModel.dispose();
     });
 
     Widget createWidget() {
@@ -37,6 +74,9 @@ void main() {
           ),
           ChangeNotifierProvider<LockViewModel>.value(
             value: mockLockViewModel,
+          ),
+          ChangeNotifierProvider<HistoryViewModel>.value(
+            value: historyViewModel,
           ),
         ],
         child: const MaterialApp(
@@ -119,7 +159,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('History'), findsAtLeastNWidgets(2));
-      expect(find.text('Coming in Phase 7'), findsOneWidget);
+      expect(find.text('Filters'), findsOneWidget);
+      expect(find.text('No history yet'), findsOneWidget);
     });
 
     testWidgets('switches to charts tab when tapped',
@@ -183,7 +224,7 @@ void main() {
       expect(find.byType(AddReadingView), findsOneWidget);
     });
 
-    testWidgets('shows stub screens with appropriate icons',
+    testWidgets('shows history empty state and charts stub',
         (WidgetTester tester) async {
       await tester.pumpWidget(createWidget());
       await tester.pumpAndSettle();
@@ -191,7 +232,7 @@ void main() {
       // History stub
       await tester.tap(find.text('History'));
       await tester.pumpAndSettle();
-      expect(find.byIcon(Icons.history), findsNWidgets(2)); // Nav + stub
+      expect(find.text('No history yet'), findsOneWidget);
 
       // Charts stub
       await tester.tap(find.text('Charts'));

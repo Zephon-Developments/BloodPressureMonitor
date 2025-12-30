@@ -1,215 +1,135 @@
-# Handoff: Steve → Tracy
+# Handoff: Steve to Tracy (Phase 7 Initiation)
+
+## Status: 🎯 New Phase - Planning Required
 
 **Date**: 2025-12-29  
-**From**: Steve (Project Lead / Workflow Conductor)  
-**To**: Tracy (Planning & Architecture)  
-**Task**: Phase 4 - Weight & Sleep Data Management  
-**Status**: 🎯 **READY FOR PLANNING**
+**From**: Steve (Project Lead)  
+**To**: Tracy (Planning & Analysis)  
+**Task**: Plan Phase 7 - History (Avg-first with expansion)  
 
 ---
 
-## Objective
+## Context
 
-Design and plan the implementation of Phase 4: Weight & Sleep data management, including:
-- Data models and database schema
-- CRUD services for weight and sleep entries
-- UI components for data input
-- Basic correlation hooks for morning BP readings
-- Comprehensive test coverage
+Phase 4 (Weight & Sleep Tracking) has been successfully merged to `main`. The project is ready to proceed with Phase 7: History views with averaged readings as the primary display and expandable raw reading details.
 
----
+### Recent Accomplishments
+- ✅ Phase 1: Core Data Layer - Complete
+- ✅ Phase 2A: Averaging Engine - Complete  
+- ✅ Phase 2B: Validation & ViewModel Integration - Complete
+- ✅ Phase 3: Medication Management - Complete
+- ✅ Phase 4: Weight & Sleep Tracking - **Just Merged**
+- ✅ Phase 5: App Security Gate - Complete
+- ✅ Phase 6: UI Foundation - Complete
 
-## Scope & Requirements
-
-### Core Features Required
-
-#### 1. Weight Management
-- **WeightEntry Model**: timestamp, weight value, unit (kg/lbs), optional notes
-- **Optional Context Fields**: salt intake, exercise level, stress/sleep quality indicators
-- **CRUD Operations**: Create, read, update, delete weight entries
-- **UI Input Form**: Simple form for manual weight entry with validation
-- **History View**: List of weight entries with trend visualization (future enhancement hook)
-
-#### 2. Sleep Management
-- **SleepEntry Model**: date, sleep start/end times, total duration, sleep quality rating
-- **Source Metadata**: Manual entry vs device import (hook for future integrations)
-- **CRUD Operations**: Create, read, update, delete sleep entries
-- **UI Input Form**: Form for manual sleep logging (start time, end time, quality)
-- **Device Import Hook**: Architecture for future import from sleep trackers
-
-#### 3. Correlation Foundation
-- **Morning BP Correlation**: Link morning BP readings with previous night's sleep
-- **Weight Correlation**: Track weight trends alongside BP patterns
-- **Data Retrieval**: Services to fetch correlated data for analytics (Phase 8)
-- **No Advice Yet**: Just data storage and retrieval; correlation analytics come later
+### Current State
+- **Test Coverage**: 571 tests passing
+- **Code Quality**: Zero analyzer issues
+- **Branch**: `main` (synced with latest merge)
+- **Next Target**: Phase 7
 
 ---
 
-## Constraints
+## Phase 7 Requirements (from Implementation Schedule)
 
-### Technical Constraints
-- **Database**: Use existing encrypted SQLite schema from Phase 1
-- **Models**: Follow established patterns (toMap/fromMap, equality, DartDoc)
-- **Services**: Maintain MVVM architecture with repository pattern
-- **Testing**: Achieve ≥85% coverage for services, ≥70% for widgets
-- **Standards**: Follow Documentation/Standards/Coding_Standards.md
+### Scope
+History list showing averaged rows as primary display; expand to view raw readings.
 
-### Design Constraints
-- **UI Consistency**: Match Phase 6 UI patterns (CustomTextField, form validation, etc.)
-- **Accessibility**: Ensure WCAG AA compliance
-- **Performance**: Efficient queries for large datasets
-- **Privacy**: All data remains local-only (encrypted at rest)
+### Tasks to Plan
+1. **History Screen Design**
+   - Date range filters (profile, tags, custom date ranges)
+   - Expandable groups showing averaged readings
+   - Raw reading details visible on expansion
+   
+2. **View Toggle & Display**
+   - Toggle between averaged vs raw view modes
+   - Display grouping membership indicators
+   - Show which readings contribute to each average
+   
+3. **Performance Optimization**
+   - Widget tests for expand/collapse behavior
+   - Filter functionality tests
+   - Data binding and update tests
+   - Performance tests with large datasets
 
-### Dependency Constraints
-- **Phase 1**: Database schema must be extended (new tables for weight/sleep)
-- **Phase 2**: No dependencies on averaging engine
-- **Phase 6**: UI components should follow existing patterns
+### Dependencies
+- ✅ Phase 2 (Averaging Engine) - Available
+- ✅ Phase 6 (UI Shell) - Available
+- ✅ `BloodPressureViewModel` with averaging integration
+- ✅ Material 3 UI components and patterns
 
----
-
-## Success Metrics
-
-### Functional Success
-- [ ] Users can manually log weight entries with optional context
-- [ ] Users can manually log sleep data with start/end times and quality
-- [ ] Data persists correctly and retrieves efficiently
-- [ ] Basic correlation hooks are in place for future analytics
-- [ ] UI forms validate input and provide clear feedback
-
-### Quality Success
-- [ ] Unit tests ≥85% for services (models, DAOs, business logic)
-- [ ] Widget tests ≥70% for UI components
-- [ ] `flutter analyze` reports zero issues
-- [ ] All tests pass (no regressions from existing 555 tests)
-- [ ] Code reviewed and approved by Clive
-
-### User Experience Success
-- [ ] Weight/sleep input is quick and intuitive
-- [ ] Forms follow established UI patterns from Phase 6
-- [ ] Clear navigation from home screen to weight/sleep entry
-- [ ] Data is immediately visible after entry (confirmation)
+### Acceptance Criteria
+- UX matches specification: averaged readings shown first, raw details one tap away
+- Smooth scrolling performance with large datasets (100+ groups)
+- Widget tests achieve ≥70% coverage for new components
+- All existing tests continue to pass
+- Zero analyzer warnings
 
 ---
 
-## Architecture Considerations
+## Tracy's Objectives
 
-### Database Schema Extensions
-Based on Phase 1 foundation, we need:
+Please create a comprehensive plan for Phase 7 that includes:
 
-**Table: weight_entries**
-- `id` (INTEGER PRIMARY KEY)
-- `profile_id` (INTEGER, FK to profiles)
-- `recorded_at` (INTEGER, timestamp)
-- `weight_kg` (REAL, normalized to kg)
-- `unit` (TEXT, 'kg' or 'lbs')
-- `notes` (TEXT, optional)
-- `salt_level` (TEXT, optional: 'low', 'medium', 'high')
-- `exercise_level` (TEXT, optional: 'none', 'light', 'moderate', 'intense')
-- `stress_level` (INTEGER, optional: 1-5 scale)
+1. **Architecture Review**
+   - Analyze existing `BloodPressureViewModel` and averaging services
+   - Determine data structures for expandable list items
+   - Plan state management for expand/collapse interactions
+   
+2. **Component Breakdown**
+   - Define all widgets needed (HistoryView, FilterBar, ExpandableReadingCard, etc.)
+   - Specify props, state, and interactions for each component
+   - Plan navigation integration with existing app shell
+   
+3. **Data Flow Design**
+   - How to efficiently fetch and paginate reading groups
+   - Strategy for loading raw readings on expansion
+   - Filter application and state persistence
+   
+4. **Performance Strategy**
+   - Lazy loading approach for large datasets
+   - Caching strategy for expanded items
+   - Scroll position preservation
+   
+5. **Testing Plan**
+   - Unit tests for new ViewModels/services (if any)
+   - Widget tests for all interactive components
+   - Integration tests for filter and pagination
+   - Performance benchmarks
+   
+6. **Implementation Phases**
+   - Break work into logical sub-tasks
+   - Identify any potential blockers
+   - Estimate complexity and risk areas
 
-**Table: sleep_entries**
-- `id` (INTEGER PRIMARY KEY)
-- `profile_id` (INTEGER, FK to profiles)
-- `sleep_date` (TEXT, ISO date for the night)
-- `sleep_start` (INTEGER, timestamp)
-- `sleep_end` (INTEGER, timestamp)
-- `duration_minutes` (INTEGER, calculated)
-- `quality_rating` (INTEGER, 1-5 scale)
-- `notes` (TEXT, optional)
-- `source` (TEXT, 'manual' or 'device')
-- `source_metadata` (TEXT, JSON for future device data)
+### Reference Materials
+- `Documentation/Standards/Coding_Standards.md` - Project coding standards
+- `lib/viewmodels/blood_pressure_viewmodel.dart` - Existing reading management
+- `lib/services/averaging_service.dart` - Grouping logic (if exists)
+- `lib/views/home/widgets/recent_readings_card.dart` - Example of reading display pattern
 
-### Service Layer
-- `WeightService`: CRUD operations, unit conversion
-- `SleepService`: CRUD operations, duration calculation, overlap detection
-- `CorrelationService`: Future hook for linking BP/weight/sleep data
-
-### ViewModel Layer
-- `WeightViewModel`: State management for weight tracking
-- `SleepViewModel`: State management for sleep logging
-- Extend `BloodPressureViewModel`: Add correlation data retrieval
-
-### UI Components
-- `AddWeightView`: Form for weight entry
-- `WeightHistoryView`: List of weight entries (basic; enhanced in Phase 7)
-- `AddSleepView`: Form for sleep logging
-- `SleepHistoryView`: List of sleep entries
-- Navigation integration: Quick actions from home screen
-
----
-
-## Reference Materials
-
-### Existing Patterns to Follow
-- **Forms**: See [lib/views/readings/add_reading_view.dart](lib/views/readings/add_reading_view.dart)
-- **Validation**: See [lib/utils/validators.dart](lib/utils/validators.dart)
-- **Widgets**: See [lib/widgets/common/custom_text_field.dart](lib/widgets/common/custom_text_field.dart)
-- **Services**: See [lib/services/database_service.dart](lib/services/database_service.dart)
-- **ViewModels**: See [lib/viewmodels/blood_pressure_viewmodel.dart](lib/viewmodels/blood_pressure_viewmodel.dart)
-
-### Standards & Guidelines
-- **Coding Standards**: [Documentation/Standards/Coding_Standards.md](Documentation/Standards/Coding_Standards.md)
-- **Implementation Schedule**: [Documentation/Plans/Implementation_Schedule.md](Documentation/Plans/Implementation_Schedule.md)
+### Deliverable
+Create `Documentation/Plans/Phase_7_History_Plan.md` with your detailed analysis and recommendations. Include:
+- Architecture decisions with rationale
+- Component specifications
+- Data flow diagrams (in markdown/mermaid if helpful)
+- Testing strategy with coverage targets
+- Risk assessment and mitigation strategies
+- Clear task breakdown for implementation
 
 ---
 
-## Tracy's Deliverables
-
-Please create a comprehensive implementation plan that includes:
-
-1. **Database Schema**: Detailed table definitions with migrations
-2. **Model Definitions**: Dart classes with full documentation
-3. **Service Architecture**: CRUD operations and business logic
-4. **UI Mockup/Wireframe**: Description of forms and navigation flow
-5. **Test Strategy**: Unit and widget test scenarios
-6. **Implementation Tasks**: Broken down for Georgina/Claudette
-7. **Acceptance Criteria**: Clear definition of "done"
-8. **Risk Assessment**: Potential blockers and mitigation strategies
-
-### Output Format
-Create the plan in: `Documentation/Plans/Phase_4_Weight_Sleep_Plan.md`
-
-Include:
-- Complete technical specifications
-- Step-by-step implementation sequence
-- Dependency mapping
-- Test scenarios and coverage targets
-- Rollback points if issues arise
+## Notes
+- The user has indicated that weight and sleep sections may see changes later, so ensure Phase 7 design is flexible enough to accommodate future enhancements
+- Maintain consistency with existing Material 3 UI patterns from Phase 6
+- Consider accessibility (screen readers, large text support) in the design
 
 ---
 
-## Next Steps
+**Handoff Complete**: Tracy, please review Phase 7 requirements and create a comprehensive implementation plan. Once your plan is ready, hand it off to Clive for review before implementation begins.
 
-1. **Tracy**: Review this handoff and create the detailed implementation plan
-2. **Tracy**: Review against CODING_STANDARDS.md for compliance
-3. **Tracy**: Hand off to Clive for plan review (Documentation/Handoffs/Tracy_to_Clive.md)
-4. **Clive**: Review plan for completeness and feasibility
-5. **Steve**: Select implementer (Georgina or Claudette) based on plan complexity
-6. **Implementation**: Execute Phase 4 with continuous quality checks
-
----
-
-## Timeline Expectations
-
-- **Planning**: 1 session (Tracy)
-- **Plan Review**: 1 session (Clive)
-- **Implementation**: 2-3 sessions (Georgina/Claudette)
-- **QA Review**: 1 session (Clive)
-- **Integration**: 1 session (Steve)
-
-**Target Completion**: Within 1 week
-
----
-
-## Questions for Tracy
-
-- Should we implement both weight and sleep in one phase, or split them?
-- What's the best approach for unit conversion (kg ↔ lbs)?
-- How should we handle sleep entries that cross midnight?
-- Should we validate sleep duration (min/max reasonable hours)?
-- What's the UX for quick weight entry vs detailed entry?
-
----
+**Suggested Next Prompt**:
+> "Tracy, please create the Phase 7 implementation plan following the requirements in Steve_to_Tracy.md"
 
 **Handoff Complete**: Tracy, please proceed with Phase 4 planning and reference CODING_STANDARDS.md throughout.
 

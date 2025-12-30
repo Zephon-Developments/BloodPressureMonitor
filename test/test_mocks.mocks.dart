@@ -7,9 +7,10 @@ import 'dart:async' as _i4;
 
 import 'package:blood_pressure_monitor/models/health_data.dart' as _i2;
 import 'package:blood_pressure_monitor/models/reading.dart' as _i5;
+import 'package:blood_pressure_monitor/services/history_service.dart' as _i6;
 import 'package:blood_pressure_monitor/services/reading_service.dart' as _i3;
-import 'package:blood_pressure_monitor/services/sleep_service.dart' as _i6;
-import 'package:blood_pressure_monitor/services/weight_service.dart' as _i7;
+import 'package:blood_pressure_monitor/services/sleep_service.dart' as _i7;
+import 'package:blood_pressure_monitor/services/weight_service.dart' as _i8;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: type=lint
@@ -157,12 +158,92 @@ class MockReadingService extends _i1.Mock implements _i3.ReadingService {
         ),
         returnValue: _i4.Future<List<_i5.Reading>>.value(<_i5.Reading>[]),
       ) as _i4.Future<List<_i5.Reading>>);
+
+  @override
+  _i4.Future<List<_i5.Reading>> getReadingsByIds(List<int>? ids) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getReadingsByIds,
+          [ids],
+        ),
+        returnValue: _i4.Future<List<_i5.Reading>>.value(<_i5.Reading>[]),
+      ) as _i4.Future<List<_i5.Reading>>);
+}
+
+/// A class which mocks [HistoryService].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockHistoryService extends _i1.Mock implements _i6.HistoryService {
+  MockHistoryService() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i4.Future<List<_i5.ReadingGroup>> fetchGroupedHistory({
+    required int? profileId,
+    DateTime? start,
+    DateTime? end,
+    DateTime? before,
+    int? limit = 20,
+    List<String>? tags = const [],
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #fetchGroupedHistory,
+          [],
+          {
+            #profileId: profileId,
+            #start: start,
+            #end: end,
+            #before: before,
+            #limit: limit,
+            #tags: tags,
+          },
+        ),
+        returnValue:
+            _i4.Future<List<_i5.ReadingGroup>>.value(<_i5.ReadingGroup>[]),
+      ) as _i4.Future<List<_i5.ReadingGroup>>);
+
+  @override
+  _i4.Future<List<_i5.Reading>> fetchRawHistory({
+    required int? profileId,
+    DateTime? start,
+    DateTime? end,
+    DateTime? before,
+    int? limit = 20,
+    List<String>? tags = const [],
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #fetchRawHistory,
+          [],
+          {
+            #profileId: profileId,
+            #start: start,
+            #end: end,
+            #before: before,
+            #limit: limit,
+            #tags: tags,
+          },
+        ),
+        returnValue: _i4.Future<List<_i5.Reading>>.value(<_i5.Reading>[]),
+      ) as _i4.Future<List<_i5.Reading>>);
+
+  @override
+  _i4.Future<List<_i5.Reading>> fetchGroupMembers(_i5.ReadingGroup? group) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #fetchGroupMembers,
+          [group],
+        ),
+        returnValue: _i4.Future<List<_i5.Reading>>.value(<_i5.Reading>[]),
+      ) as _i4.Future<List<_i5.Reading>>);
 }
 
 /// A class which mocks [SleepService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockSleepService extends _i1.Mock implements _i6.SleepService {
+class MockSleepService extends _i1.Mock implements _i7.SleepService {
   MockSleepService() {
     _i1.throwOnMissingStub(this);
   }
@@ -280,7 +361,7 @@ class MockSleepService extends _i1.Mock implements _i6.SleepService {
 /// A class which mocks [WeightService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockWeightService extends _i1.Mock implements _i7.WeightService {
+class MockWeightService extends _i1.Mock implements _i8.WeightService {
   MockWeightService() {
     _i1.throwOnMissingStub(this);
   }
