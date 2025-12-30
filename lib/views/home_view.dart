@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:blood_pressure_monitor/viewmodels/analytics_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
+import 'package:blood_pressure_monitor/views/analytics/analytics_view.dart';
 import 'package:blood_pressure_monitor/views/history/history_view.dart';
 import 'package:blood_pressure_monitor/views/home/widgets/quick_actions.dart';
 import 'package:blood_pressure_monitor/views/home/widgets/recent_readings_card.dart';
@@ -43,6 +45,18 @@ class _HomeViewState extends State<HomeView> {
         title: Text(_getTitle()),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: [
+          if (_selectedIndex == 2)
+            Consumer<AnalyticsViewModel>(
+              builder: (context, viewModel, _) => IconButton(
+                icon: Icon(
+                  viewModel.showSleepOverlay
+                      ? Icons.bedtime
+                      : Icons.bedtime_outlined,
+                ),
+                tooltip: 'Sleep overlay',
+                onPressed: () => viewModel.toggleSleepOverlay(),
+              ),
+            ),
           IconButton(
             icon: const Icon(Icons.security),
             tooltip: 'Security Settings',
@@ -105,7 +119,7 @@ class _HomeViewState extends State<HomeView> {
       case 1:
         return _buildHistoryTab();
       case 2:
-        return _buildChartsStub();
+        return const AnalyticsView();
       case 3:
         return _buildSettingsStub();
       default:
@@ -129,37 +143,6 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Widget _buildHistoryTab() => const HistoryView();
-
-  Widget _buildChartsStub() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.analytics,
-            size: 64,
-            color: Theme.of(context).colorScheme.primary.withValues(
-                  alpha: 0.5,
-                ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Charts & Analytics',
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Coming in Phase 8',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(
-                        alpha: 0.6,
-                      ),
-                ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildSettingsStub() {
     return ListView(

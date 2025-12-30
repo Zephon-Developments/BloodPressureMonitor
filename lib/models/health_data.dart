@@ -305,6 +305,18 @@ class SleepEntry {
   /// Optional sleep quality rating (1-5 scale).
   final int? quality;
 
+  /// Minutes spent in deep sleep stage.
+  final int? deepMinutes;
+
+  /// Minutes spent in light sleep stage.
+  final int? lightMinutes;
+
+  /// Minutes spent in REM sleep stage.
+  final int? remMinutes;
+
+  /// Minutes spent awake during the session.
+  final int? awakeMinutes;
+
   /// Local timezone offset in minutes at time of sleep end.
   final int localOffsetMinutes;
 
@@ -332,6 +344,10 @@ class SleepEntry {
     this.endedAt,
     int? durationMinutes,
     this.quality,
+    this.deepMinutes,
+    this.lightMinutes,
+    this.remMinutes,
+    this.awakeMinutes,
     int? localOffsetMinutes,
     this.source = SleepSource.manual,
     this.sourceMetadata,
@@ -354,6 +370,10 @@ class SleepEntry {
           : null,
       durationMinutes: map['durationMinutes'] as int,
       quality: map['quality'] as int?,
+      deepMinutes: map['deepMinutes'] as int?,
+      lightMinutes: map['lightMinutes'] as int?,
+      remMinutes: map['remMinutes'] as int?,
+      awakeMinutes: map['awakeMinutes'] as int?,
       localOffsetMinutes: map['localOffsetMinutes'] as int,
       source: SleepSourceExtension.fromDbString(map['source'] as String),
       sourceMetadata: map['sourceMetadata'] as String?,
@@ -371,6 +391,10 @@ class SleepEntry {
       'endedAt': endedAt?.toIso8601String(),
       'durationMinutes': durationMinutes,
       'quality': quality,
+      'deepMinutes': deepMinutes,
+      'lightMinutes': lightMinutes,
+      'remMinutes': remMinutes,
+      'awakeMinutes': awakeMinutes,
       'localOffsetMinutes': localOffsetMinutes,
       'source': source.toDbString(),
       'sourceMetadata': sourceMetadata,
@@ -387,6 +411,10 @@ class SleepEntry {
     DateTime? endedAt,
     int? durationMinutes,
     int? quality,
+    int? deepMinutes,
+    int? lightMinutes,
+    int? remMinutes,
+    int? awakeMinutes,
     int? localOffsetMinutes,
     SleepSource? source,
     String? sourceMetadata,
@@ -400,6 +428,10 @@ class SleepEntry {
       endedAt: endedAt ?? this.endedAt,
       durationMinutes: durationMinutes ?? this.durationMinutes,
       quality: quality ?? this.quality,
+      deepMinutes: deepMinutes ?? this.deepMinutes,
+      lightMinutes: lightMinutes ?? this.lightMinutes,
+      remMinutes: remMinutes ?? this.remMinutes,
+      awakeMinutes: awakeMinutes ?? this.awakeMinutes,
       localOffsetMinutes: localOffsetMinutes ?? this.localOffsetMinutes,
       source: source ?? this.source,
       sourceMetadata: sourceMetadata ?? this.sourceMetadata,
@@ -419,7 +451,11 @@ class SleepEntry {
         other.endedAt == endedAt &&
         other.durationMinutes == durationMinutes &&
         other.quality == quality &&
+        other.deepMinutes == deepMinutes &&
         other.localOffsetMinutes == localOffsetMinutes &&
+        other.lightMinutes == lightMinutes &&
+        other.remMinutes == remMinutes &&
+        other.awakeMinutes == awakeMinutes &&
         other.source == source &&
         other.sourceMetadata == sourceMetadata &&
         other.notes == notes &&
@@ -435,12 +471,30 @@ class SleepEntry {
       endedAt,
       durationMinutes,
       quality,
+      deepMinutes,
       localOffsetMinutes,
+      lightMinutes,
+      remMinutes,
+      awakeMinutes,
       source,
       sourceMetadata,
       notes,
       createdAt,
     );
+  }
+
+  /// Whether this entry includes a full stage breakdown.
+  bool get hasStageData =>
+      deepMinutes != null &&
+      lightMinutes != null &&
+      remMinutes != null &&
+      awakeMinutes != null;
+
+  /// The local calendar date this sleep session ended on.
+  DateTime get sessionDateLocal {
+    final anchor = endedAt ?? startedAt;
+    final local = anchor.toLocal();
+    return DateTime(local.year, local.month, local.day);
   }
 
   @override

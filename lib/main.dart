@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:blood_pressure_monitor/services/analytics_service.dart';
 import 'package:blood_pressure_monitor/services/auth_service.dart';
 import 'package:blood_pressure_monitor/services/averaging_service.dart';
 import 'package:blood_pressure_monitor/services/correlation_service.dart';
@@ -11,6 +12,7 @@ import 'package:blood_pressure_monitor/services/profile_service.dart';
 import 'package:blood_pressure_monitor/services/reading_service.dart';
 import 'package:blood_pressure_monitor/services/sleep_service.dart';
 import 'package:blood_pressure_monitor/services/weight_service.dart';
+import 'package:blood_pressure_monitor/viewmodels/analytics_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/history_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/lock_viewmodel.dart';
@@ -41,6 +43,10 @@ void main() async {
   );
   final weightService = WeightService(databaseService);
   final sleepService = SleepService(databaseService);
+  final analyticsService = AnalyticsService(
+    readingService: readingService,
+    sleepService: sleepService,
+  );
   final correlationService = CorrelationService(
     readingService: readingService,
     weightService: weightService,
@@ -60,6 +66,7 @@ void main() async {
         Provider<HistoryService>.value(value: historyService),
         Provider<WeightService>.value(value: weightService),
         Provider<SleepService>.value(value: sleepService),
+        Provider<AnalyticsService>.value(value: analyticsService),
         Provider<CorrelationService>.value(value: correlationService),
         Provider<SharedPreferences>.value(value: prefs),
         Provider<AuthService>.value(value: authService),
@@ -88,6 +95,11 @@ void main() async {
         ChangeNotifierProvider<SleepViewModel>(
           create: (context) => SleepViewModel(
             context.read<SleepService>(),
+          ),
+        ),
+        ChangeNotifierProvider<AnalyticsViewModel>(
+          create: (context) => AnalyticsViewModel(
+            analyticsService: context.read<AnalyticsService>(),
           ),
         ),
       ],

@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2025-12-30
+
+### Added
+- **Analytics & Charts** (Phase 8)
+  - Advanced statistical analytics for blood pressure, pulse, and sleep data
+  - Interactive time-range selection (7d, 30d, 90d, 1y, All)
+  - NICE HBPM clinical band visualization (Normal, Stage 1, Stage 2, Stage 3)
+  - Combined systolic/diastolic line charts with trend analysis
+  - Pulse trend charts with clinical reference ranges
+  - Sleep stage tracking and stacked area visualization (Deep, Light, REM, Awake)
+  - Sleep quality correlation with morning blood pressure readings
+  - Morning vs. Evening comparison statistics
+  - Statistical measures: min/max/mean, standard deviation, coefficient of variation
+  - Smart chart downsampling for large datasets (1 point per 24h window)
+  - 5-minute TTL caching for analytics computations
+  - Isolate-based processing for heavy statistical calculations
+  - Custom painter for clinical band overlays
+  - Interactive chart legends with sleep quality indicators
+- Database schema migration to v4
+  - Support for detailed sleep stage tracking (deep, light, REM, awake minutes)
+  - Preservation of existing sleep data during migration
+- New models: `HealthStats`, `ChartDataSet`, `SleepCorrelationData`, `SleepStageSeries`
+- `AnalyticsService` with comprehensive statistical engine
+- `AnalyticsViewModel` with state management and caching
+- `fl_chart` v0.68.0 integration for data visualization
+- Comprehensive test suite for analytics (9 new unit tests)
+
+### Changed
+- Migrated from deprecated `withOpacity()` to `withValues(alpha:)` for color handling
+- Updated `SleepEntry` model to include stage-specific duration tracking
+
 ## [1.1.0] - 2025-12-29
 
 ### Added

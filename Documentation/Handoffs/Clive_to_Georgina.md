@@ -1,38 +1,48 @@
-# Handoff: Clive to Georgina (Phase 7 Review Follow-ups)
+# Handoff: Clive → Georgina
 
-**Date**: 2025-12-29  
+**Date**: 2025-12-30  
 **From**: Clive (Review Specialist)  
-**To**: Georgina (Implementation Engineer)  
-**Task**: Phase 7 - History Coverage & Logic Refinement  
-**Status**: ❌ **BLOCKERS IDENTIFIED**
+**To**: Georgina (Implementation Specialist)  
+**Task**: Phase 8 - Charts & Analytics Implementation (Bug Fixes)  
+**Status**: ❌ **BLOCKERS IDENTIFIED (COMPILATION ERRORS)**
 
-## Review Findings
+---
 
-### 1. Coverage Blockers
-The implementation falls short of the project's coverage requirements:
-- **HistoryService**: Current coverage is **51.81%** (Target: ≥80%). The \_filterGroupsByTags\ logic and tag-filtering edge cases are not fully exercised.
-- **HistoryView**: Current coverage is **53.15%** (Aggregate for \iews/history/\ is **~68.8%**, Target: ≥70%). Handlers for refresh, custom range selection, and tag editing are currently untested.
+## Summary
 
-### 2. Logic Concerns
-- **Pagination & Filtering**: In \HistoryService.fetchGroupedHistory\, filtering occurs after the DB limit is applied. This can result in returning fewer than \limit\ items (or zero) even when more matches exist in the database. While the UI is scrollable, this is a sub-optimal UX. Consider if the service should attempt to \"fill\" the page or if we accept this limitation for Phase 7.
+While the logic and tests passed in isolation, the integrated application fails to compile due to missing imports and incorrect third-party API usage.
 
-### 3. Style & Documentation
-- **Line Length**: Several import lines in \history_view.dart\ exceed 80 characters. Please wrap or shorten where possible to maintain strict compliance.
-- **ViewModel Docs**: Verified and approved.
+### ❌ Blockers
 
-## Required Actions
-1. **Expand \	est/services/history_service_test.dart\**:
-   - Add tests for \etchGroupedHistory\ with tags.
-   - Add tests for \etchRawHistory\ with multiple tags and no-match scenarios.
-2. **Expand \	est/views/history/history_view_test.dart\**:
-   - Add \	estWidgets\ for Pull-to-Refresh (\_handleRefresh\).
-   - Add \	estWidgets\ for the Date Range Picker (\_handleCustomRange\).
-   - Add \	estWidgets\ for the Tag Filter Dialog (\_handleEditTags\).
-3. **Address Pagination UX**: Provide a brief justification if we are keeping the current \"filter-after-fetch\" logic, or implement a \"fetch-until-limit\" loop in the service.
+#### 1. Missing Type Definition in AnalyticsService
+lib/services/analytics_service.dart fails to compile because SleepEntry is not recognized.
+- **Error**: 'SleepEntry' isn't a type.
+- **Required Fix**: Add import 'package:blood_pressure_monitor/models/health_data.dart'; to [lib/services/analytics_service.dart](lib/services/analytics_service.dart).
 
-Please notify me once coverage targets are met.
+#### 2. Incorrect fl_chart API Usage
+lib/views/analytics/widgets/sleep_stacked_area_chart.dart uses an invalid parameter for BetweenBarsData.
+- **Error**: No named parameter with the name 'colors'.
+- **Context**: In l_chart v0.68.0, BetweenBarsData expects color (single) or gradient, not a colors list.
+- **Required Fix**: Update _buildBetweenBars() in [lib/views/analytics/widgets/sleep_stacked_area_chart.dart](lib/views/analytics/widgets/sleep_stacked_area_chart.dart) to use color instead of colors.
+
+---
+
+## ✅ Positive Findings
+
+- Unit tests for AnalyticsService and AnalyticsViewModel are passing.
+- Schema migration logic is sound.
+
+---
+
+## Next Steps for Georgina
+
+1.  **Fix Imports**: Add the missing health_data.dart import to AnalyticsService.
+2.  **Fix Chart Widgets**: Update BetweenBarsData parameters to match the l_chart 0.68.0 API.
+3.  **Verify Build**: Run lutter build bundle or lutter run to ensure the app compiles successfully before returning for review.
+
+**Please resolve these compilation blockers immediately.**
 
 ---
 **Clive**  
 Review Specialist  
-2025-12-29
+2025-12-30
