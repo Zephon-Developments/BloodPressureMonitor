@@ -430,3 +430,50 @@ ValidationResult validateSleepTimes(DateTime startedAt, DateTime? endedAt) {
 
   return const ValidationResult.valid();
 }
+
+/// Validates the sleep stage breakdown totals.
+///
+/// Rules:
+/// - If any stage is provided, all four must be provided.
+/// - Stage minutes cannot be negative.
+/// - Sum of stage minutes must equal [durationMinutes].
+ValidationResult validateSleepStageBreakdown({
+  required int durationMinutes,
+  int? deepMinutes,
+  int? lightMinutes,
+  int? remMinutes,
+  int? awakeMinutes,
+}) {
+  final stages = <int?>[deepMinutes, lightMinutes, remMinutes, awakeMinutes];
+  final providedCount = stages.whereType<int>().length;
+
+  if (providedCount == 0) {
+    return const ValidationResult.valid();
+  }
+
+  if (providedCount != stages.length) {
+    return const ValidationResult.error(
+      'Provide all sleep stage values or leave them blank.',
+    );
+  }
+
+  final values = stages.cast<int>();
+  if (values.any((value) => value < 0)) {
+    return const ValidationResult.error(
+      'Sleep stage values cannot be negative.',
+    );
+  }
+
+  final total = values.fold<int>(
+    0,
+    (sum, value) => sum + value,
+  );
+  if (total != durationMinutes) {
+    return ValidationResult.error(
+      'Sleep stage totals ($total min) must equal the recorded duration '
+      '($durationMinutes min).',
+    );
+  }
+
+  return const ValidationResult.valid();
+}
