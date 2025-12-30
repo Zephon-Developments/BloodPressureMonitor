@@ -14,8 +14,9 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - [x] Phase 7: History (Avg-first with expansion) ✅ **COMPLETE** (Dec 30, 2025)
 - [x] Phase 8: Charts & Analytics ✅ **COMPLETE** (Dec 30, 2025)
 - [x] Phase 9: Edit & Delete Functionality ✅ **COMPLETE** (Dec 30, 2025)
-- [ ] Phase 10: Export & Reports
-- [ ] Phase 11: Polish & Comprehensive Testing
+- [x] Phase 10: Export & Reports ✅ **COMPLETE** (Dec 30, 2025)
+- [ ] Phase 11: Medication Records UI
+- [ ] Phase 12: Polish & Comprehensive Testing
 
 ---
 
@@ -178,19 +179,60 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - Modified 14 files, added 10 new files (24 total changes)
 **Status**: Merged to `chore/phase-8-cleanup` branch; PR #20 pending merge to main
 
-### Phase 10: Export & Reports
+### Phase 10: Export & Reports ✅ COMPLETE
 **Scope**: CSV/JSON export/import; PDF doctor report.
-**Status**: 📋 **PLANNED** - Not yet started
+**Completion Date**: Dec 30, 2025
+**Status**: ✅ **COMPLETE** - Merged to feature/export-reports branch
 **Tasks**
-- Local-only CSV/JSON export/import; conflict handling basic (overwrite/append strategy).
-- PDF report for last 30/90 days: profile info, date range, averages, chart snapshot, meds/intake notes, irregular flags; disclaimer.
-- Integration tests for export/import round-trip; PDF generation smoke tests.
+- ✅ Local-only CSV/JSON export with configurable date ranges
+- ✅ Data import with conflict resolution UI (overwrite/append strategy)
+- ✅ PDF report for last 30/90 days with profile info, averages, chart snapshot, meds/intake notes
+- ✅ Integration tests for export/import round-trip
+- ✅ PDF generation tests with mock data
 **Dependencies**: Phases 1–4, 7–9 for data/views.
 **Acceptance**
-- Successful round-trip for CSV/JSON; PDF generated offline; tests pass.
-**Rollback point**: Export only (defer PDF) if needed.
+- ✅ Successful round-trip for CSV/JSON with conflict resolution
+- ✅ PDF generated offline with chart snapshots
+- ✅ All 617 tests passing; analyzer clean
+**Implementation Details**
+- Created `lib/services/export_service.dart` for CSV/JSON export
+- Created `lib/services/import_service.dart` with conflict detection
+- Created `lib/services/pdf_report_service.dart` for PDF generation
+- Created `lib/viewmodels/export_viewmodel.dart` for export logic
+- Created `lib/viewmodels/import_viewmodel.dart` with conflict state management
+- Created `lib/views/export/export_view.dart` with date range selector
+- Created `lib/views/export/import_view.dart` with conflict resolution UI
+- Added dependencies: csv ^6.0.0, pdf ^3.11.0, printing ^5.12.0, file_picker ^8.1.0, package_info_plus ^8.0.0
+**Status**: Committed to feature/export-reports (f159db6); pending PR merge
 
-### Phase 11: Polish & Comprehensive Testing
+### Phase 11: Medication Records UI
+**Scope**: User interface for viewing, editing, and managing medication records and intake history.
+**Status**: 📋 **PLANNED** - Not yet started
+**Tasks**
+- Create MedicationViewModel with CRUD operations (using existing MedicationService from Phase 3)
+- Create MedicationIntakeViewModel for logging and tracking intake history
+- Create MedicationGroupViewModel for managing medication groups
+- Build medication list view with add/edit/delete capabilities
+- Build medication intake logging view with timestamp and group support
+- Build medication history view showing intake timeline with late/missed indicators
+- Implement medication schedule management UI (optional schedule metadata)
+- Add medication correlation overlay to BP charts (show intake markers)
+- Widget tests for all medication views and ViewModels
+**Dependencies**: Phase 3 (medication backend services), Phase 8 (charts for correlation overlay)
+**Acceptance**
+- Users can create, view, edit, and delete medications
+- Users can log medication intakes individually or as groups
+- Intake history displays with proper schedule context (on-time/late/missed)
+- BP charts show medication intake markers for correlation analysis
+- All tests passing; analyzer clean
+**Implementation Details**
+- Leverage existing MedicationService, MedicationGroupService, MedicationIntakeService
+- Follow MVVM architecture patterns from other phases
+- Integrate with existing navigation structure
+- Use consistent UI components (cards, dialogs, forms)
+**Rollback point**: UI layer only; backend services remain stable
+
+### Phase 12: Polish & Comprehensive Testing
 **Scope**: Lint, coverage, perf, accessibility, and cleanup.
 **Tasks**
 - Achieve coverage targets (Models/Utils ≥90%, Services/ViewModels ≥85%, Widgets ≥70%).
