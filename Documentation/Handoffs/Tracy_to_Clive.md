@@ -1,4 +1,30 @@
-# Tracy to Clive Handoff - Phase 6: UI Foundation (Home & Add Reading)
+# Tracy to Clive Handoff – Phase 7 History Plan
+
+## Plan Ready for Review
+- Deliverable: Phase 7 implementation plan at [Documentation/Plans/Phase_7_History_Plan.md](Documentation/Plans/Phase_7_History_Plan.md).
+- Status: ✅ Ready for your review and sign-off.
+
+## Plan Highlights
+- **Architecture**: New `HistoryViewModel` to manage grouped history, filters, averaged/raw toggle, pagination, and expand/collapse state. Uses `ReadingService` + `AveragingService`; introduces `HistoryService` helper if needed for grouped queries.
+- **Data Structures**: `HistoryGroupItem` (averaged summary + member metadata + cached children), `HistoryFilters` (date range presets/custom, profile, tags, viewMode).
+- **UI**: HistoryView with FilterBar (date presets, profile selector, tags, averaged/raw toggle), paged `ListView.builder` of `HistoryGroupTile` (collapsed averages, expanded raw readings), RawModeList for flat view, empty state.
+- **Performance**: Paged queries (LIMIT/OFFSET or keyset by timestamp), prefetch near list end, cache expanded children, debounce filter changes, avoid shrinkwrap on large lists.
+- **Testing Targets**: ≥85% for new viewmodel/service logic; ≥70% for History widgets; integration-style test for expand/paginate; zero analyzer warnings.
+- **Acceptance Criteria**: Averaged view default; raw details one tap away; filters persist in session; smooth scroll with 100+ groups; tests passing; Coding_Standards compliance (80 cols, import order, trailing commas).
+
+## Open Questions
+1) Pagination approach: LIMIT/OFFSET acceptable, or prefer keyset pagination by takenAt desc for stability when new readings arrive?
+2) Scroll behavior on mode toggle: reset to top (recommended) vs attempt to preserve scroll position between averaged/raw modes?
+3) Group child fetch: prefer single query by memberReadingIds vs repeated per-id lookups; confirm DB schema/index support.
+
+## Risks & Mitigations
+- **Large data jank**: mitigate with pagination, prefetch threshold, const widgets, and caching.
+- **Expand fetch latency**: per-group loading state and cached children; refresh on pull-to-refresh.
+- **DB query complexity**: if grouping joins are heavy, rely on precomputed groups from `AveragingService.recomputeGroupsForProfile` and ensure indexed columns.
+
+## Next Steps
+1) Please review the plan and confirm the open questions.
+2) On approval, I will hand off to the implementer (Georgina/Claudette) with decisions noted.# Tracy to Clive Handoff - Phase 6: UI Foundation (Home & Add Reading)
 
 ## Objectives & Scope
 - Build the Phase 6 UI foundation: Home/Dashboard, Add Reading form, Navigation shell.

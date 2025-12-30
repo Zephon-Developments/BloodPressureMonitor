@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
+import 'package:blood_pressure_monitor/views/history/history_view.dart';
 import 'package:blood_pressure_monitor/views/home/widgets/quick_actions.dart';
 import 'package:blood_pressure_monitor/views/home/widgets/recent_readings_card.dart';
 import 'package:blood_pressure_monitor/views/settings/security_settings_view.dart';
@@ -102,7 +103,7 @@ class _HomeViewState extends State<HomeView> {
       case 0:
         return _buildHomeTab();
       case 1:
-        return _buildHistoryStub();
+        return _buildHistoryTab();
       case 2:
         return _buildChartsStub();
       case 3:
@@ -127,36 +128,7 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  Widget _buildHistoryStub() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.history,
-            size: 64,
-            color: Theme.of(context).colorScheme.primary.withValues(
-                  alpha: 0.5,
-                ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'History',
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Coming in Phase 7',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(
-                        alpha: 0.6,
-                      ),
-                ),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget _buildHistoryTab() => const HistoryView();
 
   Widget _buildChartsStub() {
     return Center(

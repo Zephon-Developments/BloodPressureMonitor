@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:blood_pressure_monitor/views/history/history_view.dart';
 import 'package:blood_pressure_monitor/views/readings/add_reading_view.dart';
 import 'package:blood_pressure_monitor/views/sleep/sleep_history_view.dart';
 import 'package:blood_pressure_monitor/views/weight/weight_history_view.dart';
@@ -42,6 +43,22 @@ class QuickActions extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (context) => const HistoryScreen(),
+                ),
+              );
+            },
+            icon: const Icon(Icons.history),
+            label: const Text('View Blood Pressure History'),
+            style: OutlinedButton.styleFrom(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+            ),
+          ),
+          const SizedBox(height: 8),
           OutlinedButton.icon(
             onPressed: () {
               Navigator.of(context).push(
