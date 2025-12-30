@@ -70,9 +70,7 @@ class HistoryGroupTile extends StatelessWidget {
                     ],
                   ),
                   Icon(
-                    item.isExpanded
-                        ? Icons.expand_less
-                        : Icons.expand_more,
+                    item.isExpanded ? Icons.expand_less : Icons.expand_more,
                   ),
                 ],
               ),

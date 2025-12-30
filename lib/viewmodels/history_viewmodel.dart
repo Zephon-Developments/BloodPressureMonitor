@@ -54,14 +54,12 @@ class HistoryViewModel extends ChangeNotifier {
       List<HistoryGroupItem>.unmodifiable(_groups);
 
   /// Flat list of raw readings when view mode is raw.
-  List<Reading> get rawReadings =>
-      List<Reading>.unmodifiable(_rawReadings);
+  List<Reading> get rawReadings => List<Reading>.unmodifiable(_rawReadings);
 
   /// True when no data is available for the current filters.
-  bool get isEmpty =>
-      _filters.viewMode == HistoryViewMode.averaged
-          ? _groups.isEmpty
-          : _rawReadings.isEmpty;
+  bool get isEmpty => _filters.viewMode == HistoryViewMode.averaged
+      ? _groups.isEmpty
+      : _rawReadings.isEmpty;
 
   /// Loads the first page for the current filters.
   ///
@@ -154,9 +152,8 @@ class HistoryViewModel extends ChangeNotifier {
       endDate: end,
       clearEndDate: end == null,
     );
-    _activePreset = preset == HistoryRangePreset.all
-        ? HistoryRangePreset.all
-        : preset;
+    _activePreset =
+        preset == HistoryRangePreset.all ? HistoryRangePreset.all : preset;
     await loadInitial();
   }
 
