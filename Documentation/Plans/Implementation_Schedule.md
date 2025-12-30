@@ -12,9 +12,10 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - [x] Phase 5: App Security Gate ✅ **COMPLETE** (Dec 29, 2025)
 - [x] Phase 6: UI Foundation ✅ **COMPLETE** (Dec 29, 2025)
 - [x] Phase 7: History (Avg-first with expansion) ✅ **COMPLETE** (Dec 30, 2025)
-- [ ] Phase 8: Charts & Analytics 🚧 **IN PROGRESS**
-- [ ] Phase 9: Export & Reports
-- [ ] Phase 10: Polish & Comprehensive Testing
+- [x] Phase 8: Charts & Analytics ✅ **COMPLETE** (Dec 30, 2025)
+- [x] Phase 9: Edit & Delete Functionality ✅ **COMPLETE** (Dec 30, 2025)
+- [ ] Phase 10: Export & Reports
+- [ ] Phase 11: Polish & Comprehensive Testing
 
 ---
 
@@ -124,30 +125,72 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - ✅ Service coverage 83.67%; all tests passing; analyzer clean.
 **Status**: Merged to main Dec 30, 2025
 
-### Phase 8: Charts & Analytics
+### Phase 8: Charts & Analytics ✅ COMPLETE
 **Scope**: Systolic/diastolic/pulse charts, banding, stats cards, morning/evening split.
+**Completion Date**: Dec 30, 2025
 **Tasks**
-- Chart widgets with banding (<130/85 green, 130–139/85–89 yellow, ≥140/90 red), isolated systolic note.
-- Time-range chips (7d/30d/90d/1y/all); stats cards (min/avg/max, variability, morning/evening split).
-- Optional overlay for sleep correlation.
-- Widget tests for rendering with sample data; perf checks.
+- ✅ BP line chart with color banding (<130/85 green, 130–139/85–89 yellow, ≥140/90 red)
+- ✅ Pulse line chart with dedicated series
+- ✅ Time-range selector (7d/30d/90d/1y/all) with chip UI
+- ✅ Stats card grid (min/avg/max, variability with CV%)
+- ✅ Morning/evening split comparison
+- ✅ Sleep correlation overlay with stacked area chart
+- ✅ Chart legend with toggle controls
+- ✅ Analytics caching with TTL (5 minutes default)
+- ✅ Widget tests for all chart components
 **Dependencies**: Phases 2, 4 (for sleep overlay), UI shell.
 **Acceptance**
-- Charts render with correct band shading and stats; tests and analyzer clean.
-**Rollback point**: Ship without sleep overlay if blocked.
+- ✅ Charts render with correct band shading and stats
+- ✅ Sleep overlay toggles on/off with correlation data
+- ✅ Cache invalidation on data mutations via refreshAnalyticsData()
+- ✅ Tests and analyzer clean
+**Implementation Details**
+- Created `lib/models/analytics.dart` with ChartDataSet, HealthStats, etc.
+- Created `lib/services/analytics_service.dart` for data aggregation
+- Created `lib/viewmodels/analytics_viewmodel.dart` with caching and range management
+- Created `lib/views/analytics/analytics_view.dart` with chart composition
+- Chart widgets: BpLineChart, PulseLineChart, SleepStackedAreaChart
+- Supporting widgets: StatsCardGrid, MorningEveningCard, TimeRangeSelector, ChartLegend
+**Status**: Implemented and integrated with Phase 9 cache invalidation
 
-### Phase 9: Export & Reports
+### Phase 9: Edit & Delete Functionality ✅ COMPLETE
+**Scope**: Edit and delete capabilities for Blood Pressure, Weight, and Sleep entries with consistent UX.
+**Completion Date**: Dec 30, 2025
+**Tasks**
+- ✅ Extend WeightViewModel and SleepViewModel with update/delete methods
+- ✅ Modify Add forms to support edit mode (pre-populate fields, update UI labels)
+- ✅ Implement swipe-to-delete on Home and History views using flutter_slidable
+- ✅ Create reusable ConfirmDeleteDialog with accessibility support
+- ✅ Add refreshAnalyticsData() extension for consistent cache invalidation
+- ✅ Ensure proper BuildContext lifecycle handling across async operations
+- ✅ Add detail bottom sheet for history entry actions
+**Dependencies**: Phases 2, 4, 6, 7 (requires ViewModels, forms, and history view)
+**Acceptance**
+- ✅ Users can edit and delete all health entries with confirmation dialogs
+- ✅ Swipe-to-delete reveals DELETE button on relevant cards
+- ✅ Analytics cache invalidates and reloads after mutations
+- ✅ All 612 tests passing; zero static analysis issues
+- ✅ Full accessibility support with semantic labels
+**Implementation Details**
+- Added `flutter_slidable: ^3.1.0` dependency
+- Created `lib/utils/provider_extensions.dart` for analytics refresh
+- Created `lib/widgets/common/confirm_delete_dialog.dart`
+- Modified 14 files, added 10 new files (24 total changes)
+**Status**: Merged to `chore/phase-8-cleanup` branch; PR #20 pending merge to main
+
+### Phase 10: Export & Reports
 **Scope**: CSV/JSON export/import; PDF doctor report.
+**Status**: 📋 **PLANNED** - Not yet started
 **Tasks**
 - Local-only CSV/JSON export/import; conflict handling basic (overwrite/append strategy).
 - PDF report for last 30/90 days: profile info, date range, averages, chart snapshot, meds/intake notes, irregular flags; disclaimer.
 - Integration tests for export/import round-trip; PDF generation smoke tests.
-**Dependencies**: Phases 1–4, 7–8 for data/views.
+**Dependencies**: Phases 1–4, 7–9 for data/views.
 **Acceptance**
 - Successful round-trip for CSV/JSON; PDF generated offline; tests pass.
 **Rollback point**: Export only (defer PDF) if needed.
 
-### Phase 10: Polish & Comprehensive Testing
+### Phase 11: Polish & Comprehensive Testing
 **Scope**: Lint, coverage, perf, accessibility, and cleanup.
 **Tasks**
 - Achieve coverage targets (Models/Utils ≥90%, Services/ViewModels ≥85%, Widgets ≥70%).

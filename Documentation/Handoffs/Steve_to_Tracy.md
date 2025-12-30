@@ -1,331 +1,296 @@
-# Handoff: Steve to Tracy
-
-**Date:** 2025-12-30
-**Subject:** Plan for Edit/Delete UI Implementation (Phase 9)
-
-## Context
-
-The user has requested the ability to edit and delete data within the app. Currently, while backend services support update and delete operations for most data types, the UI layer does not expose these capabilities to users.
-
-## Current State Analysis
-
-### Backend Capabilities (Already Implemented)
-
-| Data Type | Service | Update Method | Delete Method | Status |
-|-----------|---------|---------------|---------------|--------|
-| Blood Pressure Reading | `ReadingService` | `updateReading()` ✅ | `deleteReading()` ✅ | Backend ready |
-| Weight Entry | `WeightService` | `updateWeightEntry()` ✅ | `deleteWeightEntry()` ✅ | Backend ready |
-| Sleep Entry | `SleepService` | `updateSleepEntry()` ✅ | `deleteSleepEntry()` ✅ | Backend ready |
-| Medication | `MedicationService` | `updateMedication()` ✅ | `deleteMedication()` ✅ (soft delete) | Backend ready |
-| Medication Intake | `MedicationIntakeService` | `updateIntake()` ❌ | `deleteIntake()` ✅ | Partial |
-| Profile | `ProfileService` | `updateProfile()` ✅ | ❌ | Partial |
-
-### ViewModel Support
-
-| ViewModel | Update Support | Delete Support |
-|-----------|----------------|----------------|
-| `BloodPressureViewModel` | `updateReading()` ✅ | `deleteReading()` ✅ |
-| `WeightViewModel` | ❌ Missing | ❌ Missing |
-| `SleepViewModel` | ❌ Missing | ❌ Missing |
-| `HistoryViewModel` | ❌ (View-only) | ❌ (View-only) |
-| `AnalyticsViewModel` | ❌ (View-only) | ❌ (View-only) |
-
-### UI Gaps
-
-Currently, the app has:
-- ✅ Add views for: Readings, Weight, Sleep
-- ❌ NO edit views for any data type
-- ❌ NO delete UI for any data type
-- ❌ NO detail views with edit/delete actions
-
-The `HistoryView` displays data but provides no interaction mechanisms for editing or deleting entries.
-
-## Requirements
-
-### User Stories
-
-1. **As a user, I want to edit a blood pressure reading** so I can correct mistakes or add notes.
-2. **As a user, I want to delete a blood pressure reading** so I can remove accidental or incorrect entries.
-3. **As a user, I want to edit weight entries** to correct typos or update notes.
-4. **As a user, I want to delete weight entries** to remove duplicates or errors.
-5. **As a user, I want to edit sleep entries** to refine duration or quality scores.
-6. **As a user, I want to delete sleep entries** to remove incorrect data.
-7. **As a user, I want confirmation before deleting** to prevent accidental data loss.
-
-### Scope
-
-**In Scope:**
-- Edit/Delete for Blood Pressure Readings
-- Edit/Delete for Weight Entries
-- Edit/Delete for Sleep Entries
-- Confirmation dialogs for delete operations
-- Proper error handling and user feedback
-- Auto-refresh of views after edit/delete
-- Triggering averaging recomputation for BP readings
-
-**Out of Scope (Future Enhancements):**
-- Bulk delete operations
-- Undo functionality
-- Edit history/audit trail
-- Medication intake editing (complexity with groups)
-- Profile deletion (requires data cascade handling)
-
-## Task Breakdown
-
-### Task 1: Extend ViewModels
-**Priority:** High
-**Estimated Effort:** 2-3 hours
-
-Add update/delete methods to ViewModels that are missing them:
-
-1. **WeightViewModel**
-   - Add `updateWeightEntry(WeightEntry entry)` method
-   - Add `deleteWeightEntry(int id)` method
-   - Follow the pattern from `BloodPressureViewModel`
-   - Include proper error handling and loading states
-
-2. **SleepViewModel**
-   - Add `updateSleepEntry(SleepEntry entry)` method
-   - Add `deleteSleepEntry(int id)` method
-   - Include validation if needed
-   - Proper error handling and loading states
-
-**Acceptance Criteria:**
-- ViewModels expose update/delete methods
-- Methods handle errors gracefully
-- Loading states are properly managed
-- Unit tests added for new methods (≥85% coverage)
-
-### Task 2: Create Edit Views
-**Priority:** High
-**Estimated Effort:** 4-5 hours
-
-Create dedicated edit views that reuse the add view forms:
-
-1. **Edit Reading View**
-   - Extend or create variant of `AddReadingView`
-   - Pre-populate fields with existing reading data
-   - Support validation with override confirmations
-   - Save button triggers `updateReading()` instead of `addReading()`
-
-2. **Edit Weight View**
-   - Extend or create variant of `AddWeightView`
-   - Pre-populate weight value, unit, notes
-   - Save triggers `updateWeightEntry()`
-
-3. **Edit Sleep View**
-   - Extend or create variant of `AddSleepView`
-   - Pre-populate sleep duration, quality, timestamps
-   - Save triggers `updateSleepEntry()`
-
-**Design Patterns:**
-- Option A: Modify existing add views to accept optional `editingId` parameter
-- Option B: Create separate edit views that share form widgets
-- **Recommendation:** Option A (simpler, less duplication)
-
-**Acceptance Criteria:**
-- Forms pre-populate with existing data
-- Validation works correctly
-- Save operations update existing records
-- Navigation returns to previous screen on success
-- Error messages displayed on failure
-
-### Task 3: Add Delete Functionality
-**Priority:** High
-**Estimated Effort:** 2-3 hours
-
-Implement delete actions with confirmations:
-
-1. **Confirmation Dialog Widget**
-   - Create reusable `ConfirmDeleteDialog`
-   - Shows item details (e.g., "Delete reading from Jan 1, 2025?")
-   - Two buttons: "Cancel" and "Delete"
-   - Red/destructive styling for Delete button
-
-2. **Delete Integration**
-   - Add delete action to reading cards/list items
-   - Add delete action to weight history items
-   - Add delete action to sleep history items
-   - Show confirmation dialog before executing
-   - Display success/error messages via SnackBar
-
-**Acceptance Criteria:**
-- Delete requires confirmation
-- Confirmation shows relevant item details
-- Successful delete refreshes the view
-- Error handling with user-friendly messages
-- SnackBar feedback for success/failure
-
-### Task 4: Enhance History View
-**Priority:** Medium
-**Estimated Effort:** 3-4 hours
-
-Add edit/delete actions to the History View:
-
-1. **Reading Group Cards**
-   - Add "Expand to Edit Members" option
-   - Show individual readings in expanded state
-   - Each reading has Edit and Delete actions
-   - Maintain grouped view when editing/deleting
-
-2. **Raw Reading View**
-   - Add Edit and Delete actions to each reading card
-   - Swipe-to-delete gesture (optional, nice-to-have)
-   - Long-press menu with Edit/Delete options
-
-3. **Detail View** (Optional Enhancement)
-   - Create a detail dialog/bottom sheet
-   - Shows full reading details
-   - Includes Edit and Delete buttons
-   - Better for small screens
-
-**Acceptance Criteria:**
-- Actions accessible from history view
-- Grouped view properly handles member edits/deletes
-- Recomputes averages after BP reading changes
-- UI updates automatically after operations
-
-### Task 5: Testing & Polish
-**Priority:** High
-**Estimated Effort:** 3-4 hours
-
-1. **Unit Tests**
-   - Test ViewModel update/delete methods
-   - Test validation edge cases
-   - Test error handling paths
-   - Target ≥85% coverage for new code
-
-2. **Widget Tests**
-   - Test edit view pre-population
-   - Test delete confirmation dialog
-   - Test error state rendering
-   - Test success state navigation
-
-3. **Integration Testing**
-   - Test full edit flow: tap → edit → save → verify
-   - Test full delete flow: tap → confirm → verify
-   - Test averaging recomputation after BP edits
-   - Test error scenarios (network, database)
-
-**Acceptance Criteria:**
-- All tests passing
-- Coverage meets project standards (≥85%)
-- Manual testing checklist completed
-- No analyzer warnings
-
-## Technical Considerations
-
-### 1. Averaging Impact
-When a BP reading is edited or deleted:
-- `AveragingService.createOrUpdateGroupsForReading()` must run
-- May affect multiple groups if timestamp changes significantly
-- Need to handle potential averaging failures gracefully
-
-### 2. Analytics Cache Invalidation
-After edits/deletes:
-- `AnalyticsViewModel` cache should be invalidated
-- User should see updated stats after changes
-- Consider adding `analyticsViewModel.invalidateCache()` calls
-
-### 3. Navigation Patterns
-- Edit: Navigate to edit view → Save → Pop back
-- Delete: Show dialog → Confirm → Refresh current view
-- Consider using `Navigator.pop(context, true)` to signal changes
-
-### 4. Data Consistency
-- Ensure reading updates don't orphan averaging groups
-- Sleep/Weight deletes should be straightforward (no cascades)
-- Consider soft deletes for readings (with permanent delete later)
-
-### 5. Performance
-- Deleting from large lists: ensure smooth UX
-- Batch operations if deleting multiple items (future)
-- Consider optimistic UI updates
-
-## UI/UX Recommendations
-
-### Visual Design
-- Use trailing `PopupMenuButton` for Edit/Delete actions
-- Use `Icons.edit` and `Icons.delete` consistently
-- Delete button should use `Colors.red` or error theme color
-- Show loading spinner during operations
-
-### Confirmation Dialog
-```dart
-ConfirmDeleteDialog(
-  title: "Delete Reading?",
-  message: "This will permanently delete the reading from 
-           Jan 1, 2025 at 8:30 AM (120/80 mmHg).",
-  onConfirm: () => viewModel.deleteReading(id),
-)
-```
-
-### Feedback
-- Success: Green SnackBar "Reading deleted successfully"
-- Error: Red SnackBar with error message
-- Loading: Show progress indicator on card/button
-
-## Standards Compliance
-
-### Code Quality
-- Follow [CODING_STANDARDS.md](../Standards/Coding_Standards.md)
-- Use proper error handling patterns
-- Document public APIs with JSDoc comments
-- Use `const` constructors where applicable
-
-### Testing
-- Unit tests for all ViewModel methods
-- Widget tests for edit views and dialogs
-- Integration tests for critical flows
-- Target ≥85% coverage
-
-### Security
-- No sensitive data in logs
-- Validate user input on edits
-- Prevent SQL injection (use parameterized queries)
-
-## Success Metrics
-
-- [ ] All data types support edit operations
-- [ ] All data types support delete operations (with confirmation)
-- [ ] Zero analyzer warnings
-- [ ] All tests passing (≥85% coverage)
-- [ ] Manual testing checklist completed
-- [ ] Code review approved by Clive
-
-## Questions for Tracy
-
-1. Should we use Option A (extend add views) or Option B (separate edit views)?
-2. Should we implement swipe-to-delete gestures or stick with explicit buttons?
-3. Should deletes be soft (mark as deleted) or hard (permanent removal)?
-4. Should we create a detail view or use edit view for viewing details?
-5. Priority: Should this be Phase 9 or split into smaller phases?
-
-## Recommended Plan Structure
-
-**Phase 9A: Core Edit/Delete (MVP)**
-- Task 1: Extend ViewModels
-- Task 2: Create Edit Views (BP, Weight, Sleep)
-- Task 3: Add Delete Functionality (with confirmations)
-- Task 5: Testing
-
-**Phase 9B: History Integration & Polish**
-- Task 4: Enhance History View with edit/delete actions
-- Additional polish and UX improvements
-- Edge case handling
-
-## Next Steps
-
-Tracy, please:
-1. Review this handoff and the current codebase structure
-2. Answer the questions above
-3. Create a detailed implementation plan following the Phase structure
-4. Document the plan in `Documentation/Plans/Phase_9_Edit_Delete_Plan.md`
-5. Identify any technical blockers or dependencies
-6. Hand off to Clive for review before implementation begins
+# Steve → Tracy Handoff: Phase 10 Planning
+
+**Date:** December 30, 2025  
+**From:** Steve (Conductor)  
+**To:** Tracy (Planning Specialist)  
+**Task:** Create comprehensive implementation plan for Phase 10: Export & Reports
 
 ---
 
-**Steve**
-Workflow Conductor
-2025-12-30
+## Executive Summary
+
+Phase 9 (Edit & Delete Functionality) has been successfully merged to main via PR #20. All 612 tests passing, zero static analysis issues. The application now has complete CRUD operations for all health entry types with accessibility-focused UX.
+
+**Your Mission:** Develop a detailed implementation plan for Phase 10 (Export & Reports) covering CSV/JSON export/import functionality and PDF doctor report generation. The plan must reference [Coding_Standards.md](../Standards/Coding_Standards.md) and follow the phased delivery approach established in previous phases. Establish a new branch for the development to be conducted in.
+
+---
+
+## Project Status
+
+### Completed Phases (1-9)
+✅ **Phase 1:** Core Data Layer (encrypted SQLite with sqflite_sqlcipher)  
+✅ **Phase 2A/2B:** Averaging Engine & Validation (30-min rolling groups, bounds checking)  
+✅ **Phase 3:** Medication Management (CRUD, group intake, schedule context)  
+✅ **Phase 4:** Weight & Sleep (entries with correlation hooks)  
+✅ **Phase 5:** App Security Gate (PIN/biometric lock, idle timer)  
+✅ **Phase 6:** UI Foundation (home, add reading form, profile switcher)  
+✅ **Phase 7:** History View (avg-first with expandable raw entries, pagination)  
+✅ **Phase 8:** Charts & Analytics (BP/pulse charts, stats cards, sleep overlay, caching)  
+✅ **Phase 9:** Edit & Delete (CRUD for all entries, swipe-to-delete, confirmations)
+
+### Current Architecture Overview
+
+**State Management:** Provider pattern  
+**Database:** sqflite_sqlcipher (encrypted SQLite)  
+**Test Coverage:** 612/612 passing (Models/Utils ~90%, Services ~84%, ViewModels ~88%, Widgets ~77%)  
+**Key Dependencies:**
+- flutter_slidable: ^3.1.0 (swipe gestures)
+- fl_chart: (charting)
+- shared_preferences: (app settings)
+- local_auth: (biometric)
+
+**Data Models:**
+- `BloodPressureReading` (systolic, diastolic, pulse, timestamp, notes, tags, arm, posture)
+- `ReadingGroup` (averaged 30-min sessions)
+- `WeightEntry` (kg, timestamp, notes on salt/exercise/stress/sleep)
+- `SleepEntry` (date, hours, quality, source metadata)
+- `Medication` / `MedicationGroup` / `MedicationIntake`
+- `ChartDataSet`, `HealthStats`, `ChartPoint` (analytics models)
+
+**Services Layer:**
+- `BloodPressureService` (CRUD + averaging engine)
+- `WeightService`, `SleepService` (CRUD)
+- `MedicationService` (CRUD, group intake logging)
+- `AnalyticsService` (data aggregation with caching)
+- `DatabaseService` (encrypted DB provider)
+
+**ViewModels:**
+- `BloodPressureViewModel` (readings CRUD, session override)
+- `WeightViewModel`, `SleepViewModel` (CRUD)
+- `MedicationViewModel` (CRUD, intake tracking)
+- `AnalyticsViewModel` (chart data, time ranges, cache management)
+
+**UI Components:**
+- Home view with recent readings card (swipe-to-delete)
+- History view (averaged rows with expandable raw entries, filters, pagination)
+- Add/Edit forms for BP, weight, sleep (validation, accessibility)
+- Analytics view (charts, stats cards, time range selector)
+- ConfirmDeleteDialog (reusable, accessibility-compliant)
+
+---
+
+## Phase 10 Scope: Export & Reports
+
+### High-Level Requirements
+
+From [Implementation_Schedule.md](../Plans/Implementation_Schedule.md):
+
+> **Phase 10: Export & Reports**  
+> **Scope**: CSV/JSON export/import; PDF doctor report.
+> 
+> **Tasks:**
+> - Local-only CSV/JSON export/import; conflict handling basic (overwrite/append strategy).
+> - PDF report for last 30/90 days: profile info, date range, averages, chart snapshot, meds/intake notes, irregular flags; disclaimer.
+> - Integration tests for export/import round-trip; PDF generation smoke tests.
+> 
+> **Dependencies**: Phases 1–4, 7–9 for data/views.
+> 
+> **Acceptance**:
+> - Successful round-trip for CSV/JSON; PDF generated offline; tests pass.
+> 
+> **Rollback point**: Export only (defer PDF) if needed.
+
+### User Stories (Inferred)
+
+1. **As a user**, I want to export my blood pressure readings to CSV/JSON so I can back up my data or share with other apps.
+2. **As a user**, I want to import readings from CSV/JSON so I can restore backups or migrate from another system.
+3. **As a user**, I want to generate a PDF report of my last 30/90 days so I can share comprehensive health data with my doctor.
+4. **As a user**, I want the PDF to include charts, averages, medication notes, and any irregular readings flagged.
+5. **As a user**, I want export/import to handle conflicts gracefully (overwrite vs append strategy).
+
+### Technical Considerations
+
+**Export/Import:**
+- **Scope:** Blood pressure readings, weight entries, sleep entries, medications, medication intakes
+- **Formats:** CSV (human-readable, Excel-compatible) and JSON (structured, complete)
+- **Conflict Resolution:** User selects overwrite (replace all) or append (merge with duplicates prevention by timestamp+type)
+- **Validation:** Import must validate data integrity (required fields, bounds checking, date parsing)
+- **Error Handling:** Clear user feedback on malformed files, validation failures, partial imports
+
+**PDF Generation:**
+- **Time Ranges:** 30 days, 90 days (user-selectable)
+- **Content Sections:**
+  1. Header: Profile name, report date range, generation timestamp
+  2. Summary Stats: Average BP, min/max, pulse avg, weight trend, sleep avg
+  3. Charts: BP trend chart (same as analytics view), pulse chart
+  4. Data Table: Raw readings with timestamps (condensed view)
+  5. Medications: List of active meds + intake compliance/notes
+  6. Irregular Flags: Readings outside normal ranges highlighted
+  7. Footer: Medical disclaimer (not diagnostic, consult healthcare provider)
+- **Offline:** Must work without internet; generate on-device
+- **Sharing:** Save to file system + share intent for email/cloud
+- **Chart Rendering:** Rasterize fl_chart widgets or use PDF-native drawing
+
+**Dependencies:**
+- **csv:** ^6.0.0 (CSV parsing/generation)
+- **pdf:** ^3.11.0 (PDF document creation)
+- **path_provider:** (already in pubspec, file system access)
+- **share_plus:** (sharing generated files)
+- **printing:** ^5.12.0 (optional: layout helpers for PDF)
+
+---
+
+## Planning Requirements
+
+### Your Deliverables
+
+Create a comprehensive plan document: `Documentation/Plans/Phase_10_Export_Reports_Plan.md`
+
+**Required Sections:**
+
+1. **Overview**
+   - Phase objectives and user value
+   - Success criteria and acceptance tests
+   - Rollback strategy (export-only vs full PDF)
+
+2. **Technical Design**
+   - Export/Import architecture (services, UI flows, file formats)
+   - PDF generation pipeline (data aggregation → rendering → file creation)
+   - Conflict resolution strategies (overwrite/append UI + logic)
+   - File format specifications (CSV columns, JSON schema)
+   - Error handling and validation approach
+
+3. **Implementation Tasks**
+   - Broken down by logical units (export service, import UI, PDF service, report view)
+   - Dependencies between tasks clearly marked
+   - Estimated complexity/risk per task
+
+4. **Data Model Changes**
+   - Any new models needed (e.g., `ExportConfig`, `ReportMetadata`)
+   - Schema migrations if database changes required (likely none)
+
+5. **UI/UX Specifications**
+   - Export/Import screens (button placement, progress indicators, error dialogs)
+   - PDF report preview/share flow
+   - Conflict resolution dialogs (radio buttons for overwrite/append)
+
+6. **Testing Strategy**
+   - Unit tests for export/import services (round-trip validation)
+   - Widget tests for new screens
+   - Integration tests for full export → import cycle
+   - PDF smoke tests (verify generation, check content sections)
+
+7. **Coding Standards Compliance**
+   - Reference specific sections of [Coding_Standards.md](../Standards/Coding_Standards.md)
+   - Security considerations (file permissions, sensitive data in exports)
+   - Performance (large dataset exports, memory management)
+
+8. **Dependencies & Risks**
+   - New pub dependencies with version constraints
+   - Platform-specific considerations (file picker, sharing on iOS/Android)
+   - Edge cases (empty datasets, corrupted import files, disk space)
+
+9. **Acceptance Criteria**
+   - Specific, measurable, testable criteria
+   - Coverage targets (≥85% services, ≥70% widgets)
+   - Must align with [Implementation_Schedule.md](../Plans/Implementation_Schedule.md) phase 10 acceptance
+
+10. **Handoff Notes**
+    - What information Clive needs to review this plan
+    - What context the implementer (Georgina or Claudette) will need
+    - Any open questions for stakeholder clarification
+
+---
+
+## Coding Standards Reference
+
+Key sections to incorporate from [Coding_Standards.md](../Standards/Coding_Standards.md):
+
+- **Section 2:** Git Workflow (feature branch naming, commit messages, CI requirements)
+- **Section 3:** Code Organization (service layer patterns, separation of concerns)
+- **Section 4:** Error Handling (defensive programming, user-friendly messages, logging)
+- **Section 5:** Testing (coverage targets, test structure, mocking)
+- **Section 6:** Documentation (DartDoc requirements, inline comments for complex logic)
+- **Section 7:** Security (sensitive data handling, file permissions, encryption at rest)
+- **Section 9:** Performance (lazy loading, memory management, large file handling)
+
+---
+
+## Context for Tracy
+
+### Recent Workflow Artifacts
+- Phase 9 Plan: `Documentation/Plans/Phase_9_Edit_Delete_Plan.md`
+- Phase 9 Review: `Documentation/archive/reviews/2025-12-30-clive-phase-9-plan-review.md`
+- Phase 9 Completion: `Documentation/archive/WORKFLOW_COMPLETION_2025-12-30_Phase-9.md`
+
+These documents demonstrate the expected structure, detail level, and format for plans.
+
+### Implementation Patterns from Phase 9
+- **Service Layer:** CRUD methods with error handling (returns `String?` for errors)
+- **ViewModel Layer:** Wraps services, manages UI state, calls `notifyListeners()`
+- **Provider Extensions:** `refreshAnalyticsData()` pattern for cache invalidation
+- **Reusable Widgets:** `ConfirmDeleteDialog` sets precedent for reusable components
+- **Accessibility:** Semantics labels on all interactive elements
+- **BuildContext Safety:** Mounted checks before navigation after async operations
+
+Apply similar patterns for export/import services and PDF generation.
+
+### Key Stakeholder Expectations
+- **Security:** Export files may contain sensitive health data; warn users, consider encryption options
+- **UX:** Progress indicators for long operations (large exports, PDF generation)
+- **Reliability:** Validate imports thoroughly; don't corrupt existing data
+- **Offline:** All functionality must work without internet
+- **Testability:** Round-trip validation (export → import → verify data integrity)
+
+---
+
+## Timeline & Next Steps
+
+**Immediate:** Tracy creates Phase 10 plan (target completion: within this session)  
+**Next:** Clive reviews plan against Coding Standards and project requirements  
+**Then:** Handoff to Georgina or Claudette for implementation  
+**Finally:** Steve integrates, deploys, and manages PR workflow
+
+---
+
+## Questions for Tracy to Address in Plan
+
+1. **CSV Format:** What columns? How to handle optional fields (arm, posture, notes, tags)?
+2. **JSON Schema:** Nested structure for grouped readings? Include metadata (export date, app version)?
+3. **Conflict Resolution:** How to detect duplicates? Match on timestamp+type? Tolerance window?
+4. **PDF Charts:** Rasterize widgets or draw native PDF graphics? Image quality considerations?
+5. **File Naming:** Convention for exported files (timestamp, profile name, date range)?
+6. **Import Validation:** Strict mode (reject on any error) vs lenient (skip invalid rows with report)?
+7. **Progress Feedback:** Streaming updates for large exports? Background job or block UI?
+8. **Platform Differences:** File picker behavior on iOS vs Android? Share intent differences?
+
+---
+
+## Reference Documents
+
+- [Implementation_Schedule.md](../Plans/Implementation_Schedule.md) - Phase 10 scope and acceptance
+- [Coding_Standards.md](../Standards/Coding_Standards.md) - All coding requirements
+- [Phase_9_Edit_Delete_Plan.md](../Plans/Phase_9_Edit_Delete_Plan.md) - Template for plan structure
+- [PROJECT_SUMMARY.md](../../PROJECT_SUMMARY.md) - Overall project context
+- [SECURITY.md](../../SECURITY.md) - Security requirements for sensitive data
+
+---
+
+## Success Criteria for This Handoff
+
+Tracy's plan is ready for Clive review when it:
+1. ✅ Addresses all Phase 10 requirements from Implementation_Schedule.md
+2. ✅ References Coding_Standards.md in technical design decisions
+3. ✅ Includes clear acceptance criteria and testing strategy
+4. ✅ Breaks tasks into implementable units with dependencies
+5. ✅ Anticipates edge cases and risks
+6. ✅ Specifies UI/UX flows with sufficient detail for implementation
+7. ✅ Maintains consistency with established project patterns
+
+---
+
+## Tracy's Action Items
+
+1. **Read Reference Documents:** Implementation_Schedule.md (Phase 10 section), Coding_Standards.md (sections 2-7, 9), Phase_9_Edit_Delete_Plan.md (structure template)
+2. **Create Plan Document:** `Documentation/Plans/Phase_10_Export_Reports_Plan.md` with all required sections
+3. **Address Planning Questions:** Answer the 8 questions listed above with technical decisions
+4. **Generate Handoff to Clive:** `Documentation/Handoffs/Tracy_to_Clive.md` requesting plan review
+5. **Notify User:** Inform user that plan is ready for Clive review with suggested continuation prompt
+
+---
+
+**End of Handoff**
+
+Tracy, you have complete autonomy to make technical decisions within the constraints of Coding_Standards.md and project architecture. Focus on creating a practical, implementable plan that maintains the quality bar established in Phases 1-9.
+
+The user is waiting for your plan. Please proceed with Phase 10 planning now.
