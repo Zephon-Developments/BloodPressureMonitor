@@ -11,7 +11,7 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - [x] Phase 4: Weight & Sleep ✅ **COMPLETE** (Dec 29, 2025)
 - [x] Phase 5: App Security Gate ✅ **COMPLETE** (Dec 29, 2025)
 - [x] Phase 6: UI Foundation ✅ **COMPLETE** (Dec 29, 2025)
-- [ ] Phase 7: History (Avg-first with expansion)
+- [x] Phase 7: History (Avg-first with expansion) ✅ **COMPLETE** (Dec 30, 2025)
 - [ ] Phase 8: Charts & Analytics
 - [ ] Phase 9: Export & Reports
 - [ ] Phase 10: Polish & Comprehensive Testing
@@ -111,17 +111,18 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - ✅ 555/555 tests passing; zero static analysis issues.
 **Status**: Ready for PR merge to main Dec 29, 2025
 
-### Phase 7: History (Avg-first with expansion)
+### Phase 7: History (Avg-first with expansion) ✅ COMPLETE
 **Scope**: History list showing averaged rows primary; expand to raw readings.
 **Tasks**
-- History screen with filters (date range, profile, tags), expandable groups.
-- Toggle averaged vs raw view; display grouping membership.
-- Performance pass for large lists (ListView.builder, pagination/lazy load if needed).
-- Widget tests for expand/collapse, filters, and data binding.
+- ✅ History screen with filters (date range, profile, tags), expandable groups.
+- ✅ Toggle averaged vs raw view; display grouping membership.
+- ✅ Performance pass for large lists (keyset pagination, ListView.builder).
+- ✅ Widget tests for expand/collapse, filters, and data binding.
 **Dependencies**: Phase 2; UI shell from Phase 6.
 **Acceptance**
-- UX matches spec (avg primary, raw one tap away); smooth scroll with large datasets; widget tests ≥70%.
-**Rollback point**: Keep feature behind a toggle if perf not ready.
+- ✅ UX matches spec (avg primary, raw one tap away); smooth scroll with large datasets; widget tests ≥70% (76.87% achieved).
+- ✅ Service coverage 83.67%; all tests passing; analyzer clean.
+**Status**: Merged to main Dec 30, 2025
 
 ### Phase 8: Charts & Analytics
 **Scope**: Systolic/diastolic/pulse charts, banding, stats cards, morning/evening split.
