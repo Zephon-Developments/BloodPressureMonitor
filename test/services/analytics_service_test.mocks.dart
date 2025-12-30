@@ -123,6 +123,15 @@ class MockReadingService extends _i1.Mock implements _i3.ReadingService {
       ) as _i4.Future<int>);
 
   @override
+  _i4.Future<int> deleteAllByProfile(int? profileId) => (super.noSuchMethod(
+        Invocation.method(
+          #deleteAllByProfile,
+          [profileId],
+        ),
+        returnValue: _i4.Future<int>.value(0),
+      ) as _i4.Future<int>);
+
+  @override
   _i4.Future<int> getReadingCount(int? profileId) => (super.noSuchMethod(
         Invocation.method(
           #getReadingCount,
@@ -254,6 +263,15 @@ class MockSleepService extends _i1.Mock implements _i6.SleepService {
         ),
         returnValue: _i4.Future<bool>.value(false),
       ) as _i4.Future<bool>);
+
+  @override
+  _i4.Future<int> deleteAllByProfile(int? profileId) => (super.noSuchMethod(
+        Invocation.method(
+          #deleteAllByProfile,
+          [profileId],
+        ),
+        returnValue: _i4.Future<int>.value(0),
+      ) as _i4.Future<int>);
 
   @override
   _i4.Future<_i2.SleepEntry?> findSleepForMorningReading({

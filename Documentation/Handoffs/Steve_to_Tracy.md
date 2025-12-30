@@ -1,331 +1,166 @@
-# Handoff: Steve to Tracy
-
-**Date:** 2025-12-30
-**Subject:** Plan for Edit/Delete UI Implementation (Phase 9)
-
-## Context
-
-The user has requested the ability to edit and delete data within the app. Currently, while backend services support update and delete operations for most data types, the UI layer does not expose these capabilities to users.
-
-## Current State Analysis
-
-### Backend Capabilities (Already Implemented)
-
-| Data Type | Service | Update Method | Delete Method | Status |
-|-----------|---------|---------------|---------------|--------|
-| Blood Pressure Reading | `ReadingService` | `updateReading()` ✅ | `deleteReading()` ✅ | Backend ready |
-| Weight Entry | `WeightService` | `updateWeightEntry()` ✅ | `deleteWeightEntry()` ✅ | Backend ready |
-| Sleep Entry | `SleepService` | `updateSleepEntry()` ✅ | `deleteSleepEntry()` ✅ | Backend ready |
-| Medication | `MedicationService` | `updateMedication()` ✅ | `deleteMedication()` ✅ (soft delete) | Backend ready |
-| Medication Intake | `MedicationIntakeService` | `updateIntake()` ❌ | `deleteIntake()` ✅ | Partial |
-| Profile | `ProfileService` | `updateProfile()` ✅ | ❌ | Partial |
-
-### ViewModel Support
-
-| ViewModel | Update Support | Delete Support |
-|-----------|----------------|----------------|
-| `BloodPressureViewModel` | `updateReading()` ✅ | `deleteReading()` ✅ |
-| `WeightViewModel` | ❌ Missing | ❌ Missing |
-| `SleepViewModel` | ❌ Missing | ❌ Missing |
-| `HistoryViewModel` | ❌ (View-only) | ❌ (View-only) |
-| `AnalyticsViewModel` | ❌ (View-only) | ❌ (View-only) |
-
-### UI Gaps
-
-Currently, the app has:
-- ✅ Add views for: Readings, Weight, Sleep
-- ❌ NO edit views for any data type
-- ❌ NO delete UI for any data type
-- ❌ NO detail views with edit/delete actions
-
-The `HistoryView` displays data but provides no interaction mechanisms for editing or deleting entries.
-
-## Requirements
-
-### User Stories
-
-1. **As a user, I want to edit a blood pressure reading** so I can correct mistakes or add notes.
-2. **As a user, I want to delete a blood pressure reading** so I can remove accidental or incorrect entries.
-3. **As a user, I want to edit weight entries** to correct typos or update notes.
-4. **As a user, I want to delete weight entries** to remove duplicates or errors.
-5. **As a user, I want to edit sleep entries** to refine duration or quality scores.
-6. **As a user, I want to delete sleep entries** to remove incorrect data.
-7. **As a user, I want confirmation before deleting** to prevent accidental data loss.
-
-### Scope
-
-**In Scope:**
-- Edit/Delete for Blood Pressure Readings
-- Edit/Delete for Weight Entries
-- Edit/Delete for Sleep Entries
-- Confirmation dialogs for delete operations
-- Proper error handling and user feedback
-- Auto-refresh of views after edit/delete
-- Triggering averaging recomputation for BP readings
-
-**Out of Scope (Future Enhancements):**
-- Bulk delete operations
-- Undo functionality
-- Edit history/audit trail
-- Medication intake editing (complexity with groups)
-- Profile deletion (requires data cascade handling)
-
-## Task Breakdown
-
-### Task 1: Extend ViewModels
-**Priority:** High
-**Estimated Effort:** 2-3 hours
-
-Add update/delete methods to ViewModels that are missing them:
-
-1. **WeightViewModel**
-   - Add `updateWeightEntry(WeightEntry entry)` method
-   - Add `deleteWeightEntry(int id)` method
-   - Follow the pattern from `BloodPressureViewModel`
-   - Include proper error handling and loading states
-
-2. **SleepViewModel**
-   - Add `updateSleepEntry(SleepEntry entry)` method
-   - Add `deleteSleepEntry(int id)` method
-   - Include validation if needed
-   - Proper error handling and loading states
-
-**Acceptance Criteria:**
-- ViewModels expose update/delete methods
-- Methods handle errors gracefully
-- Loading states are properly managed
-- Unit tests added for new methods (≥85% coverage)
-
-### Task 2: Create Edit Views
-**Priority:** High
-**Estimated Effort:** 4-5 hours
-
-Create dedicated edit views that reuse the add view forms:
-
-1. **Edit Reading View**
-   - Extend or create variant of `AddReadingView`
-   - Pre-populate fields with existing reading data
-   - Support validation with override confirmations
-   - Save button triggers `updateReading()` instead of `addReading()`
-
-2. **Edit Weight View**
-   - Extend or create variant of `AddWeightView`
-   - Pre-populate weight value, unit, notes
-   - Save triggers `updateWeightEntry()`
-
-3. **Edit Sleep View**
-   - Extend or create variant of `AddSleepView`
-   - Pre-populate sleep duration, quality, timestamps
-   - Save triggers `updateSleepEntry()`
-
-**Design Patterns:**
-- Option A: Modify existing add views to accept optional `editingId` parameter
-- Option B: Create separate edit views that share form widgets
-- **Recommendation:** Option A (simpler, less duplication)
-
-**Acceptance Criteria:**
-- Forms pre-populate with existing data
-- Validation works correctly
-- Save operations update existing records
-- Navigation returns to previous screen on success
-- Error messages displayed on failure
-
-### Task 3: Add Delete Functionality
-**Priority:** High
-**Estimated Effort:** 2-3 hours
-
-Implement delete actions with confirmations:
-
-1. **Confirmation Dialog Widget**
-   - Create reusable `ConfirmDeleteDialog`
-   - Shows item details (e.g., "Delete reading from Jan 1, 2025?")
-   - Two buttons: "Cancel" and "Delete"
-   - Red/destructive styling for Delete button
-
-2. **Delete Integration**
-   - Add delete action to reading cards/list items
-   - Add delete action to weight history items
-   - Add delete action to sleep history items
-   - Show confirmation dialog before executing
-   - Display success/error messages via SnackBar
-
-**Acceptance Criteria:**
-- Delete requires confirmation
-- Confirmation shows relevant item details
-- Successful delete refreshes the view
-- Error handling with user-friendly messages
-- SnackBar feedback for success/failure
-
-### Task 4: Enhance History View
-**Priority:** Medium
-**Estimated Effort:** 3-4 hours
-
-Add edit/delete actions to the History View:
-
-1. **Reading Group Cards**
-   - Add "Expand to Edit Members" option
-   - Show individual readings in expanded state
-   - Each reading has Edit and Delete actions
-   - Maintain grouped view when editing/deleting
-
-2. **Raw Reading View**
-   - Add Edit and Delete actions to each reading card
-   - Swipe-to-delete gesture (optional, nice-to-have)
-   - Long-press menu with Edit/Delete options
-
-3. **Detail View** (Optional Enhancement)
-   - Create a detail dialog/bottom sheet
-   - Shows full reading details
-   - Includes Edit and Delete buttons
-   - Better for small screens
-
-**Acceptance Criteria:**
-- Actions accessible from history view
-- Grouped view properly handles member edits/deletes
-- Recomputes averages after BP reading changes
-- UI updates automatically after operations
-
-### Task 5: Testing & Polish
-**Priority:** High
-**Estimated Effort:** 3-4 hours
-
-1. **Unit Tests**
-   - Test ViewModel update/delete methods
-   - Test validation edge cases
-   - Test error handling paths
-   - Target ≥85% coverage for new code
-
-2. **Widget Tests**
-   - Test edit view pre-population
-   - Test delete confirmation dialog
-   - Test error state rendering
-   - Test success state navigation
-
-3. **Integration Testing**
-   - Test full edit flow: tap → edit → save → verify
-   - Test full delete flow: tap → confirm → verify
-   - Test averaging recomputation after BP edits
-   - Test error scenarios (network, database)
-
-**Acceptance Criteria:**
-- All tests passing
-- Coverage meets project standards (≥85%)
-- Manual testing checklist completed
-- No analyzer warnings
-
-## Technical Considerations
-
-### 1. Averaging Impact
-When a BP reading is edited or deleted:
-- `AveragingService.createOrUpdateGroupsForReading()` must run
-- May affect multiple groups if timestamp changes significantly
-- Need to handle potential averaging failures gracefully
-
-### 2. Analytics Cache Invalidation
-After edits/deletes:
-- `AnalyticsViewModel` cache should be invalidated
-- User should see updated stats after changes
-- Consider adding `analyticsViewModel.invalidateCache()` calls
-
-### 3. Navigation Patterns
-- Edit: Navigate to edit view → Save → Pop back
-- Delete: Show dialog → Confirm → Refresh current view
-- Consider using `Navigator.pop(context, true)` to signal changes
-
-### 4. Data Consistency
-- Ensure reading updates don't orphan averaging groups
-- Sleep/Weight deletes should be straightforward (no cascades)
-- Consider soft deletes for readings (with permanent delete later)
-
-### 5. Performance
-- Deleting from large lists: ensure smooth UX
-- Batch operations if deleting multiple items (future)
-- Consider optimistic UI updates
-
-## UI/UX Recommendations
-
-### Visual Design
-- Use trailing `PopupMenuButton` for Edit/Delete actions
-- Use `Icons.edit` and `Icons.delete` consistently
-- Delete button should use `Colors.red` or error theme color
-- Show loading spinner during operations
-
-### Confirmation Dialog
-```dart
-ConfirmDeleteDialog(
-  title: "Delete Reading?",
-  message: "This will permanently delete the reading from 
-           Jan 1, 2025 at 8:30 AM (120/80 mmHg).",
-  onConfirm: () => viewModel.deleteReading(id),
-)
-```
-
-### Feedback
-- Success: Green SnackBar "Reading deleted successfully"
-- Error: Red SnackBar with error message
-- Loading: Show progress indicator on card/button
-
-## Standards Compliance
-
-### Code Quality
-- Follow [CODING_STANDARDS.md](../Standards/Coding_Standards.md)
-- Use proper error handling patterns
-- Document public APIs with JSDoc comments
-- Use `const` constructors where applicable
-
-### Testing
-- Unit tests for all ViewModel methods
-- Widget tests for edit views and dialogs
-- Integration tests for critical flows
-- Target ≥85% coverage
-
-### Security
-- No sensitive data in logs
-- Validate user input on edits
-- Prevent SQL injection (use parameterized queries)
-
-## Success Metrics
-
-- [ ] All data types support edit operations
-- [ ] All data types support delete operations (with confirmation)
-- [ ] Zero analyzer warnings
-- [ ] All tests passing (≥85% coverage)
-- [ ] Manual testing checklist completed
-- [ ] Code review approved by Clive
-
-## Questions for Tracy
-
-1. Should we use Option A (extend add views) or Option B (separate edit views)?
-2. Should we implement swipe-to-delete gestures or stick with explicit buttons?
-3. Should deletes be soft (mark as deleted) or hard (permanent removal)?
-4. Should we create a detail view or use edit view for viewing details?
-5. Priority: Should this be Phase 9 or split into smaller phases?
-
-## Recommended Plan Structure
-
-**Phase 9A: Core Edit/Delete (MVP)**
-- Task 1: Extend ViewModels
-- Task 2: Create Edit Views (BP, Weight, Sleep)
-- Task 3: Add Delete Functionality (with confirmations)
-- Task 5: Testing
-
-**Phase 9B: History Integration & Polish**
-- Task 4: Enhance History View with edit/delete actions
-- Additional polish and UX improvements
-- Edge case handling
-
-## Next Steps
-
-Tracy, please:
-1. Review this handoff and the current codebase structure
-2. Answer the questions above
-3. Create a detailed implementation plan following the Phase structure
-4. Document the plan in `Documentation/Plans/Phase_9_Edit_Delete_Plan.md`
-5. Identify any technical blockers or dependencies
-6. Hand off to Clive for review before implementation begins
+# Handoff: Steve → Tracy
+
+**Date**: December 30, 2025  
+**Context**: Phase 10 Code Review Fixes  
+**Branch**: feature/export-reports  
+**Commit**: f55c620
 
 ---
 
-**Steve**
-Workflow Conductor
-2025-12-30
+## Objective
+
+GitHub Copilot code review identified 6 issues in the Phase 10 (Export & Reports) implementation that need to be addressed before the PR can be merged to main. These are not breaking bugs but represent technical debt and potential security/usability issues that should be resolved.
+
+---
+
+## Scope
+
+### Issues Identified
+
+1. **Hardcoded Profile IDs** (4 occurrences)
+   - [lib/views/import_view.dart](lib/views/import_view.dart#L224-L225): `profileId: 1` in importData call
+   - [lib/views/report_view.dart](lib/views/report_view.dart#L182-L183): `profileId: 1, profileName: 'User'` in PDF generation
+   - [lib/views/export_view.dart](lib/views/export_view.dart#L152-L153): `profileId: 1, profileName: 'User'` in JSON/CSV export
+   - **Impact**: Breaks multi-profile functionality; data will always export/import to profile 1 regardless of active profile
+   - **Severity**: Medium - functional issue affecting multi-profile users
+
+2. **Inconsistent Error Messaging** (1 occurrence)
+   - [lib/views/import_view.dart](lib/views/import_view.dart#L135-L141): Shows "Import Successful!" even when errors exist
+   - **Impact**: Misleading UX when partial imports occur (some records succeed, others fail)
+   - **Severity**: Low - UX issue, not data integrity issue
+   - **Expected Behavior**: Show "Partial Import" or "Import Completed with Errors" when `errors.isNotEmpty`
+
+3. **Null Pointer Exception Risk** (1 occurrence)
+   - [lib/views/report_view.dart](lib/views/report_view.dart#L170-L171): Using `!` on `_chartKey.currentContext` without null check
+   - **Impact**: Runtime crash if widget hasn't rendered or is disposed when generating PDF
+   - **Severity**: Medium - could cause app crashes in edge cases
+   - **Expected Behavior**: Add null check before accessing RenderRepaintBoundary
+
+4. **CSV Formula Injection Vulnerability** (1 occurrence)
+   - [lib/services/export_service.dart](lib/services/export_service.dart#L139-L170): User-controlled text fields written directly to CSV without sanitization
+   - **Impact**: Security risk - fields starting with `=`, `+`, `-`, `@` could execute as formulas when opened in Excel/Sheets
+   - **Severity**: High - security vulnerability (CSV injection attack vector)
+   - **Affected Fields**: `r.note`, `r.tags`, `w.notes`, medication names, sleep notes, etc.
+   - **Expected Behavior**: Escape/sanitize all user-controlled text before writing to CSV
+
+---
+
+## Constraints
+
+- **No Breaking Changes**: Fixes must maintain backward compatibility with existing data
+- **Test Coverage**: All fixes must include unit/widget tests demonstrating the issue is resolved
+- **Analyzer Clean**: No new warnings or errors introduced
+- **Minimal Scope**: Only fix the identified issues; no additional refactoring or feature additions
+- **Branch**: Continue working on `feature/export-reports` branch
+- **Standards Compliance**: Follow [Documentation/Standards/Coding_Standards.md](Documentation/Standards/Coding_Standards.md)
+
+---
+
+## Success Metrics
+
+1. **Profile ID Resolution**:
+   - All export/import/report operations use the actual active profile ID from application state
+   - No hardcoded profile IDs remain in Phase 10 code
+   - Multi-profile functionality verified via tests
+
+2. **Error Messaging**:
+   - Import result dialog accurately reflects partial success states
+   - Shows distinct messages for: full success, partial success, full failure
+
+3. **Null Safety**:
+   - No null assertion operators (`!`) used without proper null checks
+   - PDF generation gracefully handles widget lifecycle edge cases
+
+4. **CSV Security**:
+   - All user-controlled text fields sanitized before CSV export
+   - Formula injection attack vectors eliminated
+   - Sanitization preserves data readability (minimal impact on legitimate content)
+
+5. **Testing**:
+   - Unit tests demonstrate CSV sanitization works correctly
+   - Widget tests verify error messaging for all import scenarios
+   - Tests confirm profile ID propagation from state to services
+
+---
+
+## Dependencies
+
+### Application State Context
+The app currently uses a simple profile system. Need to investigate:
+- How is the active profile ID currently tracked? (Provider? Singleton? Service?)
+- Where should export/import/report views retrieve the active profile?
+- Are there existing patterns in other views (analytics, history, home) that retrieve profile context?
+
+**Research Required**: Examine [lib/views/home_view.dart](lib/views/home_view.dart), [lib/viewmodels/blood_pressure_viewmodel.dart](lib/viewmodels/blood_pressure_viewmodel.dart), and related files to understand current profile management patterns.
+
+### Related Files
+- **Services**: [lib/services/export_service.dart](lib/services/export_service.dart), [lib/services/import_service.dart](lib/services/import_service.dart), [lib/services/pdf_report_service.dart](lib/services/pdf_report_service.dart)
+- **ViewModels**: [lib/viewmodels/export_viewmodel.dart](lib/viewmodels/export_viewmodel.dart), [lib/viewmodels/import_viewmodel.dart](lib/viewmodels/import_viewmodel.dart), [lib/viewmodels/report_viewmodel.dart](lib/viewmodels/report_viewmodel.dart)
+- **Views**: [lib/views/export_view.dart](lib/views/export_view.dart), [lib/views/import_view.dart](lib/views/import_view.dart), [lib/views/report_view.dart](lib/views/report_view.dart)
+- **Tests**: All corresponding test files in `test/` directory
+
+---
+
+## Blockers / Risks
+
+### Risk: Profile State Architecture Unknown
+**Concern**: Don't know how profile state is currently managed in the application.  
+**Mitigation**: Tracy should research existing patterns before planning the fix.
+
+### Risk: CSV Sanitization Over-Aggressive
+**Concern**: Sanitizing CSV fields might corrupt legitimate data (e.g., mathematical expressions in notes).  
+**Mitigation**: Use minimal escaping (e.g., prefix with single quote `'` for Excel) that preserves data but prevents formula execution.
+
+### Risk: Breaking Import Compatibility
+**Concern**: CSV sanitization might make exported files incompatible with previously exported data.  
+**Mitigation**: Apply sanitization ONLY on export; import should handle both sanitized and unsanitized data gracefully.
+
+---
+
+## Next Steps for Tracy
+
+1. **Research Phase**: 
+   - Investigate how profile state is currently managed (check HomeView, ViewModels, Services)
+   - Review CODING_STANDARDS.md for state management patterns
+   - Research CSV injection best practices for Flutter/Dart
+
+2. **Planning Phase**:
+   - Create detailed plan for profile ID propagation (state → ViewModel → View → Service)
+   - Design CSV sanitization strategy (which fields, what escaping method)
+   - Plan error messaging enhancements for import result dialog
+   - Specify null safety approach for RenderRepaintBoundary access
+
+3. **Handoff to Clive**:
+   - Present plan with code examples for each fix
+   - Include test strategy for validating fixes
+   - Reference CODING_STANDARDS.md sections that apply
+
+---
+
+## Context Files
+
+- **Original Phase 10 Plan**: Completed and implemented (commit f159db6)
+- **Phase 10 Implementation**: Committed to feature/export-reports
+- **Implementation Schedule**: [Documentation/Plans/Implementation_Schedule.md](Documentation/Plans/Implementation_Schedule.md)
+- **Coding Standards**: [Documentation/Standards/Coding_Standards.md](Documentation/Standards/Coding_Standards.md)
+- **Active PR**: https://github.com/Zephon-Development/BloodPressureMonitor/pull/21
+
+---
+
+## Notes
+
+- This is a **fix/polish** task, not new feature development
+- These issues were caught in code review BEFORE merging to main - good catch!
+- All fixes should be committed to the existing `feature/export-reports` branch
+- After implementation and Clive approval, Steve will update the PR and proceed with merge
+- PR #21 is currently open and waiting for these fixes before final merge
+
+---
+
+**Handoff Target**: Tracy (Planning Agent)  
+**Next Action**: Research profile state management and create fix plan  
+**Expected Output**: `Tracy_to_Clive.md` with detailed fix plan for review
+
+---
+
+**Prompt for User**: "Please continue as Tracy to research the profile state management and create a comprehensive fix plan for the code review issues."

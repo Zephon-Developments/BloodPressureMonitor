@@ -187,6 +187,18 @@ class SleepService {
     return count > 0;
   }
 
+  /// Deletes all sleep entries for the provided profile.
+  ///
+  /// Returns the number of deleted rows.
+  Future<int> deleteAllByProfile(int profileId) async {
+    final db = await _databaseService.database;
+    return await db.delete(
+      'SleepEntry',
+      where: 'profileId = ?',
+      whereArgs: [profileId],
+    );
+  }
+
   /// Finds the most recent sleep entry that ended before a morning reading.
   ///
   /// Searches for sleep entries that ended within the specified lookback window

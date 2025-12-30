@@ -1,47 +1,77 @@
-# Handoff: Clive to Georgina — Phase 9 Implementation
+# Handoff: Clive → Georgina
 
-**Date:** 2025-12-30  
+**Date:** December 30, 2025  
 **From:** Clive (Review Specialist)  
-**To:** Georgina (Implementation Specialist)  
-**Plan:** [Documentation/Plans/Phase_9_Edit_Delete_Plan.md](../Plans/Phase_9_Edit_Delete_Plan.md)  
-**Review:** [reviews/2025-12-30-clive-phase-9-plan-review.md](../../reviews/2025-12-30-clive-phase-9-plan-review.md)
-
-## Objectives
-Implement Edit and Delete functionality for Blood Pressure Readings, Weight Entries, and Sleep Entries.
-
-## Key Requirements
-1.  **ViewModel Extensions**:
-    *   Add `updateWeightEntry` and `deleteWeightEntry` to `WeightViewModel`.
-    *   Add `updateSleepEntry` and `deleteSleepEntry` to `SleepViewModel`.
-    *   Ensure `BloodPressureViewModel` correctly triggers averaging recomputation (it should already, but verify).
-2.  **Edit Flow (Option A)**:
-    *   Modify `AddReadingView`, `AddWeightView`, and `AddSleepView` to accept an optional `editingEntry`.
-    *   Pre-populate forms when an entry is provided.
-    *   Update the UI (titles, buttons) to reflect "Edit" mode.
-3.  **Delete Flow**:
-    *   Implement a reusable `ConfirmDeleteDialog`.
-    *   **Home Screen**: Tapping the chevron (`>`) on a reading card opens the Edit view.
-    *   **Home Screen**: Swiping left on a reading card reveals a "DELETE" button (white text on red background).
-    *   **Action**: Tapping the revealed Delete button shows the confirmation dialog.
-4.  **Cache Invalidation**:
-    *   Invalidate the `AnalyticsViewModel` cache after any edit or delete operation for readings or sleep data.
-5.  **Dependencies**:
-    *   Add `flutter_slidable: ^3.1.0` to `pubspec.yaml` for the swipe-to-reveal functionality.
-
-## Standards & Quality
-*   **Test Coverage**: Target ≥85% for all new/modified code.
-*   **Static Analysis**: Zero warnings/errors.
-*   **Documentation**: JSDoc for all new public methods.
-*   **Formatting**: Run `dart format .` before submission.
-
-## Success Metrics
-*   Users can edit and delete readings, weight, and sleep entries.
-*   Deletions are always confirmed.
-*   Averages and charts update immediately after changes.
-*   All tests pass and coverage is maintained.
-
-Please proceed with the implementation of Phase 9A.
+**To:** Georgina (Implementer)  
+**Branch:** `feature/export-reports`  
+**Context:** Phase 10 Code Review Fixes (PR #21)
 
 ---
-**Clive**  
-Review Specialist
+
+## Objective
+
+Implement the 6 fixes identified during the Phase 10 code review. These fixes address security vulnerabilities (CSV injection), stability issues (null pointer risks), and architectural debt (hardcoded profile IDs).
+
+---
+
+## Tasks
+
+### 1. Profile State Management
+- **Implement `ActiveProfileViewModel`**:
+  - Create `lib/viewmodels/active_profile_viewmodel.dart`.
+  - Manage `activeProfileId` and `activeProfileName`.
+  - Persist selection in `SharedPreferences`.
+  - Register in `MultiProvider` in `lib/main.dart`.
+- **Refactor Views**:
+  - Update `ExportView`, `ImportView`, and `ReportView` to consume `ActiveProfileViewModel`.
+  - Remove all hardcoded `profileId: 1` and `profileName: 'User'` literals.
+
+### 2. CSV Security (High Priority)
+- **Implement Sanitization**:
+  - Add `_sanitizeCsvCell(String?)` helper in `ExportService`.
+  - Prefix values starting with `=`, `+`, `-`, or `@` with a single quote `'`.
+  - Apply to all user-controlled text fields in CSV export (notes, tags, names, etc.).
+- **Unit Tests**:
+  - Add tests in `test/services/export_service_test.dart` specifically for formula injection cases.
+
+### 3. Import UX Improvements
+- **Update `ImportView`**:
+  - Differentiate between Success, Partial Success (some errors), and Failure (all errors).
+  - Display the list of errors from `ImportResult.errors` when applicable.
+  - Use appropriate colors/icons for each state (Green/Yellow/Red).
+
+### 4. Stability & Null Safety
+- **Update `ReportView`**:
+  - Add null checks for `_chartKey.currentContext` before attempting to capture the chart image.
+  - Gracefully handle cases where the chart is not yet rendered (e.g., show a SnackBar or error message instead of crashing).
+
+---
+
+## Constraints & Standards
+
+- **Coding Standards**: Adhere strictly to [Documentation/Standards/Coding_Standards.md](Documentation/Standards/Coding_Standards.md).
+- **Testing**: Maintain or improve current test coverage. Ensure new logic is covered by unit or widget tests.
+- **Analyzer**: Zero warnings or errors.
+- **Branch**: Work on the existing `feature/export-reports` branch.
+
+---
+
+## Reference Materials
+
+- **Fix Plan**: [Documentation/Handoffs/Tracy_to_Clive.md](Documentation/Handoffs/Tracy_to_Clive.md)
+- **Review Summary**: [reviews/2025-12-30-clive-phase-10-fix-plan-review.md](reviews/2025-12-30-clive-phase-10-fix-plan-review.md)
+- **Original PR**: [PR #21](https://github.com/Zephon-Development/BloodPressureMonitor/pull/21)
+
+---
+
+## Success Metrics
+
+1. All 6 code review comments are addressed and verified.
+2. CSV exports are safe from formula injection.
+3. Multi-profile support is functional in export/import/report flows.
+4. Import results are clear and accurate.
+5. No runtime crashes during PDF generation.
+
+---
+
+**Next Action:** Georgina to implement the fixes as outlined.

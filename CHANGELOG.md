@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2025-12-30
+
+### Added
+- **Export & Reports** (Phase 10)
+  - JSON export for complete data backup with metadata
+  - CSV export for doctor-friendly spreadsheet format
+  - Multi-section CSV with readings, weight, sleep, medications, and intakes
+  - Import from JSON and CSV with conflict resolution (Overwrite/Append modes)
+  - Duplicate detection using composite keys (timestamp + values + profileId)
+  - PDF doctor report generation with summary statistics and medication lists
+  - Professional PDF formatting with charts, readings table, and medical disclaimer
+  - High-resolution chart capture (pixelRatio: 3.0) for print quality
+  - Platform share sheet integration for email, messaging, and cloud sharing
+  - Standardized export filename generation with profile name and timestamp
+  - Sensitive data warnings in CSV metadata headers
+  - Destructive import confirmation dialogs
+- New models: `ExportMetadata`, `ImportResult`, `ImportError`, `ReportMetadata`
+- New services: `ExportService`, `ImportService`, `PdfReportService`, `AppInfoService`
+- New viewmodels: `ExportViewModel`, `ImportViewModel`, `ReportViewModel`
+- New views: `ExportView`, `ImportView`, `ReportView`
+- Integration into Settings tab of Home view
+- Comprehensive test suite: 617 tests passing (export, import, PDF generation)
+- Dependencies: `csv: ^6.0.0`, `pdf: ^3.11.0`, `printing: ^5.12.0`, `file_picker: ^8.1.0`, `package_info_plus: ^8.0.0`
+
+### Changed
+- Centralized mock infrastructure using `service_mocks.dart` for improved test stability
+- Added `deleteAllByProfile` methods to all data services for overwrite import support
+
 ## [1.2.0] - 2025-12-30
 
 ### Added

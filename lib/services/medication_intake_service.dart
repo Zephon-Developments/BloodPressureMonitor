@@ -264,4 +264,16 @@ class MedicationIntakeService {
 
     return count > 0;
   }
+
+  /// Deletes all medication intakes for a profile.
+  ///
+  /// Returns the number of deleted rows.
+  Future<int> deleteAllByProfile(int profileId) async {
+    final db = await _databaseService.database;
+    return await db.delete(
+      'MedicationIntake',
+      where: 'profileId = ?',
+      whereArgs: [profileId],
+    );
+  }
 }
