@@ -61,6 +61,13 @@ class MedicationViewModel extends ChangeNotifier {
           profileId: profileId,
           searchTerm: _searchTerm,
         );
+
+        // When searching, respect the showInactive filter by removing inactive
+        // medications from the results if _showInactive is false.
+        if (!_showInactive) {
+          _medications =
+              _medications.where((medication) => medication.isActive).toList();
+        }
       } else {
         // Load all medications for profile
         _medications = await _medicationService.listMedicationsByProfile(
