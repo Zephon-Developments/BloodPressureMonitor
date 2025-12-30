@@ -156,6 +156,19 @@ class ReadingService {
     );
   }
 
+  /// Deletes all readings for the provided profile.
+  ///
+  /// Returns the number of rows removed. Used for destructive bulk
+  /// operations such as import overwrite flows.
+  Future<int> deleteAllByProfile(int profileId) async {
+    final db = await _databaseService.database;
+    return await db.delete(
+      'Reading',
+      where: 'profileId = ?',
+      whereArgs: [profileId],
+    );
+  }
+
   /// Counts the total number of readings for a profile.
   ///
   /// Useful for analytics and determining if enough data exists for trends.

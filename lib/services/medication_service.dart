@@ -177,4 +177,17 @@ class MedicationService {
 
     return count > 0;
   }
+
+  /// Permanently deletes all medications for a profile.
+  ///
+  /// Used during destructive restore flows where historical state will be
+  /// re-imported.
+  Future<int> deleteAllByProfile(int profileId) async {
+    final db = await _databaseService.database;
+    return await db.delete(
+      'Medication',
+      where: 'profileId = ?',
+      whereArgs: [profileId],
+    );
+  }
 }

@@ -237,6 +237,14 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Settings'), findsNWidgets(2)); // Nav item + title
+
+      // Scroll to find the items if they are off-screen
+      await tester.drag(
+        find.byType(ListView),
+        const Offset(0, -500),
+      );
+      await tester.pumpAndSettle();
+
       expect(find.text('Reminders'), findsOneWidget);
       expect(find.text('Appearance'), findsOneWidget);
       expect(find.text('About'), findsOneWidget);
@@ -301,19 +309,29 @@ void main() {
       await tester.tap(find.text('Settings'));
       await tester.pumpAndSettle();
 
-      final listTiles = tester.widgetList<ListTile>(
-        find.byType(ListTile),
+      // Scroll to bottom to ensure all items are built
+      await tester.drag(find.byType(ListView), const Offset(0, -500));
+      await tester.pumpAndSettle();
+
+      final remindersTile = tester.widget<ListTile>(
+        find.ancestor(
+          of: find.text('Reminders'),
+          matching: find.byType(ListTile),
+        ),
+      );
+      final appearanceTile = tester.widget<ListTile>(
+        find.ancestor(
+          of: find.text('Appearance'),
+          matching: find.byType(ListTile),
+        ),
+      );
+      final aboutTile = tester.widget<ListTile>(
+        find.ancestor(of: find.text('About'), matching: find.byType(ListTile)),
       );
 
-      // Security should be enabled, others disabled
-      int disabledCount = 0;
-      for (final tile in listTiles) {
-        if (tile.enabled == false) {
-          disabledCount++;
-        }
-      }
-
-      expect(disabledCount, 3); // Reminders, Appearance, About
+      expect(remindersTile.enabled, isFalse);
+      expect(appearanceTile.enabled, isFalse);
+      expect(aboutTile.enabled, isFalse);
     });
   });
 }
