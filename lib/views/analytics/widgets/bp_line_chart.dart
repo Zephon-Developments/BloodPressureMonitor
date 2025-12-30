@@ -58,9 +58,9 @@ class BpLineChart extends StatelessWidget {
                   borderData: FlBorderData(show: false),
                   titlesData: FlTitlesData(
                     topTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false)),
+                        sideTitles: SideTitles(showTitles: false),),
                     rightTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false)),
+                        sideTitles: SideTitles(showTitles: false),),
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
@@ -75,7 +75,7 @@ class BpLineChart extends StatelessWidget {
                         reservedSize: 36,
                         getTitlesWidget: (value, meta) {
                           final date = DateTime.fromMillisecondsSinceEpoch(
-                              value.toInt());
+                              value.toInt(),);
                           return Padding(
                             padding: const EdgeInsets.only(top: 8),
                             child: Text('${date.month}/${date.day}'),
