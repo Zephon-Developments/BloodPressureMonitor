@@ -162,7 +162,8 @@ void main() {
         start,
         rangeEnd,
       ) async {
-        final isSameInstant = start == reading.takenAt && rangeEnd == reading.takenAt;
+        final isSameInstant =
+            start == reading.takenAt && rangeEnd == reading.takenAt;
         if (profileArg == profileId && isSameInstant) {
           return [reading.copyWith(profileId: profileId)];
         }
@@ -188,7 +189,7 @@ void main() {
         result.duplicatesSkipped,
         1,
         reason:
-        'duplicates:${result.duplicatesSkipped} imported:${result.readingsImported} created:${readingService.createCallCount}',
+            'duplicates:${result.duplicatesSkipped} imported:${result.readingsImported} created:${readingService.createCallCount}',
       );
       expect(readingService.createCallCount, 1);
       expect(result.readingsImported, 1);
