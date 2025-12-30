@@ -33,6 +33,18 @@ class SleepService {
       throw ArgumentError(qualityValidation.message);
     }
 
+    // Validate stage breakdown
+    final stageValidation = validateSleepStageBreakdown(
+      durationMinutes: entry.durationMinutes,
+      deepMinutes: entry.deepMinutes,
+      lightMinutes: entry.lightMinutes,
+      remMinutes: entry.remMinutes,
+      awakeMinutes: entry.awakeMinutes,
+    );
+    if (stageValidation.level == ValidationLevel.error) {
+      throw ArgumentError(stageValidation.message);
+    }
+
     // Validate sleep times
     final timesValidation = validateSleepTimes(entry.startedAt, entry.endedAt);
     if (timesValidation.level == ValidationLevel.error) {
@@ -126,6 +138,18 @@ class SleepService {
     final qualityValidation = validateSleepQuality(entry.quality);
     if (qualityValidation.level == ValidationLevel.error) {
       throw ArgumentError(qualityValidation.message);
+    }
+
+    // Validate stage breakdown
+    final stageValidation = validateSleepStageBreakdown(
+      durationMinutes: entry.durationMinutes,
+      deepMinutes: entry.deepMinutes,
+      lightMinutes: entry.lightMinutes,
+      remMinutes: entry.remMinutes,
+      awakeMinutes: entry.awakeMinutes,
+    );
+    if (stageValidation.level == ValidationLevel.error) {
+      throw ArgumentError(stageValidation.message);
     }
 
     // Validate sleep times

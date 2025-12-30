@@ -16,7 +16,7 @@ import 'package:blood_pressure_monitor/services/secure_password_manager.dart';
 class DatabaseService {
   static Database? _database;
   static const String _databaseName = 'blood_pressure.db';
-  static const int _databaseVersion = 3;
+  static const int _databaseVersion = 4;
 
   final Database? _testDatabase;
 
@@ -256,32 +256,7 @@ class DatabaseService {
       ON WeightEntry(profileId, takenAt DESC)
     ''');
 
-    await db.execute('''
-      CREATE TABLE SleepEntry (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        profileId INTEGER NOT NULL,
-        startedAt TEXT NOT NULL,
-        endedAt TEXT,
-        durationMinutes INTEGER NOT NULL,
-        quality INTEGER,
-        localOffsetMinutes INTEGER NOT NULL,
-        source TEXT NOT NULL DEFAULT 'manual',
-        sourceMetadata TEXT,
-        notes TEXT,
-        createdAt TEXT NOT NULL,
-        FOREIGN KEY (profileId) REFERENCES Profile(id) ON DELETE CASCADE
-      )
-    ''');
-
-    await db.execute('''
-      CREATE INDEX idx_sleepentry_profile_time 
-      ON SleepEntry(profileId, endedAt DESC)
-    ''');
-
-    await db.execute('''
-      CREATE INDEX idx_sleepentry_profile_started 
-      ON SleepEntry(profileId, startedAt)
-    ''');
+    await _createSleepEntryTable(db);
 
     await db.execute('''
       CREATE TABLE Reminder (
@@ -425,6 +400,90 @@ class DatabaseService {
         ''');
       });
     }
+
+    if (oldVersion < 4) {
+      await db.transaction((txn) async {
+        await txn.execute('''
+          CREATE TABLE SleepEntry_v4 (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            profileId INTEGER NOT NULL,
+            startedAt TEXT NOT NULL,
+            endedAt TEXT,
+            durationMinutes INTEGER NOT NULL,
+            quality INTEGER,
+            deepMinutes INTEGER,
+            lightMinutes INTEGER,
+            remMinutes INTEGER,
+            awakeMinutes INTEGER,
+            localOffsetMinutes INTEGER NOT NULL,
+            source TEXT NOT NULL DEFAULT 'manual',
+            sourceMetadata TEXT,
+            notes TEXT,
+            createdAt TEXT NOT NULL,
+            FOREIGN KEY (profileId) REFERENCES Profile(id) ON DELETE CASCADE
+          )
+        ''');
+
+        await txn.execute('''
+          INSERT INTO SleepEntry_v4 (
+            id, profileId, startedAt, endedAt, durationMinutes, quality,
+            deepMinutes, lightMinutes, remMinutes, awakeMinutes,
+            localOffsetMinutes, source, sourceMetadata, notes, createdAt
+          )
+          SELECT 
+            id, profileId, startedAt, endedAt, durationMinutes, quality,
+            NULL, NULL, NULL, NULL,
+            localOffsetMinutes, source, sourceMetadata, notes, createdAt
+          FROM SleepEntry
+        ''');
+
+        await txn.execute('DROP TABLE SleepEntry');
+        await txn.execute('ALTER TABLE SleepEntry_v4 RENAME TO SleepEntry');
+
+        await txn.execute('''
+          CREATE INDEX idx_sleepentry_profile_time 
+          ON SleepEntry(profileId, endedAt DESC)
+        ''');
+
+        await txn.execute('''
+          CREATE INDEX idx_sleepentry_profile_started 
+          ON SleepEntry(profileId, startedAt)
+        ''');
+      });
+    }
+  }
+
+  Future<void> _createSleepEntryTable(DatabaseExecutor db) async {
+    await db.execute('''
+      CREATE TABLE SleepEntry (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        profileId INTEGER NOT NULL,
+        startedAt TEXT NOT NULL,
+        endedAt TEXT,
+        durationMinutes INTEGER NOT NULL,
+        quality INTEGER,
+        deepMinutes INTEGER,
+        lightMinutes INTEGER,
+        remMinutes INTEGER,
+        awakeMinutes INTEGER,
+        localOffsetMinutes INTEGER NOT NULL,
+        source TEXT NOT NULL DEFAULT 'manual',
+        sourceMetadata TEXT,
+        notes TEXT,
+        createdAt TEXT NOT NULL,
+        FOREIGN KEY (profileId) REFERENCES Profile(id) ON DELETE CASCADE
+      )
+    ''');
+
+    await db.execute('''
+      CREATE INDEX idx_sleepentry_profile_time 
+      ON SleepEntry(profileId, endedAt DESC)
+    ''');
+
+    await db.execute('''
+      CREATE INDEX idx_sleepentry_profile_started 
+      ON SleepEntry(profileId, startedAt)
+    ''');
   }
 
   /// Closes the database connection.

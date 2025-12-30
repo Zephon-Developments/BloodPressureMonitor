@@ -17,7 +17,8 @@
   - Sleep tracking (Phase 4) available for correlation overlay
   - UI shell (Phase 6) and navigation ready
   - History service (Phase 7) patterns reusable for data access
-  - Clinical banding thresholds: <130/85 green, 130-139/85-89 yellow, ≥140/90 red
+  - Clinical banding thresholds: NICE HBPM (<135/85 normal, 135-149/85-89 stage 1, 150-169/95-114 stage 2, ≥170/≥115 stage 3)
+  - Data store can be reset for Phase 8; no legacy rows require migration or backfill
 
 ## Dependencies
 - **Phase 2**: Averaging engine and `ReadingGroup` model
@@ -25,7 +26,7 @@
 - **Phase 6**: Navigation shell and Material 3 theme
 - **Phase 7**: Pagination patterns and service architecture
 - **External**: `fl_chart` package for chart rendering
-- **Standards**: [Documentation/Standards/Coding_Standards.md](../Standards/Coding_Standards.md) compliance; migration plan for sleep schema changes
+- **Standards**: [Documentation/Standards/Coding_Standards.md](../Standards/Coding_Standards.md) compliance; updated sleep schema definitions (no migration required)
 
 ---
 
@@ -451,26 +452,32 @@ class BpLineChart extends StatelessWidget {
                 backgroundColor: Colors.transparent,
                 minY: 40,
                 maxY: 200,
-                // Banding via extraLinesData
+                // Banding via extraLinesData (NICE HBPM)
                 extraLinesData: ExtraLinesData(
                   horizontalLines: [
-                    // Green zone (normal)
+                    // Green zone (Normal < 135)
                     HorizontalLine(
-                      y: 130,
+                      y: 67.5, // Center of 0-135
                       color: Colors.green.withOpacity(0.1),
-                      strokeWidth: 60, // Fill to diastolic 85
+                      strokeWidth: 135, 
                     ),
-                    // Yellow zone (elevated)
+                    // Yellow zone (Stage 1: 135-149)
                     HorizontalLine(
-                      y: 139,
+                      y: 142, // Center of 135-149
                       color: Colors.yellow.withOpacity(0.1),
-                      strokeWidth: 18, // 130-139 systolic
+                      strokeWidth: 14,
                     ),
-                    // Red zone (high)
+                    // Orange zone (Stage 2: 150-169)
                     HorizontalLine(
-                      y: 160,
+                      y: 159.5, // Center of 150-169
+                      color: Colors.orange.withOpacity(0.1),
+                      strokeWidth: 19,
+                    ),
+                    // Red zone (Stage 3: >= 170)
+                    HorizontalLine(
+                      y: 185, // Center of 170-200
                       color: Colors.red.withOpacity(0.1),
-                      strokeWidth: 80, // 140+ systolic
+                      strokeWidth: 30,
                     ),
                   ],
                 ),
@@ -746,16 +753,17 @@ Optional chart annotation showing sleep quality:
 
 ## Clinical Banding Specifications
 
-### Blood Pressure Categories
+### Blood Pressure Categories (NICE HBPM Guidance)
 
 | Category | Systolic (mmHg) | Diastolic (mmHg) | Color | Opacity |
 |----------|-----------------|------------------|-------|---------|
-| Normal | <130 | <85 | Green | 0.1 |
-| Elevated | 130-139 | 85-89 | Yellow | 0.15 |
-| High | ≥140 | ≥90 | Red | 0.2 |
+| Normal | <135 | <85 | Green | 0.1 |
+| Stage 1 | 135-149 | 85-89 | Yellow | 0.15 |
+| Stage 2 | 150-169 | 95-114 | Orange | 0.2 |
+| Stage 3 | ≥170 | ≥115 | Red | 0.25 |
 
 **Special Cases**:
-- **Isolated Systolic Hypertension**: Systolic ≥140 AND Diastolic <90
+- **Isolated Systolic Hypertension**: Systolic ≥140 AND Diastolic <90 (NICE definition varies, but for visualization, flag systolic-only elevation)
   - Marker: Orange dot on chart
   - Tooltip annotation: "Isolated systolic elevation"
 
@@ -764,6 +772,7 @@ Optional chart annotation showing sleep quality:
 - Use horizontal line spans in `fl_chart` `extraLinesData`
 - Ensure sufficient contrast for accessibility (WCAG AA)
 - Include text legend below charts for colorblind users
+- **Note**: These thresholds follow NICE HBPM (Home Blood Pressure Monitoring) standards, which are lower than clinic-based thresholds.
 
 ---
 
@@ -1192,7 +1201,7 @@ File: `integration_test/analytics_flow_test.dart`
 ## Implementation Sequence
 
 ### Phase 1: Foundation (Days 1-2)
-1. Extend sleep schema (stage minutes, endedAt as get-up time), add migration, update validators/services.
+1. Extend sleep schema (stage minutes, endedAt as get-up time), update models/validators/services (fresh schema, no migration needed).
 2. Add `fl_chart` dependency to `pubspec.yaml`
 3. Create data models (`HealthStats`, `ChartDataSet`, `SleepStageSeries`, etc.)
 4. Implement `AnalyticsService` with basic stat calculations and sleep stage aggregation
@@ -1246,7 +1255,7 @@ File: `integration_test/analytics_flow_test.dart`
 | Sleep correlation complexity delays delivery | Medium | Low | Mark as optional; ship without if blocked |
 | Statistical calculation errors | Low | High | Use well-tested algorithms; validate with known datasets; add property tests |
 | Memory leaks from chart controllers | Medium | Medium | Ensure proper disposal; use DevTools memory profiler |
-| Sleep schema migration gaps | Medium | Medium | Add migration tests; default stage minutes to 0; show incomplete-data banner; make stage fields nullable |
+| Sleep schema implementation gaps | Medium | Medium | Add unit tests for schema/model changes; ensure null-safe stage handling; show incomplete-data banner where fields missing |
 
 ---
 
@@ -1270,8 +1279,8 @@ File: `integration_test/analytics_flow_test.dart`
 - [x] Code follows [Coding_Standards.md](../Standards/Coding_Standards.md)
 - [x] DartDoc comments on public APIs
 - [x] Proper resource disposal (controllers, subscriptions)
-- [x] Sleep schema migration applied with backfill; validators enforce stage
-  totals and duration alignment
+- [x] Sleep schema updated with stage fields; validators enforce stage totals
+  and duration alignment
 
 ### UX Requirements
 - [x] Charts load within 500ms for typical datasets
