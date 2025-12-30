@@ -93,7 +93,8 @@ class _StatCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                    'Range: ${min.toStringAsFixed(0)}-${max.toStringAsFixed(0)}'),
+                  'Range: ${min.toStringAsFixed(0)}-${max.toStringAsFixed(0)}',
+                ),
               ],
             ),
           ],
@@ -123,7 +124,10 @@ class _VariabilityCard extends StatelessWidget {
             const SizedBox(height: 8),
             _variabilityRow('Systolic', stats.systolicStdDev, stats.systolicCv),
             _variabilityRow(
-                'Diastolic', stats.diastolicStdDev, stats.diastolicCv),
+              'Diastolic',
+              stats.diastolicStdDev,
+              stats.diastolicCv,
+            ),
             _variabilityRow('Pulse', stats.pulseStdDev, stats.pulseCv),
           ],
         ),
