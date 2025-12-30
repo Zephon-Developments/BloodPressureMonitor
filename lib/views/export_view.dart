@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/export_viewmodel.dart';
 
 class ExportView extends StatelessWidget {
@@ -148,9 +149,18 @@ class ExportView extends StatelessWidget {
     ExportViewModel viewModel,
     bool isJson,
   ) async {
+    // Get active profile from ActiveProfileViewModel
+    final activeProfile = context.read<ActiveProfileViewModel>();
+
     final success = isJson
-        ? await viewModel.exportToJson(profileId: 1, profileName: 'User')
-        : await viewModel.exportToCsv(profileId: 1, profileName: 'User');
+        ? await viewModel.exportToJson(
+            profileId: activeProfile.activeProfileId,
+            profileName: activeProfile.activeProfileName,
+          )
+        : await viewModel.exportToCsv(
+            profileId: activeProfile.activeProfileId,
+            profileName: activeProfile.activeProfileName,
+          );
     if (success && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Export completed successfully')),

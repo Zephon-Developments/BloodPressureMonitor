@@ -18,6 +18,7 @@ import 'package:blood_pressure_monitor/services/export_service.dart';
 import 'package:blood_pressure_monitor/services/import_service.dart';
 import 'package:blood_pressure_monitor/services/pdf_report_service.dart';
 import 'package:blood_pressure_monitor/services/app_info_service.dart';
+import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/analytics_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/history_viewmodel.dart';
@@ -88,11 +89,21 @@ void main() async {
   // Initialize auth service
   final authService = AuthService(prefs: prefs);
 
+  // Initialize profile service
+  final profileService = ProfileService();
+
+  // Initialize and load active profile
+  final activeProfileViewModel = ActiveProfileViewModel(
+    profileService: profileService,
+    prefs: prefs,
+  );
+  await activeProfileViewModel.loadInitial();
+
   runApp(
     MultiProvider(
       providers: [
         Provider<DatabaseService>.value(value: databaseService),
-        Provider<ProfileService>(create: (_) => ProfileService()),
+        Provider<ProfileService>.value(value: profileService),
         Provider<ReadingService>.value(value: readingService),
         Provider<AveragingService>.value(value: averagingService),
         Provider<HistoryService>.value(value: historyService),
@@ -108,6 +119,9 @@ void main() async {
         Provider<PdfReportService>.value(value: pdfReportService),
         Provider<SharedPreferences>.value(value: prefs),
         Provider<AuthService>.value(value: authService),
+        ChangeNotifierProvider<ActiveProfileViewModel>.value(
+          value: activeProfileViewModel,
+        ),
         ChangeNotifierProvider<LockViewModel>(
           create: (_) => LockViewModel(
             authService: authService,

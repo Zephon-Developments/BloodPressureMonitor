@@ -1,47 +1,77 @@
-# Review Feedback: Phase 10 - Export & Reports
+# Handoff: Clive → Georgina
 
-**Reviewer:** Clive
-**Date:** December 30, 2025
-**Status:** **BLOCKERS REMAINING**
+**Date:** December 30, 2025  
+**From:** Clive (Review Specialist)  
+**To:** Georgina (Implementer)  
+**Branch:** `feature/export-reports`  
+**Context:** Phase 10 Code Review Fixes (PR #21)
 
-## Summary
-The implementation of Phase 10 provides the core UI and service structure, but several critical logic gaps and quality issues must be addressed before merge. Most notably, the "Overwrite" import mode is not implemented, and test coverage for the new services is insufficient.
+---
 
-## Findings
+## Objective
 
-### 1. Blockers (Must be resolved)
+Implement the 6 fixes identified during the Phase 10 code review. These fixes address security vulnerabilities (CSV injection), stability issues (null pointer risks), and architectural debt (hardcoded profile IDs).
 
-#### 1.1 Missing Overwrite Logic in `ImportService`
-- **File:** [lib/services/import_service.dart](lib/services/import_service.dart)
-- **Issue:** The `conflictMode == ImportConflictMode.overwrite` logic is not implemented in `importFromJson` or `importFromCsv`.
-- **Impact:** Users selecting "Overwrite" will have data appended without duplicate checking, leading to a corrupted state instead of a clean restoration.
-- **Requirement:** Implement bulk deletion of existing data for the target profile before importing when `overwrite` is selected. You may need to add `deleteAllByProfile` methods to the respective services (`ReadingService`, `WeightService`, etc.).
+---
 
-#### 1.2 Insufficient Test Coverage
-- **Files:** [test/services/export_service_test.dart](test/services/export_service_test.dart), `test/services/import_service_test.dart` (missing), `test/services/pdf_report_service_test.dart` (missing).
-- **Issue:** The new services have almost no functional tests. `export_service_test.dart` only contains initialization stubs.
-- **Impact:** High risk of regressions in parsing logic, file generation, and conflict resolution.
-- **Requirement:** 
-    - Add comprehensive unit tests for `ImportService` (JSON/CSV parsing, duplicate detection, conflict resolution).
-    - Add functional tests for `ExportService` (verify JSON/CSV structure).
-    - Add unit tests for `PdfReportService` (verify data aggregation for the report).
+## Tasks
 
-### 2. Minor Issues (Should be resolved)
+### 1. Profile State Management
+- **Implement `ActiveProfileViewModel`**:
+  - Create `lib/viewmodels/active_profile_viewmodel.dart`.
+  - Manage `activeProfileId` and `activeProfileName`.
+  - Persist selection in `SharedPreferences`.
+  - Register in `MultiProvider` in `lib/main.dart`.
+- **Refactor Views**:
+  - Update `ExportView`, `ImportView`, and `ReportView` to consume `ActiveProfileViewModel`.
+  - Remove all hardcoded `profileId: 1` and `profileName: 'User'` literals.
 
-#### 2.1 Static Analysis Warnings
-- **File:** [test/views/home_view_test.dart](test/views/home_view_test.dart)
-- **Issue:** Two `require_trailing_commas` info issues.
-- **Requirement:** Fix these to achieve a completely clean `dart analyze` output.
+### 2. CSV Security (High Priority)
+- **Implement Sanitization**:
+  - Add `_sanitizeCsvCell(String?)` helper in `ExportService`.
+  - Prefix values starting with `=`, `+`, `-`, or `@` with a single quote `'`.
+  - Apply to all user-controlled text fields in CSV export (notes, tags, names, etc.).
+- **Unit Tests**:
+  - Add tests in `test/services/export_service_test.dart` specifically for formula injection cases.
 
-#### 2.2 Hardcoded App Version
-- **File:** [lib/services/export_service.dart](lib/services/export_service.dart)
-- **Issue:** `appVersion` is hardcoded as `'1.1.0'`.
-- **Requirement:** Use `package_info_plus` or a central configuration constant.
+### 3. Import UX Improvements
+- **Update `ImportView`**:
+  - Differentiate between Success, Partial Success (some errors), and Failure (all errors).
+  - Display the list of errors from `ImportResult.errors` when applicable.
+  - Use appropriate colors/icons for each state (Green/Yellow/Red).
 
-#### 2.3 Date Formatting in PDF
-- **File:** [lib/services/pdf_report_service.dart](lib/services/pdf_report_service.dart)
-- **Issue:** Uses `DateTime.now().toLocal().toString()` which is not user-friendly.
-- **Requirement:** Use `DateFormat` from `lib/utils/date_formats.dart` for consistency.
+### 4. Stability & Null Safety
+- **Update `ReportView`**:
+  - Add null checks for `_chartKey.currentContext` before attempting to capture the chart image.
+  - Gracefully handle cases where the chart is not yet rendered (e.g., show a SnackBar or error message instead of crashing).
 
-## Next Steps
-Georgina, please address the blockers above. Specifically, ensure the `overwrite` logic is fully functional and that we have at least 80% test coverage for the new services. Once fixed, please update the handoff for another review.
+---
+
+## Constraints & Standards
+
+- **Coding Standards**: Adhere strictly to [Documentation/Standards/Coding_Standards.md](Documentation/Standards/Coding_Standards.md).
+- **Testing**: Maintain or improve current test coverage. Ensure new logic is covered by unit or widget tests.
+- **Analyzer**: Zero warnings or errors.
+- **Branch**: Work on the existing `feature/export-reports` branch.
+
+---
+
+## Reference Materials
+
+- **Fix Plan**: [Documentation/Handoffs/Tracy_to_Clive.md](Documentation/Handoffs/Tracy_to_Clive.md)
+- **Review Summary**: [reviews/2025-12-30-clive-phase-10-fix-plan-review.md](reviews/2025-12-30-clive-phase-10-fix-plan-review.md)
+- **Original PR**: [PR #21](https://github.com/Zephon-Development/BloodPressureMonitor/pull/21)
+
+---
+
+## Success Metrics
+
+1. All 6 code review comments are addressed and verified.
+2. CSV exports are safe from formula injection.
+3. Multi-profile support is functional in export/import/report flows.
+4. Import results are clear and accurate.
+5. No runtime crashes during PDF generation.
+
+---
+
+**Next Action:** Georgina to implement the fixes as outlined.

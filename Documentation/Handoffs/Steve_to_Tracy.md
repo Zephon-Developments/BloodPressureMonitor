@@ -1,296 +1,166 @@
-# Steve → Tracy Handoff: Phase 10 Planning
+# Handoff: Steve → Tracy
 
-**Date:** December 30, 2025  
-**From:** Steve (Conductor)  
-**To:** Tracy (Planning Specialist)  
-**Task:** Create comprehensive implementation plan for Phase 10: Export & Reports
-
----
-
-## Executive Summary
-
-Phase 9 (Edit & Delete Functionality) has been successfully merged to main via PR #20. All 612 tests passing, zero static analysis issues. The application now has complete CRUD operations for all health entry types with accessibility-focused UX.
-
-**Your Mission:** Develop a detailed implementation plan for Phase 10 (Export & Reports) covering CSV/JSON export/import functionality and PDF doctor report generation. The plan must reference [Coding_Standards.md](../Standards/Coding_Standards.md) and follow the phased delivery approach established in previous phases. Establish a new branch for the development to be conducted in.
+**Date**: December 30, 2025  
+**Context**: Phase 10 Code Review Fixes  
+**Branch**: feature/export-reports  
+**Commit**: f55c620
 
 ---
 
-## Project Status
+## Objective
 
-### Completed Phases (1-9)
-✅ **Phase 1:** Core Data Layer (encrypted SQLite with sqflite_sqlcipher)  
-✅ **Phase 2A/2B:** Averaging Engine & Validation (30-min rolling groups, bounds checking)  
-✅ **Phase 3:** Medication Management (CRUD, group intake, schedule context)  
-✅ **Phase 4:** Weight & Sleep (entries with correlation hooks)  
-✅ **Phase 5:** App Security Gate (PIN/biometric lock, idle timer)  
-✅ **Phase 6:** UI Foundation (home, add reading form, profile switcher)  
-✅ **Phase 7:** History View (avg-first with expandable raw entries, pagination)  
-✅ **Phase 8:** Charts & Analytics (BP/pulse charts, stats cards, sleep overlay, caching)  
-✅ **Phase 9:** Edit & Delete (CRUD for all entries, swipe-to-delete, confirmations)
-
-### Current Architecture Overview
-
-**State Management:** Provider pattern  
-**Database:** sqflite_sqlcipher (encrypted SQLite)  
-**Test Coverage:** 612/612 passing (Models/Utils ~90%, Services ~84%, ViewModels ~88%, Widgets ~77%)  
-**Key Dependencies:**
-- flutter_slidable: ^3.1.0 (swipe gestures)
-- fl_chart: (charting)
-- shared_preferences: (app settings)
-- local_auth: (biometric)
-
-**Data Models:**
-- `BloodPressureReading` (systolic, diastolic, pulse, timestamp, notes, tags, arm, posture)
-- `ReadingGroup` (averaged 30-min sessions)
-- `WeightEntry` (kg, timestamp, notes on salt/exercise/stress/sleep)
-- `SleepEntry` (date, hours, quality, source metadata)
-- `Medication` / `MedicationGroup` / `MedicationIntake`
-- `ChartDataSet`, `HealthStats`, `ChartPoint` (analytics models)
-
-**Services Layer:**
-- `BloodPressureService` (CRUD + averaging engine)
-- `WeightService`, `SleepService` (CRUD)
-- `MedicationService` (CRUD, group intake logging)
-- `AnalyticsService` (data aggregation with caching)
-- `DatabaseService` (encrypted DB provider)
-
-**ViewModels:**
-- `BloodPressureViewModel` (readings CRUD, session override)
-- `WeightViewModel`, `SleepViewModel` (CRUD)
-- `MedicationViewModel` (CRUD, intake tracking)
-- `AnalyticsViewModel` (chart data, time ranges, cache management)
-
-**UI Components:**
-- Home view with recent readings card (swipe-to-delete)
-- History view (averaged rows with expandable raw entries, filters, pagination)
-- Add/Edit forms for BP, weight, sleep (validation, accessibility)
-- Analytics view (charts, stats cards, time range selector)
-- ConfirmDeleteDialog (reusable, accessibility-compliant)
+GitHub Copilot code review identified 6 issues in the Phase 10 (Export & Reports) implementation that need to be addressed before the PR can be merged to main. These are not breaking bugs but represent technical debt and potential security/usability issues that should be resolved.
 
 ---
 
-## Phase 10 Scope: Export & Reports
+## Scope
 
-### High-Level Requirements
+### Issues Identified
 
-From [Implementation_Schedule.md](../Plans/Implementation_Schedule.md):
+1. **Hardcoded Profile IDs** (4 occurrences)
+   - [lib/views/import_view.dart](lib/views/import_view.dart#L224-L225): `profileId: 1` in importData call
+   - [lib/views/report_view.dart](lib/views/report_view.dart#L182-L183): `profileId: 1, profileName: 'User'` in PDF generation
+   - [lib/views/export_view.dart](lib/views/export_view.dart#L152-L153): `profileId: 1, profileName: 'User'` in JSON/CSV export
+   - **Impact**: Breaks multi-profile functionality; data will always export/import to profile 1 regardless of active profile
+   - **Severity**: Medium - functional issue affecting multi-profile users
 
-> **Phase 10: Export & Reports**  
-> **Scope**: CSV/JSON export/import; PDF doctor report.
-> 
-> **Tasks:**
-> - Local-only CSV/JSON export/import; conflict handling basic (overwrite/append strategy).
-> - PDF report for last 30/90 days: profile info, date range, averages, chart snapshot, meds/intake notes, irregular flags; disclaimer.
-> - Integration tests for export/import round-trip; PDF generation smoke tests.
-> 
-> **Dependencies**: Phases 1–4, 7–9 for data/views.
-> 
-> **Acceptance**:
-> - Successful round-trip for CSV/JSON; PDF generated offline; tests pass.
-> 
-> **Rollback point**: Export only (defer PDF) if needed.
+2. **Inconsistent Error Messaging** (1 occurrence)
+   - [lib/views/import_view.dart](lib/views/import_view.dart#L135-L141): Shows "Import Successful!" even when errors exist
+   - **Impact**: Misleading UX when partial imports occur (some records succeed, others fail)
+   - **Severity**: Low - UX issue, not data integrity issue
+   - **Expected Behavior**: Show "Partial Import" or "Import Completed with Errors" when `errors.isNotEmpty`
 
-### User Stories (Inferred)
+3. **Null Pointer Exception Risk** (1 occurrence)
+   - [lib/views/report_view.dart](lib/views/report_view.dart#L170-L171): Using `!` on `_chartKey.currentContext` without null check
+   - **Impact**: Runtime crash if widget hasn't rendered or is disposed when generating PDF
+   - **Severity**: Medium - could cause app crashes in edge cases
+   - **Expected Behavior**: Add null check before accessing RenderRepaintBoundary
 
-1. **As a user**, I want to export my blood pressure readings to CSV/JSON so I can back up my data or share with other apps.
-2. **As a user**, I want to import readings from CSV/JSON so I can restore backups or migrate from another system.
-3. **As a user**, I want to generate a PDF report of my last 30/90 days so I can share comprehensive health data with my doctor.
-4. **As a user**, I want the PDF to include charts, averages, medication notes, and any irregular readings flagged.
-5. **As a user**, I want export/import to handle conflicts gracefully (overwrite vs append strategy).
-
-### Technical Considerations
-
-**Export/Import:**
-- **Scope:** Blood pressure readings, weight entries, sleep entries, medications, medication intakes
-- **Formats:** CSV (human-readable, Excel-compatible) and JSON (structured, complete)
-- **Conflict Resolution:** User selects overwrite (replace all) or append (merge with duplicates prevention by timestamp+type)
-- **Validation:** Import must validate data integrity (required fields, bounds checking, date parsing)
-- **Error Handling:** Clear user feedback on malformed files, validation failures, partial imports
-
-**PDF Generation:**
-- **Time Ranges:** 30 days, 90 days (user-selectable)
-- **Content Sections:**
-  1. Header: Profile name, report date range, generation timestamp
-  2. Summary Stats: Average BP, min/max, pulse avg, weight trend, sleep avg
-  3. Charts: BP trend chart (same as analytics view), pulse chart
-  4. Data Table: Raw readings with timestamps (condensed view)
-  5. Medications: List of active meds + intake compliance/notes
-  6. Irregular Flags: Readings outside normal ranges highlighted
-  7. Footer: Medical disclaimer (not diagnostic, consult healthcare provider)
-- **Offline:** Must work without internet; generate on-device
-- **Sharing:** Save to file system + share intent for email/cloud
-- **Chart Rendering:** Rasterize fl_chart widgets or use PDF-native drawing
-
-**Dependencies:**
-- **csv:** ^6.0.0 (CSV parsing/generation)
-- **pdf:** ^3.11.0 (PDF document creation)
-- **path_provider:** (already in pubspec, file system access)
-- **share_plus:** (sharing generated files)
-- **printing:** ^5.12.0 (optional: layout helpers for PDF)
+4. **CSV Formula Injection Vulnerability** (1 occurrence)
+   - [lib/services/export_service.dart](lib/services/export_service.dart#L139-L170): User-controlled text fields written directly to CSV without sanitization
+   - **Impact**: Security risk - fields starting with `=`, `+`, `-`, `@` could execute as formulas when opened in Excel/Sheets
+   - **Severity**: High - security vulnerability (CSV injection attack vector)
+   - **Affected Fields**: `r.note`, `r.tags`, `w.notes`, medication names, sleep notes, etc.
+   - **Expected Behavior**: Escape/sanitize all user-controlled text before writing to CSV
 
 ---
 
-## Planning Requirements
+## Constraints
 
-### Your Deliverables
-
-Create a comprehensive plan document: `Documentation/Plans/Phase_10_Export_Reports_Plan.md`
-
-**Required Sections:**
-
-1. **Overview**
-   - Phase objectives and user value
-   - Success criteria and acceptance tests
-   - Rollback strategy (export-only vs full PDF)
-
-2. **Technical Design**
-   - Export/Import architecture (services, UI flows, file formats)
-   - PDF generation pipeline (data aggregation → rendering → file creation)
-   - Conflict resolution strategies (overwrite/append UI + logic)
-   - File format specifications (CSV columns, JSON schema)
-   - Error handling and validation approach
-
-3. **Implementation Tasks**
-   - Broken down by logical units (export service, import UI, PDF service, report view)
-   - Dependencies between tasks clearly marked
-   - Estimated complexity/risk per task
-
-4. **Data Model Changes**
-   - Any new models needed (e.g., `ExportConfig`, `ReportMetadata`)
-   - Schema migrations if database changes required (likely none)
-
-5. **UI/UX Specifications**
-   - Export/Import screens (button placement, progress indicators, error dialogs)
-   - PDF report preview/share flow
-   - Conflict resolution dialogs (radio buttons for overwrite/append)
-
-6. **Testing Strategy**
-   - Unit tests for export/import services (round-trip validation)
-   - Widget tests for new screens
-   - Integration tests for full export → import cycle
-   - PDF smoke tests (verify generation, check content sections)
-
-7. **Coding Standards Compliance**
-   - Reference specific sections of [Coding_Standards.md](../Standards/Coding_Standards.md)
-   - Security considerations (file permissions, sensitive data in exports)
-   - Performance (large dataset exports, memory management)
-
-8. **Dependencies & Risks**
-   - New pub dependencies with version constraints
-   - Platform-specific considerations (file picker, sharing on iOS/Android)
-   - Edge cases (empty datasets, corrupted import files, disk space)
-
-9. **Acceptance Criteria**
-   - Specific, measurable, testable criteria
-   - Coverage targets (≥85% services, ≥70% widgets)
-   - Must align with [Implementation_Schedule.md](../Plans/Implementation_Schedule.md) phase 10 acceptance
-
-10. **Handoff Notes**
-    - What information Clive needs to review this plan
-    - What context the implementer (Georgina or Claudette) will need
-    - Any open questions for stakeholder clarification
+- **No Breaking Changes**: Fixes must maintain backward compatibility with existing data
+- **Test Coverage**: All fixes must include unit/widget tests demonstrating the issue is resolved
+- **Analyzer Clean**: No new warnings or errors introduced
+- **Minimal Scope**: Only fix the identified issues; no additional refactoring or feature additions
+- **Branch**: Continue working on `feature/export-reports` branch
+- **Standards Compliance**: Follow [Documentation/Standards/Coding_Standards.md](Documentation/Standards/Coding_Standards.md)
 
 ---
 
-## Coding Standards Reference
+## Success Metrics
 
-Key sections to incorporate from [Coding_Standards.md](../Standards/Coding_Standards.md):
+1. **Profile ID Resolution**:
+   - All export/import/report operations use the actual active profile ID from application state
+   - No hardcoded profile IDs remain in Phase 10 code
+   - Multi-profile functionality verified via tests
 
-- **Section 2:** Git Workflow (feature branch naming, commit messages, CI requirements)
-- **Section 3:** Code Organization (service layer patterns, separation of concerns)
-- **Section 4:** Error Handling (defensive programming, user-friendly messages, logging)
-- **Section 5:** Testing (coverage targets, test structure, mocking)
-- **Section 6:** Documentation (DartDoc requirements, inline comments for complex logic)
-- **Section 7:** Security (sensitive data handling, file permissions, encryption at rest)
-- **Section 9:** Performance (lazy loading, memory management, large file handling)
+2. **Error Messaging**:
+   - Import result dialog accurately reflects partial success states
+   - Shows distinct messages for: full success, partial success, full failure
 
----
+3. **Null Safety**:
+   - No null assertion operators (`!`) used without proper null checks
+   - PDF generation gracefully handles widget lifecycle edge cases
 
-## Context for Tracy
+4. **CSV Security**:
+   - All user-controlled text fields sanitized before CSV export
+   - Formula injection attack vectors eliminated
+   - Sanitization preserves data readability (minimal impact on legitimate content)
 
-### Recent Workflow Artifacts
-- Phase 9 Plan: `Documentation/Plans/Phase_9_Edit_Delete_Plan.md`
-- Phase 9 Review: `Documentation/archive/reviews/2025-12-30-clive-phase-9-plan-review.md`
-- Phase 9 Completion: `Documentation/archive/WORKFLOW_COMPLETION_2025-12-30_Phase-9.md`
-
-These documents demonstrate the expected structure, detail level, and format for plans.
-
-### Implementation Patterns from Phase 9
-- **Service Layer:** CRUD methods with error handling (returns `String?` for errors)
-- **ViewModel Layer:** Wraps services, manages UI state, calls `notifyListeners()`
-- **Provider Extensions:** `refreshAnalyticsData()` pattern for cache invalidation
-- **Reusable Widgets:** `ConfirmDeleteDialog` sets precedent for reusable components
-- **Accessibility:** Semantics labels on all interactive elements
-- **BuildContext Safety:** Mounted checks before navigation after async operations
-
-Apply similar patterns for export/import services and PDF generation.
-
-### Key Stakeholder Expectations
-- **Security:** Export files may contain sensitive health data; warn users, consider encryption options
-- **UX:** Progress indicators for long operations (large exports, PDF generation)
-- **Reliability:** Validate imports thoroughly; don't corrupt existing data
-- **Offline:** All functionality must work without internet
-- **Testability:** Round-trip validation (export → import → verify data integrity)
+5. **Testing**:
+   - Unit tests demonstrate CSV sanitization works correctly
+   - Widget tests verify error messaging for all import scenarios
+   - Tests confirm profile ID propagation from state to services
 
 ---
 
-## Timeline & Next Steps
+## Dependencies
 
-**Immediate:** Tracy creates Phase 10 plan (target completion: within this session)  
-**Next:** Clive reviews plan against Coding Standards and project requirements  
-**Then:** Handoff to Georgina or Claudette for implementation  
-**Finally:** Steve integrates, deploys, and manages PR workflow
+### Application State Context
+The app currently uses a simple profile system. Need to investigate:
+- How is the active profile ID currently tracked? (Provider? Singleton? Service?)
+- Where should export/import/report views retrieve the active profile?
+- Are there existing patterns in other views (analytics, history, home) that retrieve profile context?
 
----
+**Research Required**: Examine [lib/views/home_view.dart](lib/views/home_view.dart), [lib/viewmodels/blood_pressure_viewmodel.dart](lib/viewmodels/blood_pressure_viewmodel.dart), and related files to understand current profile management patterns.
 
-## Questions for Tracy to Address in Plan
-
-1. **CSV Format:** What columns? How to handle optional fields (arm, posture, notes, tags)?
-2. **JSON Schema:** Nested structure for grouped readings? Include metadata (export date, app version)?
-3. **Conflict Resolution:** How to detect duplicates? Match on timestamp+type? Tolerance window?
-4. **PDF Charts:** Rasterize widgets or draw native PDF graphics? Image quality considerations?
-5. **File Naming:** Convention for exported files (timestamp, profile name, date range)?
-6. **Import Validation:** Strict mode (reject on any error) vs lenient (skip invalid rows with report)?
-7. **Progress Feedback:** Streaming updates for large exports? Background job or block UI?
-8. **Platform Differences:** File picker behavior on iOS vs Android? Share intent differences?
+### Related Files
+- **Services**: [lib/services/export_service.dart](lib/services/export_service.dart), [lib/services/import_service.dart](lib/services/import_service.dart), [lib/services/pdf_report_service.dart](lib/services/pdf_report_service.dart)
+- **ViewModels**: [lib/viewmodels/export_viewmodel.dart](lib/viewmodels/export_viewmodel.dart), [lib/viewmodels/import_viewmodel.dart](lib/viewmodels/import_viewmodel.dart), [lib/viewmodels/report_viewmodel.dart](lib/viewmodels/report_viewmodel.dart)
+- **Views**: [lib/views/export_view.dart](lib/views/export_view.dart), [lib/views/import_view.dart](lib/views/import_view.dart), [lib/views/report_view.dart](lib/views/report_view.dart)
+- **Tests**: All corresponding test files in `test/` directory
 
 ---
 
-## Reference Documents
+## Blockers / Risks
 
-- [Implementation_Schedule.md](../Plans/Implementation_Schedule.md) - Phase 10 scope and acceptance
-- [Coding_Standards.md](../Standards/Coding_Standards.md) - All coding requirements
-- [Phase_9_Edit_Delete_Plan.md](../Plans/Phase_9_Edit_Delete_Plan.md) - Template for plan structure
-- [PROJECT_SUMMARY.md](../../PROJECT_SUMMARY.md) - Overall project context
-- [SECURITY.md](../../SECURITY.md) - Security requirements for sensitive data
+### Risk: Profile State Architecture Unknown
+**Concern**: Don't know how profile state is currently managed in the application.  
+**Mitigation**: Tracy should research existing patterns before planning the fix.
 
----
+### Risk: CSV Sanitization Over-Aggressive
+**Concern**: Sanitizing CSV fields might corrupt legitimate data (e.g., mathematical expressions in notes).  
+**Mitigation**: Use minimal escaping (e.g., prefix with single quote `'` for Excel) that preserves data but prevents formula execution.
 
-## Success Criteria for This Handoff
-
-Tracy's plan is ready for Clive review when it:
-1. ✅ Addresses all Phase 10 requirements from Implementation_Schedule.md
-2. ✅ References Coding_Standards.md in technical design decisions
-3. ✅ Includes clear acceptance criteria and testing strategy
-4. ✅ Breaks tasks into implementable units with dependencies
-5. ✅ Anticipates edge cases and risks
-6. ✅ Specifies UI/UX flows with sufficient detail for implementation
-7. ✅ Maintains consistency with established project patterns
+### Risk: Breaking Import Compatibility
+**Concern**: CSV sanitization might make exported files incompatible with previously exported data.  
+**Mitigation**: Apply sanitization ONLY on export; import should handle both sanitized and unsanitized data gracefully.
 
 ---
 
-## Tracy's Action Items
+## Next Steps for Tracy
 
-1. **Read Reference Documents:** Implementation_Schedule.md (Phase 10 section), Coding_Standards.md (sections 2-7, 9), Phase_9_Edit_Delete_Plan.md (structure template)
-2. **Create Plan Document:** `Documentation/Plans/Phase_10_Export_Reports_Plan.md` with all required sections
-3. **Address Planning Questions:** Answer the 8 questions listed above with technical decisions
-4. **Generate Handoff to Clive:** `Documentation/Handoffs/Tracy_to_Clive.md` requesting plan review
-5. **Notify User:** Inform user that plan is ready for Clive review with suggested continuation prompt
+1. **Research Phase**: 
+   - Investigate how profile state is currently managed (check HomeView, ViewModels, Services)
+   - Review CODING_STANDARDS.md for state management patterns
+   - Research CSV injection best practices for Flutter/Dart
+
+2. **Planning Phase**:
+   - Create detailed plan for profile ID propagation (state → ViewModel → View → Service)
+   - Design CSV sanitization strategy (which fields, what escaping method)
+   - Plan error messaging enhancements for import result dialog
+   - Specify null safety approach for RenderRepaintBoundary access
+
+3. **Handoff to Clive**:
+   - Present plan with code examples for each fix
+   - Include test strategy for validating fixes
+   - Reference CODING_STANDARDS.md sections that apply
 
 ---
 
-**End of Handoff**
+## Context Files
 
-Tracy, you have complete autonomy to make technical decisions within the constraints of Coding_Standards.md and project architecture. Focus on creating a practical, implementable plan that maintains the quality bar established in Phases 1-9.
+- **Original Phase 10 Plan**: Completed and implemented (commit f159db6)
+- **Phase 10 Implementation**: Committed to feature/export-reports
+- **Implementation Schedule**: [Documentation/Plans/Implementation_Schedule.md](Documentation/Plans/Implementation_Schedule.md)
+- **Coding Standards**: [Documentation/Standards/Coding_Standards.md](Documentation/Standards/Coding_Standards.md)
+- **Active PR**: https://github.com/Zephon-Development/BloodPressureMonitor/pull/21
 
-The user is waiting for your plan. Please proceed with Phase 10 planning now.
+---
+
+## Notes
+
+- This is a **fix/polish** task, not new feature development
+- These issues were caught in code review BEFORE merging to main - good catch!
+- All fixes should be committed to the existing `feature/export-reports` branch
+- After implementation and Clive approval, Steve will update the PR and proceed with merge
+- PR #21 is currently open and waiting for these fixes before final merge
+
+---
+
+**Handoff Target**: Tracy (Planning Agent)  
+**Next Action**: Research profile state management and create fix plan  
+**Expected Output**: `Tracy_to_Clive.md` with detailed fix plan for review
+
+---
+
+**Prompt for User**: "Please continue as Tracy to research the profile state management and create a comprehensive fix plan for the code review issues."

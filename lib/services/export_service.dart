@@ -34,6 +34,30 @@ class ExportService {
         _intakeService = intakeService,
         _appInfoService = appInfoService ?? const AppInfoService();
 
+  /// Sanitizes a CSV cell value to prevent formula injection.
+  ///
+  /// Prefixes values starting with `=`, `+`, `-`, or `@` with a single quote
+  /// to prevent them from being interpreted as formulas in spreadsheet software.
+  /// This mitigates CSV injection attacks while preserving data readability.
+  ///
+  /// Returns null if the input is null, otherwise returns the sanitized string.
+  String? _sanitizeCsvCell(String? value) {
+    if (value == null || value.isEmpty) return value;
+
+    final trimmed = value.trimLeft();
+    if (trimmed.isEmpty) return value;
+
+    final firstChar = trimmed[0];
+    if (firstChar == '=' ||
+        firstChar == '+' ||
+        firstChar == '-' ||
+        firstChar == '@') {
+      return "'$value";
+    }
+
+    return value;
+  }
+
   /// Generates a standardized filename for export files.
   String generateFilename({
     required String profileName,
@@ -161,12 +185,12 @@ class ExportService {
           r.pulse,
           r.takenAt.toIso8601String(),
           r.localOffsetMinutes,
-          r.posture,
-          r.arm,
-          r.medsContext,
+          _sanitizeCsvCell(r.posture),
+          _sanitizeCsvCell(r.arm),
+          _sanitizeCsvCell(r.medsContext),
           r.irregularFlag ? 1 : 0,
-          r.tags,
-          r.note,
+          _sanitizeCsvCell(r.tags),
+          _sanitizeCsvCell(r.note),
         ]);
       }
       rows.add([]); // Empty line
@@ -194,15 +218,15 @@ class ExportService {
         rows.add([
           w.id,
           w.weightValue,
-          w.unit.toDbString(),
+          _sanitizeCsvCell(w.unit.toDbString()),
           w.takenAt.toIso8601String(),
           w.localOffsetMinutes,
-          w.notes,
-          w.saltIntake,
-          w.exerciseLevel,
-          w.stressLevel,
-          w.sleepQuality,
-          w.source,
+          _sanitizeCsvCell(w.notes),
+          _sanitizeCsvCell(w.saltIntake),
+          _sanitizeCsvCell(w.exerciseLevel),
+          _sanitizeCsvCell(w.stressLevel),
+          _sanitizeCsvCell(w.sleepQuality),
+          _sanitizeCsvCell(w.source),
           w.createdAt.toIso8601String(),
         ]);
       }
@@ -238,8 +262,8 @@ class ExportService {
           s.lightMinutes,
           s.remMinutes,
           s.awakeMinutes,
-          s.notes,
-          s.source.toDbString(),
+          _sanitizeCsvCell(s.notes),
+          _sanitizeCsvCell(s.source.toDbString()),
           s.createdAt.toIso8601String(),
         ]);
       }
@@ -264,10 +288,10 @@ class ExportService {
       for (final m in medications) {
         rows.add([
           m.id,
-          m.name,
-          m.dosage,
-          m.unit,
-          m.frequency,
+          _sanitizeCsvCell(m.name),
+          _sanitizeCsvCell(m.dosage),
+          _sanitizeCsvCell(m.unit),
+          _sanitizeCsvCell(m.frequency),
           m.isActive ? 1 : 0,
           m.createdAt.toIso8601String(),
         ]);
@@ -293,7 +317,7 @@ class ExportService {
           i.localOffsetMinutes,
           i.scheduledFor?.toIso8601String(),
           i.groupId,
-          i.note,
+          _sanitizeCsvCell(i.note),
         ]);
       }
       rows.add([]); // Empty line
