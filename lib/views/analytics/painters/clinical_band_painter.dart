@@ -17,7 +17,10 @@ class ClinicalBandPainter extends CustomPainter {
       _Band(color: Colors.amber.withValues(alpha: 0.15), start: 135, end: 149),
       _Band(color: Colors.orange.withValues(alpha: 0.2), start: 150, end: 169),
       _Band(
-          color: Colors.red.withValues(alpha: 0.25), start: 170, end: maxValue),
+        color: Colors.red.withValues(alpha: 0.25),
+        start: 170,
+        end: maxValue,
+      ),
     ];
 
     for (final band in bands) {

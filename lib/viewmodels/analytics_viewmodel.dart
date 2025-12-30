@@ -95,8 +95,10 @@ class AnalyticsViewModel extends ChangeNotifier {
   }
 
   /// Loads analytics for the selected range, leveraging cache where possible.
-  Future<void> loadData(
-      {bool forceRefresh = false, bool forceOverlayRefresh = false}) async {
+  Future<void> loadData({
+    bool forceRefresh = false,
+    bool forceOverlayRefresh = false,
+  }) async {
     if (_isLoading) {
       return;
     }
