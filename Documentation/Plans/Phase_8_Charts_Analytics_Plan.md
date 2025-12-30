@@ -4,12 +4,13 @@
 - Deliver interactive blood pressure charts with clinical banding for systolic, diastolic, and pulse metrics.
 - Provide statistical summaries (min/avg/max, variability, morning/evening split) in accessible card format.
 - Support time-range filtering (7d, 30d, 90d, 1y, all-time) with smooth data transitions.
-- Optional sleep quality correlation overlay for enhanced pattern recognition.
+- Normalize sleep data to include morning-after date, get-up time, and stage durations (deep, light, REM, awake) for correlation and visualization.
+- Deliver a stacked area chart for sleep stages alongside BP charts.
 - Maintain performance with large datasets (1000+ readings) through efficient queries and caching.
 - Achieve coverage targets: Services/ViewModels ≥85%, Widgets ≥70%.
 
 ## Scope & Assumptions
-- **In-scope**: Chart widgets with clinical banding, statistics dashboard, time-range selectors, morning/evening split, sleep correlation overlay, analytics service layer, viewmodel orchestration, comprehensive testing.
+- **In-scope**: Chart widgets with clinical banding, statistics dashboard, time-range selectors, morning/evening split, sleep correlation overlay, sleep stage data prep (date/get-up/stages), analytics service layer, viewmodel orchestration, comprehensive testing.
 - **Out-of-scope**: Predictive analytics, health advice, export/PDF generation (Phase 9), medication correlation charts (future enhancement).
 - **Assumptions**: 
   - Averaging engine (Phase 2) provides stable grouped data
@@ -20,11 +21,11 @@
 
 ## Dependencies
 - **Phase 2**: Averaging engine and `ReadingGroup` model
-- **Phase 4**: `SleepEntry` model and `SleepService` for correlation
+- **Phase 4**: `SleepEntry` model and `SleepService` for correlation (requires schema extension for stage breakdown and get-up time)
 - **Phase 6**: Navigation shell and Material 3 theme
 - **Phase 7**: Pagination patterns and service architecture
 - **External**: `fl_chart` package for chart rendering
-- **Standards**: [Documentation/Standards/Coding_Standards.md](../Standards/Coding_Standards.md) compliance
+- **Standards**: [Documentation/Standards/Coding_Standards.md](../Standards/Coding_Standards.md) compliance; migration plan for sleep schema changes
 
 ---
 
@@ -41,6 +42,9 @@ New service at `lib/services/analytics_service.dart`:
 - Classify readings by time-of-day (morning vs evening)
 - Prepare chart data points with efficient sampling
 - Correlate sleep data with morning readings
+- Aggregate sleep stage breakdowns per session (deep, light, REM, awake),
+  aligned to the morning-after date and get-up time
+- Produce stacked-area-ready series for sleep stages
 
 **Key Methods**:
 ```dart
@@ -70,6 +74,13 @@ class AnalyticsService {
   
   // Sleep correlation
   Future<SleepCorrelationData> getSleepCorrelation({
+    required int profileId,
+    required DateTime startDate,
+    required DateTime endDate,
+  });
+
+  // Sleep stage stacked area data
+  Future<SleepStageSeries> getSleepStageSeries({
     required int profileId,
     required DateTime startDate,
     required DateTime endDate,
@@ -111,10 +122,25 @@ class ChartPoint {
   final int? groupId;
 }
 
+class SleepStageBreakdown {
+  final DateTime sessionDate; // Morning-after date (endedAt local date)
+  final DateTime? getUpTime;  // endedAt timestamp
+  final int deepMinutes;
+  final int lightMinutes;
+  final int remMinutes;
+  final int awakeMinutes;
+}
+
+class SleepStageSeries {
+  final List<SleepStageBreakdown> stages;
+  final bool hasIncompleteSessions; // True if any stage data missing
+}
+
 class SleepCorrelationData {
   final Map<DateTime, SleepQuality> sleepByDate;
   final Map<DateTime, ReadingGroup> morningReadings;
   final List<CorrelationPoint> correlationPoints;
+  final SleepStageSeries stageSeries;
 }
 ```
 
@@ -147,6 +173,7 @@ class AnalyticsViewModel extends ChangeNotifier {
   HealthStats? _stats;
   ChartDataSet? _chartData;
   SleepCorrelationData? _sleepData;
+  SleepStageSeries? _sleepStages;
   bool _isLoading = false;
   String? _error;
   bool _showSleepOverlay = false;
@@ -155,6 +182,7 @@ class AnalyticsViewModel extends ChangeNotifier {
   TimeRange get selectedRange => _selectedRange;
   HealthStats? get stats => _stats;
   ChartDataSet? get chartData => _chartData;
+  SleepStageSeries? get sleepStages => _sleepStages;
   bool get isLoading => _isLoading;
   String? get error => _error;
   bool get hasData => _chartData?.systolicPoints.isNotEmpty ?? false;
@@ -184,12 +212,21 @@ class AnalyticsViewModel extends ChangeNotifier {
             startDate: startDate,
             endDate: endDate,
           ),
+        if (_showSleepOverlay)
+          _analyticsService.getSleepStageSeries(
+            profileId: profileId,
+            startDate: startDate,
+            endDate: endDate,
+          ),
       ]);
       
       _stats = results[0] as HealthStats;
       _chartData = results[1] as ChartDataSet;
       if (_showSleepOverlay && results.length > 2) {
         _sleepData = results[2] as SleepCorrelationData;
+        _sleepStages = results.length > 3
+            ? results[3] as SleepStageSeries
+            : null;
       }
     } catch (e) {
       _error = 'Failed to load analytics data';
@@ -257,6 +294,7 @@ lib/views/analytics/
 │   ├── stats_card_grid.dart      # Statistics summary cards
 │   ├── bp_line_chart.dart        # Systolic + diastolic combo chart
 │   ├── pulse_line_chart.dart     # Pulse trend chart
+│   ├── sleep_stacked_area_chart.dart # Sleep stages stacked area
 │   ├── chart_legend.dart         # Clinical band legend
 │   ├── morning_evening_card.dart # AM/PM split stats
 │   ├── sleep_overlay_toggle.dart # Toggle for sleep correlation
@@ -322,6 +360,9 @@ class AnalyticsView extends StatelessWidget {
                   const BpLineChart(),
                   const SizedBox(height: 24),
                   const PulseLineChart(),
+                  const SizedBox(height: 24),
+                  if (viewModel.showSleepOverlay)
+                    const SleepStackedAreaChart(),
                   const SizedBox(height: 24),
                   const MorningEveningCard(),
                 ],
@@ -647,6 +688,49 @@ class MorningEveningCard extends StatelessWidget {
 }
 ```
 
+### SleepStackedAreaChart
+Stacked area visualization for sleep stages (deep, light, REM, awake), aligned
+to the morning-after date and get-up time:
+
+```dart
+class SleepStackedAreaChart extends StatelessWidget {
+  const SleepStackedAreaChart({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<AnalyticsViewModel>(
+      builder: (context, viewModel, _) {
+        final stages = viewModel.sleepStages;
+        if (stages == null) return const SizedBox.shrink();
+
+        return AspectRatio(
+          aspectRatio: 1.6,
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: StackedAreaChart(
+                series: stages.stages,
+                showLegend: true,
+                hasIncompleteData: stages.hasIncompleteSessions,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+```
+
+**Notes**:
+- X-axis uses morning-after date (from `endedAt` local date) and optionally
+  renders a marker for get-up time.
+- Y-axis uses minutes; stacked to total sleep duration for that session.
+- Legend colors: deep (navy), light (blue), REM (purple), awake (red, low
+  opacity).
+- Supports partial data (imports without stage breakdown) via `hasIncompleteData`
+  banner.
+
 ### Sleep Correlation Overlay
 Optional chart annotation showing sleep quality:
 
@@ -655,6 +739,8 @@ Optional chart annotation showing sleep quality:
 - Color-code by sleep quality (poor red, fair yellow, good green)
 - Show tooltip with sleep hours and quality on tap
 - Maintain chart readability (semi-transparent markers)
+- Drive stacked area series from `SleepStageSeries` (deep/light/REM/awake) and
+  align annotations to the morning-after date and get-up time.
 
 ---
 
@@ -936,6 +1022,42 @@ group('AnalyticsService', () {
       expect(correlation.correlationPoints.length, 1);
     });
   });
+
+  group('getSleepStageSeries', () {
+    test('aggregates stage minutes and flags incomplete data', () async {
+      when(mockSleepService.getEntriesInRange(any, any, any))
+          .thenAnswer((_) async => [
+                SleepEntry(
+                  id: 1,
+                  profileId: 1,
+                  startedAt: DateTime(2025, 1, 1, 22),
+                  endedAt: DateTime(2025, 1, 2, 6, 30),
+                  deepMinutes: 120,
+                  lightMinutes: 180,
+                  remMinutes: 60,
+                  awakeMinutes: 30,
+                ),
+                SleepEntry(
+                  id: 2,
+                  profileId: 1,
+                  startedAt: DateTime(2025, 1, 2, 23),
+                  endedAt: DateTime(2025, 1, 3, 7),
+                  durationMinutes: 480, // Missing stages
+                ),
+              ]);
+
+      final series = await service.getSleepStageSeries(
+        profileId: 1,
+        startDate: DateTime(2025, 1, 1),
+        endDate: DateTime(2025, 1, 4),
+      );
+
+      expect(series.stages.length, 2);
+      expect(series.stages.first.sessionDate, DateTime(2025, 1, 2));
+      expect(series.stages.first.deepMinutes, 120);
+      expect(series.hasIncompleteSessions, true);
+    });
+  });
 });
 ```
 
@@ -950,6 +1072,7 @@ File: `test/viewmodels/analytics_viewmodel_test.dart`
 - Error state exposed when service throws
 - Cache invalidation on new reading event
 - Sleep overlay toggle updates state
+- Sleep stage series available when overlay enabled
 - Empty data state handled gracefully
 
 ### Widget Tests (Target: ≥70% coverage)
@@ -992,6 +1115,8 @@ group('AnalyticsView', () {
     when(mockViewModel.error).thenReturn(null);
     when(mockViewModel.stats).thenReturn(_createMockStats());
     when(mockViewModel.chartData).thenReturn(_createMockChartData());
+    when(mockViewModel.showSleepOverlay).thenReturn(true);
+    when(mockViewModel.sleepStages).thenReturn(_createMockSleepStages());
     
     await tester.pumpWidget(
       _buildTestApp(mockViewModel),
@@ -1000,6 +1125,7 @@ group('AnalyticsView', () {
     expect(find.byType(BpLineChart), findsOneWidget);
     expect(find.byType(PulseLineChart), findsOneWidget);
     expect(find.byType(StatsCardGrid), findsOneWidget);
+    expect(find.byType(SleepStackedAreaChart), findsOneWidget);
   });
   
   testWidgets('time range selector triggers data reload', (tester) async {
@@ -1066,45 +1192,47 @@ File: `integration_test/analytics_flow_test.dart`
 ## Implementation Sequence
 
 ### Phase 1: Foundation (Days 1-2)
-1. Add `fl_chart` dependency to `pubspec.yaml`
-2. Create data models (`HealthStats`, `ChartDataSet`, etc.)
-3. Implement `AnalyticsService` with basic stat calculations
-4. Write unit tests for `AnalyticsService`
+1. Extend sleep schema (stage minutes, endedAt as get-up time), add migration, update validators/services.
+2. Add `fl_chart` dependency to `pubspec.yaml`
+3. Create data models (`HealthStats`, `ChartDataSet`, `SleepStageSeries`, etc.)
+4. Implement `AnalyticsService` with basic stat calculations and sleep stage aggregation
+5. Write unit tests for `AnalyticsService`
 
 ### Phase 2: ViewModel (Day 3)
-5. Implement `AnalyticsViewModel` with state management
-6. Add caching logic and invalidation
-7. Write unit tests for `AnalyticsViewModel`
+6. Implement `AnalyticsViewModel` with state management
+7. Add caching logic and invalidation
+8. Write unit tests for `AnalyticsViewModel`
 
 ### Phase 3: Basic UI (Days 4-5)
-8. Create `AnalyticsView` scaffold with navigation
-9. Implement `TimeRangeSelector` and `StatsCardGrid`
-10. Add loading/error/empty states
-11. Write widget tests for basic UI
+9. Create `AnalyticsView` scaffold with navigation
+10. Implement `TimeRangeSelector` and `StatsCardGrid`
+11. Add loading/error/empty states
+12. Write widget tests for basic UI
 
 ### Phase 4: Charts (Days 6-7)
-12. Implement `BpLineChart` with banding
-13. Implement `PulseLineChart`
-14. Add `ChartLegend` and tooltips
-15. Write widget tests for charts
+13. Implement `BpLineChart` with banding
+14. Implement `PulseLineChart`
+15. Add `ChartLegend` and tooltips
+16. Write widget tests for charts
 
 ### Phase 5: Advanced Features (Day 8)
-16. Implement `MorningEveningCard` with split stats
-17. Add sleep correlation overlay (optional)
-18. Implement downsampling logic
-19. Write tests for advanced features
+17. Implement `MorningEveningCard` with split stats
+18. Add `SleepStackedAreaChart` (stacked stages) and wire to overlay toggle
+19. Add sleep correlation overlay (optional annotations)
+20. Implement downsampling logic
+21. Write tests for advanced features
 
 ### Phase 6: Polish & Performance (Day 9)
-20. Add chart animations and transitions
-21. Optimize query performance
-22. Implement caching improvements
-23. Conduct performance profiling
+22. Add chart animations and transitions
+23. Optimize query performance
+24. Implement caching improvements
+25. Conduct performance profiling
 
 ### Phase 7: Testing & Documentation (Day 10)
-24. Achieve coverage targets (run `flutter test --coverage`)
-25. Fix analyzer warnings (`flutter analyze`)
-26. Add DartDoc comments to public APIs
-27. Update user documentation
+26. Achieve coverage targets (run `flutter test --coverage`)
+27. Fix analyzer warnings (`flutter analyze`)
+28. Add DartDoc comments to public APIs
+29. Update user documentation
 
 ---
 
@@ -1118,6 +1246,7 @@ File: `integration_test/analytics_flow_test.dart`
 | Sleep correlation complexity delays delivery | Medium | Low | Mark as optional; ship without if blocked |
 | Statistical calculation errors | Low | High | Use well-tested algorithms; validate with known datasets; add property tests |
 | Memory leaks from chart controllers | Medium | Medium | Ensure proper disposal; use DevTools memory profiler |
+| Sleep schema migration gaps | Medium | Medium | Add migration tests; default stage minutes to 0; show incomplete-data banner; make stage fields nullable |
 
 ---
 
@@ -1129,6 +1258,9 @@ File: `integration_test/analytics_flow_test.dart`
 - [x] Time range selector works (7d/30d/90d/1y/all)
 - [x] Statistics cards show min/avg/max, variability, morning/evening split
 - [x] Sleep correlation overlay functional (optional)
+- [x] Sleep stages stacked area chart renders deep/light/REM/awake, aligned to
+  morning-after date and get-up time
+- [x] Sleep data includes stage durations and get-up time for each session
 - [x] Smooth performance with 1000+ readings
 
 ### Technical Requirements
@@ -1138,6 +1270,8 @@ File: `integration_test/analytics_flow_test.dart`
 - [x] Code follows [Coding_Standards.md](../Standards/Coding_Standards.md)
 - [x] DartDoc comments on public APIs
 - [x] Proper resource disposal (controllers, subscriptions)
+- [x] Sleep schema migration applied with backfill; validators enforce stage
+  totals and duration alignment
 
 ### UX Requirements
 - [x] Charts load within 500ms for typical datasets

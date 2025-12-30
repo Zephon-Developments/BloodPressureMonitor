@@ -24,7 +24,8 @@ Phase 8 implementation plan has been completed per Steve's handoff requirements.
 - Interactive blood pressure charts with clinical banding
 - Statistical dashboard (min/avg/max, variability, morning/evening split)
 - Time-range filtering (7d, 30d, 90d, 1y, all-time)
-- Optional sleep quality correlation overlay
+- Sleep data normalization (morning-after date, get-up time, deep/light/REM/awake stage minutes)
+- Optional sleep quality correlation overlay + stacked sleep stages area chart
 - Performance optimizations for large datasets
 
 **Architecture**:
@@ -36,8 +37,9 @@ Phase 8 implementation plan has been completed per Steve's handoff requirements.
 1. **Chart Library**: `fl_chart` (Flutter-native, customizable, good performance)
 2. **Clinical Banding**: Horizontal zones (<130/85 green, 130-139/85-89 yellow, ≥140/90 red)
 3. **Downsampling Strategy**: Smart sampling based on time range (raw for 7d, daily avg for 90d+)
-4. **Caching**: ViewModel-level caching with 5-minute TTL and invalidation on new data
-5. **Morning/Evening Cutoff**: 12:00 PM (configurable)
+4. **Sleep Schema Extension**: Stage minutes (deep/light/REM/awake) + get-up time derived from `endedAt`, migration with backfill
+5. **Caching**: ViewModel-level caching with 5-minute TTL and invalidation on new data
+6. **Morning/Evening Cutoff**: 12:00 PM (configurable)
 
 **Coverage Targets**:
 - Services: ≥85%
@@ -100,6 +102,7 @@ Please review the plan for:
   - [x] Chart widgets with banding
   - [x] Time-range chips (7d/30d/90d/1y/all)
   - [x] Stats cards (min/avg/max, variability, morning/evening split)
+  - [x] Sleep data normalization (date/get-up/stages) and stacked area chart
   - [x] Optional sleep correlation overlay
   - [x] Widget tests for rendering
   - [x] Performance checks
@@ -118,6 +121,13 @@ The plan specifies:
 - **Isolated Systolic**: ≥140 systolic AND <90 diastolic → Orange marker
 
 **Question for Clive**: Do these thresholds match medical guidelines accurately? Should isolated diastolic hypertension be flagged similarly?
+
+### Sleep Data Completeness
+- Plan adds deep/light/REM/awake stage minutes, get-up time (endedAt), and morning-after alignment for correlation and stacked area chart.
+
+**Questions for Clive**:
+- Are stage fields sufficient (awake vs light split) for the planned visual?
+- Any migration concerns for existing sleep entries—should we default stage minutes to null vs 0 and surface an "incomplete" badge?
 
 ### Statistical Calculation Validation
 The plan includes standard deviation for variability. 
