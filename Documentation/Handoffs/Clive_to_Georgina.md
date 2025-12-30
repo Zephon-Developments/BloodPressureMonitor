@@ -1,48 +1,47 @@
-# Handoff: Clive → Georgina
+# Handoff: Clive to Georgina — Phase 9 Implementation
 
-**Date**: 2025-12-30  
-**From**: Clive (Review Specialist)  
-**To**: Georgina (Implementation Specialist)  
-**Task**: Phase 8 - Charts & Analytics Implementation (Bug Fixes)  
-**Status**: ❌ **BLOCKERS IDENTIFIED (COMPILATION ERRORS)**
+**Date:** 2025-12-30  
+**From:** Clive (Review Specialist)  
+**To:** Georgina (Implementation Specialist)  
+**Plan:** [Documentation/Plans/Phase_9_Edit_Delete_Plan.md](../Plans/Phase_9_Edit_Delete_Plan.md)  
+**Review:** [reviews/2025-12-30-clive-phase-9-plan-review.md](../../reviews/2025-12-30-clive-phase-9-plan-review.md)
 
----
+## Objectives
+Implement Edit and Delete functionality for Blood Pressure Readings, Weight Entries, and Sleep Entries.
 
-## Summary
+## Key Requirements
+1.  **ViewModel Extensions**:
+    *   Add `updateWeightEntry` and `deleteWeightEntry` to `WeightViewModel`.
+    *   Add `updateSleepEntry` and `deleteSleepEntry` to `SleepViewModel`.
+    *   Ensure `BloodPressureViewModel` correctly triggers averaging recomputation (it should already, but verify).
+2.  **Edit Flow (Option A)**:
+    *   Modify `AddReadingView`, `AddWeightView`, and `AddSleepView` to accept an optional `editingEntry`.
+    *   Pre-populate forms when an entry is provided.
+    *   Update the UI (titles, buttons) to reflect "Edit" mode.
+3.  **Delete Flow**:
+    *   Implement a reusable `ConfirmDeleteDialog`.
+    *   **Home Screen**: Tapping the chevron (`>`) on a reading card opens the Edit view.
+    *   **Home Screen**: Swiping left on a reading card reveals a "DELETE" button (white text on red background).
+    *   **Action**: Tapping the revealed Delete button shows the confirmation dialog.
+4.  **Cache Invalidation**:
+    *   Invalidate the `AnalyticsViewModel` cache after any edit or delete operation for readings or sleep data.
+5.  **Dependencies**:
+    *   Add `flutter_slidable: ^3.1.0` to `pubspec.yaml` for the swipe-to-reveal functionality.
 
-While the logic and tests passed in isolation, the integrated application fails to compile due to missing imports and incorrect third-party API usage.
+## Standards & Quality
+*   **Test Coverage**: Target ≥85% for all new/modified code.
+*   **Static Analysis**: Zero warnings/errors.
+*   **Documentation**: JSDoc for all new public methods.
+*   **Formatting**: Run `dart format .` before submission.
 
-### ❌ Blockers
+## Success Metrics
+*   Users can edit and delete readings, weight, and sleep entries.
+*   Deletions are always confirmed.
+*   Averages and charts update immediately after changes.
+*   All tests pass and coverage is maintained.
 
-#### 1. Missing Type Definition in AnalyticsService
-lib/services/analytics_service.dart fails to compile because SleepEntry is not recognized.
-- **Error**: 'SleepEntry' isn't a type.
-- **Required Fix**: Add import 'package:blood_pressure_monitor/models/health_data.dart'; to [lib/services/analytics_service.dart](lib/services/analytics_service.dart).
-
-#### 2. Incorrect fl_chart API Usage
-lib/views/analytics/widgets/sleep_stacked_area_chart.dart uses an invalid parameter for BetweenBarsData.
-- **Error**: No named parameter with the name 'colors'.
-- **Context**: In l_chart v0.68.0, BetweenBarsData expects color (single) or gradient, not a colors list.
-- **Required Fix**: Update _buildBetweenBars() in [lib/views/analytics/widgets/sleep_stacked_area_chart.dart](lib/views/analytics/widgets/sleep_stacked_area_chart.dart) to use color instead of colors.
-
----
-
-## ✅ Positive Findings
-
-- Unit tests for AnalyticsService and AnalyticsViewModel are passing.
-- Schema migration logic is sound.
-
----
-
-## Next Steps for Georgina
-
-1.  **Fix Imports**: Add the missing health_data.dart import to AnalyticsService.
-2.  **Fix Chart Widgets**: Update BetweenBarsData parameters to match the l_chart 0.68.0 API.
-3.  **Verify Build**: Run lutter build bundle or lutter run to ensure the app compiles successfully before returning for review.
-
-**Please resolve these compilation blockers immediately.**
+Please proceed with the implementation of Phase 9A.
 
 ---
 **Clive**  
-Review Specialist  
-2025-12-30
+Review Specialist

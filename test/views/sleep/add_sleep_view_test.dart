@@ -74,17 +74,41 @@ void main() {
     verify(mockSleepService.createSleepEntry(any)).called(1);
     expect(find.byType(AddSleepView), findsNothing);
   });
+
+  testWidgets('prefills data when editing sleep entry', (tester) async {
+    when(mockSleepService.updateSleepEntry(any)).thenAnswer((invocation) async {
+      return invocation.positionalArguments.first as SleepEntry;
+    });
+
+    await _pumpAddSleepView(
+      tester,
+      viewModel,
+      editingEntry: sampleEntry,
+    );
+
+    expect(find.text('Edit Sleep Session'), findsOneWidget);
+
+    final saveButton = find.text('Update Sleep Session');
+    await tester.ensureVisible(saveButton);
+    await tester.tap(saveButton);
+    await tester.pumpAndSettle();
+
+    verify(mockSleepService.updateSleepEntry(any)).called(1);
+  });
 }
 
 Future<void> _pumpAddSleepView(
   WidgetTester tester,
-  SleepViewModel viewModel,
-) async {
+  SleepViewModel viewModel, {
+  SleepEntry? editingEntry,
+}) async {
   await tester.pumpWidget(
     ChangeNotifierProvider<SleepViewModel>.value(
       value: viewModel,
-      child: const MaterialApp(
-        home: _RouteLauncher(child: AddSleepView()),
+      child: MaterialApp(
+        home: _RouteLauncher(
+          child: AddSleepView(editingEntry: editingEntry),
+        ),
       ),
     ),
   );

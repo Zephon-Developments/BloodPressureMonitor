@@ -8,6 +8,7 @@ import 'package:blood_pressure_monitor/models/reading.dart';
 import 'package:blood_pressure_monitor/utils/validators.dart';
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
 import 'package:blood_pressure_monitor/views/readings/add_reading_view.dart';
+import 'package:blood_pressure_monitor/views/readings/widgets/session_control_widget.dart';
 import 'package:blood_pressure_monitor/widgets/common/loading_button.dart';
 import 'package:blood_pressure_monitor/widgets/common/validation_message_widget.dart';
 
@@ -17,6 +18,7 @@ import 'add_reading_view_test.mocks.dart';
 void main() {
   group('AddReadingView Widget Tests', () {
     late MockBloodPressureViewModel mockViewModel;
+    late Reading editingReading;
 
     setUp(() {
       mockViewModel = MockBloodPressureViewModel();
@@ -26,13 +28,32 @@ void main() {
           confirmOverride: anyNamed('confirmOverride'),
         ),
       ).thenAnswer((_) async => const ValidationResult.valid());
+      when(
+        mockViewModel.updateReading(
+          any,
+          confirmOverride: anyNamed('confirmOverride'),
+        ),
+      ).thenAnswer((_) async => const ValidationResult.valid());
+      editingReading = Reading(
+        id: 5,
+        profileId: 1,
+        systolic: 130,
+        diastolic: 85,
+        pulse: 72,
+        takenAt: DateTime(2025, 1, 5, 8, 30),
+        localOffsetMinutes: 0,
+        arm: 'left',
+        posture: 'sitting',
+        note: 'Prefilled note',
+        tags: 'morning',
+      );
     });
 
-    Widget createWidget() {
+    Widget createWidget({Reading? editing}) {
       return ChangeNotifierProvider<BloodPressureViewModel>.value(
         value: mockViewModel,
-        child: const MaterialApp(
-          home: AddReadingView(),
+        child: MaterialApp(
+          home: AddReadingView(editingReading: editing),
         ),
       );
     }
@@ -354,6 +375,24 @@ void main() {
       final reading = captured.first as Reading;
       expect(reading.arm, 'left');
       expect(reading.posture, 'sitting');
+    });
+
+    testWidgets('hides session control and updates when editing',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(createWidget(editing: editingReading));
+
+      expect(find.text('Edit Reading'), findsOneWidget);
+      expect(find.byType(SessionControlWidget), findsNothing);
+
+      await tester.tap(find.byType(LoadingButton));
+      await tester.pumpAndSettle();
+
+      verify(
+        mockViewModel.updateReading(
+          any,
+          confirmOverride: false,
+        ),
+      ).called(1);
     });
   });
 }
