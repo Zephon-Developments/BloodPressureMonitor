@@ -142,6 +142,18 @@ class WeightService {
     return entry;
   }
 
+  /// Deletes all weight entries for a profile.
+  ///
+  /// Returns the number of deleted rows.
+  Future<int> deleteAllByProfile(int profileId) async {
+    final db = await _databaseService.database;
+    return await db.delete(
+      'WeightEntry',
+      where: 'profileId = ?',
+      whereArgs: [profileId],
+    );
+  }
+
   /// Deletes a weight entry by ID.
   ///
   /// Returns `true` if an entry was deleted, `false` otherwise.

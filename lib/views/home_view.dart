@@ -8,6 +8,9 @@ import 'package:blood_pressure_monitor/views/history/history_view.dart';
 import 'package:blood_pressure_monitor/views/home/widgets/quick_actions.dart';
 import 'package:blood_pressure_monitor/views/home/widgets/recent_readings_card.dart';
 import 'package:blood_pressure_monitor/views/settings/security_settings_view.dart';
+import 'package:blood_pressure_monitor/views/export_view.dart';
+import 'package:blood_pressure_monitor/views/import_view.dart';
+import 'package:blood_pressure_monitor/views/report_view.dart';
 
 /// Main home screen with navigation shell.
 ///
@@ -121,7 +124,7 @@ class _HomeViewState extends State<HomeView> {
       case 2:
         return const AnalyticsView();
       case 3:
-        return _buildSettingsStub();
+        return _buildSettingsTab();
       default:
         return _buildHomeTab();
     }
@@ -144,7 +147,7 @@ class _HomeViewState extends State<HomeView> {
 
   Widget _buildHistoryTab() => const HistoryView();
 
-  Widget _buildSettingsStub() {
+  Widget _buildSettingsTab() {
     return ListView(
       children: [
         ListTile(
@@ -156,6 +159,56 @@ class _HomeViewState extends State<HomeView> {
             Navigator.of(context).push(
               MaterialPageRoute<void>(
                 builder: (context) => const SecuritySettingsView(),
+              ),
+            );
+          },
+        ),
+        const Divider(),
+        const Padding(
+          padding: EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: Text(
+            'Data & Reports',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.blue,
+            ),
+          ),
+        ),
+        ListTile(
+          leading: const Icon(Icons.picture_as_pdf),
+          title: const Text('Doctor Report'),
+          subtitle: const Text('Generate PDF report for your doctor'),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (context) => const ReportView(),
+              ),
+            );
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.upload),
+          title: const Text('Export Data'),
+          subtitle: const Text('Backup your data to JSON or CSV'),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (context) => const ExportView(),
+              ),
+            );
+          },
+        ),
+        ListTile(
+          leading: const Icon(Icons.download),
+          title: const Text('Import Data'),
+          subtitle: const Text('Restore data from a backup file'),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (context) => const ImportView(),
               ),
             );
           },
