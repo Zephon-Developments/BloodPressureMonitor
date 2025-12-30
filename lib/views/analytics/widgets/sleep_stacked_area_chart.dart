@@ -63,9 +63,9 @@ class SleepStackedAreaChart extends StatelessWidget {
                   ),
                   titlesData: FlTitlesData(
                     topTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false)),
+                        sideTitles: SideTitles(showTitles: false),),
                     rightTitles: const AxisTitles(
-                        sideTitles: SideTitles(showTitles: false)),
+                        sideTitles: SideTitles(showTitles: false),),
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
@@ -81,7 +81,7 @@ class SleepStackedAreaChart extends StatelessWidget {
                         reservedSize: 40,
                         getTitlesWidget: (value, meta) {
                           final date = DateTime.fromMillisecondsSinceEpoch(
-                              value.toInt());
+                              value.toInt(),);
                           return Padding(
                             padding: const EdgeInsets.only(top: 8),
                             child: Text('${date.month}/${date.day}'),
