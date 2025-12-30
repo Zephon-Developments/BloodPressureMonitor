@@ -19,7 +19,7 @@ void main() {
     final db = await databaseFactoryFfi.openDatabase(
       inMemoryDatabasePath,
       options: OpenDatabaseOptions(
-        version: 3,
+        version: 4,
         onCreate: (db, version) async {
           // Use same schema as production
           await db.execute('''
@@ -42,6 +42,10 @@ void main() {
               endedAt TEXT,
               durationMinutes INTEGER NOT NULL,
               quality INTEGER,
+              deepMinutes INTEGER,
+              lightMinutes INTEGER,
+              remMinutes INTEGER,
+              awakeMinutes INTEGER,
               localOffsetMinutes INTEGER NOT NULL,
               source TEXT NOT NULL DEFAULT 'manual',
               sourceMetadata TEXT,

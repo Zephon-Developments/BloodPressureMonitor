@@ -4,30 +4,39 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 
+import 'package:blood_pressure_monitor/models/analytics.dart';
+import 'package:blood_pressure_monitor/models/health_data.dart';
 import 'package:blood_pressure_monitor/models/lock_state.dart';
 import 'package:blood_pressure_monitor/models/reading.dart';
+import 'package:blood_pressure_monitor/viewmodels/analytics_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/history_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/lock_viewmodel.dart';
 import 'package:blood_pressure_monitor/views/home_view.dart';
 import 'package:blood_pressure_monitor/views/readings/add_reading_view.dart';
 import 'package:blood_pressure_monitor/views/settings/security_settings_view.dart';
+import 'package:blood_pressure_monitor/views/analytics/analytics_view.dart';
 
 @GenerateMocks([BloodPressureViewModel, LockViewModel])
 import 'home_view_test.mocks.dart';
 import '../test_mocks.mocks.dart' show MockHistoryService;
+import '../viewmodels/analytics_viewmodel_test.mocks.dart'
+    show MockAnalyticsService;
 
 void main() {
   group('HomeView Widget Tests', () {
     late MockBloodPressureViewModel mockViewModel;
     late MockLockViewModel mockLockViewModel;
     late MockHistoryService mockHistoryService;
+    late MockAnalyticsService mockAnalyticsService;
     late HistoryViewModel historyViewModel;
+    late AnalyticsViewModel analyticsViewModel;
 
     setUp(() {
       mockViewModel = MockBloodPressureViewModel();
       mockLockViewModel = MockLockViewModel();
       mockHistoryService = MockHistoryService();
+      mockAnalyticsService = MockAnalyticsService();
       when(mockViewModel.loadReadings()).thenAnswer((_) async {});
       when(mockViewModel.isLoading).thenReturn(false);
       when(mockViewModel.error).thenReturn(null);
@@ -60,10 +69,51 @@ void main() {
         mockHistoryService,
         clock: () => DateTime.utc(2025, 1, 1),
       );
+
+      analyticsViewModel = AnalyticsViewModel(
+        analyticsService: mockAnalyticsService,
+        clock: () => DateTime.utc(2025, 1, 10),
+      );
+
+      when(
+        mockAnalyticsService.calculateStats(
+          profileId: anyNamed('profileId'),
+          startDate: anyNamed('startDate'),
+          endDate: anyNamed('endDate'),
+        ),
+      ).thenAnswer((_) async => _sampleStats());
+      when(
+        mockAnalyticsService.getChartData(
+          profileId: anyNamed('profileId'),
+          startDate: anyNamed('startDate'),
+          endDate: anyNamed('endDate'),
+          range: anyNamed('range'),
+        ),
+      ).thenAnswer((_) async => _sampleChart());
+      when(
+        mockAnalyticsService.getSleepCorrelation(
+          profileId: anyNamed('profileId'),
+          startDate: anyNamed('startDate'),
+          endDate: anyNamed('endDate'),
+        ),
+      ).thenAnswer((_) async => _sampleSleepCorrelation());
+      when(
+        mockAnalyticsService.getSleepStageSeries(
+          profileId: anyNamed('profileId'),
+          startDate: anyNamed('startDate'),
+          endDate: anyNamed('endDate'),
+        ),
+      ).thenAnswer(
+        (_) async => const SleepStageSeries(
+          stages: [],
+          hasIncompleteSessions: false,
+        ),
+      );
     });
 
     tearDown(() {
       historyViewModel.dispose();
+      analyticsViewModel.dispose();
     });
 
     Widget createWidget() {
@@ -77,6 +127,9 @@ void main() {
           ),
           ChangeNotifierProvider<HistoryViewModel>.value(
             value: historyViewModel,
+          ),
+          ChangeNotifierProvider<AnalyticsViewModel>.value(
+            value: analyticsViewModel,
           ),
         ],
         child: const MaterialApp(
@@ -171,8 +224,8 @@ void main() {
       await tester.tap(find.text('Charts'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Charts & Analytics'), findsOneWidget);
-      expect(find.text('Coming in Phase 8'), findsOneWidget);
+      expect(find.byType(AnalyticsView), findsOneWidget);
+      expect(find.byIcon(Icons.bedtime_outlined), findsOneWidget);
     });
 
     testWidgets('switches to settings tab when tapped',
@@ -224,7 +277,7 @@ void main() {
       expect(find.byType(AddReadingView), findsOneWidget);
     });
 
-    testWidgets('shows history empty state and charts stub',
+    testWidgets('shows history empty state and charts content',
         (WidgetTester tester) async {
       await tester.pumpWidget(createWidget());
       await tester.pumpAndSettle();
@@ -237,7 +290,8 @@ void main() {
       // Charts stub
       await tester.tap(find.text('Charts'));
       await tester.pumpAndSettle();
-      expect(find.byIcon(Icons.analytics), findsNWidgets(2)); // Nav + stub
+      expect(find.byType(AnalyticsView), findsOneWidget);
+      expect(find.byIcon(Icons.bedtime_outlined), findsOneWidget);
     });
 
     testWidgets('settings tab items are disabled', (WidgetTester tester) async {
@@ -262,4 +316,108 @@ void main() {
       expect(disabledCount, 3); // Reminders, Appearance, About
     });
   });
+}
+
+HealthStats _sampleStats() {
+  return HealthStats(
+    minSystolic: 120,
+    avgSystolic: 125,
+    maxSystolic: 130,
+    minDiastolic: 80,
+    avgDiastolic: 82,
+    maxDiastolic: 85,
+    minPulse: 65,
+    avgPulse: 68,
+    maxPulse: 72,
+    systolicStdDev: 2,
+    systolicCv: 1.5,
+    diastolicStdDev: 1,
+    diastolicCv: 1.2,
+    pulseStdDev: 1.5,
+    pulseCv: 2,
+    split: const MorningEveningSplit(
+      morning: ReadingBucketStats(
+        count: 1,
+        minSystolic: 120,
+        avgSystolic: 122,
+        maxSystolic: 125,
+        minDiastolic: 80,
+        avgDiastolic: 82,
+        maxDiastolic: 84,
+        minPulse: 65,
+        avgPulse: 67,
+        maxPulse: 70,
+      ),
+      evening: ReadingBucketStats(
+        count: 1,
+        minSystolic: 126,
+        avgSystolic: 128,
+        maxSystolic: 130,
+        minDiastolic: 83,
+        avgDiastolic: 84,
+        maxDiastolic: 85,
+        minPulse: 70,
+        avgPulse: 71,
+        maxPulse: 72,
+      ),
+      morningCount: 1,
+      eveningCount: 1,
+    ),
+    totalReadings: 2,
+    periodStart: DateTime.utc(2025, 1, 1),
+    periodEnd: DateTime.utc(2025, 1, 7),
+  );
+}
+
+ChartDataSet _sampleChart() {
+  final now = DateTime.utc(2025, 1, 1);
+  return ChartDataSet(
+    systolicPoints: [
+      ChartPoint(timestamp: now, value: 120),
+      ChartPoint(timestamp: now.add(const Duration(days: 1)), value: 125),
+    ],
+    diastolicPoints: [
+      ChartPoint(timestamp: now, value: 80),
+      ChartPoint(timestamp: now.add(const Duration(days: 1)), value: 82),
+    ],
+    pulsePoints: [
+      ChartPoint(timestamp: now, value: 68),
+      ChartPoint(timestamp: now.add(const Duration(days: 1)), value: 70),
+    ],
+    minDate: now,
+    maxDate: now.add(const Duration(days: 1)),
+  );
+}
+
+SleepCorrelationData _sampleSleepCorrelation() {
+  final date = DateTime(2025, 1, 2);
+  final reading = ReadingGroup(
+    id: 1,
+    profileId: 1,
+    groupStartAt: date,
+    avgSystolic: 125,
+    avgDiastolic: 82,
+    avgPulse: 68,
+    memberReadingIds: '1',
+  );
+  final sleep = SleepEntry(
+    id: 1,
+    profileId: 1,
+    startedAt: date.subtract(const Duration(hours: 7)),
+    endedAt: date,
+    durationMinutes: 420,
+    deepMinutes: 100,
+    lightMinutes: 200,
+    remMinutes: 80,
+    awakeMinutes: 40,
+    quality: 4,
+  );
+
+  return SleepCorrelationData(
+    sleepByDate: {date: SleepQualityLevel.good},
+    morningReadings: {date: reading},
+    correlationPoints: [
+      CorrelationPoint(date: date, sleepEntry: sleep, reading: reading),
+    ],
+  );
 }

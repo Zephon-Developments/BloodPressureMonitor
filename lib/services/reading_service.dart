@@ -195,6 +195,30 @@ class ReadingService {
         .toList();
   }
 
+  /// Retrieves averaged reading groups within a date range.
+  ///
+  /// Returns groups ordered by [groupStartAt] ascending to support chart
+  /// rendering in chronological order.
+  Future<List<ReadingGroup>> getGroupsInRange({
+    required int profileId,
+    required DateTime start,
+    required DateTime end,
+  }) async {
+    final db = await _databaseService.database;
+    final rows = await db.query(
+      'ReadingGroup',
+      where: 'profileId = ? AND groupStartAt >= ? AND groupStartAt <= ?',
+      whereArgs: [
+        profileId,
+        start.toIso8601String(),
+        end.toIso8601String(),
+      ],
+      orderBy: 'groupStartAt ASC',
+    );
+
+    return rows.map(ReadingGroup.fromMap).toList();
+  }
+
   /// Retrieves readings whose ids are contained in [ids].
   ///
   /// Returns results without guaranteeing order, so callers should sort

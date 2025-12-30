@@ -1,130 +1,210 @@
-# Tracy to Clive Handoff – Phase 7 History Plan
+# Handoff: Tracy → Clive
 
-## Plan Ready for Review
-- Deliverable: Phase 7 implementation plan at [Documentation/Plans/Phase_7_History_Plan.md](Documentation/Plans/Phase_7_History_Plan.md).
-- Status: ✅ Ready for your review and sign-off.
+**Date**: 2025-12-30  
+**From**: Tracy (Planning Specialist)  
+**To**: Clive (Review Specialist)  
+**Task**: Phase 8 Charts & Analytics Plan Review  
+**Status**: 🔵 **AWAITING REVIEW**
 
-## Plan Highlights
-- **Architecture**: New `HistoryViewModel` to manage grouped history, filters, averaged/raw toggle, pagination, and expand/collapse state. Uses `ReadingService` + `AveragingService`; introduces `HistoryService` helper if needed for grouped queries.
-- **Data Structures**: `HistoryGroupItem` (averaged summary + member metadata + cached children), `HistoryFilters` (date range presets/custom, profile, tags, viewMode).
-- **UI**: HistoryView with FilterBar (date presets, profile selector, tags, averaged/raw toggle), paged `ListView.builder` of `HistoryGroupTile` (collapsed averages, expanded raw readings), RawModeList for flat view, empty state.
-- **Performance**: Paged queries (LIMIT/OFFSET or keyset by timestamp), prefetch near list end, cache expanded children, debounce filter changes, avoid shrinkwrap on large lists.
-- **Testing Targets**: ≥85% for new viewmodel/service logic; ≥70% for History widgets; integration-style test for expand/paginate; zero analyzer warnings.
-- **Acceptance Criteria**: Averaged view default; raw details one tap away; filters persist in session; smooth scroll with 100+ groups; tests passing; Coding_Standards compliance (80 cols, import order, trailing commas).
+---
 
-## Open Questions
-1) Pagination approach: LIMIT/OFFSET acceptable, or prefer keyset pagination by takenAt desc for stability when new readings arrive?
-2) Scroll behavior on mode toggle: reset to top (recommended) vs attempt to preserve scroll position between averaged/raw modes?
-3) Group child fetch: prefer single query by memberReadingIds vs repeated per-id lookups; confirm DB schema/index support.
+## Context
 
-## Risks & Mitigations
-- **Large data jank**: mitigate with pagination, prefetch threshold, const widgets, and caching.
-- **Expand fetch latency**: per-group loading state and cached children; refresh on pull-to-refresh.
-- **DB query complexity**: if grouping joins are heavy, rely on precomputed groups from `AveragingService.recomputeGroupsForProfile` and ensure indexed columns.
+Phase 8 implementation plan has been completed per Steve's handoff requirements. This phase builds on the successful Phase 7 (History) foundation and introduces interactive analytics capabilities.
 
-## Next Steps
-1) Please review the plan and confirm the open questions.
-2) On approval, I will hand off to the implementer (Georgina/Claudette) with decisions noted.# Tracy to Clive Handoff - Phase 6: UI Foundation (Home & Add Reading)
+---
 
-## Objectives & Scope
-- Build the Phase 6 UI foundation: Home/Dashboard, Add Reading form, Navigation shell.
-- Integrate existing services/viewmodels (BloodPressureViewModel, validators, averaging) without altering domain logic.
-- Maintain security posture: lock screen must gate navigation when locked.
+## Deliverable
 
-## Dependencies & Standards
-- Upstream complete: Phases 1, 2A, 2B, 5; Navigation shell already minimal in HomeView.
-- Coding Standards: follow import order, 80-char lines, mandatory trailing commas, `flutter analyze`/`flutter test`/`dart format` required (see Documentation/Standards/Coding_Standards.md sections 2.4, 3.3, 3.4).
+**Plan Document**: [Documentation/Plans/Phase_8_Charts_Analytics_Plan.md](../Plans/Phase_8_Charts_Analytics_Plan.md)
 
-## Proposed Architecture
-- **Navigation Shell**: Single `Scaffold` host with bottom navigation (Home, History stub, Charts stub, Settings). Uses named routes for future deep links. LockViewModel guards entry (redirect to lock screen when locked).
-- **Home (Dashboard)**: Composition of widgets: profile selector (if >1 profile), recent readings card, quick actions (Add Reading, Go to History), and shortcuts to Settings/Security.
-- **Add Reading Form**: Two-pane layout (basic + advanced collapsible). Uses form state + validators; on submit, calls BloodPressureViewModel to create reading and triggers averaging. Provides session override toggle.
-- **Common Widgets**: Reusable validated text field, expandable section, loading button, validation message banner.
+### Plan Highlights
 
-## Wireframes (textual)
-- **Navigation (Bottom bar)**: [Home | History (stub) | Charts (stub) | Settings]
-- **Home**:
-  - AppBar: title, profile selector (dropdown if multi-profile), settings icon.
-  - Body: Quick actions row (Add Reading primary), Recent readings card (list 3-5 averaged entries, tappable to History stub), Optional meds shortcut.
-- **Add Reading**:
-  - AppBar: "Add Reading", save action disabled until valid.
-  - Form (scrollable):
-    - Basic: systolic, diastolic, pulse, timestamp picker.
-    - Advanced (expandable): arm (chips), posture (chips), notes (multiline), tags (chips or text), medication checkbox/link.
-    - Session control: switch + helper text.
-    - Validation banner inline; submit button with loading state.
+**Scope**:
+- Interactive blood pressure charts with clinical banding
+- Statistical dashboard (min/avg/max, variability, morning/evening split)
+- Time-range filtering (7d, 30d, 90d, 1y, all-time)
+- Sleep data normalization (morning-after date, get-up time, deep/light/REM/awake stage minutes)
+- Optional sleep quality correlation overlay + stacked sleep stages area chart
+- Performance optimizations for large datasets
 
-## Component/Widget Hierarchy
-- `lib/views/home/home_view.dart` (enhance):
-  - `HomeView` -> `Scaffold` with bottom nav
-    - `AppBar`: profile selector, settings button
-    - `Body`: `RecentReadingsCard`, `QuickActions`, `MedsShortcut` (optional)
-- `lib/views/home/widgets/`:
-  - `profile_selector.dart`: dropdown/list tile with profile names
-  - `recent_readings_card.dart`: list of recent averaged readings with timestamps
-  - `quick_actions.dart`: primary CTA "Add Reading", secondary "History" (stub)
-- `lib/views/readings/add_reading_view.dart`:
-  - `AddReadingView` -> `Form` + `SingleChildScrollView`
-  - Uses subwidgets in `lib/views/readings/widgets/`:
-    - `reading_form_basic.dart`: systolic, diastolic, pulse, timestamp
-    - `reading_form_advanced.dart`: arm, posture, notes, tags
-    - `session_control_widget.dart`: toggle + tooltip
-    - `validation_message_widget.dart`: warning/error banner
-- `lib/widgets/common/`:
-  - `custom_text_field.dart`: labeled, helper/error, numeric keyboard, validation hook
-  - `expandable_section.dart`: animated expand/collapse
-  - `loading_button.dart`: handles busy state
+**Architecture**:
+- **Service Layer**: New `AnalyticsService` for stats calculations, chart data prep, sleep correlation
+- **ViewModel Layer**: `AnalyticsViewModel` managing state, caching, time range selection
+- **View Layer**: `AnalyticsView` with reusable chart widgets (`BpLineChart`, `PulseLineChart`, stats cards)
 
-## Data Flow & Integration
-- **Add Reading Submit**: Validate -> confirm overrides -> call BloodPressureViewModel.addReading(...) -> service writes -> averaging auto-triggers -> refresh Home recent readings.
-- **Session Override**: Toggle sets flag passed into ViewModel to start new averaging session.
-- **Lock Integration**: On app resume or navigation change, if LockViewModel.state.isLocked, route to lock screen.
+**Key Technical Decisions**:
+1. **Chart Library**: `fl_chart` (Flutter-native, customizable, good performance)
+2. **Clinical Banding**: Horizontal zones (<130/85 green, 130-139/85-89 yellow, ≥140/90 red)
+3. **Downsampling Strategy**: Smart sampling based on time range (raw for 7d, daily avg for 90d+)
+4. **Sleep Schema Extension**: Stage minutes (deep/light/REM/awake) + get-up time derived from `endedAt`, migration with backfill
+5. **Caching**: ViewModel-level caching with 5-minute TTL and invalidation on new data
+6. **Morning/Evening Cutoff**: 12:00 PM (configurable)
 
-## File Impact (planned)
-- Update: `lib/views/home_view.dart` (replace current minimal UI with shell + sections).
-- Add dirs/files: `lib/views/home/widgets/*`, `lib/views/readings/add_reading_view.dart`, `lib/views/readings/widgets/*`, `lib/widgets/common/*`.
-- Tests: `test/views/home/`, `test/views/readings/`, `test/widgets/common/` for widget coverage.
+**Coverage Targets**:
+- Services: ≥85%
+- ViewModels: ≥85%
+- Widgets: ≥70%
 
-## Validation & UX Rules
-- Real-time validation using existing validators (bounds: sys 70–250, dia 40–150, pulse 30–200).
-- Warning/override path uses existing override confirmation pattern; block errors.
-- Accessibility: labels for inputs, switches, and chips; touch targets >=48dp; high-contrast colors; semantic hints for validation banners.
-- Performance: keep widget trees lean; use const where possible; ListView.builder for recent readings.
+---
 
-## Test Strategy
-- **Widget tests (target ≥70% for new widgets):**
-  - AddReading basic fields validate bounds; warnings surface; submit disabled until valid.
-  - Advanced section expand/collapse state persists; arm/posture selection emits value.
-  - Session toggle sets new-session flag.
-  - Home quick action triggers navigation to AddReading; recent readings render list.
-  - Lock state redirect when locked (mock LockViewModel).
-- **Unit tests:** helper widgets (expandable_section, loading_button) behaviors.
-- **Integration (optional):** create reading -> appears in recent list (using fake services).
+## Review Requirements
 
-## Sequencing
-1) Shell & navigation scaffold (bottom nav, routes, lock gating hook)
-2) Home widgets (profile selector, quick actions, recent readings stub with mock data)
-3) Add Reading basic form + validation + submission to ViewModel
-4) Advanced section + session control + medication stub link
-5) Wire to real services; refresh recent readings
-6) Tests (widgets, unit); analyzer/format
+Please review the plan for:
 
-## Risks & Mitigations
-- **Lock integration**: ensure navigation respects locked state; add guard in shell. Mitigation: route middleware or early return to lock screen.
-- **Validation UX complexity**: warning vs error states. Mitigation: shared validation banner component.
-- **Large forms usability**: ensure scroll + keyboard padding. Mitigation: SingleChildScrollView + padding + safe area.
+### 1. CODING_STANDARDS.md Compliance
+- [ ] Architecture patterns align with established service → viewmodel → view flow
+- [ ] Naming conventions follow standards (camelCase, PascalCase, snake_case files)
+- [ ] Import organization specified correctly
+- [ ] 80-character line limit considerations addressed
+- [ ] Resource disposal strategy documented (chart controllers)
+- [ ] Error handling approach defined
 
-## Open Questions
-- Should recent readings show averaged groups or raw latest? (Assuming averaged top 3-5.)
-- Preferred nav pattern: bottom nav (default) vs navigation rail for tablets?
-- Medication quick-log: open existing intake flow or stub dialog? (Assuming stub link for now.)
+### 2. Technical Soundness
+- [ ] Service layer responsibilities clearly defined and scoped
+- [ ] ViewModel state management approach aligns with Provider patterns
+- [ ] Chart data structures efficient and well-typed
+- [ ] Statistical calculations mathematically correct (min/avg/max, std dev)
+- [ ] Query optimization strategies realistic
+- [ ] Caching strategy prevents stale data issues
+- [ ] Downsampling logic preserves data integrity
 
-## Timeline (per handoff, reaffirmed)
-- Planning/wireframes: 0.5 day
-- Implementation: 2-3 days (form, home, nav shell)
-- Testing/QA: 1 day
-- Polish/Review: 0.5 day
+### 3. Testing Strategy
+- [ ] Unit test coverage comprehensive (service logic, calculations)
+- [ ] Widget test scenarios cover critical user interactions
+- [ ] Test cases include edge cases (empty data, single reading, outliers)
+- [ ] Mock structure appropriate for isolated testing
+- [ ] Coverage targets achievable and aligned with standards
 
-## Handoff Action
-- Clive: review this plan. On approval, proceed to implement on a feature branch following Coding Standards and CI gates.
+### 4. Performance & Scalability
+- [ ] Downsampling thresholds appropriate for mobile constraints
+- [ ] Query limits prevent excessive data loading
+- [ ] Chart rendering optimizations (RepaintBoundary, const constructors) documented
+- [ ] Memory management strategy addresses potential leaks
+- [ ] `compute()` isolate usage appropriate for heavy calculations
+
+### 5. UX & Accessibility
+- [ ] Clinical banding colors meet WCAG AA contrast requirements
+- [ ] Text legend provided for colorblind accessibility
+- [ ] Empty states clearly defined
+- [ ] Loading indicators specified
+- [ ] Error messaging user-friendly
+
+### 6. Implementation Feasibility
+- [ ] 10-day implementation timeline realistic
+- [ ] Task sequencing logical (foundation → viewmodel → UI → polish)
+- [ ] Dependencies identified and justified
+- [ ] Rollback strategy viable if blockers encountered
+- [ ] Risk assessment comprehensive with actionable mitigations
+
+### 7. Alignment with Phase Requirements
+- [ ] All tasks from [Implementation_Schedule.md](../Plans/Implementation_Schedule.md) addressed:
+  - [x] Chart widgets with banding
+  - [x] Time-range chips (7d/30d/90d/1y/all)
+  - [x] Stats cards (min/avg/max, variability, morning/evening split)
+  - [x] Sleep data normalization (date/get-up/stages) and stacked area chart
+  - [x] Optional sleep correlation overlay
+  - [x] Widget tests for rendering
+  - [x] Performance checks
+- [ ] Acceptance criteria measurable and aligned with schedule
+- [ ] Dependencies on Phases 2, 4, 6, 7 acknowledged
+
+---
+
+## Specific Review Focus Areas
+
+### Clinical Banding Accuracy
+The plan specifies:
+- **Normal**: <130 systolic AND <85 diastolic → Green
+- **Elevated**: 130-139 systolic OR 85-89 diastolic → Yellow
+- **High**: ≥140 systolic OR ≥90 diastolic → Red
+- **Isolated Systolic**: ≥140 systolic AND <90 diastolic → Orange marker
+
+**Question for Clive**: Do these thresholds match medical guidelines accurately? Should isolated diastolic hypertension be flagged similarly?
+
+### Sleep Data Completeness
+- Plan adds deep/light/REM/awake stage minutes, get-up time (endedAt), and morning-after alignment for correlation and stacked area chart.
+
+**Questions for Clive**:
+- Are stage fields sufficient (awake vs light split) for the planned visual?
+- Any migration concerns for existing sleep entries—should we default stage minutes to null vs 0 and surface an "incomplete" badge?
+
+### Statistical Calculation Validation
+The plan includes standard deviation for variability. 
+
+**Question for Clive**: Is coefficient of variation (CV) more appropriate for blood pressure variability, or is std dev sufficient?
+
+### Downsampling Strategy
+- 7d: All points (typically <50)
+- 30d: All if <100, else daily averages
+- 90d: Daily averages
+- 1y+: Weekly averages
+
+**Question for Clive**: Does this strike the right balance between data fidelity and performance?
+
+### Sleep Correlation Complexity
+Marked as optional due to potential scope creep.
+
+**Question for Clive**: Should this be deferred to Phase 8.5, or is it core to Phase 8 acceptance?
+
+---
+
+## Files for Review
+
+1. **Primary Plan**: [Documentation/Plans/Phase_8_Charts_Analytics_Plan.md](../Plans/Phase_8_Charts_Analytics_Plan.md)
+2. **Implementation Schedule**: [Documentation/Plans/Implementation_Schedule.md](../Plans/Implementation_Schedule.md) (Phase 8 section)
+3. **Coding Standards Reference**: [Documentation/Standards/Coding_Standards.md](../Standards/Coding_Standards.md)
+4. **Phase 7 Pattern Reference**: [Documentation/Plans/Phase_7_History_Plan.md](../Plans/Phase_7_History_Plan.md) (architectural consistency)
+
+---
+
+## Handoff Instructions
+
+### If Plan Approved
+Create handoff document: `Documentation/Handoffs/Clive_to_Georgina.md` (or `Clive_to_Claudette.md` depending on implementer assignment)
+
+Include:
+- Approval confirmation with any conditions/caveats
+- Specific areas requiring extra attention during implementation
+- Testing priorities (e.g., "Focus on chart performance tests early")
+- Any plan adjustments made during review
+
+### If Plan Requires Revision
+Create handoff document: `Documentation/Handoffs/Clive_to_Tracy.md`
+
+Include:
+- Specific sections requiring revision
+- Blocking issues vs nice-to-have improvements
+- Deadline for revised plan submission
+- Clarifying questions answered
+
+---
+
+## Additional Context
+
+**Grok Musings**: User provided [Documentation/Handoffs/Grok_to_Tracy.md](Grok_to_Tracy.md) with chart ideas (separate systolic/diastolic charts, stacked sleep area chart, PDF export). Treated as informational—plan focuses on core Phase 8 requirements first. Separate charts and PDF export can be revisited in Phase 9 (Export & Reports) or Phase 8.5 enhancements.
+
+**Current Branch**: `feature/phase-8-charts-analytics` (Phase 7 cleanup committed)
+
+**Test Suite Status**: 588 tests passing before Phase 8 work begins
+
+---
+
+## Success Criteria for This Handoff
+
+- [ ] Clive confirms plan aligns with CODING_STANDARDS.md
+- [ ] Technical approach validated (architecture, libraries, performance)
+- [ ] Testing strategy deemed comprehensive
+- [ ] Implementation timeline realistic
+- [ ] Clinical accuracy verified (banding thresholds)
+- [ ] Rollback strategy acceptable
+- [ ] Plan greenlit for implementation OR specific revisions requested
+
+---
+
+**Tracy**  
+Planning Specialist  
+2025-12-30
+
+**Next Action**: Clive to review plan and provide approval/revision feedback via handoff document.
 
