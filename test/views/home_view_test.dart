@@ -312,7 +312,7 @@ void main() {
       expect(find.byIcon(Icons.bedtime_outlined), findsOneWidget);
     });
 
-    testWidgets('settings tab items are disabled', (WidgetTester tester) async {
+    testWidgets('settings tab has Appearance and About items enabled', (WidgetTester tester) async {
       await tester.pumpWidget(createWidget());
       await tester.pumpAndSettle();
 
@@ -333,8 +333,9 @@ void main() {
         find.ancestor(of: find.text('About'), matching: find.byType(ListTile)),
       );
 
-      expect(appearanceTile.enabled, isFalse);
-      expect(aboutTile.enabled, isFalse);
+      // Phase 17 enabled these items
+      expect(appearanceTile.enabled, isTrue);
+      expect(aboutTile.enabled, isTrue);
     });
   });
 }
