@@ -245,7 +245,6 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Reminders'), findsOneWidget);
       expect(find.text('Appearance'), findsOneWidget);
       expect(find.text('About'), findsOneWidget);
     });
@@ -313,12 +312,6 @@ void main() {
       await tester.drag(find.byType(ListView), const Offset(0, -500));
       await tester.pumpAndSettle();
 
-      final remindersTile = tester.widget<ListTile>(
-        find.ancestor(
-          of: find.text('Reminders'),
-          matching: find.byType(ListTile),
-        ),
-      );
       final appearanceTile = tester.widget<ListTile>(
         find.ancestor(
           of: find.text('Appearance'),
@@ -329,7 +322,6 @@ void main() {
         find.ancestor(of: find.text('About'), matching: find.byType(ListTile)),
       );
 
-      expect(remindersTile.enabled, isFalse);
       expect(appearanceTile.enabled, isFalse);
       expect(aboutTile.enabled, isFalse);
     });

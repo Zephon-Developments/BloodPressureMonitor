@@ -16,7 +16,7 @@ import 'package:blood_pressure_monitor/services/secure_password_manager.dart';
 class DatabaseService {
   static Database? _database;
   static const String _databaseName = 'blood_pressure.db';
-  static const int _databaseVersion = 4;
+  static const int _databaseVersion = 5;
 
   final Database? _testDatabase;
 
@@ -257,16 +257,6 @@ class DatabaseService {
     ''');
 
     await _createSleepEntryTable(db);
-
-    await db.execute('''
-      CREATE TABLE Reminder (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        profileId INTEGER NOT NULL,
-        schedule TEXT NOT NULL,
-        isActive INTEGER NOT NULL DEFAULT 0,
-        FOREIGN KEY (profileId) REFERENCES Profile(id) ON DELETE CASCADE
-      )
-    ''');
   }
 
   /// Handles database migrations between versions.
@@ -450,6 +440,11 @@ class DatabaseService {
           ON SleepEntry(profileId, startedAt)
         ''');
       });
+    }
+
+    if (oldVersion < 5) {
+      // Migration from v4 to v5: Remove Reminder feature
+      await db.execute('DROP TABLE IF EXISTS Reminder');
     }
   }
 
