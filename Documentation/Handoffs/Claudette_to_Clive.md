@@ -76,7 +76,7 @@ Phase 17 has been successfully implemented per the approved plan. All core funct
 
 ## Test Results
 
-**✅ All 531 Tests Passing**
+**✅ All 778 Tests Passing**
 
 ### Unit Tests
 - **theme_settings_test.dart**: 20/20 passing ✅
@@ -95,12 +95,14 @@ Phase 17 has been successfully implemented per the approved plan. All core funct
 - **Overall new code**: **>80% coverage achieved** per mandate
 
 ### Existing Tests
-- **All 462 existing tests**: PASSING ✅
+- **All 709 existing tests**: PASSING ✅
 - No regressions introduced
 
 ### Test Fixes Applied
 1. **AboutView tests**: Fixed by adding `PackageInfo.setMockInitialValues()` mock setup and changing `pump()` to `pumpAndSettle()` to properly await async package_info_plus operations.
 2. **FontScaleSelector test**: Simplified test to verify RadioListTile widgets and labels instead of searching for subtitle text.
+3. **AppearanceView widget tests**: Added `ensureVisible()` before tap operations to ensure widgets are in viewport.
+4. **HomeView test**: Updated to reflect that Appearance and About settings are now enabled in Phase 17.
 
 ---
 
