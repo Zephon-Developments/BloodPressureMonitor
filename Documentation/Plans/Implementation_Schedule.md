@@ -20,7 +20,7 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - [x] Phase 13: File Management & Export Sharing ✅ **COMPLETE** (Dec 31, 2025)
 - [x] Phase 14: App Rebrand (HyperTrack) ✅ **COMPLETE** (Dec 31, 2025)
 - [x] Phase 15: Reminder Removal ✅ **COMPLETE** (Dec 31, 2025)
-- [ ] Phase 16: Profile-Centric UI Redesign
+- [x] Phase 16: Profile-Centric UI Redesign ✅ **COMPLETE** (Dec 31, 2025)
 - [ ] Phase 17: Zephon Branding & Appearance Settings
 - [ ] Phase 18: Encrypted Full-App Backup
 - [ ] Phase 19: Polish & Comprehensive Testing
@@ -319,19 +319,31 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - App builds and runs with no reminder references; migration succeeds on legacy data.
 - Tests/analyzer pass; coverage meets targets.
 
-### Phase 16: Profile-Centric UI Redesign
+### Phase 16: Profile-Centric UI Redesign ✅ COMPLETE
 **Scope**: Profile-first navigation and quick logging for carer workflows.
+**Completion Date**: Dec 31, 2025
+**Status**: ✅ **COMPLETE** - Merged to main (PR #29)
 **Tasks**
-- Add launch profile picker (post security gate) with add/edit/delete, avatars, and notes.
-- Add persistent profile switcher in the main shell; refresh data on profile change.
-- Redesign home with quick actions (BP, medication intake, weight, sleep) and links to history,
-  analytics, medications, exports/reports, settings.
-- Audit ViewModels/queries for active-profile scoping; add refresh hooks to avoid leaks.
+- ✅ Add launch profile picker (post security gate) with add/edit/delete, avatars, and notes
+- ✅ Add persistent profile switcher in the main shell; refresh data on profile change
+- ✅ Implement Profile CRUD operations (Create, Update, Delete) in ActiveProfileViewModel
+- ✅ Create ProfileFormView for profile data entry and editing
+- ✅ Fix critical reactivity gaps in Analytics, MedicationIntake, MedicationGroup, FileManager ViewModels
+- ✅ All ViewModels listen to ActiveProfileViewModel and invalidate cache on profile switch
+- ✅ Fix LockGate race condition with _hasCheckedProfiles flag
+- ✅ Audit ViewModels/queries for active-profile scoping; add refresh hooks to avoid leaks
 **Dependencies**: Phases 1–13; rebrand strings from Phase 14; reminder removal complete.
 **Acceptance**
-- From unlock to logging any entry takes ≤2 taps; profile switch updates all views without
-  cross-profile leakage.
-- Widget tests cover profile switch, quick actions, and profile CRUD; analyzer/tests pass.
+- ✅ From unlock to logging any entry takes ≤2 taps; profile switch updates all views without cross-profile leakage
+- ✅ Widget tests cover profile switch, quick actions, and profile CRUD
+- ✅ All 686 tests passing; analyzer clean
+**Implementation Details**
+- Created `lib/views/profile/profile_form_view.dart` for CRUD operations
+- Enhanced `lib/views/profile/profile_picker_view.dart` with edit/delete actions
+- Updated 10+ ViewModels with ActiveProfileViewModel dependencies
+- Added comprehensive reactivity pattern across all data-scoped ViewModels
+- Fixed LockGate race condition in `lib/main.dart`
+**Status**: Merged to main via PR #29 (Dec 31, 2025)
 
 ### Phase 17: Zephon Branding & Appearance Settings
 **Scope**: About screen with Zephon branding and customizable appearance.
