@@ -71,7 +71,8 @@ void main() {
     expect(find.byIcon(Icons.add_circle_outline), findsNothing);
   });
 
-  testWidgets('should display multiple log intake buttons for multiple active meds',
+  testWidgets(
+      'should display multiple log intake buttons for multiple active meds',
       (tester) async {
     final medications = [
       Medication(
