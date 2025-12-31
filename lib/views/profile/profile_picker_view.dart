@@ -6,8 +6,29 @@ import 'package:blood_pressure_monitor/services/profile_service.dart';
 
 /// Profile selection screen shown after authentication when multiple profiles exist.
 ///
-/// Allows users to select which profile to activate for the current session.
-/// Supports adding new profiles and managing existing ones.
+/// This screen displays all available profiles and allows the user to select
+/// which profile to activate for the current session. It is typically shown
+/// immediately after the security gate (biometric/PIN authentication) when
+/// the app detects multiple profiles in the database.
+///
+/// The screen provides:
+/// - A scrollable list of all profiles with avatars, names, and birth years
+/// - Visual feedback during loading and error states
+/// - The ability to add new profiles (placeholder for future implementation)
+/// - Automatic navigation back to home after successful profile selection
+///
+/// Example usage:
+/// ```dart
+/// Navigator.of(context).push(
+///   MaterialPageRoute<void>(
+///     builder: (context) => const ProfilePickerView(),
+///   ),
+/// );
+/// ```
+///
+/// See also:
+/// - [ProfileSwitcher], which provides the persistent profile switcher widget
+/// - [ActiveProfileViewModel], which manages the active profile state
 class ProfilePickerView extends StatefulWidget {
   const ProfilePickerView({super.key});
 
