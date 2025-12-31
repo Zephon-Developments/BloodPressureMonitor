@@ -80,6 +80,15 @@ class MockBloodPressureViewModel extends _i1.Mock
       ) as bool);
 
   @override
+  void dispose() => super.noSuchMethod(
+        Invocation.method(
+          #dispose,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
   _i6.Future<void> loadReadings({bool? clearError = true}) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -159,15 +168,6 @@ class MockBloodPressureViewModel extends _i1.Mock
         Invocation.method(
           #removeListener,
           [listener],
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  void dispose() => super.noSuchMethod(
-        Invocation.method(
-          #dispose,
-          [],
         ),
         returnValueForMissingStub: null,
       );

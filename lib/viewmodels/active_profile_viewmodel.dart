@@ -98,6 +98,51 @@ class ActiveProfileViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Creates a new profile and optionally sets it as active.
+  Future<int> createProfile(Profile profile, {bool setAsActive = false}) async {
+    final id = await _profileService.createProfile(profile);
+    if (setAsActive) {
+      final newProfile = profile.copyWith(id: id);
+      await setActive(newProfile);
+    } else {
+      notifyListeners();
+    }
+    return id;
+  }
+
+  /// Updates an existing profile.
+  ///
+  /// If the updated profile is the active one, updates the local state.
+  Future<void> updateProfile(Profile profile) async {
+    await _profileService.updateProfile(profile);
+    if (profile.id == _activeProfileId) {
+      _activeProfileName = profile.name;
+      await _persistActiveProfile();
+    }
+    notifyListeners();
+  }
+
+  /// Deletes a profile.
+  ///
+  /// If the deleted profile is the active one, switches to another profile
+  /// or creates a default one if none remain.
+  Future<void> deleteProfile(int id) async {
+    await _profileService.deleteProfile(id);
+
+    if (id == _activeProfileId) {
+      // Need to find a new active profile
+      final profiles = await _profileService.getAllProfiles();
+      if (profiles.isNotEmpty) {
+        await setActive(profiles.first);
+      } else {
+        // No profiles left, create a default one
+        await loadInitial();
+      }
+    } else {
+      notifyListeners();
+    }
+  }
+
   /// Persists the active profile selection to SharedPreferences.
   Future<void> _persistActiveProfile() async {
     await _prefs.setInt(_activeProfileIdKey, _activeProfileId);

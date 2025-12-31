@@ -10,10 +10,13 @@ void main() {
   late MockWeightService mockWeightService;
   late WeightViewModel viewModel;
   late WeightEntry sampleEntry;
+  late MockActiveProfileViewModel mockActiveProfileViewModel;
 
   setUp(() {
     mockWeightService = MockWeightService();
-    viewModel = WeightViewModel(mockWeightService);
+    mockActiveProfileViewModel = MockActiveProfileViewModel();
+    when(mockActiveProfileViewModel.activeProfileId).thenReturn(1);
+    viewModel = WeightViewModel(mockWeightService, mockActiveProfileViewModel);
     sampleEntry = WeightEntry(
       id: 1,
       profileId: 1,

@@ -3,22 +3,41 @@ import 'package:flutter/foundation.dart';
 import 'package:blood_pressure_monitor/models/history.dart';
 import 'package:blood_pressure_monitor/models/reading.dart';
 import 'package:blood_pressure_monitor/services/history_service.dart';
+import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart';
 
 /// ViewModel coordinating history retrieval, filtering, and pagination.
+///
+/// Automatically reloads data when the active profile changes.
 class HistoryViewModel extends ChangeNotifier {
   HistoryViewModel(
-    this._historyService, {
-    int profileId = 1,
+    this._historyService,
+    this._activeProfileViewModel, {
     DateTime Function()? clock,
-  })  : _profileId = profileId,
-        _clock = clock ?? DateTime.now,
-        _filters = HistoryFilters.initial((clock ?? DateTime.now)().toUtc());
+  })  : _clock = clock ?? DateTime.now,
+        _filters = HistoryFilters.initial((clock ?? DateTime.now)().toUtc()) {
+    _activeProfileViewModel.addListener(_onProfileChanged);
+  }
 
   static const int _pageSize = 20;
 
   final HistoryService _historyService;
-  final int _profileId;
+  final ActiveProfileViewModel _activeProfileViewModel;
   final DateTime Function() _clock;
+
+  @override
+  void dispose() {
+    _activeProfileViewModel.removeListener(_onProfileChanged);
+    super.dispose();
+  }
+
+  /// Callback invoked when the active profile changes.
+  void _onProfileChanged() {
+    _groups = [];
+    _rawReadings = [];
+    _error = null;
+    notifyListeners();
+    loadInitial();
+  }
 
   HistoryFilters _filters;
   HistoryRangePreset _activePreset = HistoryRangePreset.thirtyDays;
@@ -255,7 +274,7 @@ class HistoryViewModel extends ChangeNotifier {
 
   Future<void> _loadGroups({required bool reset}) async {
     final groups = await _historyService.fetchGroupedHistory(
-      profileId: _profileId,
+      profileId: _activeProfileViewModel.activeProfileId,
       start: _filters.startDate,
       end: _filters.endDate,
       before: reset ? null : _groupCursor,
@@ -276,7 +295,7 @@ class HistoryViewModel extends ChangeNotifier {
 
   Future<void> _loadRawReadings({required bool reset}) async {
     final readings = await _historyService.fetchRawHistory(
-      profileId: _profileId,
+      profileId: _activeProfileViewModel.activeProfileId,
       start: _filters.startDate,
       end: _filters.endDate,
       before: reset ? null : _rawCursor,

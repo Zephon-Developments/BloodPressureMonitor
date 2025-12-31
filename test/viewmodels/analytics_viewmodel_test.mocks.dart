@@ -4,13 +4,18 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i4;
+import 'dart:ui' as _i11;
 
 import 'package:blood_pressure_monitor/models/analytics.dart' as _i2;
+import 'package:blood_pressure_monitor/models/profile.dart' as _i10;
 import 'package:blood_pressure_monitor/models/reading.dart' as _i7;
 import 'package:blood_pressure_monitor/services/analytics_service.dart' as _i3;
 import 'package:blood_pressure_monitor/utils/time_range.dart' as _i6;
+import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart'
+    as _i8;
 import 'package:flutter/material.dart' as _i5;
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:mockito/src/dummies.dart' as _i9;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -246,4 +251,131 @@ class MockAnalyticsService extends _i1.Mock implements _i3.AnalyticsService {
           ),
         ),
       ) as _i3.TimeOfDayClassification);
+}
+
+/// A class which mocks [ActiveProfileViewModel].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockActiveProfileViewModel extends _i1.Mock
+    implements _i8.ActiveProfileViewModel {
+  MockActiveProfileViewModel() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  int get activeProfileId => (super.noSuchMethod(
+        Invocation.getter(#activeProfileId),
+        returnValue: 0,
+      ) as int);
+
+  @override
+  String get activeProfileName => (super.noSuchMethod(
+        Invocation.getter(#activeProfileName),
+        returnValue: _i9.dummyValue<String>(
+          this,
+          Invocation.getter(#activeProfileName),
+        ),
+      ) as String);
+
+  @override
+  bool get isLoading => (super.noSuchMethod(
+        Invocation.getter(#isLoading),
+        returnValue: false,
+      ) as bool);
+
+  @override
+  bool get hasListeners => (super.noSuchMethod(
+        Invocation.getter(#hasListeners),
+        returnValue: false,
+      ) as bool);
+
+  @override
+  _i4.Future<void> loadInitial() => (super.noSuchMethod(
+        Invocation.method(
+          #loadInitial,
+          [],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> setActive(_i10.Profile? profile) => (super.noSuchMethod(
+        Invocation.method(
+          #setActive,
+          [profile],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<int> createProfile(
+    _i10.Profile? profile, {
+    bool? setAsActive = false,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #createProfile,
+          [profile],
+          {#setAsActive: setAsActive},
+        ),
+        returnValue: _i4.Future<int>.value(0),
+      ) as _i4.Future<int>);
+
+  @override
+  _i4.Future<void> updateProfile(_i10.Profile? profile) => (super.noSuchMethod(
+        Invocation.method(
+          #updateProfile,
+          [profile],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<void> deleteProfile(int? id) => (super.noSuchMethod(
+        Invocation.method(
+          #deleteProfile,
+          [id],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  void addListener(_i11.VoidCallback? listener) => super.noSuchMethod(
+        Invocation.method(
+          #addListener,
+          [listener],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void removeListener(_i11.VoidCallback? listener) => super.noSuchMethod(
+        Invocation.method(
+          #removeListener,
+          [listener],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void dispose() => super.noSuchMethod(
+        Invocation.method(
+          #dispose,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void notifyListeners() => super.noSuchMethod(
+        Invocation.method(
+          #notifyListeners,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
 }

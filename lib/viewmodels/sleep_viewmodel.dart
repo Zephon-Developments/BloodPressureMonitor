@@ -2,18 +2,39 @@ import 'package:flutter/foundation.dart';
 
 import 'package:blood_pressure_monitor/models/health_data.dart';
 import 'package:blood_pressure_monitor/services/sleep_service.dart';
+import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart';
 
 /// ViewModel for manual sleep tracking workflows.
 ///
 /// Provides CRUD helpers with loading/submission state, allowing UI widgets
 /// to bind to reactive sleep data.
+///
+/// Automatically reloads data when the active profile changes.
 class SleepViewModel extends ChangeNotifier {
   /// Creates a [SleepViewModel].
-  SleepViewModel(this._sleepService, {int profileId = 1})
-      : _profileId = profileId;
+  SleepViewModel(
+    this._sleepService,
+    this._activeProfileViewModel,
+  ) {
+    _activeProfileViewModel.addListener(_onProfileChanged);
+  }
 
   final SleepService _sleepService;
-  final int _profileId;
+  final ActiveProfileViewModel _activeProfileViewModel;
+
+  @override
+  void dispose() {
+    _activeProfileViewModel.removeListener(_onProfileChanged);
+    super.dispose();
+  }
+
+  /// Callback invoked when the active profile changes.
+  void _onProfileChanged() {
+    _entries = [];
+    _error = null;
+    notifyListeners();
+    loadEntries();
+  }
 
   List<SleepEntry> _entries = <SleepEntry>[];
   bool _isLoading = false;
@@ -39,7 +60,7 @@ class SleepViewModel extends ChangeNotifier {
 
     try {
       _entries = await _sleepService.listSleepEntries(
-        profileId: _profileId,
+        profileId: _activeProfileViewModel.activeProfileId,
         from: from,
         to: to,
       );
@@ -68,7 +89,7 @@ class SleepViewModel extends ChangeNotifier {
     try {
       final entry = SleepEntry(
         id: id,
-        profileId: _profileId,
+        profileId: _activeProfileViewModel.activeProfileId,
         startedAt: start,
         endedAt: end,
         quality: quality,

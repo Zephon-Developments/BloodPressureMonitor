@@ -9,6 +9,7 @@ import '../test_mocks.mocks.dart';
 void main() {
   late MockHistoryService mockHistoryService;
   late HistoryViewModel viewModel;
+  late MockActiveProfileViewModel mockActiveProfileViewModel;
   final DateTime now = DateTime.utc(2025, 1, 15);
 
   ReadingGroup buildGroup(int id, DateTime start, String ids) {
@@ -38,8 +39,11 @@ void main() {
 
   setUp(() {
     mockHistoryService = MockHistoryService();
+    mockActiveProfileViewModel = MockActiveProfileViewModel();
+    when(mockActiveProfileViewModel.activeProfileId).thenReturn(1);
     viewModel = HistoryViewModel(
       mockHistoryService,
+      mockActiveProfileViewModel,
       clock: () => now,
     );
   });

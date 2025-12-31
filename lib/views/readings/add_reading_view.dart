@@ -5,6 +5,7 @@ import 'package:blood_pressure_monitor/models/reading.dart';
 import 'package:blood_pressure_monitor/utils/validators.dart';
 import 'package:blood_pressure_monitor/utils/provider_extensions.dart';
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
+import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart';
 import 'package:blood_pressure_monitor/views/readings/widgets/reading_form_advanced.dart';
 import 'package:blood_pressure_monitor/views/readings/widgets/reading_form_basic.dart';
 import 'package:blood_pressure_monitor/views/readings/widgets/session_control_widget.dart';
@@ -111,11 +112,12 @@ class _AddReadingViewState extends State<AddReadingView> {
     });
 
     final viewModel = context.read<BloodPressureViewModel>();
+    final activeProfileViewModel = context.read<ActiveProfileViewModel>();
 
     final reading = Reading(
       id: widget.editingReading?.id,
       profileId: widget.editingReading?.profileId ??
-          1, // TODO: Use actual profile ID from profile selector
+          activeProfileViewModel.activeProfileId,
       takenAt: _selectedDateTime,
       localOffsetMinutes: _selectedDateTime.timeZoneOffset.inMinutes,
       systolic: int.parse(_systolicController.text),
