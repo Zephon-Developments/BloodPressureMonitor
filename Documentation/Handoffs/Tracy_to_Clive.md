@@ -1,121 +1,138 @@
-## Context
-- Goal: enable users to record when medications are taken. Medication models/services and the intake sheet already exist, but there is no obvious CTA from the medication list/home to log intakes.
-- Standards: follow Documentation/Standards/Coding_Standards.md (import order, const usage, 80-char lines, Provider MVVM, explicit error handling, tests for new logic).
-- Reference plan: Documentation/Plans/Medication_Intake_Plan.md.
-
-## Priorities
-1) Add a "Log intake" action on each medication row in the medication list that opens `showLogIntakeSheet` with the selected medication. Ensure MedicationIntakeViewModel is in provider scope when invoking.
-2) After logging, show success/error feedback and refresh intake history via MedicationIntakeViewModel.loadIntakes; stay on the current screen.
-3) Optional stretch: add a Home quick action to pick a medication then open the intake sheet.
-4) Update empty/help text if needed to point to the new log button.
-5) Tests: unit for MedicationIntakeService/MedicationIntakeViewModel logging paths (success/error, tz offset captured); widget for medication tile log CTA → sheet submit and success snackbar.
-
-## Risks/Notes
-- Provider wiring: confirm MedicationIntakeViewModel is available where the sheet launches; add scoped provider if missing.
-- Time zone correctness depends on MedicationIntake.default localOffsetMinutes; cover with a unit test.
-- If the Home quick action is skipped, ensure the medication list CTA is discoverable (icon + label or tooltip).
-
-## Open Questions
-- Should we support one-tap group logging from a quick action?
-- Should logging also link to the latest blood pressure reading via `medsContext` for correlation? (likely future work)# Handoff: Tracy → Clive (Phase 12 Plan)
+# Handoff: Tracy → Clive
 
 **Date:** December 31, 2025  
-**From:** Tracy (Architecture Planner)  
-**To:** Clive (Reviewer)  
-**Request:** Implement Phase 12 — Medication Reminders & Notifications
+**From:** Tracy (Planning)  
+**To:** Clive (Review)  
+**Scope:** Phase 13 – Export/PDF management & export sharing + automated cleanup
 
-## Objectives
-- Deliver per-medication reminders with local notifications (schedule, snooze, dismiss) and a reminder history view. 
-- Ensure reminders stay profile-scoped and respect medication active status. 
-- Maintain zero analyzer warnings and 100% passing tests per Coding_Standards.md.
+---
 
-## Scope
-- **Reminder Scheduling:** Local notifications for each medication instance based on schedule metadata; cancel/reschedule on edits/deletes/inactivation.
-- **Snooze/Dismiss:** In-notification actions to snooze (configurable duration) or dismiss; record action to history.
-- **Reminder History:** UI to review sent reminders and their outcomes (triggered, snoozed, dismissed, expired/missed).
-- **Settings & Permissions:** Global reminder enable/disable, per-medication opt-in/out, permission prompts, and fallback handling when permissions are denied.
+## Objectives & Success Metrics
+- Provide users a way to **view, share, and delete** locally stored exports (JSON/CSV) and doctor report PDFs.
+- Add **sharing for exports** identical to existing doctor report sharing (platform share sheet via `share_plus`).
+- Implement **automated cleanup** based on time and/or count thresholds, with clear controls and confirmations.
+- Maintain existing export/PDF generation behavior and file naming.
+- Success: Users can see stored files with size/date, share any export/PDF, delete individually/bulk, and configure/trigger cleanup; analyzer/tests green and coverage ≥ project standards.
 
-## Constraints & Dependencies
-- Follow **Coding_Standards.md**: zero analyzer warnings, formatted code, strong typing, DartDoc for public APIs, tests for new logic.
-- Platform: local notifications (Android primary; iOS must degrade gracefully if unsupported/permission denied). Use `flutter_local_notifications` + `timezone` packages; ensure tz initialization in `main.dart`.
-- Data must remain **profile-scoped** (ActiveProfileViewModel); inactive medications must not schedule reminders.
-- Scheduling must survive app restarts (persisted data drives rehydrate-on-launch scheduling).
-- Keep builds passing existing 628+ tests; add new coverage for reminder logic.
+## Best Practices Alignment (must-have)
+- **Security/Privacy**: Treat exports as sensitive; keep in app documents dir; avoid PII in filenames; no world-readable paths; do not auto-upload. Consider optional password-zip later (out of scope now).
+- **Sharing UX**: Use platform share sheet with clear text (e.g., "Sensitive health data – Blood Pressure Export"); handle missing files gracefully; never share by default.
+- **Data Integrity**: Keep JSON/CSV schema versioned; include metadata (app version, timezone offset, profile id) and preserve existing CSV sanitization against formula injection.
+- **Lifecycle & Cleanup**: Provide visibility (list with size/date), confirmation for delete/bulk, configurable cleanup (age/count, optional size), default conservative values; show summary of freed space.
+- **Resilience**: Handle low disk space and I/O errors with user-friendly messaging; tolerate orphaned or unparsable filenames; fall back to fs metadata.
+- **Performance/UX**: Async operations with progress/spinners; non-blocking cleanup; success/error toasts; predictable filenames already in place.
+- **Compliance & Docs**: Document that shares leave secure storage and users must handle responsibly; align with Coding_Standards security/testability sections.
 
-## Success Metrics
-- 0 analyzer errors/warnings; `flutter test` passes.
-- Notifications fire at expected local times (incl. DST/timezone changes) for active medications.
-- Editing/deleting/inactivating a medication cancels/reschedules associated reminders.
-- Snooze/dismiss actions update reminder history and do not duplicate notifications.
-- Reminder permissions handled gracefully with clear UX when denied.
+## Constraints & Standards
+- Architecture: MVVM (Service → ViewModel → View). Provider/ChangeNotifier.
+- Storage: Uses `path_provider` documents directory; respect sandboxing (Android/iOS).
+- Coding: Follow Coding Standards (import ordering, 80-char guidance, security/testability emphasis) per Documentation/Standards/Coding_Standards.md §1 (security/reliability/testability) and §3 (imports/style).
+- Tests: New logic must be unit-testable; target same coverage bar as existing (~90%+ on new code). No analyzer warnings.
+- Branching: use protected main; branch e.g., `feature/export-file-management`.
 
-## Proposed Architecture
-- **Data Model**
-  - Extend `Medication.scheduleMetadata` to include reminder config (versioned JSON):
-    - `reminders.enabled`, `reminders.times` (HH:mm local), `reminders.daysOfWeek` (1-7), `reminders.leadMinutes` (optional pre-dose alert), `reminders.snoozeMinutes` default, `reminders.channelId`.
-  - New model: `MedicationReminderEvent` (id, medicationId, profileId, scheduledFor, firedAt, action: triggered/snoozed/dismissed/expired, snoozeUntil?, localOffsetMinutes, createdAt).
-- **Services**
-  - `ReminderService` (new): maps medication schedules → notification requests; persists `MedicationReminderEvent`; cancels/reschedules on changes.
-  - `NotificationService` (new, wrapper on flutter_local_notifications): init, permission check/request, schedule (with tz), cancel, snooze, action handling callbacks.
-- **ViewModels**
-  - `ReminderViewModel`: manages reminder settings (global toggle, per-medication enable), triggers reschedule, exposes permission state.
-  - `ReminderHistoryViewModel`: loads `MedicationReminderEvent` list (filters: date range, medication), supports clear.
-  - Integrations:
-    - `MedicationViewModel`: on create/update/delete/inactivate → notify `ReminderService` to sync schedules.
-    - `MedicationIntakeViewModel`: when logging intake, optionally mark related reminders as satisfied (avoid repeat the same slot?).
-- **Views/UX**
-  - Medication detail/settings panel: per-medication reminder toggle, time pickers, snooze default selector, lead-time selector.
-  - Global Reminder Settings: enable/disable all reminders, permission status, “Reschedule all” button.
-  - Reminder History View: list of `MedicationReminderEvent` with status chips (triggered/snoozed/dismissed/expired), filters by date/medication.
-  - Notification actions: “Snooze” (uses configured snoozeMinutes), “Dismiss”; tap opens app to intake logging for that medication.
-- **App Startup**
-  - Initialize timezone + notifications in `main.dart` before runApp.
-  - On launch and profile switch: load active profile meds and reschedule reminders for active ones with reminders enabled.
+## Current State (for reference)
+- `ExportService` saves JSON/CSV to documents dir; no sharing/cleanup.
+- `PdfReportService` saves PDFs; has `shareReport(File)` using `Share.shareXFiles`.
+- `ExportViewModel` handles export; tracks last path and errors only.
+- `ExportView` shows buttons for JSON/CSV, success path, no share/management UI.
+- No file registry; files accumulate indefinitely.
+
+## Key Decisions to Lock
+1. **File discovery**: Prefer filesystem scan in documents dir using naming patterns (`bp_export_*`, `bp_report_*`). Optional registry not required now; handle orphaned files gracefully.
+2. **UI pattern**: Use **hybrid** approach:
+   - Add "Recent exports" and share button in `ExportView` post-export.
+   - Add dedicated **File Manager** screen for full list and cleanup controls, linked from Export screen and Settings.
+3. **Auto-cleanup policy**: Configurable thresholds with safe defaults (proposal: age ≥ 90 days OR keep latest 50 per type). Manual cleanup always available.
+4. **Deletion UX**: Confirm dialogs for single/bulk; show total size freed; handle missing files without crashing.
+5. **Sharing**: Use `share_plus` for all file types; reuse pattern from doctor reports.
+
+## Architecture & Components
+- **FileManagerService (new)**
+  - Responsibilities: scan documents dir, classify files (type, createdAt from filename or fs metadata), compute size, delete files, bulk delete by filters (age/count/type), run auto-cleanup routine.
+  - Inputs: documents path (`getApplicationDocumentsDirectory()`), optional filters.
+  - Outputs: `List<ManagedFile>` model with metadata (path, name, size, createdAt, type: export_json/export_csv/report_pdf).
+
+- **ManagedFile model (new)**
+  - Fields: `String path`, `String name`, `int sizeBytes`, `DateTime createdAt`, `FileKind kind`, `String? profileName` (parsed if present).
+  - Parsing: derive from filename prefix; fallback to fs stats if parse fails.
+
+- **ExportService (update)**
+  - Add `Future<void> shareExport(File file)` using `Share.shareXFiles([XFile(file.path)], text: 'Blood Pressure Export');`.
+  - Optionally centralize filename pattern helpers for reuse by FileManagerService.
+
+- **PdfReportService (existing)**
+  - No change to generation; ensure share helper reused if possible (optional utility wrapper).
+
+- **ExportViewModel (update)**
+  - Expose `shareLastExport()` (uses stored path) and error handling.
+  - Optionally expose a callback to open File Manager.
+
+- **FileManagerViewModel (new)**
+  - Holds list state, loading/error flags, total size, filters.
+  - Actions: load files, delete single, delete bulk (by selection or rule), run auto-cleanup, refresh.
+  - Handles missing-file gracefully (removes from state, surfaces soft warning).
+
+- **AutoCleanupPolicy (new model)**
+  - Fields: `Duration? maxAge`, `int? maxFilesPerType`, `bool enabled` (defaults enabled with safe values?), `int? maxTotalSizeMB` (optional stretch).
+  - Stored in `SharedPreferences` or existing settings mechanism.
+
+- **FileManagerView (new UI)**
+  - Lists files grouped by type; shows name, size, date.
+  - Actions per item: Share, Delete.
+  - Bulk actions: Delete selected; Run auto-cleanup now.
+  - Summary header: total files, total size, cleanup policy display.
+
+- **ExportView (update UI)**
+  - After successful export, show buttons: `Share`, `Open in File Manager`.
+  - Optional mini-list of last N exports (with share/delete quick actions) to reduce navigation friction.
 
 ## Data Flow
-1. **Configure**: User sets reminder times per medication → `Medication.scheduleMetadata` updated → `ReminderService` schedules notifications.
-2. **Trigger**: Notification fires; action buttons (snooze/dismiss) handled via `NotificationService` callbacks → record `MedicationReminderEvent`; snooze reschedules single notification; dismiss cancels current instance.
-3. **Update**: Medication edit/delete/inactivate → `ReminderService` cancels/reschedules relevant notifications.
-4. **History**: `ReminderHistoryViewModel` queries events (profile-scoped) for UI.
-5. **Permissions**: On-demand prompt; if denied, surface banner/toast and disable scheduling for that profile until granted.
+1. Export/Report generation writes to documents dir with current naming.
+2. FileManagerService scans dir on demand; returns `ManagedFile` list.
+3. FileManagerViewModel loads list, applies grouping/sorting, exposes to UI.
+4. Share action: FileManagerViewModel → Share via ExportService/PdfReportService helper (based on type) or unified share utility.
+5. Delete action: FileManagerViewModel → FileManagerService.delete(path) → refresh list.
+6. Auto-cleanup: run on demand and optionally on startup of FileManagerViewModel or app init; uses policy to delete old/excess files.
 
-## Affected Files (expected)
-- `pubspec.yaml`: add `flutter_local_notifications`, `timezone` (and permissions configs).
-- `android/` & `ios/`: notification setup (channels, icons, permission strings for iOS if needed).
-- `lib/main.dart`: init tz, `NotificationService`, register providers, app startup reschedule.
-- `lib/services/`: add `notification_service.dart`, `reminder_service.dart`; extend `medication_service.dart` to expose reminder metadata helpers (if needed).
-- `lib/models/medication.dart`: extend schedule metadata schema; add `MedicationReminderEvent` model (new file or same file section).
-- `lib/viewmodels/`: add `reminder_viewmodel.dart`, `reminder_history_viewmodel.dart`; integrate hooks in existing medication/intake viewmodels.
-- `lib/views/`: medication detail/settings panel for reminders; global reminder settings; reminder history view; notification action routing entrypoint.
-- `test/`: unit tests for services/viewmodels; widget tests for reminder settings UI; permission-denied handling tests.
+## Automated Cleanup Design
+- Trigger points: manual "Run cleanup now" button; optional automatic on app launch of Export/FileManager screens; post-export hook (non-blocking).
+- Rules (configurable):
+  - **Age rule**: delete files older than N days (default 90).
+  - **Count rule**: retain most recent M per type (default 50) and delete older.
+  - (Optional) **Size rule**: keep total under S MB by deleting oldest first.
+- Safety: dry-run preview counts/size to be deleted; confirm before executing.
+- Error handling: skip missing/locked files; collect errors; present summary.
 
-## Sequencing Plan
-1. **Dependencies & Config**: add packages, notification/tz init, Android channel setup, iOS permission strings (if applicable).
-2. **Models**: define reminder config schema and `MedicationReminderEvent`.
-3. **Services**: implement `NotificationService` (scheduling, actions), `ReminderService` (mapping schedules to notifications, persistence, cancel/reschedule).
-4. **ViewModels**: reminder settings + history; wire medication lifecycle hooks to reschedule.
-5. **Views**: reminder settings UI (per-med), global settings, history view; hook navigation from Settings/Medications.
-6. **Integration**: startup reschedule; notification action callbacks into app (snooze/dismiss → history + optional intake flow).
-7. **Testing**: unit tests (schedule mapping, cancel/reschedule, snooze), widget tests for settings; ensure analyzer/test pass.
-
-## Risks & Mitigations
-- **Timezone/DST shifts**: use `timezone` package; store wall-clock intent; reschedule on tz init and app resume.
-- **Doze/background limits**: document platform caveats; prefer exact alarms only if permitted; otherwise fallback.
-- **Permission denied**: surface clear UX; skip scheduling until granted; keep state consistent.
-- **Action handling**: ensure callbacks registered early; guard against null context when app not running; log events safely.
-- **Profile switching**: always scope to `ActiveProfileViewModel`; cancel reminders from previous profile on switch.
-
-## Open Questions for Review
-1. Snooze default: fixed (e.g., 10 min) vs per-med configurable? cap on snooze count?
-2. Lead-time alerts: required or optional? default value?
-3. iOS support requirements: is iOS a must-have now, or Android-only acceptable with graceful degradation?
-4. Should dismiss auto-mark as “missed” in history, or remain neutral?
-5. Do we block scheduling for inactive medications automatically (assumed yes)?
+## Sequencing
+1. **Services/Models**: Add ManagedFile, AutoCleanupPolicy, FileManagerService; update ExportService sharing helper.
+2. **ViewModels**: Add FileManagerViewModel; extend ExportViewModel with share + navigation hooks.
+3. **UI**: Update ExportView (share button + recent list + link); create FileManagerView; add navigation entry (Settings or menu/quick action).
+4. **Auto-cleanup**: Implement policy storage, apply rules in service, wire UI controls, optional on-load trigger.
+5. **Tests**: Unit tests for services, viewmodels; widget tests for views; integration-style tests for cleanup logic with temp dirs.
+6. **Docs**: Update README/QUICKSTART or in-app help; note storage/cleanup behavior.
 
 ## Test Strategy
-- Unit tests: schedule mapping (times, daysOfWeek, leadMinutes), cancel/reschedule on edits/deletes, snooze action rescheduling, permission-denied no-op behavior.
-- ViewModel tests: reminder enable/disable flows, history filters, profile switch reschedule.
-- Widget tests: per-med reminder settings form; global settings banner when permission denied.
-- Manual: notification fire, snooze/dismiss actions, DST boundary sanity check.
+- **Service tests**: FileManagerService scanning (mixed file types), delete single/bulk, age and count pruning, size calculations, missing file handling.
+- **ViewModel tests**: state transitions on load/share/delete/cleanup success and failures; error propagation.
+- **Widget tests**: ExportView share button visible after export; FileManagerView list rendering, share/delete flows (mocked); confirmation dialogs.
+- **Edge cases**: zero files; corrupted filename parse; file removed between scan and delete; share on missing file; policy disabled; large file sizes.
+- Follow Coding_Standards guidance on test isolation and coverage (§1.1 Testability, §3 style).
 
-Please review the scope, architecture, risks, and open questions. Upon approval I’ll proceed to implementation guidance for Claudette.
+## Risks & Mitigations
+- **Platform storage quirks**: Android/iOS sandbox—mitigate by staying in documents dir; no external storage assumptions.
+- **Incorrect deletions**: Require confirmations; default conservative policy; dry-run preview.
+- **Orphaned files/unparseable names**: Fallback to fs metadata; show as "Unknown" type but manageable.
+- **Long scans**: Use async with progress; consider caching if needed (defer unless perf issues).
+- **Concurrent access**: Guard against deleting file in use; surface user-friendly error and refresh.
+
+## Open Questions for Clive/User
+1. Default auto-cleanup policy values (proposed: age 90 days, keep 50 per type; size cap? 200 MB?).
+2. Should auto-cleanup be enabled by default, or opt-in?
+3. Where to surface File Manager entry (Settings, Export screen button, plus possibly Home quick action)?
+4. Should users be able to open files (JSON/CSV) in external viewer, or only share/delete?
+5. Need a "Select all" bulk delete, or only rule-based cleanup?
+
+---
+
+## Ready for Review
+This plan is ready for your review, focusing on the proposed architecture, auto-cleanup defaults, and UI placement choices.

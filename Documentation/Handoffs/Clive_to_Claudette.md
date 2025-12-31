@@ -1,42 +1,85 @@
-# Handoff: Clive → Claudette (Medication Intake Implementation)
+# Handoff: Clive → Claudette
 
 **Date:** December 31, 2025  
 **From:** Clive (Reviewer)  
-**To:** Claudette (Implementation Specialist)  
-**Status:** APPROVED
-
-## Scope & Objectives
-Implement the "Medication Intake Recording" feature as outlined in [Documentation/Plans/Medication_Intake_Plan.md](Documentation/Plans/Medication_Intake_Plan.md). The goal is to provide a clear and fast way for users to log medication intakes (single or grouped).
-
-## Key Requirements
-1.  **Medication List CTA**: Add a "Log intake" icon button to each medication tile in `MedicationListView`. This should open the existing `LogIntakeSheet`.
-2.  **Group Logging**: Ensure the implementation supports logging multiple medications at once if they belong to a group (as per Decision 1 in the plan).
-3.  **Home Quick Action**: Add a "Log Medication" quick action to the `HomeView` that allows users to pick a medication and log an intake.
-4.  **Feedback & Refresh**: Show success/error snackbars after logging. Ensure `MedicationIntakeViewModel.loadIntakes()` is called to refresh history.
-5.  **Timing Correlation**: Log the exact date/time taken. Do not prompt for missed/late status; rely on existing schedule metadata logic.
-
-## Technical Constraints
--   **MVVM**: Follow the established Provider pattern.
--   **Coding Standards**: 
-    -   Strictly follow [Documentation/Standards/Coding_Standards.md](Documentation/Standards/Coding_Standards.md).
-    -   Maintain 80-character line limits.
-    -   Use `const` constructors where possible.
-    -   Organize imports correctly.
--   **Security**: All data must be persisted via the encrypted `DatabaseService`.
--   **Testing**: 
-    -   Unit tests for `MedicationIntakeService` and `MedicationIntakeViewModel`.
-    -   Widget tests for the new CTAs and the `LogIntakeSheet` flow.
-    -   Maintain ≥80% coverage.
-
-## Affected Files
--   `lib/views/medication/medication_list_view.dart`: Add log CTA to tiles.
--   `lib/views/home_view.dart`: Add quick action.
--   `lib/views/home/widgets/quick_actions.dart`: (If applicable) Add medication log action.
--   `lib/viewmodels/medication_intake_viewmodel.dart`: Ensure refresh logic is robust.
--   `test/`: Add corresponding unit and widget tests.
-
-## Handoff Instructions
-Claudette, please proceed with the implementation. Ensure you run `flutter analyze` and `flutter test` before submitting your changes. If you encounter any architectural blockers, consult with Tracy.
+**To:** Claudette (Implementer)  
+**Subject:** Phase 13 – Export/PDF Management, Sharing, and Automated Cleanup
 
 ---
-**Reviewer Note**: The plan is solid. Focus on the UX of the quick action to ensure it's truly "fast" for the user.
+
+## 1. Scope & Acceptance Criteria
+
+Implement a comprehensive file management system for health data exports (JSON/CSV) and doctor reports (PDF).
+
+### Acceptance Criteria:
+- **File Management:** A new `FileManagerView` to list, share, and delete files in the app's documents directory.
+- **Sharing:** Enable platform share sheets for JSON/CSV exports (matching existing PDF sharing).
+- **Automated Cleanup:** Implement logic to prune old/excess files based on age (default 90 days) and count (default 50 per type).
+- **UI Integration:** 
+    - Update `ExportView` to show a "Share" button and "Manage Files" link after export.
+    - Add a "File Manager" entry point in Settings/Main Menu.
+- **Safety:** Mandatory confirmation dialogs for all deletion operations.
+- **Quality:** 90%+ test coverage for new logic; zero analyzer issues; strict adherence to `Coding_Standards.md`.
+
+---
+
+## 2. Technical Architecture
+
+Follow the MVVM pattern as outlined in Tracy's plan:
+
+### Models
+- `ManagedFile`: Metadata for files (path, name, size, date, type).
+- `AutoCleanupPolicy`: Configuration for cleanup thresholds.
+
+### Services
+- `FileManagerService`: 
+    - Scan `getApplicationDocumentsDirectory()` for `bp_export_*` and `bp_report_*`.
+    - Handle file deletion and bulk cleanup logic.
+    - Calculate total storage usage.
+- `ExportService` (Update): Add `shareExport(File file)` using `share_plus`.
+
+### ViewModels
+- `FileManagerViewModel`: Manage state for the file list, loading, and cleanup actions.
+- `ExportViewModel` (Update): Support sharing the last generated export.
+
+### Views
+- `FileManagerView`: Grouped list of files with metadata and actions (Share/Delete).
+- `ExportView` (Update): Post-export UX improvements.
+
+---
+
+## 3. Implementation Details & Defaults
+
+- **Auto-Cleanup Defaults:** 
+    - Age: 90 days.
+    - Count: 50 files per type.
+    - Enabled by default: Yes (provide a toggle in the File Manager).
+- **Sharing Text:** Use "Sensitive health data – Blood Pressure Export" in the share sheet.
+- **Error Handling:** Gracefully handle missing files (e.g., if deleted via OS) and I/O errors.
+- **Performance:** Ensure directory scanning and cleanup are non-blocking (async).
+
+---
+
+## 4. Reviewer's Focus Points
+
+- **Typing:** No `any` or `dynamic` where specific types can be used.
+- **Documentation:** JSDoc/DartDoc for all new public methods in services and viewmodels.
+- **Tests:** 
+    - Unit tests for `FileManagerService` (mocking `FileSystem`).
+    - ViewModel tests for state transitions.
+    - Widget tests for the new `FileManagerView` and updated `ExportView`.
+- **Security:** Verify that files are never moved to public/external storage without explicit user share action.
+
+---
+
+## 5. Reference Documents
+- [Tracy's Plan](../Handoffs/Tracy_to_Clive.md)
+- [Coding Standards](../Standards/Coding_Standards.md)
+
+---
+
+**Status:** APPROVED FOR IMPLEMENTATION  
+**Implementer:** Claudette  
+**Branch:** `feature/export-file-management`
+
+Please proceed with implementation. Reach out to Steve if you encounter blockers.

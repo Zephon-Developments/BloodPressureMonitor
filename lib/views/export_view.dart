@@ -109,6 +109,12 @@ class ExportView extends StatelessWidget {
                           textAlign: TextAlign.center,
                           style: const TextStyle(fontSize: 12),
                         ),
+                        const SizedBox(height: 12),
+                        ElevatedButton.icon(
+                          onPressed: () => _shareLastExport(context),
+                          icon: const Icon(Icons.share),
+                          label: const Text('Share'),
+                        ),
                       ],
                     ),
                   ),
@@ -166,5 +172,10 @@ class ExportView extends StatelessWidget {
         const SnackBar(content: Text('Export completed successfully')),
       );
     }
+  }
+
+  Future<void> _shareLastExport(BuildContext context) async {
+    final viewModel = context.read<ExportViewModel>();
+    await viewModel.shareLastExport();
   }
 }

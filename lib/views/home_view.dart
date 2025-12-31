@@ -11,6 +11,7 @@ import 'package:blood_pressure_monitor/views/settings/security_settings_view.dar
 import 'package:blood_pressure_monitor/views/export_view.dart';
 import 'package:blood_pressure_monitor/views/import_view.dart';
 import 'package:blood_pressure_monitor/views/report_view.dart';
+import 'package:blood_pressure_monitor/views/file_manager_view.dart';
 import 'package:blood_pressure_monitor/views/medication/medication_list_view.dart';
 import 'package:blood_pressure_monitor/views/medication/medication_history_view.dart';
 
@@ -248,6 +249,20 @@ class _HomeViewState extends State<HomeView> {
             Navigator.of(context).push(
               MaterialPageRoute<void>(
                 builder: (context) => const ImportView(),
+              ),
+            );
+          },
+        ),
+        const Divider(),
+        ListTile(
+          leading: const Icon(Icons.folder_open),
+          title: const Text('File Manager'),
+          subtitle: const Text('Manage exports and reports'),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (context) => const FileManagerView(),
               ),
             );
           },

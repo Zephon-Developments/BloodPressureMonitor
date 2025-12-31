@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:blood_pressure_monitor/services/export_service.dart';
 
@@ -85,5 +86,30 @@ class ExportViewModel extends ChangeNotifier {
   void clearError() {
     _errorMessage = null;
     notifyListeners();
+  }
+
+  /// Shares the last exported file.
+  Future<bool> shareLastExport() async {
+    if (_lastExportPath == null) {
+      _errorMessage = 'No file to share';
+      notifyListeners();
+      return false;
+    }
+
+    try {
+      final file = File(_lastExportPath!);
+      if (!await file.exists()) {
+        _errorMessage = 'Export file no longer exists';
+        notifyListeners();
+        return false;
+      }
+
+      await _exportService.shareExport(file);
+      return true;
+    } catch (e) {
+      _errorMessage = 'Failed to share: $e';
+      notifyListeners();
+      return false;
+    }
   }
 }
