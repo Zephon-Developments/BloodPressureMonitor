@@ -1,4 +1,4 @@
-# Blood Pressure Monitor - Phased Implementation Schedule
+# HyperTrack - Phased Implementation Schedule
 
 ## Purpose
 Break the implementation into sprint-sized phases with clear tasks, dependencies, acceptance criteria, and a simple progress tracker. Each phase should be reviewable/mergeable independently.

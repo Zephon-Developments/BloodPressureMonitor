@@ -1,6 +1,6 @@
-# Contributing to Blood Pressure Monitor
+# Contributing to HyperTrack
 
-Thank you for your interest in contributing to the Blood Pressure Monitor project! This document provides guidelines for contributing to this project.
+Thank you for your interest in contributing to the HyperTrack project! This document provides guidelines for contributing to this project.
 
 ## Code of Conduct
 
