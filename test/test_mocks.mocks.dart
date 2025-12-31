@@ -22,6 +22,8 @@ import 'package:blood_pressure_monitor/services/sleep_service.dart' as _i8;
 import 'package:blood_pressure_monitor/services/weight_service.dart' as _i9;
 import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart'
     as _i13;
+import 'package:blood_pressure_monitor/viewmodels/medication_viewmodel.dart'
+    as _i17;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i14;
 
@@ -936,6 +938,172 @@ class MockActiveProfileViewModel extends _i1.Mock
         returnValue: _i5.Future<void>.value(),
         returnValueForMissingStub: _i5.Future<void>.value(),
       ) as _i5.Future<void>);
+
+  @override
+  void addListener(_i16.VoidCallback? listener) => super.noSuchMethod(
+        Invocation.method(
+          #addListener,
+          [listener],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void removeListener(_i16.VoidCallback? listener) => super.noSuchMethod(
+        Invocation.method(
+          #removeListener,
+          [listener],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void dispose() => super.noSuchMethod(
+        Invocation.method(
+          #dispose,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void notifyListeners() => super.noSuchMethod(
+        Invocation.method(
+          #notifyListeners,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+}
+
+/// A class which mocks [MedicationViewModel].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockMedicationViewModel extends _i1.Mock
+    implements _i17.MedicationViewModel {
+  MockMedicationViewModel() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  List<_i3.Medication> get medications => (super.noSuchMethod(
+        Invocation.getter(#medications),
+        returnValue: <_i3.Medication>[],
+      ) as List<_i3.Medication>);
+
+  @override
+  bool get isLoading => (super.noSuchMethod(
+        Invocation.getter(#isLoading),
+        returnValue: false,
+      ) as bool);
+
+  @override
+  String? get errorMessage => (super.noSuchMethod(
+        Invocation.getter(#errorMessage),
+        returnValue: null,
+      ) as String?);
+
+  @override
+  String get searchTerm => (super.noSuchMethod(
+        Invocation.getter(#searchTerm),
+        returnValue: _i14.dummyValue<String>(
+          this,
+          Invocation.getter(#searchTerm),
+        ),
+      ) as String);
+
+  @override
+  bool get showInactive => (super.noSuchMethod(
+        Invocation.getter(#showInactive),
+        returnValue: false,
+      ) as bool);
+
+  @override
+  bool get hasListeners => (super.noSuchMethod(
+        Invocation.getter(#hasListeners),
+        returnValue: false,
+      ) as bool);
+
+  @override
+  _i5.Future<void> loadMedications() => (super.noSuchMethod(
+        Invocation.method(
+          #loadMedications,
+          [],
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
+
+  @override
+  _i5.Future<void> search(String? term) => (super.noSuchMethod(
+        Invocation.method(
+          #search,
+          [term],
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
+
+  @override
+  _i5.Future<void> toggleShowInactive() => (super.noSuchMethod(
+        Invocation.method(
+          #toggleShowInactive,
+          [],
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
+
+  @override
+  _i5.Future<void> setGroupFilter(int? groupId) => (super.noSuchMethod(
+        Invocation.method(
+          #setGroupFilter,
+          [groupId],
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
+
+  @override
+  _i5.Future<void> createMedication(_i3.Medication? medication) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #createMedication,
+          [medication],
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
+
+  @override
+  _i5.Future<void> updateMedication(_i3.Medication? medication) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #updateMedication,
+          [medication],
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
+
+  @override
+  _i5.Future<void> deleteMedication(int? id) => (super.noSuchMethod(
+        Invocation.method(
+          #deleteMedication,
+          [id],
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
+
+  @override
+  void clearError() => super.noSuchMethod(
+        Invocation.method(
+          #clearError,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
 
   @override
   void addListener(_i16.VoidCallback? listener) => super.noSuchMethod(
