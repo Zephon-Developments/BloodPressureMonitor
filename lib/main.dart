@@ -14,6 +14,7 @@ import 'package:blood_pressure_monitor/services/sleep_service.dart';
 import 'package:blood_pressure_monitor/services/weight_service.dart';
 import 'package:blood_pressure_monitor/services/medication_service.dart';
 import 'package:blood_pressure_monitor/services/medication_intake_service.dart';
+import 'package:blood_pressure_monitor/services/medication_group_service.dart';
 import 'package:blood_pressure_monitor/services/export_service.dart';
 import 'package:blood_pressure_monitor/services/import_service.dart';
 import 'package:blood_pressure_monitor/services/pdf_report_service.dart';
@@ -28,6 +29,9 @@ import 'package:blood_pressure_monitor/viewmodels/weight_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/export_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/import_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/report_viewmodel.dart';
+import 'package:blood_pressure_monitor/viewmodels/medication_viewmodel.dart';
+import 'package:blood_pressure_monitor/viewmodels/medication_intake_viewmodel.dart';
+import 'package:blood_pressure_monitor/viewmodels/medication_group_viewmodel.dart';
 import 'package:blood_pressure_monitor/views/home_view.dart';
 import 'package:blood_pressure_monitor/views/lock/lock_screen.dart';
 
@@ -55,6 +59,7 @@ void main() async {
   final sleepService = SleepService(databaseService);
   final medicationService = MedicationService(databaseService);
   final intakeService = MedicationIntakeService(databaseService);
+  final medicationGroupService = MedicationGroupService(databaseService);
   const appInfoService = AppInfoService();
   final analyticsService = AnalyticsService(
     readingService: readingService,
@@ -111,6 +116,7 @@ void main() async {
         Provider<SleepService>.value(value: sleepService),
         Provider<MedicationService>.value(value: medicationService),
         Provider<MedicationIntakeService>.value(value: intakeService),
+        Provider<MedicationGroupService>.value(value: medicationGroupService),
         Provider<AppInfoService>.value(value: appInfoService),
         Provider<AnalyticsService>.value(value: analyticsService),
         Provider<CorrelationService>.value(value: correlationService),
@@ -167,6 +173,26 @@ void main() async {
         ChangeNotifierProvider<ReportViewModel>(
           create: (context) => ReportViewModel(
             pdfReportService: context.read<PdfReportService>(),
+          ),
+        ),
+        ChangeNotifierProvider<MedicationViewModel>(
+          create: (context) => MedicationViewModel(
+            medicationService: context.read<MedicationService>(),
+            medicationGroupService: context.read<MedicationGroupService>(),
+            activeProfileViewModel: context.read<ActiveProfileViewModel>(),
+          ),
+        ),
+        ChangeNotifierProvider<MedicationIntakeViewModel>(
+          create: (context) => MedicationIntakeViewModel(
+            intakeService: context.read<MedicationIntakeService>(),
+            medicationService: context.read<MedicationService>(),
+            activeProfileViewModel: context.read<ActiveProfileViewModel>(),
+          ),
+        ),
+        ChangeNotifierProvider<MedicationGroupViewModel>(
+          create: (context) => MedicationGroupViewModel(
+            groupService: context.read<MedicationGroupService>(),
+            activeProfileViewModel: context.read<ActiveProfileViewModel>(),
           ),
         ),
       ],

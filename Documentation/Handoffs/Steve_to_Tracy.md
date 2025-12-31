@@ -1,166 +1,149 @@
-# Handoff: Steve → Tracy
+# Handoff: Steve → Tracy (Phase 11 Planning)
 
-**Date**: December 30, 2025  
-**Context**: Phase 10 Code Review Fixes  
-**Branch**: feature/export-reports  
-**Commit**: f55c620
-
----
-
-## Objective
-
-GitHub Copilot code review identified 6 issues in the Phase 10 (Export & Reports) implementation that need to be addressed before the PR can be merged to main. These are not breaking bugs but represent technical debt and potential security/usability issues that should be resolved.
+**Date:** December 30, 2025  
+**From:** Steve (Conductor)  
+**To:** Tracy (Planner)  
+**Status:** ACTIVE  
 
 ---
 
-## Scope
+## Context
 
-### Issues Identified
+Phase 10 (Export & Reports) has been successfully completed, reviewed, merged, and archived. All workflow artifacts have been moved to archive locations, and a comprehensive completion report has been created.
 
-1. **Hardcoded Profile IDs** (4 occurrences)
-   - [lib/views/import_view.dart](lib/views/import_view.dart#L224-L225): `profileId: 1` in importData call
-   - [lib/views/report_view.dart](lib/views/report_view.dart#L182-L183): `profileId: 1, profileName: 'User'` in PDF generation
-   - [lib/views/export_view.dart](lib/views/export_view.dart#L152-L153): `profileId: 1, profileName: 'User'` in JSON/CSV export
-   - **Impact**: Breaks multi-profile functionality; data will always export/import to profile 1 regardless of active profile
-   - **Severity**: Medium - functional issue affecting multi-profile users
-
-2. **Inconsistent Error Messaging** (1 occurrence)
-   - [lib/views/import_view.dart](lib/views/import_view.dart#L135-L141): Shows "Import Successful!" even when errors exist
-   - **Impact**: Misleading UX when partial imports occur (some records succeed, others fail)
-   - **Severity**: Low - UX issue, not data integrity issue
-   - **Expected Behavior**: Show "Partial Import" or "Import Completed with Errors" when `errors.isNotEmpty`
-
-3. **Null Pointer Exception Risk** (1 occurrence)
-   - [lib/views/report_view.dart](lib/views/report_view.dart#L170-L171): Using `!` on `_chartKey.currentContext` without null check
-   - **Impact**: Runtime crash if widget hasn't rendered or is disposed when generating PDF
-   - **Severity**: Medium - could cause app crashes in edge cases
-   - **Expected Behavior**: Add null check before accessing RenderRepaintBoundary
-
-4. **CSV Formula Injection Vulnerability** (1 occurrence)
-   - [lib/services/export_service.dart](lib/services/export_service.dart#L139-L170): User-controlled text fields written directly to CSV without sanitization
-   - **Impact**: Security risk - fields starting with `=`, `+`, `-`, `@` could execute as formulas when opened in Excel/Sheets
-   - **Severity**: High - security vulnerability (CSV injection attack vector)
-   - **Affected Fields**: `r.note`, `r.tags`, `w.notes`, medication names, sleep notes, etc.
-   - **Expected Behavior**: Escape/sanitize all user-controlled text before writing to CSV
+The project is now ready to begin **Phase 11: Medication Records UI**.
 
 ---
 
-## Constraints
+## Task for Tracy
 
-- **No Breaking Changes**: Fixes must maintain backward compatibility with existing data
-- **Test Coverage**: All fixes must include unit/widget tests demonstrating the issue is resolved
-- **Analyzer Clean**: No new warnings or errors introduced
-- **Minimal Scope**: Only fix the identified issues; no additional refactoring or feature additions
-- **Branch**: Continue working on `feature/export-reports` branch
-- **Standards Compliance**: Follow [Documentation/Standards/Coding_Standards.md](Documentation/Standards/Coding_Standards.md)
+**Objective:** Design a comprehensive implementation plan for Phase 11 based on the Implementation Schedule requirements.
+
+### Scope (from Implementation_Schedule.md)
+
+> Build comprehensive medication management UI:
+> - Build MedicationViewModel with CRUD operations for medications
+> - Build medication list view with search and filtering
+> - Build add/edit medication view with dosage, frequency, and scheduling
+> - Build medication history view showing intake records
+> - Add medication intake tracking UI
+> - Polish UI/UX for all medication screens
+
+### Key Considerations
+
+1. **Existing Infrastructure:**
+   - `MedicationService` and `MedicationIntakeService` are already implemented (Phase 3)
+   - `MedicationGroupService` exists for grouping medications
+   - `ActiveProfileViewModel` should be used for profile-scoped medication management
+   - Database schema supports medications, medication groups, and intake tracking
+
+2. **Reference Implementations:**
+   - **Phase 4**: Weight & Sleep UI (models: list view, add/edit view patterns)
+   - **Phase 7**: History UI (demonstrates filtering and date range selection)
+   - **Phase 8**: Charts & Analytics (shows visualization patterns)
+   - **Phase 9**: Edit & Delete (demonstrates CRUD operations in existing views)
+
+3. **Standards Compliance:**
+   - Follow [Documentation/Standards/Coding_Standards.md](../Standards/Coding_Standards.md)
+   - Maintain test coverage ≥85% for services, ≥75% for widgets
+   - Ensure zero analyzer warnings
+   - Use Provider pattern for state management
+   - Apply DartDoc to all public APIs
+
+4. **UI/UX Requirements:**
+   - Intuitive medication list with visual hierarchy
+   - Search and filtering capabilities (by name, active status, etc.)
+   - Clear add/edit forms with validation
+   - Medication history showing past intakes
+   - Quick intake tracking (e.g., "Mark as Taken" button)
+   - Dosage and scheduling information prominently displayed
+
+5. **Security & Validation:**
+   - Validate all user inputs (medication name, dosage, frequency)
+   - Prevent duplicate medications within the same profile
+   - Handle edge cases (deletion of medications with intake history)
+   - Ensure profile isolation (users can't see/edit other profiles' medications)
+
+6. **Testing Strategy:**
+   - Unit tests for `MedicationViewModel` (CRUD, filtering, search)
+   - Widget tests for medication list view
+   - Widget tests for add/edit medication view
+   - Widget tests for intake tracking UI
+   - Integration tests for end-to-end medication management flow
+
+---
+
+## Deliverables
+
+Tracy should produce:
+
+1. **Implementation Plan Document** (`Documentation/Plans/Phase_11_Medication_UI_Plan.md`):
+   - Detailed task breakdown
+   - File structure (new ViewModels, Views, Widgets)
+   - Data flow diagrams (how ViewModels interact with Services)
+   - UI wireframes or descriptions
+   - Test plan with specific test cases
+   - Dependencies and risks
+   - Acceptance criteria
+
+2. **Handoff to Clive** (`Documentation/Handoffs/Tracy_to_Clive.md`):
+   - Summary of the plan
+   - Request for review and approval
+   - Any clarifying questions or assumptions made
+
+---
+
+## Research Areas
+
+Tracy should investigate:
+
+1. **Medication Scheduling Patterns:**
+   - How to represent daily, weekly, or custom frequencies
+   - How to handle "as needed" medications
+   - How to display upcoming scheduled doses
+
+2. **Search & Filtering:**
+   - Should search be real-time or require a submit action?
+   - What filters are most useful? (active/inactive, by medication group, by frequency)
+
+3. **Intake Tracking UX:**
+   - Should users mark intakes from the medication list or a separate view?
+   - How to handle missed doses or early/late intakes
+   - Should there be a "quick add intake" shortcut?
+
+4. **Medication Groups:**
+   - Should group management be part of this phase or deferred?
+   - How to display medications that belong to groups?
+
+5. **Existing Code Review:**
+   - Review `lib/services/medication_service.dart` for available CRUD methods
+   - Review `lib/services/medication_intake_service.dart` for intake tracking capabilities
+   - Review `lib/models/medication.dart` and `lib/models/medication_intake.dart` for data structure
+
+---
+
+## Reference Documents
+
+- **Implementation Schedule:** [Documentation/Plans/Implementation_Schedule.md](../Plans/Implementation_Schedule.md)
+- **Coding Standards:** [Documentation/Standards/Coding_Standards.md](../Standards/Coding_Standards.md)
+- **Phase 4 Plan** (Weight & Sleep UI): Review for UI patterns
+- **Phase 7 Plan** (History): Review for filtering and list view patterns
+- **Medication Service:** `lib/services/medication_service.dart`
+- **Medication Intake Service:** `lib/services/medication_intake_service.dart`
 
 ---
 
 ## Success Metrics
 
-1. **Profile ID Resolution**:
-   - All export/import/report operations use the actual active profile ID from application state
-   - No hardcoded profile IDs remain in Phase 10 code
-   - Multi-profile functionality verified via tests
-
-2. **Error Messaging**:
-   - Import result dialog accurately reflects partial success states
-   - Shows distinct messages for: full success, partial success, full failure
-
-3. **Null Safety**:
-   - No null assertion operators (`!`) used without proper null checks
-   - PDF generation gracefully handles widget lifecycle edge cases
-
-4. **CSV Security**:
-   - All user-controlled text fields sanitized before CSV export
-   - Formula injection attack vectors eliminated
-   - Sanitization preserves data readability (minimal impact on legitimate content)
-
-5. **Testing**:
-   - Unit tests demonstrate CSV sanitization works correctly
-   - Widget tests verify error messaging for all import scenarios
-   - Tests confirm profile ID propagation from state to services
+- Clear, actionable plan with task estimates
+- Clive approves the plan without major revisions
+- Plan addresses all items in the Implementation Schedule scope
+- Plan considers reusability of existing patterns and infrastructure
 
 ---
 
-## Dependencies
-
-### Application State Context
-The app currently uses a simple profile system. Need to investigate:
-- How is the active profile ID currently tracked? (Provider? Singleton? Service?)
-- Where should export/import/report views retrieve the active profile?
-- Are there existing patterns in other views (analytics, history, home) that retrieve profile context?
-
-**Research Required**: Examine [lib/views/home_view.dart](lib/views/home_view.dart), [lib/viewmodels/blood_pressure_viewmodel.dart](lib/viewmodels/blood_pressure_viewmodel.dart), and related files to understand current profile management patterns.
-
-### Related Files
-- **Services**: [lib/services/export_service.dart](lib/services/export_service.dart), [lib/services/import_service.dart](lib/services/import_service.dart), [lib/services/pdf_report_service.dart](lib/services/pdf_report_service.dart)
-- **ViewModels**: [lib/viewmodels/export_viewmodel.dart](lib/viewmodels/export_viewmodel.dart), [lib/viewmodels/import_viewmodel.dart](lib/viewmodels/import_viewmodel.dart), [lib/viewmodels/report_viewmodel.dart](lib/viewmodels/report_viewmodel.dart)
-- **Views**: [lib/views/export_view.dart](lib/views/export_view.dart), [lib/views/import_view.dart](lib/views/import_view.dart), [lib/views/report_view.dart](lib/views/report_view.dart)
-- **Tests**: All corresponding test files in `test/` directory
+**Next Step:** Tracy, please research the existing medication infrastructure, design the UI/UX flow, and create a comprehensive implementation plan for Phase 11. Once complete, hand off to Clive for review.
 
 ---
 
-## Blockers / Risks
-
-### Risk: Profile State Architecture Unknown
-**Concern**: Don't know how profile state is currently managed in the application.  
-**Mitigation**: Tracy should research existing patterns before planning the fix.
-
-### Risk: CSV Sanitization Over-Aggressive
-**Concern**: Sanitizing CSV fields might corrupt legitimate data (e.g., mathematical expressions in notes).  
-**Mitigation**: Use minimal escaping (e.g., prefix with single quote `'` for Excel) that preserves data but prevents formula execution.
-
-### Risk: Breaking Import Compatibility
-**Concern**: CSV sanitization might make exported files incompatible with previously exported data.  
-**Mitigation**: Apply sanitization ONLY on export; import should handle both sanitized and unsanitized data gracefully.
-
----
-
-## Next Steps for Tracy
-
-1. **Research Phase**: 
-   - Investigate how profile state is currently managed (check HomeView, ViewModels, Services)
-   - Review CODING_STANDARDS.md for state management patterns
-   - Research CSV injection best practices for Flutter/Dart
-
-2. **Planning Phase**:
-   - Create detailed plan for profile ID propagation (state → ViewModel → View → Service)
-   - Design CSV sanitization strategy (which fields, what escaping method)
-   - Plan error messaging enhancements for import result dialog
-   - Specify null safety approach for RenderRepaintBoundary access
-
-3. **Handoff to Clive**:
-   - Present plan with code examples for each fix
-   - Include test strategy for validating fixes
-   - Reference CODING_STANDARDS.md sections that apply
-
----
-
-## Context Files
-
-- **Original Phase 10 Plan**: Completed and implemented (commit f159db6)
-- **Phase 10 Implementation**: Committed to feature/export-reports
-- **Implementation Schedule**: [Documentation/Plans/Implementation_Schedule.md](Documentation/Plans/Implementation_Schedule.md)
-- **Coding Standards**: [Documentation/Standards/Coding_Standards.md](Documentation/Standards/Coding_Standards.md)
-- **Active PR**: https://github.com/Zephon-Development/BloodPressureMonitor/pull/21
-
----
-
-## Notes
-
-- This is a **fix/polish** task, not new feature development
-- These issues were caught in code review BEFORE merging to main - good catch!
-- All fixes should be committed to the existing `feature/export-reports` branch
-- After implementation and Clive approval, Steve will update the PR and proceed with merge
-- PR #21 is currently open and waiting for these fixes before final merge
-
----
-
-**Handoff Target**: Tracy (Planning Agent)  
-**Next Action**: Research profile state management and create fix plan  
-**Expected Output**: `Tracy_to_Clive.md` with detailed fix plan for review
-
----
-
-**Prompt for User**: "Please continue as Tracy to research the profile state management and create a comprehensive fix plan for the code review issues."
+*Handoff Protocol: This document overwrites any previous `Steve_to_Tracy.md` handoff.*
