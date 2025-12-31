@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,6 +19,7 @@ class MedicationPickerDialog extends StatefulWidget {
 class _MedicationPickerDialogState extends State<MedicationPickerDialog> {
   final TextEditingController _searchController = TextEditingController();
   String _searchTerm = '';
+  Timer? _debounceTimer;
 
   @override
   void initState() {
@@ -29,6 +32,7 @@ class _MedicationPickerDialogState extends State<MedicationPickerDialog> {
   @override
   void dispose() {
     _searchController.dispose();
+    _debounceTimer?.cancel();
     super.dispose();
   }
 
@@ -77,6 +81,7 @@ class _MedicationPickerDialogState extends State<MedicationPickerDialog> {
               ? IconButton(
                   icon: const Icon(Icons.clear),
                   onPressed: () {
+                    _debounceTimer?.cancel();
                     setState(() {
                       _searchTerm = '';
                       _searchController.clear();
@@ -91,7 +96,13 @@ class _MedicationPickerDialogState extends State<MedicationPickerDialog> {
           setState(() {
             _searchTerm = value;
           });
-          context.read<MedicationViewModel>().search(value);
+          // Cancel previous timer
+          _debounceTimer?.cancel();
+          // Start new timer for debouncing (300ms delay)
+          _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+            if (!mounted) return;
+            context.read<MedicationViewModel>().search(value);
+          });
         },
       ),
     );
@@ -165,7 +176,10 @@ class _MedicationPickerDialogState extends State<MedicationPickerDialog> {
               title: Text(medication.name),
               subtitle: medication.dosage != null || medication.unit != null
                   ? Text(
-                      '${medication.dosage ?? ''} ${medication.unit ?? ''}',
+                      [
+                        if (medication.dosage != null) medication.dosage,
+                        if (medication.unit != null) medication.unit,
+                      ].join(' '),
                     )
                   : null,
               onTap: () => Navigator.of(context).pop(medication),

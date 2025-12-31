@@ -998,6 +998,12 @@ class MockMedicationViewModel extends _i1.Mock
       ) as bool);
 
   @override
+  String? get errorMessage => (super.noSuchMethod(
+        Invocation.getter(#errorMessage),
+        returnValue: null,
+      ) as String?);
+
+  @override
   String get searchTerm => (super.noSuchMethod(
         Invocation.getter(#searchTerm),
         returnValue: _i14.dummyValue<String>(
