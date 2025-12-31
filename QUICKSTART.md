@@ -1,6 +1,6 @@
 # Quick Start Guide
 
-Welcome to Blood Pressure Monitor! This guide will help you get started quickly.
+Welcome to HyperTrack! This guide will help you get started quickly.
 
 ## Installation
 

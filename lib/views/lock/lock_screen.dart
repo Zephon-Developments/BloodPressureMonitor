@@ -69,7 +69,7 @@ class _LockScreenViewState extends State<LockScreenView>
 
                 // Title
                 Text(
-                  'Blood Pressure Monitor',
+                  'HyperTrack',
                   style: Theme.of(context).textTheme.headlineSmall,
                   textAlign: TextAlign.center,
                 ),

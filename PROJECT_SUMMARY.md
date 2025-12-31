@@ -1,4 +1,4 @@
-# Blood Pressure Monitor - Project Summary
+# HyperTrack - Project Summary
 
 ## Project Overview
 

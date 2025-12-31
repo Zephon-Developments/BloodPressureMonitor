@@ -219,7 +219,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Blood Pressure Monitor',
+      title: 'HyperTrack',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
@@ -302,7 +302,7 @@ class _LockGateState extends State<_LockGate> with WidgetsBindingObserver {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Blood Pressure Monitor',
+                    'HyperTrack',
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
                 ],
