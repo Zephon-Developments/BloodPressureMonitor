@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'package:blood_pressure_monitor/models/medication.dart';
 import 'package:blood_pressure_monitor/viewmodels/medication_viewmodel.dart';
 import 'package:blood_pressure_monitor/views/medication/add_edit_medication_view.dart';
+import 'package:blood_pressure_monitor/views/medication/log_intake_sheet.dart';
 import 'package:blood_pressure_monitor/widgets/common/confirm_delete_dialog.dart';
 
 /// View for displaying and managing the list of medications.
@@ -223,6 +225,13 @@ class _MedicationListViewState extends State<MedicationListView> {
                 backgroundColor: Colors.grey,
                 padding: EdgeInsets.zero,
               ),
+            if (medication.isActive)
+              IconButton(
+                icon: const Icon(Icons.add_circle_outline),
+                onPressed: () => _logIntake(context, medication),
+                tooltip: 'Log intake',
+                color: Theme.of(context).primaryColor,
+              ),
             IconButton(
               icon: const Icon(Icons.edit),
               onPressed: () => _navigateToEditMedication(context, medication),
@@ -249,6 +258,10 @@ class _MedicationListViewState extends State<MedicationListView> {
     if (mounted) {
       this.context.read<MedicationViewModel>().loadMedications();
     }
+  }
+
+  void _logIntake(BuildContext context, Medication medication) {
+    showLogIntakeSheet(context, medication);
   }
 
   Future<void> _navigateToEditMedication(

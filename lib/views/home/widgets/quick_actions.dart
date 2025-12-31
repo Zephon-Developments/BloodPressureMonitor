@@ -4,6 +4,8 @@ import 'package:blood_pressure_monitor/views/history/history_view.dart';
 import 'package:blood_pressure_monitor/views/readings/add_reading_view.dart';
 import 'package:blood_pressure_monitor/views/sleep/sleep_history_view.dart';
 import 'package:blood_pressure_monitor/views/weight/weight_history_view.dart';
+import 'package:blood_pressure_monitor/views/medication/log_intake_sheet.dart';
+import 'package:blood_pressure_monitor/widgets/medication/medication_picker_dialog.dart';
 
 /// Quick action buttons for the home screen.
 ///
@@ -44,6 +46,24 @@ class QuickActions extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           OutlinedButton.icon(
+            onPressed: () async {
+              final medication = await showMedicationPicker(context);
+              if (medication != null && context.mounted) {
+                showLogIntakeSheet(context, medication);
+              }
+            },
+            icon: const Icon(Icons.medication),
+            label: const Text('Log Medication Intake'),
+            style: OutlinedButton.styleFrom(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.symmetric(
+                vertical: 16,
+                horizontal: 20,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute<void>(
@@ -55,7 +75,10 @@ class QuickActions extends StatelessWidget {
             label: const Text('View Blood Pressure History'),
             style: OutlinedButton.styleFrom(
               alignment: Alignment.centerLeft,
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+              padding: const EdgeInsets.symmetric(
+                vertical: 16,
+                horizontal: 20,
+              ),
             ),
           ),
           const SizedBox(height: 8),
@@ -71,7 +94,10 @@ class QuickActions extends StatelessWidget {
             label: const Text('View Weight History'),
             style: OutlinedButton.styleFrom(
               alignment: Alignment.centerLeft,
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+              padding: const EdgeInsets.symmetric(
+                vertical: 16,
+                horizontal: 20,
+              ),
             ),
           ),
           const SizedBox(height: 8),
@@ -87,7 +113,10 @@ class QuickActions extends StatelessWidget {
             label: const Text('View Sleep History'),
             style: OutlinedButton.styleFrom(
               alignment: Alignment.centerLeft,
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+              padding: const EdgeInsets.symmetric(
+                vertical: 16,
+                horizontal: 20,
+              ),
             ),
           ),
         ],
