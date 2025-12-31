@@ -3,64 +3,61 @@
 **Date**: December 31, 2025  
 **From**: Clive (Review Specialist)  
 **To**: Claudette (Implementation Engineer)  
-**Task**: Implement HyperTrack Evolution (Phases 14–18)
+**Task**: Phase 15 - Reminder Removal Implementation
 
 ---
 
-## 1. Context
+## 1. Task Overview
 
-The implementation plans for the next major evolution of the app (now named **HyperTrack**) have been approved. This work involves a significant UI redesign to support carer workflows, a secure backup system, and branding updates for Zephon Development.
+You are assigned to implement **Phase 15: Reminder Removal**. The goal is to completely remove the reminder feature, including its database schema, data models, and UI placeholders, while ensuring a smooth migration for existing users.
 
-## 2. Objectives
+## 2. Reference Documents
 
-Implement Phases 14 through 18 as defined in the approved plans.
+- **Implementation Plan**: [Documentation/Plans/Phase_15_Reminder_Removal_Plan.md](../Plans/Phase_15_Reminder_Removal_Plan.md)
+- **Review Approval**: [reviews/2025-12-31-clive-phase-15-plan-review.md](../../reviews/2025-12-31-clive-phase-15-plan-review.md)
+- **Coding Standards**: [Documentation/Standards/CODING_STANDARDS.md](../Standards/CODING_STANDARDS.md)
 
-## 3. Reference Materials
+## 3. Implementation Steps
 
-- **Phase 14 (Rebrand)**: `Documentation/Plans/Phase_14_Rebrand_HyperTrack_Plan.md`
-- **Phase 15 (Reminder Removal)**: `Documentation/Plans/Phase_15_Reminder_Removal_Plan.md`
-- **Phase 16 (Profile UI)**: `Documentation/Plans/Phase_16_Profile_Centric_UI_Plan.md`
-- **Phase 17 (Branding)**: `Documentation/Plans/Phase_17_Zephon_Branding_Appearance_Plan.md`
-- **Phase 18 (Backup)**: `Documentation/Plans/Phase_18_Encrypted_Backup_Plan.md`
-- **Review Notes**: `reviews/2025-12-31-clive-phases-14-18-plan-review.md`
-- **Coding Standards**: `Documentation/Standards/Coding_Standards.md`
+### 3.1 Database Migration
+1.  Open `lib/services/database_service.dart`.
+2.  Increment `_databaseVersion` from `4` to `5`.
+3.  In `_onCreate`, remove the `CREATE TABLE Reminder` block.
+4.  In `_onUpgrade`, add a migration for `oldVersion < 5`:
+    ```dart
+    if (oldVersion < 5) {
+      await db.execute('DROP TABLE IF EXISTS Reminder');
+    }
+    ```
 
-## 4. Implementation Sequence & Branching
+### 3.2 Model Removal
+1.  Open `lib/models/health_data.dart`.
+2.  Delete the `Reminder` class and its associated DartDoc.
+3.  Verify no unused imports remain in other files (though audit suggests none exist).
 
-Please implement in the following order to minimize dependency friction:
+### 3.3 UI Cleanup
+1.  Open `lib/views/home_view.dart`.
+2.  Locate and remove the `ListTile` for "Reminders" (currently disabled with "Coming soon" subtitle).
 
-1.  **Phase 14: App Rebrand**
-    - **Branch**: `feature/rebrand-hypertrack`
-    - **Note**: Do NOT change package IDs.
-2.  **Phase 15: Reminder Removal**
-    - **Branch**: `feature/remove-reminders`
-    - **Note**: Ensure migration is tested against legacy data.
-3.  **Phase 16: Profile-Centric UI**
-    - **Branch**: `feature/phase-16-profile-ui`
-    - **Note**: Focus on strict profile isolation and global state refresh.
-4.  **Phase 17: Zephon Branding & Appearance**
-    - **Branch**: `feature/phase-17-branding-appearance`
-5.  **Phase 18: Encrypted Full-App Backup**
-    - **Branch**: `feature/phase-18-encrypted-backup`
-    - **Note**: Use AES-GCM for the additional encryption layer.
+### 3.4 Documentation
+1.  Update `CHANGELOG.md` (if applicable) or prepare the commit message to clearly state the removal of the reminder feature and the associated data drop.
 
-## 5. Quality Gates (Mandatory)
+## 4. Quality Requirements
 
-- **Test Coverage**: 
-    - Services/ViewModels: **≥85%**
-    - Models/Utils: **≥90%**
-    - Widgets: **≥70%**
-- **Documentation**: All new public APIs must have DartDoc comments.
-- **Analyzer**: Zero warnings or errors.
-- **Formatting**: Strict adherence to `dart format`.
+- **Static Analysis**: Run `flutter analyze` and ensure zero issues.
+- **Formatting**: Run `dart format --set-exit-if-changed lib test`.
+- **Testing**:
+    - **Migration Test**: Create a test case that uses a v4 database fixture (containing `Reminder` data) and verify that upgrading to v5 succeeds and other data is preserved.
+    - **Regression**: Ensure all 667 existing tests still pass.
+- **Coverage**: Maintain targets (Services/ViewModels ≥85%, Models/Utils ≥90%, Widgets ≥70%).
 
-## 6. Success Criteria
+## 5. Branching & Commits
 
-- All phases implemented and merged to `main`.
-- App name is "HyperTrack" everywhere.
-- Carer workflow (profile-first) is smooth and intuitive.
-- Encrypted backups work reliably with passphrase protection.
+- **Branch**: `feature/remove-reminders`
+- **Commit Message**: Follow conventional commits, e.g., `feat(database): remove reminder feature and migrate schema to v5`
 
 ---
 
-**Handoff Complete.** Please notify me as each PR is ready for review.
+**Status**: 🟢 **READY FOR IMPLEMENTATION**
+
+Please proceed with the implementation. If you encounter any unexpected dependencies during the removal, stop and consult with Tracy or myself.
