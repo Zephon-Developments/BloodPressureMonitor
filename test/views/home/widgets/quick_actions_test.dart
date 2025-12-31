@@ -8,7 +8,7 @@ import 'package:blood_pressure_monitor/views/readings/add_reading_view.dart';
 import 'package:blood_pressure_monitor/viewmodels/medication_viewmodel.dart';
 import 'package:blood_pressure_monitor/widgets/medication/medication_picker_dialog.dart';
 
-import '../../test_mocks.mocks.dart';
+import '../../../test_mocks.mocks.dart';
 
 void main() {
   late MockMedicationViewModel mockMedicationViewModel;
