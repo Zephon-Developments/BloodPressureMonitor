@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:csv/csv.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:blood_pressure_monitor/models/health_data.dart';
 import 'package:blood_pressure_monitor/models/export_import.dart';
 import 'package:blood_pressure_monitor/services/app_info_service.dart';
@@ -330,5 +331,16 @@ class ExportService {
     final file = File('${directory.path}/$filename');
 
     return await file.writeAsString(csvString);
+  }
+
+  /// Shares an export file using the platform share sheet.
+  ///
+  /// Uses the text "Sensitive health data – Blood Pressure Export" to warn
+  /// recipients about the nature of the data being shared.
+  Future<void> shareExport(File file) async {
+    await Share.shareXFiles(
+      [XFile(file.path)],
+      text: 'Sensitive health data – Blood Pressure Export',
+    );
   }
 }

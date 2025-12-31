@@ -1,152 +1,121 @@
-# Tracy  Clive: Phase 5 Implementation Plan (App Security Gate)
+## Context
+- Goal: enable users to record when medications are taken. Medication models/services and the intake sheet already exist, but there is no obvious CTA from the medication list/home to log intakes.
+- Standards: follow Documentation/Standards/Coding_Standards.md (import order, const usage, 80-char lines, Provider MVVM, explicit error handling, tests for new logic).
+- Reference plan: Documentation/Plans/Medication_Intake_Plan.md.
 
-**Date:** December 29, 2025  
-**From:** Tracy (Planning)  
+## Priorities
+1) Add a "Log intake" action on each medication row in the medication list that opens `showLogIntakeSheet` with the selected medication. Ensure MedicationIntakeViewModel is in provider scope when invoking.
+2) After logging, show success/error feedback and refresh intake history via MedicationIntakeViewModel.loadIntakes; stay on the current screen.
+3) Optional stretch: add a Home quick action to pick a medication then open the intake sheet.
+4) Update empty/help text if needed to point to the new log button.
+5) Tests: unit for MedicationIntakeService/MedicationIntakeViewModel logging paths (success/error, tz offset captured); widget for medication tile log CTA → sheet submit and success snackbar.
+
+## Risks/Notes
+- Provider wiring: confirm MedicationIntakeViewModel is available where the sheet launches; add scoped provider if missing.
+- Time zone correctness depends on MedicationIntake.default localOffsetMinutes; cover with a unit test.
+- If the Home quick action is skipped, ensure the medication list CTA is discoverable (icon + label or tooltip).
+
+## Open Questions
+- Should we support one-tap group logging from a quick action?
+- Should logging also link to the latest blood pressure reading via `medsContext` for correlation? (likely future work)# Handoff: Tracy → Clive (Phase 12 Plan)
+
+**Date:** December 31, 2025  
+**From:** Tracy (Architecture Planner)  
 **To:** Clive (Reviewer)  
-**Phase:** 5 - App Security Gate  
-**Status:** Plan Ready for Review
+**Request:** Implement Phase 12 — Medication Reminders & Notifications
 
----
+## Objectives
+- Deliver per-medication reminders with local notifications (schedule, snooze, dismiss) and a reminder history view. 
+- Ensure reminders stay profile-scoped and respect medication active status. 
+- Maintain zero analyzer warnings and 100% passing tests per Coding_Standards.md.
 
-## Objectives & Context
-- Deliver app-level security gate: PIN + biometric, idle auto-lock, secure credential storage, and DB password migration (per [Documentation/Handoffs/Steve_to_Tracy.md](Steve_to_Tracy.md)).
-- Replace placeholder SQLCipher password with per-installation secure password stored in platform keychain/keystore (see [SECURITY.md](../../SECURITY.md)).
-- Align with Coding Standards: testing coverage (services 5%, widgets 70%, utilities 90% per [Coding_Standards.md 78](../Standards/Coding_Standards.md#L542-L620)), CI cleanliness, and branch/PR workflow.
-- Acceptance from Implementation Schedule: lock enforced on launch/return; bypass impossible; analyzer clean; targeted tests passing ([Implementation_Schedule.md](../Plans/Implementation_Schedule.md#L89-L120)).
+## Scope
+- **Reminder Scheduling:** Local notifications for each medication instance based on schedule metadata; cancel/reschedule on edits/deletes/inactivation.
+- **Snooze/Dismiss:** In-notification actions to snooze (configurable duration) or dismiss; record action to history.
+- **Reminder History:** UI to review sent reminders and their outcomes (triggered, snoozed, dismissed, expired/missed).
+- **Settings & Permissions:** Global reminder enable/disable, per-medication opt-in/out, permission prompts, and fallback handling when permissions are denied.
 
----
+## Constraints & Dependencies
+- Follow **Coding_Standards.md**: zero analyzer warnings, formatted code, strong typing, DartDoc for public APIs, tests for new logic.
+- Platform: local notifications (Android primary; iOS must degrade gracefully if unsupported/permission denied). Use `flutter_local_notifications` + `timezone` packages; ensure tz initialization in `main.dart`.
+- Data must remain **profile-scoped** (ActiveProfileViewModel); inactive medications must not schedule reminders.
+- Scheduling must survive app restarts (persisted data drives rehydrate-on-launch scheduling).
+- Keep builds passing existing 628+ tests; add new coverage for reminder logic.
 
-## Scope (In / Out)
-- **In:** Secure DB credential management; PIN+biometric auth; lock on launch/resume; idle timeout; lock settings UI; migration from placeholder password; logging/hardening; tests (unit, widget, integration with platform mocks).
-- **Out:** Per-profile secrets, account recovery, remote wipe, multi-device sync, cloud backup encryption, analytics.
+## Success Metrics
+- 0 analyzer errors/warnings; `flutter test` passes.
+- Notifications fire at expected local times (incl. DST/timezone changes) for active medications.
+- Editing/deleting/inactivating a medication cancels/reschedules associated reminders.
+- Snooze/dismiss actions update reminder history and do not duplicate notifications.
+- Reminder permissions handled gracefully with clear UX when denied.
 
----
+## Proposed Architecture
+- **Data Model**
+  - Extend `Medication.scheduleMetadata` to include reminder config (versioned JSON):
+    - `reminders.enabled`, `reminders.times` (HH:mm local), `reminders.daysOfWeek` (1-7), `reminders.leadMinutes` (optional pre-dose alert), `reminders.snoozeMinutes` default, `reminders.channelId`.
+  - New model: `MedicationReminderEvent` (id, medicationId, profileId, scheduledFor, firedAt, action: triggered/snoozed/dismissed/expired, snoozeUntil?, localOffsetMinutes, createdAt).
+- **Services**
+  - `ReminderService` (new): maps medication schedules → notification requests; persists `MedicationReminderEvent`; cancels/reschedules on changes.
+  - `NotificationService` (new, wrapper on flutter_local_notifications): init, permission check/request, schedule (with tz), cancel, snooze, action handling callbacks.
+- **ViewModels**
+  - `ReminderViewModel`: manages reminder settings (global toggle, per-medication enable), triggers reschedule, exposes permission state.
+  - `ReminderHistoryViewModel`: loads `MedicationReminderEvent` list (filters: date range, medication), supports clear.
+  - Integrations:
+    - `MedicationViewModel`: on create/update/delete/inactivate → notify `ReminderService` to sync schedules.
+    - `MedicationIntakeViewModel`: when logging intake, optionally mark related reminders as satisfied (avoid repeat the same slot?).
+- **Views/UX**
+  - Medication detail/settings panel: per-medication reminder toggle, time pickers, snooze default selector, lead-time selector.
+  - Global Reminder Settings: enable/disable all reminders, permission status, “Reschedule all” button.
+  - Reminder History View: list of `MedicationReminderEvent` with status chips (triggered/snoozed/dismissed/expired), filters by date/medication.
+  - Notification actions: “Snooze” (uses configured snoozeMinutes), “Dismiss”; tap opens app to intake logging for that medication.
+- **App Startup**
+  - Initialize timezone + notifications in `main.dart` before runApp.
+  - On launch and profile switch: load active profile meds and reschedule reminders for active ones with reminders enabled.
 
-## Architecture & Components
-- **SecurePasswordManager (service)**
-  - Responsibilities: generate cryptographically secure DB password; store/retrieve via `flutter_secure_storage`; expose `getOrCreatePassword()`; rotate/migrate from placeholder.
-  - Implementation: use `Random.secure()`; 32-byte base64; platform-specific options (Android strongbox if available, iOS accessible-after-first-unlock); redact logs.
-- **DatabaseService integration**
-  - On init: fetch password from `SecurePasswordManager`; if old placeholder detected, perform SQLCipher rekey (`PRAGMA rekey`); ensure idempotent.
-  - Failures: surface fatal errors with safe messaging; avoid partial migrations (wrap in transaction where possible).
-- **AuthService (service)**
-  - Store PIN hash+salt (PBKDF2 or SHA256 with salt) in `flutter_secure_storage` / `shared_preferences` for non-secret prefs (enabled flags, timeout minutes).
-  - Track attempt count; lockout thresholds (e.g., 5 attempts, exponential backoff 30s/60s/300s); provide `verifyPin`, `setPin`, `changePin` flows.
-  - Biometric: check availability via `local_auth`; prompt for auth; fallback to PIN; handle revoked biometrics.
-- **IdleTimerService (service)**
-  - Tracks foreground activity timestamps; listens to app lifecycle & user activity pings; triggers lock after configurable idle period (default 2 minutes per handoff).
-- **LockState (model) & LockViewModel**
-  - Holds lock status, lockout timers, remaining attempts, biometric availability, idle timeout config; orchestrates AuthService + IdleTimerService.
-- **LockScreenView (widget)**
-  - PIN keypad entry, biometric button, error/lockout messaging; disable app switcher preview (blur/placeholder if needed); respects accessibility (screen reader labels, focus order).
-- **Settings: Security screen**
-  - Configure PIN (set/change), toggle biometrics, set idle timeout (predefined options), view lockout info; minimal UI acceptable if Phase 6 shell not ready.
-- **Navigation Gate**
-  - Wrap root navigator with guard: app starts locked; app resumes locked if IdleTimer or background; block access to main content until unlock.
-- **Config & Persistence**
-  - `shared_preferences` for non-secret prefs: biometrics enabled flag, idle timeout minutes, last-lock timestamp; secure storage for secrets (PIN hash/salt, DB password).
+## Data Flow
+1. **Configure**: User sets reminder times per medication → `Medication.scheduleMetadata` updated → `ReminderService` schedules notifications.
+2. **Trigger**: Notification fires; action buttons (snooze/dismiss) handled via `NotificationService` callbacks → record `MedicationReminderEvent`; snooze reschedules single notification; dismiss cancels current instance.
+3. **Update**: Medication edit/delete/inactivate → `ReminderService` cancels/reschedules relevant notifications.
+4. **History**: `ReminderHistoryViewModel` queries events (profile-scoped) for UI.
+5. **Permissions**: On-demand prompt; if denied, surface banner/toast and disable scheduling for that profile until granted.
 
----
+## Affected Files (expected)
+- `pubspec.yaml`: add `flutter_local_notifications`, `timezone` (and permissions configs).
+- `android/` & `ios/`: notification setup (channels, icons, permission strings for iOS if needed).
+- `lib/main.dart`: init tz, `NotificationService`, register providers, app startup reschedule.
+- `lib/services/`: add `notification_service.dart`, `reminder_service.dart`; extend `medication_service.dart` to expose reminder metadata helpers (if needed).
+- `lib/models/medication.dart`: extend schedule metadata schema; add `MedicationReminderEvent` model (new file or same file section).
+- `lib/viewmodels/`: add `reminder_viewmodel.dart`, `reminder_history_viewmodel.dart`; integrate hooks in existing medication/intake viewmodels.
+- `lib/views/`: medication detail/settings panel for reminders; global reminder settings; reminder history view; notification action routing entrypoint.
+- `test/`: unit tests for services/viewmodels; widget tests for reminder settings UI; permission-denied handling tests.
 
-## Data Flow & Sequences
-1. **App Launch**: SecurePasswordManager retrieves/creates DB password  -> DatabaseService opens/rekeys if needed  -> LockViewModel sets state to locked  -> LockScreen shown.
-2. **Unlock (PIN)**: user enters PIN  AuthService verifies hash/salt  on success, resets attempts, unlocks; on failure, increment attempts, apply lockout/backoff.
-3. **Unlock (Biometric)**: user taps biometric  local_auth prompt  on success, unlock; on failure/cancel, stay locked and show guidance.
-4. **Idle Auto-Lock**: IdleTimerService tracks last activity; when timeout reached or app goes background, LockViewModel transitions to locked; on resume, lock screen appears.
-5. **Settings Updates**: changes to PIN/biometric/timeout persisted; LockViewModel reloads config; existing sessions may be forced to relock depending on setting changes (e.g., PIN change).
-6. **DB Password Migration**: first post-update launch detects placeholder password; SecurePasswordManager generates new password; DatabaseService rekeys within a single connection; success path persists new password; failure path restores placeholder and surfaces fatal error.
-
----
-
-## File/Package Changes
-- **New packages (pubspec.yaml)**: `flutter_secure_storage`, `local_auth`, `shared_preferences` (versions per handoff). Run `flutter pub get`.
-- **New code (proposed paths):**
-  - `lib/services/secure_password_manager.dart`
-  - `lib/services/auth_service.dart`
-  - `lib/services/idle_timer_service.dart`
-  - `lib/viewmodels/lock_viewmodel.dart`
-  - `lib/views/lock/lock_screen.dart`
-  - `lib/views/settings/security_settings_view.dart`
-  - `lib/models/lock_state.dart`
-- **Updates:**
-  - `lib/services/database_service.dart` (integrate SecurePasswordManager, rekey logic)
-  - `lib/main.dart` / navigation shell (gate to LockScreen)
-  - `android/app/src/main/AndroidManifest.xml` (biometric permissions if required), `ios/Runner/Info.plist` (Face ID usage description), platform setup per `local_auth` docs.
-  - `Documentation/` (update SECURITY.md, CHANGELOG.md, PROJECT_SUMMARY.md if needed).
-- **Tests:**
-  - `test/services/secure_password_manager_test.dart`
-  - `test/services/auth_service_test.dart`
-  - `test/services/idle_timer_service_test.dart`
-  - `test/viewmodels/lock_viewmodel_test.dart`
-  - `test/widgets/lock_screen_test.dart`
-  - `test/widgets/security_settings_view_test.dart`
-  - Integration: `test/integration/lock_flow_test.dart` (using `local_auth`/secure storage mocks).
-
----
-
-## Implementation Sequence
-1. **Branch & deps**: create `feature/phase-5-security-gate`; add pubspec deps; configure platform permissions/entitlements.
-2. **SecurePasswordManager**: implement secure generation/storage, migration helpers; unit tests (crypto quality, persistence, rekey path).
-3. **DatabaseService wiring**: inject SecurePasswordManager; implement `rekeyIfNeeded` from placeholder to new password; add tests (mock sqlcipher, verify rekey PRAGMA executed once, failure rollback).
-4. **AuthService**: PIN lifecycle (set/verify/change), salt+hash, attempt tracking, lockout math, biometric availability/prompt wrappers; tests with mocks for storage/local_auth.
-5. **IdleTimerService**: lifecycle hooks + activity pings; timeout scheduler; tests for timeout/resume/background scenarios.
-6. **LockState/LockViewModel**: orchestrate auth + idle; expose streams/notifiers; handle lock/unlock/lockout; tests.
-7. **UI**: LockScreen and SecuritySettings views; wire to ViewModel; accessibility and error states; widget tests with mock viewmodel.
-8. **Navigation Gate**: wrap app shell to present LockScreen when locked; ensure back navigation cannot bypass; add integration tests for launch/resume/idle flows.
-9. **Docs & configs**: update SECURITY.md (placeholder removal), PROJECT_SUMMARY.md (Phase 5), CHANGELOG.md entry; ensure analyzer/test passing.
-10. **Review & PR**: Clive review against Coding Standards & handoff; ensure coverage thresholds met; prepare PR notes.
-
----
-
-## Testing Strategy (aligns with Coding Standards 78)
-- **Coverage targets**: Services 85%, Utilities 90%, Widgets 070% (hand-off minimum 80% overall for new code is satisfied by these).
-- **Unit tests**: password generation randomness/length; storage round-trip; rekey path; PIN hash/verify; lockout escalation; idle timer scheduling; biometric availability handling with mocks.
-- **Widget tests**: LockScreen keypad flow, biometric button states, error/lockout messaging, accessibility labels; SecuritySettings toggles and validation.
-- **Integration tests**: end-to-end launch  lock  unlock (PIN and biometric), resume lock, idle timeout lock; ensure navigation bypass impossible.
-- **Platform mocks**: mock `flutter_secure_storage`, `local_auth`, `shared_preferences`, lifecycle events; simulate biometric denied, removed biometrics, secure storage failure.
-- **Performance checks**: ensure lock screen render <200ms (measure with `WidgetTester.pump` timings); biometric within 3s path.
-
----
-
-## Migration Plan (DB password)
-- Detect placeholder password usage; generate new password via SecurePasswordManager.
-- Use SQLCipher `PRAGMA rekey` within single connection; wrap in transaction-equivalent flow.
-- On failure: revert to placeholder, log securely (no secrets), present fatal error screen; do NOT proceed to app content.
-- On success: persist new password and mark migration complete; subsequent launches reuse password without rekey.
-- Fresh installs: generate password on first launch; no migration needed.
-
----
+## Sequencing Plan
+1. **Dependencies & Config**: add packages, notification/tz init, Android channel setup, iOS permission strings (if applicable).
+2. **Models**: define reminder config schema and `MedicationReminderEvent`.
+3. **Services**: implement `NotificationService` (scheduling, actions), `ReminderService` (mapping schedules to notifications, persistence, cancel/reschedule).
+4. **ViewModels**: reminder settings + history; wire medication lifecycle hooks to reschedule.
+5. **Views**: reminder settings UI (per-med), global settings, history view; hook navigation from Settings/Medications.
+6. **Integration**: startup reschedule; notification action callbacks into app (snooze/dismiss → history + optional intake flow).
+7. **Testing**: unit tests (schedule mapping, cancel/reschedule, snooze), widget tests for settings; ensure analyzer/test pass.
 
 ## Risks & Mitigations
-- **Biometric edge cases**: revoked/changed biometrics  fallback to PIN; prompt user to re-enable.
-- **Lockout UX**: avoid permanent lock; use backoff timers; show remaining attempts/time.
-- **Storage failures**: secure storage unavailable  block app with clear message; offer retry; log without secrets.
-- **Navigation bypass**: ensure all routes gated; block deep links when locked; guard background tasks.
-- **Performance**: avoid heavy crypto on UI thread; precompute salts/hashes async.
-- **Platform parity**: align Android/iOS permissions and behavior; test both.
+- **Timezone/DST shifts**: use `timezone` package; store wall-clock intent; reschedule on tz init and app resume.
+- **Doze/background limits**: document platform caveats; prefer exact alarms only if permitted; otherwise fallback.
+- **Permission denied**: surface clear UX; skip scheduling until granted; keep state consistent.
+- **Action handling**: ensure callbacks registered early; guard against null context when app not running; log events safely.
+- **Profile switching**: always scope to `ActiveProfileViewModel`; cancel reminders from previous profile on switch.
 
----
+## Open Questions for Review
+1. Snooze default: fixed (e.g., 10 min) vs per-med configurable? cap on snooze count?
+2. Lead-time alerts: required or optional? default value?
+3. iOS support requirements: is iOS a must-have now, or Android-only acceptable with graceful degradation?
+4. Should dismiss auto-mark as “missed” in history, or remain neutral?
+5. Do we block scheduling for inactive medications automatically (assumed yes)?
 
-## Open Decisions / Questions (for Clive & PO)
-1. PIN length: enforce fixed 6 or allow 46 digits? (default to 6 if unspecified)
-2. Lockout policy: attempts before backoff (proposal: 5 attempts; backoff 30s/60s/300s); max lockout cap?
-3. Idle timeout options: fixed choices (e.g., 30s, 1m, 2m default, 5m, 10m) vs custom slider?
-4. Should app auto-lock immediately when backgrounded regardless of idle timer? (proposal: yes)
-5. Minimum OS support for biometrics (e.g., Android API 23+, iOS 11+); what fallback for unsupported? (PIN-only).
-6. Should we blur app switcher preview on lock screen to avoid data leakage?
+## Test Strategy
+- Unit tests: schedule mapping (times, daysOfWeek, leadMinutes), cancel/reschedule on edits/deletes, snooze action rescheduling, permission-denied no-op behavior.
+- ViewModel tests: reminder enable/disable flows, history filters, profile switch reschedule.
+- Widget tests: per-med reminder settings form; global settings banner when permission denied.
+- Manual: notification fire, snooze/dismiss actions, DST boundary sanity check.
 
----
-
-## Acceptance Criteria (mapped)
-- App launches/resumes locked; no bypass to content without auth.
-- PIN and biometric unlock succeed; failures enforced with lockout.
-- Idle timeout triggers lock; backgrounding locks immediately (if accepted).
-- Database password migrated to per-installation secure value; no hardcoded secrets remain.
-- Tests meet coverage targets; `flutter analyze` clean; CI green.
-- Security docs updated; CHANGELOG entry for Phase 5.
-
----
-
-## Next Step
-Clive: please review this plan for alignment with Coding Standards and the Phase 5 handoff. After approval, Steve can assign implementation to Claudette or Georgina.
-
+Please review the scope, architecture, risks, and open questions. Upon approval I’ll proceed to implementation guidance for Claudette.

@@ -1,58 +1,31 @@
-# Handoff: Clive → Steve
+# Handoff: Clive to Steve - Phase 13 Refinements
 
-**Date**: 2025-12-31  
-**Feature**: Phase 12 - Medication Intake Recording  
-**Status**: **APPROVED** ✅
+## Scope & Acceptance Criteria
+- **Profile Isolation**: Ensure the File Manager only shows and manages files belonging to the currently active profile.
+- **Cleanup Defaults**: Change the default `maxFilesPerType` from 50 to 5.
+- **UI Transparency**: Display the current cleanup policy in the confirmation dialog.
 
----
+## Changes Implemented
 
-## Summary
+### 1. Profile Isolation
+- **`FileManagerService`**: Updated `listFiles`, `runAutoCleanup`, and `getTotalStorageBytes` to accept an optional `profileName` parameter. It uses regex to extract the profile name from filenames (e.g., `bp_export_John_Doe_...`).
+- **`FileManagerViewModel`**: Now depends on `ActiveProfileViewModel`. It passes the active profile name to the service methods to ensure data isolation.
+- **`main.dart`**: Updated `MultiProvider` to inject `ActiveProfileViewModel` into `FileManagerViewModel`.
 
-Phase 12 implementation is complete and has passed a full review. The feature adds critical UI entry points for medication intake logging, improving the user experience for medication tracking.
+### 2. Default Policy
+- **`AutoCleanupPolicy`**: Changed `defaultPolicy()` to set `maxFilesPerType` to 5.
 
----
-
-## Key Changes
-
-### 1. UI Components
-- **Medication Picker**: A new searchable dialog for selecting active medications.
-- **Medication List**: Added a "Log intake" button to active medication tiles.
-- **Home Screen**: Added a "Log Medication Intake" quick action.
-
-### 2. Testing
-- Restored and fixed widget tests for `MedicationPickerDialog` and `MedicationListView`.
-- Total tests: 632 passing.
-- Coverage for new components is verified.
-
-### 3. Standards
-- Full compliance with `CODING_STANDARDS.md`.
-- JSDoc present for all new public APIs.
-- Clean analysis (`flutter analyze`).
-
----
+### 3. UI Enhancements
+- **`FileManagerView`**: The "Run Auto-Cleanup" confirmation dialog now explicitly states the policy being applied (e.g., "This will delete files older than 90 days or exceeding the limit of 5 files per type for the current profile.").
 
 ## Verification Results
+- **Unit Tests**: Updated `test/services/file_manager_service_test.dart` and `test/models/auto_cleanup_policy_test.dart` to verify profile filtering and new defaults. All 23 tests passed.
+- **Static Analysis**: `dart analyze` passed with no issues (resolved unnecessary null checks in `FileManagerViewModel`).
+- **Manual Review**: Verified that `FileManagerViewModel` correctly orchestrates the profile-specific logic.
 
-- ✅ **Functional**: All buttons and dialogs work as expected.
-- ✅ **Security**: No sensitive data exposed; uses existing encrypted storage services.
-- ✅ **Performance**: Efficient local database queries for searching.
-- ✅ **Tests**: 100% pass rate for new and existing tests.
+## Blockers
+- None.
 
----
-
-## Deployment Instructions
-
-1. The implementation is ready for final integration.
-2. No database migrations are required.
-3. No new dependencies were added.
-
----
-
-## Next Agent Actions
-
-**Suggested**: Return to **Steve** for final integration and project update.
-
-**Prompt for user**:
-```
-@steve Phase 12 is approved. Please proceed with final integration and update the project status.
-```
+## Next Steps
+- Steve: Final integration and deployment.
+- Georgina: Update user documentation to mention that exports are now profile-specific.
