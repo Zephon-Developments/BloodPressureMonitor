@@ -21,11 +21,11 @@ class AutoCleanupPolicy {
     this.enabled = true,
   });
 
-  /// Default policy: 90 days age limit, keep 50 files per type, enabled.
+  /// Default policy: 90 days age limit, keep 5 files per type, enabled.
   factory AutoCleanupPolicy.defaultPolicy() {
     return const AutoCleanupPolicy(
       maxAge: Duration(days: 90),
-      maxFilesPerType: 50,
+      maxFilesPerType: 5,
       enabled: true,
     );
   }
@@ -38,10 +38,15 @@ class AutoCleanupPolicy {
   /// Loads policy from SharedPreferences.
   static Future<AutoCleanupPolicy> load() async {
     final prefs = await SharedPreferences.getInstance();
-    final enabled = prefs.getBool('cleanup_enabled') ?? true;
-    final ageDays = prefs.getInt('cleanup_max_age_days');
-    final maxFiles = prefs.getInt('cleanup_max_files_per_type');
-    final maxSizeMB = prefs.getInt('cleanup_max_total_size_mb');
+    final defaultP = AutoCleanupPolicy.defaultPolicy();
+
+    final enabled = prefs.getBool('cleanup_enabled') ?? defaultP.enabled;
+    final ageDays =
+        prefs.getInt('cleanup_max_age_days') ?? defaultP.maxAge?.inDays;
+    final maxFiles =
+        prefs.getInt('cleanup_max_files_per_type') ?? defaultP.maxFilesPerType;
+    final maxSizeMB =
+        prefs.getInt('cleanup_max_total_size_mb') ?? defaultP.maxTotalSizeMB;
 
     return AutoCleanupPolicy(
       enabled: enabled,

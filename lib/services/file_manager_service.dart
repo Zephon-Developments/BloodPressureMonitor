@@ -36,16 +36,18 @@ class CleanupResult {
 class FileManagerService {
   /// Scans the documents directory and returns a list of managed files.
   ///
+  /// If [profileName] is provided, only files belonging to that profile are returned.
+  ///
   /// Looks for files matching the patterns:
   /// - `bp_export_*.json`
   /// - `bp_export_*.csv`
   /// - `bp_report_*.pdf`
   ///
   /// Files that don't match these patterns are ignored.
-  Future<List<ManagedFile>> listFiles() async {
+  Future<List<ManagedFile>> listFiles({String? profileName}) async {
     final directory = await getApplicationDocumentsDirectory();
     final entities = directory.listSync();
-    final files = <ManagedFile>[];
+    var files = <ManagedFile>[];
 
     for (final entity in entities) {
       if (entity is! File) continue;
@@ -53,7 +55,9 @@ class FileManagerService {
       final fileName = entity.path.split(Platform.pathSeparator).last;
       final managedFile = _parseFile(entity, fileName);
       if (managedFile != null) {
-        files.add(managedFile);
+        if (profileName == null || managedFile.profileName == profileName) {
+          files.add(managedFile);
+        }
       }
     }
 
@@ -109,18 +113,17 @@ class FileManagerService {
       final withoutSuffix =
           withoutPrefix.substring(0, withoutPrefix.length - suffix.length);
 
-      // Find last underscore (before timestamp)
-      final lastUnderscore = withoutSuffix.lastIndexOf('_');
-      if (lastUnderscore == -1) return null;
+      final parts = withoutSuffix.split('_');
+      if (parts.length < 2) return null;
 
-      // Find second-to-last underscore
-      final secondLastUnderscore =
-          withoutSuffix.lastIndexOf('_', lastUnderscore - 1);
-      if (secondLastUnderscore == -1) return null;
+      // For exports, timestamp is the last two parts (YYYYMMDD and HHMM)
+      // For reports, timestamp is the last part (millisecondsSinceEpoch)
+      int timestampParts = prefix.contains('export') ? 2 : 1;
 
-      // Profile name is everything before the timestamp
-      final profileName = withoutSuffix.substring(0, secondLastUnderscore);
-      return profileName.replaceAll('_', ' ');
+      if (parts.length <= timestampParts) return null;
+
+      final profileNameParts = parts.sublist(0, parts.length - timestampParts);
+      return profileNameParts.join(' ');
     } catch (e) {
       return null; // Failed to parse, no big deal
     }
@@ -179,13 +182,18 @@ class FileManagerService {
 
   /// Runs automatic cleanup based on the provided policy.
   ///
+  /// If [profileName] is provided, cleanup is restricted to files belonging to that profile.
+  ///
   /// Returns a [CleanupResult] with the number of files deleted and bytes freed.
-  Future<CleanupResult> runAutoCleanup(AutoCleanupPolicy policy) async {
+  Future<CleanupResult> runAutoCleanup(
+    AutoCleanupPolicy policy, {
+    String? profileName,
+  }) async {
     if (!policy.enabled) {
       return const CleanupResult(filesDeleted: 0, bytesFreed: 0);
     }
 
-    final files = await listFiles();
+    final files = await listFiles(profileName: profileName);
     final toDelete = <String>[];
 
     // Group files by type
@@ -244,8 +252,8 @@ class FileManagerService {
   }
 
   /// Calculates total storage used by managed files.
-  Future<int> getTotalStorageBytes() async {
-    final files = await listFiles();
+  Future<int> getTotalStorageBytes({String? profileName}) async {
+    final files = await listFiles(profileName: profileName);
     return files.fold<int>(0, (sum, file) => sum + file.sizeBytes);
   }
 }

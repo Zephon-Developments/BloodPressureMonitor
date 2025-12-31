@@ -4,7 +4,7 @@ import 'package:path_provider_platform_interface/path_provider_platform_interfac
 import 'package:blood_pressure_monitor/models/managed_file.dart';
 import 'package:blood_pressure_monitor/models/auto_cleanup_policy.dart';
 import 'package:blood_pressure_monitor/services/file_manager_service.dart';
-import 'package:blood_pressure_monitor/test/helpers/test_path_provider.dart';
+import '../helpers/test_path_provider.dart';
 
 void main() {
   late Directory tempDir;
@@ -13,8 +13,7 @@ void main() {
   setUp(() async {
     // Create temp directory for tests
     tempDir = await Directory.systemTemp.createTemp('file_manager_test_');
-    PathProviderPlatform.instance =
-        TestPathProviderPlatform(tempDir.path);
+    PathProviderPlatform.instance = TestPathProviderPlatform(tempDir.path);
     service = FileManagerService();
   });
 
@@ -32,7 +31,8 @@ void main() {
     });
 
     test('listFiles finds and parses export JSON files', () async {
-      final file = File('${tempDir.path}/bp_export_John_Doe_20251231_1430.json');
+      final file =
+          File('${tempDir.path}/bp_export_John_Doe_20251231_1430.json');
       await file.writeAsString('{}');
 
       final files = await service.listFiles();
@@ -43,7 +43,8 @@ void main() {
     });
 
     test('listFiles finds and parses export CSV files', () async {
-      final file = File('${tempDir.path}/bp_export_Jane_Smith_20251231_1500.csv');
+      final file =
+          File('${tempDir.path}/bp_export_Jane_Smith_20251231_1500.csv');
       await file.writeAsString('data');
 
       final files = await service.listFiles();
@@ -70,13 +71,34 @@ void main() {
       expect(files, isEmpty);
     });
 
+    test('listFiles filters by profileName', () async {
+      await File('${tempDir.path}/bp_export_John_Doe_20251231_1430.json')
+          .writeAsString('{}');
+      await File('${tempDir.path}/bp_export_Jane_Smith_20251231_1500.csv')
+          .writeAsString('data');
+
+      final johnFiles = await service.listFiles(profileName: 'John Doe');
+      expect(johnFiles.length, 1);
+      expect(johnFiles[0].profileName, 'John Doe');
+
+      final janeFiles = await service.listFiles(profileName: 'Jane Smith');
+      expect(janeFiles.length, 1);
+      expect(janeFiles[0].profileName, 'Jane Smith');
+
+      final unknownFiles = await service.listFiles(profileName: 'Unknown');
+      expect(unknownFiles, isEmpty);
+    });
+
     test('listFiles sorts by creation date, newest first', () async {
       final file1 = File('${tempDir.path}/bp_export_A_20251231_1000.json');
       await file1.writeAsString('{}');
-      await Future.delayed(const Duration(milliseconds: 100));
+      await file1.setLastModified(
+        DateTime.now().subtract(const Duration(seconds: 10)),
+      );
 
       final file2 = File('${tempDir.path}/bp_export_B_20251231_1100.json');
       await file2.writeAsString('{}');
+      await file2.setLastModified(DateTime.now());
 
       final files = await service.listFiles();
       expect(files.length, 2);
@@ -96,7 +118,8 @@ void main() {
     });
 
     test('deleteFile returns false for non-existent file', () async {
-      final result = await service.deleteFile('${tempDir.path}/nonexistent.json');
+      final result =
+          await service.deleteFile('${tempDir.path}/nonexistent.json');
       expect(result, false);
     });
 
@@ -125,17 +148,21 @@ void main() {
     });
 
     test('getTotalStorageBytes calculates total size', () async {
-      await File('${tempDir.path}/bp_export_A_20251231.json')
+      await File('${tempDir.path}/bp_export_John_20251231_1200.json')
           .writeAsString('{"data": "test"}'); // ~16 bytes
-      await File('${tempDir.path}/bp_export_B_20251231.json')
+      await File('${tempDir.path}/bp_export_Jane_20251231_1200.json')
           .writeAsString('{"data": "test"}'); // ~16 bytes
 
-      final total = await service.getTotalStorageBytes();
-      expect(total, greaterThan(0));
+      final totalAll = await service.getTotalStorageBytes();
+      expect(totalAll, greaterThan(30));
+
+      final totalJohn = await service.getTotalStorageBytes(profileName: 'John');
+      expect(totalJohn, lessThan(20));
+      expect(totalJohn, greaterThan(10));
     });
 
     test('runAutoCleanup with disabled policy does nothing', () async {
-      await File('${tempDir.path}/bp_export_Old_20200101.json')
+      await File('${tempDir.path}/bp_export_Old_20200101_1200.json')
           .writeAsString('{}');
 
       final policy = AutoCleanupPolicy.disabled();
@@ -146,7 +173,7 @@ void main() {
 
     test('runAutoCleanup deletes files older than maxAge', () async {
       // Create an old file (modify date will be recent, but let's test the logic)
-      final oldFile = File('${tempDir.path}/bp_export_Old_20200101.json');
+      final oldFile = File('${tempDir.path}/bp_export_Old_20200101_1200.json');
       await oldFile.writeAsString('{}');
 
       // Set file modification time to 100 days ago
@@ -164,7 +191,9 @@ void main() {
     test('runAutoCleanup keeps most recent N files per type', () async {
       // Create 60 export JSON files
       for (int i = 0; i < 60; i++) {
-        final file = File('${tempDir.path}/bp_export_Test_File_$i.json');
+        final file = File(
+          '${tempDir.path}/bp_export_Test_File_20251231_${1000 + i}.json',
+        );
         await file.writeAsString('{}');
         // Ensure different timestamps
         await Future.delayed(const Duration(milliseconds: 10));
@@ -181,7 +210,8 @@ void main() {
     test('runAutoCleanup respects size limit', () async {
       // Create files with known size
       for (int i = 0; i < 10; i++) {
-        final file = File('${tempDir.path}/bp_export_File_$i.json');
+        final file =
+            File('${tempDir.path}/bp_export_File_20251231_${1000 + i}.json');
         await file.writeAsString('x' * 1024 * 1024); // 1 MB each
         await Future.delayed(const Duration(milliseconds: 10));
       }
@@ -192,6 +222,41 @@ void main() {
       );
       final result = await service.runAutoCleanup(policy);
       expect(result.filesDeleted, greaterThan(0));
+    });
+
+    test('runAutoCleanup filters by profileName', () async {
+      // Create 10 files for John
+      for (int i = 0; i < 10; i++) {
+        await File(
+          '${tempDir.path}/bp_export_John_Doe_20251231_${1000 + i}.json',
+        ).writeAsString('{}');
+        await Future.delayed(const Duration(milliseconds: 10));
+      }
+      // Create 10 files for Jane
+      for (int i = 0; i < 10; i++) {
+        await File(
+          '${tempDir.path}/bp_export_Jane_Smith_20251231_${1000 + i}.json',
+        ).writeAsString('{}');
+        await Future.delayed(const Duration(milliseconds: 10));
+      }
+
+      const policy = AutoCleanupPolicy(
+        enabled: true,
+        maxFilesPerType: 5,
+      );
+
+      // Cleanup only John's files
+      final result =
+          await service.runAutoCleanup(policy, profileName: 'John Doe');
+      expect(result.filesDeleted, 5);
+
+      // Verify John has 5 files left
+      final johnFiles = await service.listFiles(profileName: 'John Doe');
+      expect(johnFiles.length, 5);
+
+      // Verify Jane still has 10 files
+      final janeFiles = await service.listFiles(profileName: 'Jane Smith');
+      expect(janeFiles.length, 10);
     });
   });
 

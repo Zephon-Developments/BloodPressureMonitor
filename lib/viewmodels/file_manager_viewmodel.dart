@@ -5,20 +5,25 @@ import 'package:blood_pressure_monitor/models/auto_cleanup_policy.dart';
 import 'package:blood_pressure_monitor/services/file_manager_service.dart';
 import 'package:blood_pressure_monitor/services/export_service.dart';
 import 'package:blood_pressure_monitor/services/pdf_report_service.dart';
+import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart';
 
 /// ViewModel for the file manager screen.
 class FileManagerViewModel extends ChangeNotifier {
   final FileManagerService _fileManagerService;
   final ExportService _exportService;
   final PdfReportService _pdfReportService;
+  final ActiveProfileViewModel _activeProfileViewModel;
 
   FileManagerViewModel({
     required FileManagerService fileManagerService,
     required ExportService exportService,
     required PdfReportService pdfReportService,
+    required ActiveProfileViewModel activeProfileViewModel,
   })  : _fileManagerService = fileManagerService,
         _exportService = exportService,
-        _pdfReportService = pdfReportService;
+        _pdfReportService = pdfReportService,
+        _activeProfileViewModel = activeProfileViewModel,
+        _policy = AutoCleanupPolicy.defaultPolicy();
 
   List<ManagedFile> _files = [];
   List<ManagedFile> get files => List.unmodifiable(_files);
@@ -29,8 +34,8 @@ class FileManagerViewModel extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  AutoCleanupPolicy? _policy;
-  AutoCleanupPolicy? get policy => _policy;
+  AutoCleanupPolicy _policy;
+  AutoCleanupPolicy get policy => _policy;
 
   int _totalStorageBytes = 0;
   int get totalStorageBytes => _totalStorageBytes;
@@ -61,8 +66,11 @@ class FileManagerViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _files = await _fileManagerService.listFiles();
-      _totalStorageBytes = await _fileManagerService.getTotalStorageBytes();
+      final profileName = _activeProfileViewModel.activeProfileName;
+      _files = await _fileManagerService.listFiles(profileName: profileName);
+      _totalStorageBytes = await _fileManagerService.getTotalStorageBytes(
+        profileName: profileName,
+      );
       _policy = await AutoCleanupPolicy.load();
     } catch (e) {
       _errorMessage = 'Failed to load files: $e';
@@ -112,11 +120,7 @@ class FileManagerViewModel extends ChangeNotifier {
 
   /// Runs automatic cleanup based on current policy.
   Future<String?> runAutoCleanup() async {
-    if (_policy == null) {
-      await loadFiles(); // Load policy if not yet loaded
-    }
-
-    if (_policy == null || !_policy!.enabled) {
+    if (!_policy.enabled) {
       return 'Auto-cleanup is disabled';
     }
 
@@ -125,7 +129,11 @@ class FileManagerViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final result = await _fileManagerService.runAutoCleanup(_policy!);
+      final profileName = _activeProfileViewModel.activeProfileName;
+      final result = await _fileManagerService.runAutoCleanup(
+        _policy,
+        profileName: profileName,
+      );
       await loadFiles(); // Refresh the list
 
       if (result.filesDeleted == 0) {
