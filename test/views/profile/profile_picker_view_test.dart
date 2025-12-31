@@ -18,6 +18,7 @@ void main() {
   setUp(() {
     mockProfileService = MockProfileService();
     mockActiveProfileViewModel = MockActiveProfileViewModel();
+    when(mockActiveProfileViewModel.activeProfileId).thenReturn(1);
   });
 
   Widget createTestWidget() {
@@ -174,7 +175,7 @@ void main() {
       final avatar = tester.widget<CircleAvatar>(
         find.byType(CircleAvatar).first,
       );
-      expect(avatar.backgroundColor, equals(const Color(0xFF5733)));
+      expect(avatar.backgroundColor, equals(const Color(0x00FF5733)));
     });
 
     testWidgets('should show snackbar on profile selection error',

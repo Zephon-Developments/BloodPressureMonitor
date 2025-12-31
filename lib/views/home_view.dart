@@ -55,7 +55,7 @@ class _HomeViewState extends State<HomeView> {
           padding: EdgeInsets.all(8.0),
           child: ProfileSwitcher(),
         ),
-        leadingWidth: 140,
+        leadingWidth: 200,
         actions: [
           if (_selectedIndex == 2)
             Consumer<AnalyticsViewModel>(

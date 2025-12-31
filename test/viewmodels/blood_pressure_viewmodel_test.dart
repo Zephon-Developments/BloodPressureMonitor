@@ -5,7 +5,10 @@ import 'package:blood_pressure_monitor/services/reading_service.dart';
 import 'package:blood_pressure_monitor/utils/validators.dart';
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
+import '../test_mocks.mocks.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +19,7 @@ void main() {
   late ReadingService readingService;
   late AveragingService averagingService;
   late BloodPressureViewModel viewModel;
+  late MockActiveProfileViewModel mockActiveProfileViewModel;
 
   setUp(() async {
     // Create in-memory unencrypted database for testing
@@ -99,9 +103,12 @@ void main() {
       databaseService: databaseService,
       readingService: readingService,
     );
+    mockActiveProfileViewModel = MockActiveProfileViewModel();
+    when(mockActiveProfileViewModel.activeProfileId).thenReturn(1);
     viewModel = BloodPressureViewModel(
       readingService,
       averagingService,
+      mockActiveProfileViewModel,
     );
   });
 

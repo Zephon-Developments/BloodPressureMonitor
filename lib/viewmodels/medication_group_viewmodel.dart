@@ -18,7 +18,23 @@ class MedicationGroupViewModel extends ChangeNotifier {
     required MedicationGroupService groupService,
     required ActiveProfileViewModel activeProfileViewModel,
   })  : _groupService = groupService,
-        _activeProfileViewModel = activeProfileViewModel;
+        _activeProfileViewModel = activeProfileViewModel {
+    _activeProfileViewModel.addListener(_onProfileChanged);
+  }
+
+  @override
+  void dispose() {
+    _activeProfileViewModel.removeListener(_onProfileChanged);
+    super.dispose();
+  }
+
+  /// Callback invoked when the active profile changes.
+  void _onProfileChanged() {
+    _groups = [];
+    _errorMessage = null;
+    notifyListeners();
+    loadGroups();
+  }
 
   /// List of medication groups for the active profile.
   List<MedicationGroup> get groups => _groups;

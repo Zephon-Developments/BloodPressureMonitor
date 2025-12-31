@@ -23,7 +23,24 @@ class FileManagerViewModel extends ChangeNotifier {
         _exportService = exportService,
         _pdfReportService = pdfReportService,
         _activeProfileViewModel = activeProfileViewModel,
-        _policy = AutoCleanupPolicy.defaultPolicy();
+        _policy = AutoCleanupPolicy.defaultPolicy() {
+    _activeProfileViewModel.addListener(_onProfileChanged);
+  }
+
+  @override
+  void dispose() {
+    _activeProfileViewModel.removeListener(_onProfileChanged);
+    super.dispose();
+  }
+
+  /// Callback invoked when the active profile changes.
+  void _onProfileChanged() {
+    _files = [];
+    _totalStorageBytes = 0;
+    _errorMessage = null;
+    notifyListeners();
+    loadFiles();
+  }
 
   List<ManagedFile> _files = [];
   List<ManagedFile> get files => List.unmodifiable(_files);

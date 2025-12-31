@@ -28,7 +28,24 @@ class MedicationIntakeViewModel extends ChangeNotifier {
     required ActiveProfileViewModel activeProfileViewModel,
   })  : _intakeService = intakeService,
         _medicationService = medicationService,
-        _activeProfileViewModel = activeProfileViewModel;
+        _activeProfileViewModel = activeProfileViewModel {
+    _activeProfileViewModel.addListener(_onProfileChanged);
+  }
+
+  @override
+  void dispose() {
+    _activeProfileViewModel.removeListener(_onProfileChanged);
+    super.dispose();
+  }
+
+  /// Callback invoked when the active profile changes.
+  void _onProfileChanged() {
+    _intakes = [];
+    _medicationCache = {};
+    _errorMessage = null;
+    notifyListeners();
+    loadIntakes();
+  }
 
   /// List of medication intakes filtered by current criteria.
   List<MedicationIntake> get intakes => _intakes;

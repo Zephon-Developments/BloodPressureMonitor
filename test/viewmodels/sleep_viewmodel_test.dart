@@ -10,10 +10,13 @@ void main() {
   late MockSleepService mockSleepService;
   late SleepViewModel viewModel;
   late SleepEntry sampleEntry;
+  late MockActiveProfileViewModel mockActiveProfileViewModel;
 
   setUp(() {
     mockSleepService = MockSleepService();
-    viewModel = SleepViewModel(mockSleepService);
+    mockActiveProfileViewModel = MockActiveProfileViewModel();
+    when(mockActiveProfileViewModel.activeProfileId).thenReturn(1);
+    viewModel = SleepViewModel(mockSleepService, mockActiveProfileViewModel);
     sampleEntry = SleepEntry(
       id: 7,
       profileId: 1,
