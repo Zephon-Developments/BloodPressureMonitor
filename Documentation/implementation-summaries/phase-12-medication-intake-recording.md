@@ -35,7 +35,7 @@ Implemented UI entry points for medication intake recording per approved Phase 1
 - Added "Log Medication Intake" button to home screen
 - Two-step flow: medication picker → log intake sheet
 - Allows logging without navigating to medication list
-- Icon: `Icons.medication_outlined`
+- Icon: `Icons.medication`
 
 ---
 
