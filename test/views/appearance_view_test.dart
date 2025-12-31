@@ -217,6 +217,7 @@ void main() {
 
       final radioTile =
           tester.widget<RadioListTile<AppThemeMode>>(darkRadio);
+      // ignore: deprecated_member_use
       expect(radioTile.groupValue, AppThemeMode.dark);
     });
 
@@ -232,6 +233,7 @@ void main() {
 
       final radioTile =
           tester.widget<RadioListTile<FontScaleOption>>(largeRadio);
+      // ignore: deprecated_member_use
       expect(radioTile.groupValue, FontScaleOption.large);
     });
 

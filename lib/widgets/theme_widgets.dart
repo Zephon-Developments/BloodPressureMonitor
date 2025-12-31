@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/theme_settings.dart';
+import 'package:blood_pressure_monitor/models/theme_settings.dart';
 
 /// Widget for selecting an accent color from the available palette.
 ///
@@ -151,6 +151,7 @@ class FontScaleSelector extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             ...FontScaleOption.values.map((scale) {
+              // ignore: deprecated_member_use
               return RadioListTile<FontScaleOption>(
                 title: Text(scale.displayName),
                 subtitle: Text(
@@ -158,14 +159,16 @@ class FontScaleSelector extends StatelessWidget {
                   style: TextStyle(fontSize: 14 * scale.scaleFactor),
                 ),
                 value: scale,
+                // ignore: deprecated_member_use
                 groupValue: selectedScale,
+                // ignore: deprecated_member_use
                 onChanged: (value) {
                   if (value != null) {
                     onScaleSelected(value);
                   }
                 },
               );
-            }).toList(),
+            }),
           ],
         ),
       ),

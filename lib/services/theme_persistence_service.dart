@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../models/theme_settings.dart';
+import 'package:blood_pressure_monitor/models/theme_settings.dart';
 
 /// Service responsible for persisting and loading theme settings.
 ///
