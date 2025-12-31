@@ -1,62 +1,35 @@
-# Handoff: Clive → Claudette
+# Handoff: Clive → Claudette (Phase 11 Implementation)
 
-**Date**: 2025-12-29  
-**From**: Clive (Reviewer)  
-**To**: Claudette (Implementation Engineer)  
-**Task**: Phase 6 UI Foundation - Validation & Test Coverage Follow-up  
-**Status**: ❌ **BLOCKERS IDENTIFIED**
+**Date:** December 30, 2025  
+**From:** Clive (Reviewer)  
+**To:** Claudette (Implementer)  
+**Status:** APPROVED & READY  
 
----
+## Context
+The implementation plan for **Phase 11: Medication Records UI** has been reviewed and approved. You are tasked with executing the implementation as described in the plan.
 
-## Review Summary
+## Reference Documents
+- **Implementation Plan:** [Documentation/Plans/Phase_11_Medication_UI_Plan.md](../Plans/Phase_11_Medication_UI_Plan.md)
+- **Plan Review:** [reviews/2025-12-30-clive-phase-11-plan-review.md](../../reviews/2025-12-30-clive-phase-11-plan-review.md)
+- **Coding Standards:** [Documentation/Standards/Coding_Standards.md](../Standards/Coding_Standards.md)
 
-Phase 6 implementation has been reviewed. While the UI structure and the majority of widget tests are well-implemented, there is a critical gap in form validation that prevents the "UI Foundation" from being truly robust and causes test failures/skips.
+## Key Tasks
+1.  **Scaffolding:** Register MedicationViewModel, MedicationIntakeViewModel, and MedicationGroupViewModel in main.dart.
+2.  **Medication Management:** Build the Medication List and Add/Edit Form views.
+3.  **Intake Logging:** Implement the intake logging sheet (single and group support).
+4.  **History:** Build the Medication History view with status chips (on-time/late/missed).
+5.  **Profile Isolation:** Ensure all operations use ActiveProfileViewModel.activeProfileId.
+6.  **Testing:** Achieve ≥85% coverage for ViewModels and ≥75% for Widgets.
 
-### ❌ Blockers
+## Standards Reminders
+- **DartDoc:** All public classes and methods must have documentation comments.
+- **Strong Typing:** Avoid ny or dynamic unless strictly necessary for serialization.
+- **Formatting:** Ensure trailing commas are used and lutter format is run.
+- **Analyzer:** Zero warnings or errors allowed.
 
-#### 1. Missing Form Validation Logic
-- **Issue**: `CustomTextField` uses `TextField` instead of `TextFormField`.
-- **Impact**: The `Form` in `AddReadingView` cannot perform validation. `_formKey.currentState!.validate()` always returns true even if fields are empty.
-- **Regression**: Attempting to save an empty form causes a `FormatException` in `AddReadingView._submitReading` when calling `int.parse()`.
-- **Required Fix**:
-  - Update `lib/widgets/common/custom_text_field.dart` to use `TextFormField` and accept a `validator` property.
-  - Implement validation logic in `lib/views/readings/widgets/reading_form_basic.dart` using the validators from `lib/utils/validators.dart`.
+## Success Metrics
+- All Phase 11 tasks in Implementation_Schedule.md are completed.
+- All tests pass and meet coverage requirements.
+- UI is responsive and follows established patterns.
 
-#### 2. Incomplete Test Coverage (Skipped Tests)
-- **Issue**: `test/views/readings/add_reading_view_test.dart` has a skipped test: `"validates empty form submission"`.
-- **Impact**: Core functionality (validation) is not verified.
-- **Required Fix**: Once validation is implemented, enable and fix this test to ensure the form correctly prevents submission of invalid data.
-
-### ⚠️ Minor Findings
-
-#### 1. Flutter Analyze Info (Style)
-- **Issue**: 11 "Missing a required trailing comma" info messages in `test/views/readings/add_reading_view_test.dart`.
-- **Required Fix**: Run `dart format` or manually add trailing commas to satisfy the linter.
-
----
-
-## Detailed Findings
-
-### `lib/widgets/common/custom_text_field.dart`
-The widget should be a wrapper around `TextFormField` to support the `Form` widget's validation lifecycle.
-
-### `lib/views/readings/widgets/reading_form_basic.dart`
-The `CustomTextField` instances for Systolic, Diastolic, and Pulse need `validator` functions that check for:
-1. Empty values (Required).
-2. Numeric range (using `Validators.validateSystolic`, etc.).
-
----
-
-## Next Steps
-
-1. **Refactor `CustomTextField`** to support `TextFormField` and `validator`.
-2. **Add validators** to `ReadingFormBasic`.
-3. **Enable and fix** the skipped test in `add_reading_view_test.dart`.
-4. **Address trailing comma** info messages to achieve 0 issues in `flutter analyze`.
-
-Please notify me once these blockers are resolved for a final review.
-
----
-**Clive**  
-Review Specialist  
-2025-12-29
+**Next Step:** Claudette, please begin the implementation. Start with the ViewModel scaffolding and then proceed to the UI components.
