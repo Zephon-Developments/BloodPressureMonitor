@@ -20,6 +20,7 @@ import 'package:blood_pressure_monitor/services/file_manager_service.dart';
 import 'package:blood_pressure_monitor/services/import_service.dart';
 import 'package:blood_pressure_monitor/services/pdf_report_service.dart';
 import 'package:blood_pressure_monitor/services/app_info_service.dart';
+import 'package:blood_pressure_monitor/services/theme_persistence_service.dart';
 import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/analytics_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
@@ -34,6 +35,7 @@ import 'package:blood_pressure_monitor/viewmodels/report_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/medication_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/medication_intake_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/medication_group_viewmodel.dart';
+import 'package:blood_pressure_monitor/viewmodels/theme_viewmodel.dart';
 import 'package:blood_pressure_monitor/views/home_view.dart';
 import 'package:blood_pressure_monitor/views/lock/lock_screen.dart';
 import 'package:blood_pressure_monitor/views/profile/profile_picker_view.dart';
@@ -98,6 +100,10 @@ void main() async {
   // Initialize auth service
   final authService = AuthService(prefs: prefs);
 
+  // Initialize theme persistence service and view model
+  final themePersistenceService = ThemePersistenceService(prefs);
+  final themeViewModel = ThemeViewModel(themePersistenceService);
+
   // Initialize profile service
   final profileService = ProfileService();
 
@@ -130,6 +136,8 @@ void main() async {
         Provider<PdfReportService>.value(value: pdfReportService),
         Provider<SharedPreferences>.value(value: prefs),
         Provider<AuthService>.value(value: authService),
+        Provider<ThemePersistenceService>.value(value: themePersistenceService),
+        ChangeNotifierProvider<ThemeViewModel>.value(value: themeViewModel),
         ChangeNotifierProvider<ActiveProfileViewModel>.value(
           value: activeProfileViewModel,
         ),
@@ -224,12 +232,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeViewModel = context.watch<ThemeViewModel>();
+
     return MaterialApp(
       title: 'HyperTrack',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
+      theme: themeViewModel.lightTheme,
+      darkTheme: themeViewModel.darkTheme,
+      themeMode: themeViewModel.materialThemeMode,
       home: const _LockGate(),
     );
   }

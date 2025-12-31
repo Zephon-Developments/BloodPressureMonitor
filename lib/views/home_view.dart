@@ -14,6 +14,8 @@ import 'package:blood_pressure_monitor/views/report_view.dart';
 import 'package:blood_pressure_monitor/views/file_manager_view.dart';
 import 'package:blood_pressure_monitor/views/medication/medication_list_view.dart';
 import 'package:blood_pressure_monitor/views/medication/medication_history_view.dart';
+import 'package:blood_pressure_monitor/views/appearance_view.dart';
+import 'package:blood_pressure_monitor/views/about_view.dart';
 import 'package:blood_pressure_monitor/widgets/profile_switcher.dart';
 
 /// Main home screen with navigation shell.
@@ -274,17 +276,31 @@ class _HomeViewState extends State<HomeView> {
           },
         ),
         const Divider(),
-        const ListTile(
-          leading: Icon(Icons.palette),
-          title: Text('Appearance'),
-          subtitle: Text('Coming soon'),
-          enabled: false,
+        ListTile(
+          leading: const Icon(Icons.palette),
+          title: const Text('Appearance'),
+          subtitle: const Text('Theme, colors, and accessibility'),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (context) => const AppearanceView(),
+              ),
+            );
+          },
         ),
-        const ListTile(
-          leading: Icon(Icons.info),
-          title: Text('About'),
-          subtitle: Text('Coming soon'),
-          enabled: false,
+        ListTile(
+          leading: const Icon(Icons.info),
+          title: const Text('About'),
+          subtitle: const Text('App version and developer info'),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (context) => const AboutView(),
+              ),
+            );
+          },
         ),
       ],
     );
