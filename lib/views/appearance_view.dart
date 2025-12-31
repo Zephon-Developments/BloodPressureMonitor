@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/theme_settings.dart';
-import '../viewmodels/theme_viewmodel.dart';
-import '../widgets/theme_widgets.dart';
+import 'package:blood_pressure_monitor/models/theme_settings.dart';
+import 'package:blood_pressure_monitor/viewmodels/theme_viewmodel.dart';
+import 'package:blood_pressure_monitor/widgets/theme_widgets.dart';
 
 /// Screen for managing app appearance and theme settings.
 ///
@@ -48,18 +48,21 @@ class AppearanceView extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         ...AppThemeMode.values.map((mode) {
+                          // ignore: deprecated_member_use
                           return RadioListTile<AppThemeMode>(
                             title: Text(mode.displayName),
                             subtitle: Text(_getThemeModeDescription(mode)),
                             value: mode,
+                            // ignore: deprecated_member_use
                             groupValue: themeViewModel.themeMode,
+                            // ignore: deprecated_member_use
                             onChanged: (value) {
                               if (value != null) {
                                 themeViewModel.setThemeMode(value);
                               }
                             },
                           );
-                        }).toList(),
+                        }),
                       ],
                     ),
                   ),
@@ -115,7 +118,9 @@ class AppearanceView extends StatelessWidget {
   }
 
   Widget _buildPreviewSection(
-      BuildContext context, ThemeViewModel themeViewModel) {
+      BuildContext context,
+      ThemeViewModel themeViewModel,
+  ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 

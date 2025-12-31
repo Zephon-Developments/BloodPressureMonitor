@@ -184,6 +184,7 @@ void main() {
 
       final radioTile =
           tester.widget<RadioListTile<FontScaleOption>>(largeRadio);
+      // ignore: deprecated_member_use
       expect(radioTile.groupValue, FontScaleOption.large);
     });
 

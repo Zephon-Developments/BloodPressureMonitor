@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../models/theme_settings.dart';
-import '../services/theme_persistence_service.dart';
+import 'package:blood_pressure_monitor/models/theme_settings.dart';
+import 'package:blood_pressure_monitor/services/theme_persistence_service.dart';
 
 /// ViewModel managing theme state and appearance preferences for the application.
 ///
@@ -228,8 +228,6 @@ class ThemeViewModel extends ChangeNotifier {
         onSecondary: Colors.white,
         surface: Colors.white,
         onSurface: Colors.black,
-        background: Colors.white,
-        onBackground: Colors.black,
       );
     } else {
       return scheme.copyWith(
@@ -239,8 +237,6 @@ class ThemeViewModel extends ChangeNotifier {
         onSecondary: Colors.black,
         surface: Colors.black,
         onSurface: Colors.white,
-        background: Colors.black,
-        onBackground: Colors.white,
       );
     }
   }
