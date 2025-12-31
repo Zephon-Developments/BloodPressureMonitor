@@ -2,18 +2,39 @@ import 'package:flutter/foundation.dart';
 
 import 'package:blood_pressure_monitor/models/health_data.dart';
 import 'package:blood_pressure_monitor/services/weight_service.dart';
+import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart';
 
 /// ViewModel that coordinates weight tracking workflows.
 ///
 /// Exposes a list of weight entries, loading/submission state, and provides
 /// helpers for CRUD operations with appropriate user-facing error handling.
+///
+/// Automatically reloads data when the active profile changes.
 class WeightViewModel extends ChangeNotifier {
   /// Creates a [WeightViewModel].
-  WeightViewModel(this._weightService, {int profileId = 1})
-      : _profileId = profileId;
+  WeightViewModel(
+    this._weightService,
+    this._activeProfileViewModel,
+  ) {
+    _activeProfileViewModel.addListener(_onProfileChanged);
+  }
 
   final WeightService _weightService;
-  final int _profileId;
+  final ActiveProfileViewModel _activeProfileViewModel;
+
+  @override
+  void dispose() {
+    _activeProfileViewModel.removeListener(_onProfileChanged);
+    super.dispose();
+  }
+
+  /// Callback invoked when the active profile changes.
+  void _onProfileChanged() {
+    _entries = [];
+    _error = null;
+    notifyListeners();
+    loadEntries();
+  }
 
   List<WeightEntry> _entries = <WeightEntry>[];
   bool _isLoading = false;
@@ -39,7 +60,7 @@ class WeightViewModel extends ChangeNotifier {
 
     try {
       _entries = await _weightService.listWeightEntries(
-        profileId: _profileId,
+        profileId: _activeProfileViewModel.activeProfileId,
         from: from,
         to: to,
       );
@@ -71,7 +92,7 @@ class WeightViewModel extends ChangeNotifier {
     try {
       final entry = WeightEntry(
         id: id,
-        profileId: _profileId,
+        profileId: _activeProfileViewModel.activeProfileId,
         takenAt: recordedAt,
         weightValue: weightValue,
         unit: unit,

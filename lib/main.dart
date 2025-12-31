@@ -36,6 +36,7 @@ import 'package:blood_pressure_monitor/viewmodels/medication_intake_viewmodel.da
 import 'package:blood_pressure_monitor/viewmodels/medication_group_viewmodel.dart';
 import 'package:blood_pressure_monitor/views/home_view.dart';
 import 'package:blood_pressure_monitor/views/lock/lock_screen.dart';
+import 'package:blood_pressure_monitor/views/profile/profile_picker_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -142,26 +143,31 @@ void main() async {
           create: (context) => BloodPressureViewModel(
             context.read<ReadingService>(),
             context.read<AveragingService>(),
+            context.read<ActiveProfileViewModel>(),
           ),
         ),
         ChangeNotifierProvider<HistoryViewModel>(
           create: (context) => HistoryViewModel(
             context.read<HistoryService>(),
+            context.read<ActiveProfileViewModel>(),
           ),
         ),
         ChangeNotifierProvider<WeightViewModel>(
           create: (context) => WeightViewModel(
             context.read<WeightService>(),
+            context.read<ActiveProfileViewModel>(),
           ),
         ),
         ChangeNotifierProvider<SleepViewModel>(
           create: (context) => SleepViewModel(
             context.read<SleepService>(),
+            context.read<ActiveProfileViewModel>(),
           ),
         ),
         ChangeNotifierProvider<AnalyticsViewModel>(
           create: (context) => AnalyticsViewModel(
             analyticsService: context.read<AnalyticsService>(),
+            activeProfileViewModel: context.read<ActiveProfileViewModel>(),
           ),
         ),
         ChangeNotifierProvider<ExportViewModel>(
@@ -233,6 +239,9 @@ class MyApp extends StatelessWidget {
 ///
 /// Also includes a privacy screen overlay that prevents sensitive data from
 /// being visible in the app switcher when backgrounded.
+///
+/// When unlocked, checks if multiple profiles exist and routes to
+/// ProfilePickerView if necessary before showing HomeView.
 class _LockGate extends StatefulWidget {
   const _LockGate();
 
@@ -242,6 +251,9 @@ class _LockGate extends StatefulWidget {
 
 class _LockGateState extends State<_LockGate> with WidgetsBindingObserver {
   bool _showPrivacyScreen = false;
+  bool _needsProfileSelection = false;
+  bool _isCheckingProfiles = false;
+  bool _hasCheckedProfiles = false;
 
   @override
   void initState() {
@@ -253,6 +265,33 @@ class _LockGateState extends State<_LockGate> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  Future<void> _checkProfileSelection() async {
+    if (_isCheckingProfiles || _hasCheckedProfiles) return;
+
+    setState(() {
+      _isCheckingProfiles = true;
+    });
+
+    try {
+      final profileService = context.read<ProfileService>();
+      final profiles = await profileService.getAllProfiles();
+
+      if (!mounted) return;
+
+      setState(() {
+        _needsProfileSelection = profiles.length > 1;
+        _isCheckingProfiles = false;
+        _hasCheckedProfiles = true;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isCheckingProfiles = false;
+        _hasCheckedProfiles = true;
+      });
+    }
   }
 
   @override
@@ -272,16 +311,52 @@ class _LockGateState extends State<_LockGate> with WidgetsBindingObserver {
 
     Widget mainContent;
     if (lockViewModel.state.isLocked) {
+      // Reset profile selection state when locked
+      if (_needsProfileSelection || _hasCheckedProfiles) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            setState(() {
+              _needsProfileSelection = false;
+              _hasCheckedProfiles = false;
+            });
+          }
+        });
+      }
       mainContent = const LockScreenView();
     } else {
-      // Wrap entire app content to track activity globally
-      // This ensures navigation to other screens still records user activity
-      mainContent = Listener(
-        // Listen to all pointer events to catch interactions anywhere in the app
-        onPointerDown: (_) => lockViewModel.recordActivity(),
-        onPointerMove: (_) => lockViewModel.recordActivity(),
-        child: const HomeView(),
-      );
+      // Check if profile selection is needed after unlock
+      if (!_hasCheckedProfiles && !_isCheckingProfiles) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _checkProfileSelection();
+        });
+      }
+
+      // Show ProfilePickerView if multiple profiles exist
+      if (_needsProfileSelection) {
+        mainContent = Listener(
+          onPointerDown: (_) => lockViewModel.recordActivity(),
+          onPointerMove: (_) => lockViewModel.recordActivity(),
+          child: ProfilePickerView(
+            allowBack: false,
+            onProfileSelected: () {
+              if (mounted) {
+                setState(() {
+                  _needsProfileSelection = false;
+                });
+              }
+            },
+          ),
+        );
+      } else {
+        // Wrap entire app content to track activity globally
+        // This ensures navigation to other screens still records user activity
+        mainContent = Listener(
+          // Listen to all pointer events to catch interactions anywhere in the app
+          onPointerDown: (_) => lockViewModel.recordActivity(),
+          onPointerMove: (_) => lockViewModel.recordActivity(),
+          child: const HomeView(),
+        );
+      }
     }
 
     // Overlay privacy screen when app is backgrounded
