@@ -16,6 +16,7 @@ import 'package:blood_pressure_monitor/services/medication_service.dart';
 import 'package:blood_pressure_monitor/services/medication_intake_service.dart';
 import 'package:blood_pressure_monitor/services/medication_group_service.dart';
 import 'package:blood_pressure_monitor/services/export_service.dart';
+import 'package:blood_pressure_monitor/services/file_manager_service.dart';
 import 'package:blood_pressure_monitor/services/import_service.dart';
 import 'package:blood_pressure_monitor/services/pdf_report_service.dart';
 import 'package:blood_pressure_monitor/services/app_info_service.dart';
@@ -27,6 +28,7 @@ import 'package:blood_pressure_monitor/viewmodels/lock_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/sleep_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/weight_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/export_viewmodel.dart';
+import 'package:blood_pressure_monitor/viewmodels/file_manager_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/import_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/report_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/medication_viewmodel.dart';
@@ -90,6 +92,7 @@ void main() async {
     readingService: readingService,
     medicationService: medicationService,
   );
+  final fileManagerService = FileManagerService();
 
   // Initialize auth service
   final authService = AuthService(prefs: prefs);
@@ -121,6 +124,7 @@ void main() async {
         Provider<AnalyticsService>.value(value: analyticsService),
         Provider<CorrelationService>.value(value: correlationService),
         Provider<ExportService>.value(value: exportService),
+        Provider<FileManagerService>.value(value: fileManagerService),
         Provider<ImportService>.value(value: importService),
         Provider<PdfReportService>.value(value: pdfReportService),
         Provider<SharedPreferences>.value(value: prefs),
@@ -163,6 +167,13 @@ void main() async {
         ChangeNotifierProvider<ExportViewModel>(
           create: (context) => ExportViewModel(
             exportService: context.read<ExportService>(),
+          ),
+        ),
+        ChangeNotifierProvider<FileManagerViewModel>(
+          create: (context) => FileManagerViewModel(
+            fileManagerService: context.read<FileManagerService>(),
+            exportService: context.read<ExportService>(),
+            pdfReportService: context.read<PdfReportService>(),
           ),
         ),
         ChangeNotifierProvider<ImportViewModel>(
@@ -262,10 +273,12 @@ class _LockGateState extends State<_LockGate> with WidgetsBindingObserver {
     if (lockViewModel.state.isLocked) {
       mainContent = const LockScreenView();
     } else {
-      mainContent = GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: () => lockViewModel.recordActivity(),
-        onPanUpdate: (_) => lockViewModel.recordActivity(),
+      // Wrap entire app content to track activity globally
+      // This ensures navigation to other screens still records user activity
+      mainContent = Listener(
+        // Listen to all pointer events to catch interactions anywhere in the app
+        onPointerDown: (_) => lockViewModel.recordActivity(),
+        onPointerMove: (_) => lockViewModel.recordActivity(),
         child: const HomeView(),
       );
     }
