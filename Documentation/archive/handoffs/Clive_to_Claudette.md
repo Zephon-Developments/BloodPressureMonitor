@@ -1,79 +1,42 @@
-# Review: Phase 5 - App Security Gate
+# Handoff: Clive → Claudette (Medication Intake Implementation)
 
-**Reviewer**: Clive  
-**Date**: 2025-12-29  
-**Status**: ❌ BLOCKERS REMAINING
+**Date:** December 31, 2025  
+**From:** Clive (Reviewer)  
+**To:** Claudette (Implementation Specialist)  
+**Status:** APPROVED
 
----
+## Scope & Objectives
+Implement the "Medication Intake Recording" feature as outlined in [Documentation/Plans/Medication_Intake_Plan.md](Documentation/Plans/Medication_Intake_Plan.md). The goal is to provide a clear and fast way for users to log medication intakes (single or grouped).
 
-## Scope & Acceptance Criteria
+## Key Requirements
+1.  **Medication List CTA**: Add a "Log intake" icon button to each medication tile in `MedicationListView`. This should open the existing `LogIntakeSheet`.
+2.  **Group Logging**: Ensure the implementation supports logging multiple medications at once if they belong to a group (as per Decision 1 in the plan).
+3.  **Home Quick Action**: Add a "Log Medication" quick action to the `HomeView` that allows users to pick a medication and log an intake.
+4.  **Feedback & Refresh**: Show success/error snackbars after logging. Ensure `MedicationIntakeViewModel.loadIntakes()` is called to refresh history.
+5.  **Timing Correlation**: Log the exact date/time taken. Do not prompt for missed/late status; rely on existing schedule metadata logic.
 
-**Scope**: Implementation of PIN/Biometric authentication, database encryption migration, and auto-lock functionality.
+## Technical Constraints
+-   **MVVM**: Follow the established Provider pattern.
+-   **Coding Standards**: 
+    -   Strictly follow [Documentation/Standards/Coding_Standards.md](Documentation/Standards/Coding_Standards.md).
+    -   Maintain 80-character line limits.
+    -   Use `const` constructors where possible.
+    -   Organize imports correctly.
+-   **Security**: All data must be persisted via the encrypted `DatabaseService`.
+-   **Testing**: 
+    -   Unit tests for `MedicationIntakeService` and `MedicationIntakeViewModel`.
+    -   Widget tests for the new CTAs and the `LogIntakeSheet` flow.
+    -   Maintain ≥80% coverage.
 
-**Acceptance Criteria**:
-- [x] PBKDF2-based PIN hashing (10,000 iterations)
-- [x] Tiered lockout policy (5/10/15 attempts)
-- [x] Database migration from placeholder to secure password
-- [x] Auto-lock on idle timeout and backgrounding
-- [x] Privacy screen in app switcher
-- [x] Zero linting issues and all tests passing
-- [ ] Production-ready UI integration (Blocker)
+## Affected Files
+-   `lib/views/medication/medication_list_view.dart`: Add log CTA to tiles.
+-   `lib/views/home_view.dart`: Add quick action.
+-   `lib/views/home/widgets/quick_actions.dart`: (If applicable) Add medication log action.
+-   `lib/viewmodels/medication_intake_viewmodel.dart`: Ensure refresh logic is robust.
+-   `test/`: Add corresponding unit and widget tests.
 
----
-
-## Findings
-
-### 🔴 Critical Blockers
-
-#### 1. Unreachable Security Settings
-The `SecuritySettingsView` is implemented but not integrated into the application's navigation. There is no button or menu item in `HomeView` to access security settings.
-- **File**: [lib/views/home_view.dart](../../lib/views/home_view.dart)
-- **Impact**: Users cannot set up PINs, enable biometrics, or change timeout settings.
-
-#### 2. Aggressive Auto-Lock (UX/Security Bug)
-The app triggers a lock immediately upon backgrounding even if no PIN has been set.
-- **File**: [lib/viewmodels/lock_viewmodel.dart](../../lib/viewmodels/lock_viewmodel.dart#L118)
-- **Impact**: New users who haven't opted into security are forced into a PIN setup flow the first time they background the app.
-- **Required Fix**: `LockViewModel.lock()` should only set `isLocked = true` if `isPinSet` is true.
-
-#### 3. Broken PIN Setup Flow in LockScreen
-If a user sets a PIN via the `LockScreenView` (e.g., after being forced there by the backgrounding bug), the app remains locked after the PIN is set.
-- **File**: [lib/viewmodels/lock_viewmodel.dart](../../lib/viewmodels/lock_viewmodel.dart#L131)
-- **Impact**: User must enter their new PIN twice: once to set it, and once to unlock.
-- **Required Fix**: `LockViewModel.setPin()` should also set `isLocked = false` and start the idle timer if it's being called to "unlock" the app.
-
-### 🟡 Minor Issues & Standards Compliance
-
-#### 1. Missing Explicit Types (Standards Violation)
-Several methods in `LockScreenView` use untyped `state` parameters, which defaults to `dynamic`.
-- **File**: [lib/views/lock/lock_screen.dart](../../lib/views/lock/lock_screen.dart#L178) (and others: `_buildKeypad`, `_buildKeypadRow`, `_buildNumberButton`, `_onNumberPressed`, `_submitPin`)
-- **Requirement**: All parameters must have explicit types (e.g., `AppLockState state`).
-
-#### 2. Use of `stderr.writeln`
-The `DatabaseService` uses `stderr.writeln` for logging errors and migration status.
-- **File**: [lib/services/database_service.dart](../../lib/services/database_service.dart#L56)
-- **Requirement**: Use `debugPrint` or a dedicated logging service to ensure logs are captured correctly in Flutter environments.
-
-#### 3. Incomplete Implementation Comment
-- **File**: [lib/views/lock/lock_screen.dart](../../lib/views/lock/lock_screen.dart#L285)
-- **Comment**: `// Setting up initial PIN - would need confirmation flow. For now, just set it`
-- **Requirement**: Either implement the confirmation flow in `LockScreenView` or ensure that PIN setup only happens in `SecuritySettingsView` (which already has confirmation).
+## Handoff Instructions
+Claudette, please proceed with the implementation. Ensure you run `flutter analyze` and `flutter test` before submitting your changes. If you encounter any architectural blockers, consult with Tracy.
 
 ---
-
-## Next Steps for Claudette
-
-1. **Integrate Navigation**: Add a settings icon to the `HomeView` AppBar that navigates to `SecuritySettingsView`.
-2. **Fix Lock Logic**: Update `LockViewModel.lock()` to check `isPinSet` before locking.
-3. **Fix Setup Flow**: Ensure `setPin` or the caller in `LockScreenView` unlocks the app after successful setup.
-4. **Type Safety**: Add explicit `AppLockState` types to all parameters in `LockScreenView`.
-5. **Logging**: Replace `stderr.writeln` with `debugPrint`.
-
----
-
-## Approval Status
-**Green-light**: 🔴 NO  
-**Blockers**: 3  
-**Follow-ups**: 2
-
-Please address these blockers and resubmit for review.
+**Reviewer Note**: The plan is solid. Focus on the UX of the quick action to ensure it's truly "fast" for the user.
