@@ -116,6 +116,10 @@ void main() {
     testWidgets('selecting font scale calls viewmodel', (tester) async {
       await tester.pumpWidget(buildTestWidget());
 
+      // Scroll to make Large option visible
+      await tester.ensureVisible(find.text('Large'));
+      await tester.pumpAndSettle();
+      
       await tester.tap(find.text('Large'));
       await tester.pumpAndSettle();
 
@@ -125,7 +129,11 @@ void main() {
     testWidgets('toggling high contrast calls viewmodel', (tester) async {
       await tester.pumpWidget(buildTestWidget());
 
+      // Scroll to make Switch visible
       final switchWidget = find.byType(Switch);
+      await tester.ensureVisible(switchWidget);
+      await tester.pumpAndSettle();
+      
       await tester.tap(switchWidget);
       await tester.pumpAndSettle();
 
