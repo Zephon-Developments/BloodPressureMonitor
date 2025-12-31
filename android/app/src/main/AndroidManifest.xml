@@ -6,7 +6,7 @@
     <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
     
     <application
-        android:label="Blood Pressure Monitor"
+        android:label="HyperTrack"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         

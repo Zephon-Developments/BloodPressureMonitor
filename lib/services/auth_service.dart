@@ -186,7 +186,7 @@ class AuthService {
     try {
       debugPrint('Attempting biometric authentication...');
       final result = await _localAuth.authenticate(
-        localizedReason: 'Authenticate to unlock Blood Pressure Monitor',
+        localizedReason: 'Authenticate to unlock HyperTrack',
         options: const AuthenticationOptions(
           stickyAuth: true,
           biometricOnly: false, // Allow device PIN fallback if biometric fails

@@ -1,85 +1,66 @@
 # Handoff: Clive → Claudette
 
-**Date:** December 31, 2025  
-**From:** Clive (Reviewer)  
-**To:** Claudette (Implementer)  
-**Subject:** Phase 13 – Export/PDF Management, Sharing, and Automated Cleanup
+**Date**: December 31, 2025  
+**From**: Clive (Review Specialist)  
+**To**: Claudette (Implementation Engineer)  
+**Task**: Implement HyperTrack Evolution (Phases 14–18)
 
 ---
 
-## 1. Scope & Acceptance Criteria
+## 1. Context
 
-Implement a comprehensive file management system for health data exports (JSON/CSV) and doctor reports (PDF).
+The implementation plans for the next major evolution of the app (now named **HyperTrack**) have been approved. This work involves a significant UI redesign to support carer workflows, a secure backup system, and branding updates for Zephon Development.
 
-### Acceptance Criteria:
-- **File Management:** A new `FileManagerView` to list, share, and delete files in the app's documents directory.
-- **Sharing:** Enable platform share sheets for JSON/CSV exports (matching existing PDF sharing).
-- **Automated Cleanup:** Implement logic to prune old/excess files based on age (default 90 days) and count (default 50 per type).
-- **UI Integration:** 
-    - Update `ExportView` to show a "Share" button and "Manage Files" link after export.
-    - Add a "File Manager" entry point in Settings/Main Menu.
-- **Safety:** Mandatory confirmation dialogs for all deletion operations.
-- **Quality:** 90%+ test coverage for new logic; zero analyzer issues; strict adherence to `Coding_Standards.md`.
+## 2. Objectives
 
----
+Implement Phases 14 through 18 as defined in the approved plans.
 
-## 2. Technical Architecture
+## 3. Reference Materials
 
-Follow the MVVM pattern as outlined in Tracy's plan:
+- **Phase 14 (Rebrand)**: `Documentation/Plans/Phase_14_Rebrand_HyperTrack_Plan.md`
+- **Phase 15 (Reminder Removal)**: `Documentation/Plans/Phase_15_Reminder_Removal_Plan.md`
+- **Phase 16 (Profile UI)**: `Documentation/Plans/Phase_16_Profile_Centric_UI_Plan.md`
+- **Phase 17 (Branding)**: `Documentation/Plans/Phase_17_Zephon_Branding_Appearance_Plan.md`
+- **Phase 18 (Backup)**: `Documentation/Plans/Phase_18_Encrypted_Backup_Plan.md`
+- **Review Notes**: `reviews/2025-12-31-clive-phases-14-18-plan-review.md`
+- **Coding Standards**: `Documentation/Standards/Coding_Standards.md`
 
-### Models
-- `ManagedFile`: Metadata for files (path, name, size, date, type).
-- `AutoCleanupPolicy`: Configuration for cleanup thresholds.
+## 4. Implementation Sequence & Branching
 
-### Services
-- `FileManagerService`: 
-    - Scan `getApplicationDocumentsDirectory()` for `bp_export_*` and `bp_report_*`.
-    - Handle file deletion and bulk cleanup logic.
-    - Calculate total storage usage.
-- `ExportService` (Update): Add `shareExport(File file)` using `share_plus`.
+Please implement in the following order to minimize dependency friction:
 
-### ViewModels
-- `FileManagerViewModel`: Manage state for the file list, loading, and cleanup actions.
-- `ExportViewModel` (Update): Support sharing the last generated export.
+1.  **Phase 14: App Rebrand**
+    - **Branch**: `feature/rebrand-hypertrack`
+    - **Note**: Do NOT change package IDs.
+2.  **Phase 15: Reminder Removal**
+    - **Branch**: `feature/remove-reminders`
+    - **Note**: Ensure migration is tested against legacy data.
+3.  **Phase 16: Profile-Centric UI**
+    - **Branch**: `feature/phase-16-profile-ui`
+    - **Note**: Focus on strict profile isolation and global state refresh.
+4.  **Phase 17: Zephon Branding & Appearance**
+    - **Branch**: `feature/phase-17-branding-appearance`
+5.  **Phase 18: Encrypted Full-App Backup**
+    - **Branch**: `feature/phase-18-encrypted-backup`
+    - **Note**: Use AES-GCM for the additional encryption layer.
 
-### Views
-- `FileManagerView`: Grouped list of files with metadata and actions (Share/Delete).
-- `ExportView` (Update): Post-export UX improvements.
+## 5. Quality Gates (Mandatory)
 
----
+- **Test Coverage**: 
+    - Services/ViewModels: **≥85%**
+    - Models/Utils: **≥90%**
+    - Widgets: **≥70%**
+- **Documentation**: All new public APIs must have DartDoc comments.
+- **Analyzer**: Zero warnings or errors.
+- **Formatting**: Strict adherence to `dart format`.
 
-## 3. Implementation Details & Defaults
+## 6. Success Criteria
 
-- **Auto-Cleanup Defaults:** 
-    - Age: 90 days.
-    - Count: 50 files per type.
-    - Enabled by default: Yes (provide a toggle in the File Manager).
-- **Sharing Text:** Use "Sensitive health data – Blood Pressure Export" in the share sheet.
-- **Error Handling:** Gracefully handle missing files (e.g., if deleted via OS) and I/O errors.
-- **Performance:** Ensure directory scanning and cleanup are non-blocking (async).
-
----
-
-## 4. Reviewer's Focus Points
-
-- **Typing:** No `any` or `dynamic` where specific types can be used.
-- **Documentation:** JSDoc/DartDoc for all new public methods in services and viewmodels.
-- **Tests:** 
-    - Unit tests for `FileManagerService` (mocking `FileSystem`).
-    - ViewModel tests for state transitions.
-    - Widget tests for the new `FileManagerView` and updated `ExportView`.
-- **Security:** Verify that files are never moved to public/external storage without explicit user share action.
+- All phases implemented and merged to `main`.
+- App name is "HyperTrack" everywhere.
+- Carer workflow (profile-first) is smooth and intuitive.
+- Encrypted backups work reliably with passphrase protection.
 
 ---
 
-## 5. Reference Documents
-- [Tracy's Plan](../Handoffs/Tracy_to_Clive.md)
-- [Coding Standards](../Standards/Coding_Standards.md)
-
----
-
-**Status:** APPROVED FOR IMPLEMENTATION  
-**Implementer:** Claudette  
-**Branch:** `feature/export-file-management`
-
-Please proceed with implementation. Reach out to Steve if you encounter blockers.
+**Handoff Complete.** Please notify me as each PR is ready for review.

@@ -142,7 +142,7 @@ void main() {
       await tester.pumpWidget(createWidget());
       await tester.pumpAndSettle();
 
-      expect(find.text('Blood Pressure Monitor'), findsOneWidget);
+      expect(find.text('HyperTrack'), findsOneWidget);
       expect(find.byType(AppBar), findsOneWidget);
     });
 
@@ -256,7 +256,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Initially Home
-      expect(find.text('Blood Pressure Monitor'), findsOneWidget);
+      expect(find.text('HyperTrack'), findsOneWidget);
 
       // Switch to History
       await tester.tap(find.text('History'));

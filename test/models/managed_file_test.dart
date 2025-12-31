@@ -90,7 +90,7 @@ void main() {
           createdAt: DateTime(2025, 1, 1),
           kind: FileKind.unknown,
         ).shareText,
-        'Blood Pressure Monitor File',
+        'HyperTrack File',
       );
     });
   });

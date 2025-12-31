@@ -220,4 +220,4 @@ We appreciate security researchers who responsibly disclose vulnerabilities. Con
 - Release notes
 - This document (with permission)
 
-Thank you for helping keep Blood Pressure Monitor secure! 🔒
+Thank you for helping keep HyperTrack secure! 🔒

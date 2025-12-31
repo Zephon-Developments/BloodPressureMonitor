@@ -87,6 +87,6 @@ When handing off work to another agent:
 - After the PR is merged by the user:
   - **Archive workflow artifacts**: Move summaries, plans, and other documents to appropriate archive locations (e.g., `Documentation/archive/handoffs/` or `Documentation/archive/summaries/`), preserving only essential guides that remain relevant for future development.
   - **Clean up temporary files**: Remove all temporary files created during the workflow, including handoff notes, context files, and other ancillary documents that are no longer needed. Ensure no temporary artifacts remain in the workspace without documented justification.
-  - If no further actions are required, mark the workflow as complete and update any relevant tracking systems.
+  - If no further actions are required, mark the workflow as complete and update any relevant tracking systems, specifically including Implementation_Schedule.md.
 
 ```
