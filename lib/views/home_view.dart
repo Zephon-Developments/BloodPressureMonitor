@@ -269,12 +269,6 @@ class _HomeViewState extends State<HomeView> {
         ),
         const Divider(),
         const ListTile(
-          leading: Icon(Icons.notifications),
-          title: Text('Reminders'),
-          subtitle: Text('Coming soon'),
-          enabled: false,
-        ),
-        const ListTile(
           leading: Icon(Icons.palette),
           title: Text('Appearance'),
           subtitle: Text('Coming soon'),
