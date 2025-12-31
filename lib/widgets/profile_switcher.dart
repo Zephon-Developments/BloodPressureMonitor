@@ -5,8 +5,33 @@ import 'package:blood_pressure_monitor/views/profile/profile_picker_view.dart';
 
 /// Persistent profile switcher widget displayed in the app bar.
 ///
-/// Shows the active profile's avatar and name. Tapping opens the profile
-/// picker to switch profiles.
+/// This widget provides a constant visual indicator of the currently active
+/// profile and allows users to switch profiles by tapping. It displays:
+/// - A circular avatar with the first letter of the profile name
+/// - The profile name (truncated with ellipsis if too long)
+/// - A dropdown arrow to indicate interactivity
+///
+/// The widget automatically updates when the active profile changes via
+/// [ActiveProfileViewModel]. Tapping the widget opens [ProfilePickerView]
+/// to allow profile selection.
+///
+/// This widget is designed to be placed in the app bar's `leading` position
+/// and respects Material 3 theming for color contrast and accessibility.
+///
+/// Example usage:
+/// ```dart
+/// AppBar(
+///   leading: const Padding(
+///     padding: EdgeInsets.all(8.0),
+///     child: ProfileSwitcher(),
+///   ),
+///   leadingWidth: 140,
+/// )
+/// ```
+///
+/// See also:
+/// - [ProfilePickerView], which is opened when this widget is tapped
+/// - [ActiveProfileViewModel], which provides the active profile data
 class ProfileSwitcher extends StatelessWidget {
   const ProfileSwitcher({super.key});
 

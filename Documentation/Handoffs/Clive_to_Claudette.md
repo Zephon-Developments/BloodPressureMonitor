@@ -3,33 +3,43 @@
 **Date:** December 31, 2025  
 **From:** Clive (Review Specialist)  
 **To:** Claudette (Implementation)  
-**Scope:** Phase 16 – Profile-Centric UI Redesign
+**Scope:** Phase 16 – Profile-Centric UI Redesign (Review Follow-up)
 
 ---
 
-## Approved Plan
-The implementation plan for Phase 16 has been approved: [Documentation/Plans/Phase_16_Profile_Centric_UI_Plan.md](../Plans/Phase_16_Profile_Centric_UI_Plan.md)
+## Review Status: 🔴 BLOCKERS REMAINING
 
-## Key Implementation Requirements
-1.  **Security Gate Integration**: Ensure the Profile Picker is only accessible *after* the user has successfully authenticated via the security gate (biometric/PIN).
-2.  **Profile Isolation**: This is critical. When switching profiles, you must:
-    - Invalidate all caches.
-    - **Cancel all profile-scoped subscriptions/listeners** before re-subscribing for the new profile.
-    - Ensure all queries are explicitly scoped by the new active profile ID.
-3.  **Home Redesign**: Focus on the "hero" quick actions for rapid logging (BP, meds, weight, sleep). Ensure the layout is responsive and handles large text gracefully.
-4.  **Documentation**: All new public classes, methods, and widgets must have DartDoc comments per §10.1 of the [Coding Standards](../Standards/Coding_Standards.md).
-5.  **Testing**: 
-    - Unit tests for `ActiveProfileViewModel` switch logic and subscription management.
-    - Widget tests for the new Profile Picker and Home quick actions.
-    - Coverage targets: ViewModels/Services ≥85%, Widgets ≥70%.
+The partial implementation of Phase 16 has been reviewed against the [Coding Standards](../Standards/Coding_Standards.md) and the [Phase 16 Plan](../Plans/Phase_16_Profile_Centric_UI_Plan.md). While the core infrastructure is functional, several critical blockers must be resolved before this can be merged.
 
-## Branching
-- **Branch**: `feature/phase-16-profile-ui`
+## Findings & Required Actions
+
+### 1. Missing Test Coverage (§8.1)
+**Severity: Blocker**  
+- **Issue:** No tests were provided for the new components. Project standards require ≥70% coverage for Widgets and ≥85% for ViewModels/Services.
+- **Action:** Implement widget tests for `ProfilePickerView` and `ProfileSwitcher`. Verify profile loading, selection, and error states.
+
+### 2. Incomplete Documentation (§10.1)
+**Severity: Blocker**  
+- **Issue:** Public APIs in `ProfilePickerView` and `ProfileSwitcher` lack full DartDoc compliance (missing examples, detailed property descriptions).
+- **Action:** Update all new public classes and methods with comprehensive DartDoc per §10.1.
+
+### 3. Scope Gaps (Phase 16 Plan)
+**Severity: Blocker**  
+- **Issue:** The implementation is missing several key tasks from the approved plan:
+    - **Task 2 (Home Redesign):** Hero quick actions and navigation tiles.
+    - **Task 3 (Profile Management):** Add/Edit/Delete profile screens.
+    - **Task 4 (Isolation Audit):** Subscription management and cache invalidation on switch.
+- **Action:** Complete the remaining tasks in the Phase 16 plan. The "Isolation Audit" (Task 4) is particularly critical for data integrity.
+
+### 4. Integration with Lock Gate
+**Severity: Important**  
+- **Issue:** The Profile Picker is currently only accessible via the switcher. The plan requires it to show automatically after the security gate if multiple profiles exist.
+- **Action:** Update `_LockGate` in `lib/main.dart` to handle the post-auth profile selection flow.
 
 ## Next Steps
-- Initialize the feature branch.
-- Follow the task list in the approved plan.
-- Submit a PR for review once all quality gates (analyzer, format, tests) are passing.
+1. Address the blockers listed above.
+2. Ensure `flutter analyze` and `flutter test` pass with the new tests.
+3. Update the handoff document once the implementation is complete.
 
 ---
-*Clive has approved this plan for implementation.*
+*Clive will re-review once these blockers are resolved.*
