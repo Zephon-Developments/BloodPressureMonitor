@@ -93,7 +93,7 @@ class ManagedFile {
       case FileKind.reportPdf:
         return 'Blood Pressure Report';
       case FileKind.unknown:
-        return 'Blood Pressure Monitor File';
+        return 'HyperTrack File';
     }
   }
 }
