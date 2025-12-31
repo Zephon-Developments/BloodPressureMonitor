@@ -36,6 +36,7 @@ dependencies:
   share_plus: ^10.1.0
   file_picker: ^8.1.0
   package_info_plus: ^8.0.0
+  url_launcher: ^6.2.0
 
 dev_dependencies:
   flutter_test:
@@ -52,3 +53,6 @@ dev_dependencies:
   local_auth_windows: any
 flutter:
   uses-material-design: true
+  assets:
+    - Assets/ZephonDevelopmentsLogo.jpg
+    - Assets/ZephonDevelopmentsIcon.png
