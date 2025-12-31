@@ -100,6 +100,7 @@ class _MedicationPickerDialogState extends State<MedicationPickerDialog> {
           _debounceTimer?.cancel();
           // Start new timer for debouncing (300ms delay)
           _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+            if (!mounted) return;
             context.read<MedicationViewModel>().search(value);
           });
         },
