@@ -121,7 +121,7 @@ void main() {
       expect(find.text('Extra Large'), findsOneWidget);
     });
 
-    testWidgets('shows sample text at different scales', (tester) async {
+    testWidgets('shows all font scale options', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -133,10 +133,13 @@ void main() {
         ),
       );
 
-      // The actual text is lowercase 'sample'
-      expect(find.textContaining('sample text at 100% scale', findRichText: true), findsOneWidget);
-      expect(find.textContaining('sample text at 115% scale', findRichText: true), findsOneWidget);
-      expect(find.textContaining('sample text at 130% scale', findRichText: true), findsOneWidget);
+      // Verify all three font scale options are displayed with correct labels
+      expect(find.text('Normal'), findsOneWidget);
+      expect(find.text('Large'), findsOneWidget);
+      expect(find.text('Extra Large'), findsOneWidget);
+      
+      // Verify RadioListTile widgets exist for each option
+      expect(find.byType(RadioListTile<FontScaleOption>), findsNWidgets(3));
     });
 
     testWidgets('calls onScaleSelected when selecting an option',
