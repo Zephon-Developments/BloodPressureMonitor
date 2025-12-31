@@ -103,7 +103,7 @@ void main() {
     await tester.pump();
 
     await tester.enterText(find.byType(TextField), 'Aspirin');
-    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
     verify(mockViewModel.search('Aspirin')).called(1);
   });
