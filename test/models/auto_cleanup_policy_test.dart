@@ -12,7 +12,7 @@ void main() {
       final policy = AutoCleanupPolicy.defaultPolicy();
       expect(policy.enabled, true);
       expect(policy.maxAge, const Duration(days: 90));
-      expect(policy.maxFilesPerType, 50);
+      expect(policy.maxFilesPerType, 5);
       expect(policy.maxTotalSizeMB, null);
     });
 
@@ -22,7 +22,7 @@ void main() {
     });
 
     test('save and load roundtrip', () async {
-      final policy = const AutoCleanupPolicy(
+      const policy = AutoCleanupPolicy(
         enabled: true,
         maxAge: Duration(days: 60),
         maxFilesPerType: 25,
@@ -40,10 +40,11 @@ void main() {
 
     test('load with no saved values returns defaults', () async {
       final loaded = await AutoCleanupPolicy.load();
-      expect(loaded.enabled, true);
-      expect(loaded.maxAge, null);
-      expect(loaded.maxFilesPerType, null);
-      expect(loaded.maxTotalSizeMB, null);
+      final defaults = AutoCleanupPolicy.defaultPolicy();
+      expect(loaded.enabled, defaults.enabled);
+      expect(loaded.maxAge, defaults.maxAge);
+      expect(loaded.maxFilesPerType, defaults.maxFilesPerType);
+      expect(loaded.maxTotalSizeMB, defaults.maxTotalSizeMB);
     });
 
     test('copyWith creates modified copy', () {

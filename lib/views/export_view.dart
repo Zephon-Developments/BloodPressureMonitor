@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/export_viewmodel.dart';
-import 'package:blood_pressure_monitor/views/file_manager_view.dart';
 
 class ExportView extends StatelessWidget {
   const ExportView({super.key});
@@ -111,21 +110,10 @@ class ExportView extends StatelessWidget {
                           style: const TextStyle(fontSize: 12),
                         ),
                         const SizedBox(height: 12),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            ElevatedButton.icon(
-                              onPressed: () => _shareLastExport(context),
-                              icon: const Icon(Icons.share),
-                              label: const Text('Share'),
-                            ),
-                            const SizedBox(width: 12),
-                            OutlinedButton.icon(
-                              onPressed: () => _openFileManager(context),
-                              icon: const Icon(Icons.folder_open),
-                              label: const Text('Manage Files'),
-                            ),
-                          ],
+                        ElevatedButton.icon(
+                          onPressed: () => _shareLastExport(context),
+                          icon: const Icon(Icons.share),
+                          label: const Text('Share'),
                         ),
                       ],
                     ),
@@ -189,13 +177,5 @@ class ExportView extends StatelessWidget {
   Future<void> _shareLastExport(BuildContext context) async {
     final viewModel = context.read<ExportViewModel>();
     await viewModel.shareLastExport();
-  }
-
-  void _openFileManager(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => const FileManagerView(),
-      ),
-    );
   }
 }

@@ -174,6 +174,7 @@ void main() async {
             fileManagerService: context.read<FileManagerService>(),
             exportService: context.read<ExportService>(),
             pdfReportService: context.read<PdfReportService>(),
+            activeProfileViewModel: context.read<ActiveProfileViewModel>(),
           ),
         ),
         ChangeNotifierProvider<ImportViewModel>(
