@@ -3,16 +3,19 @@ import 'package:blood_pressure_monitor/models/reading.dart';
 import 'package:blood_pressure_monitor/services/averaging_service.dart';
 import 'package:blood_pressure_monitor/services/reading_service.dart';
 import 'package:blood_pressure_monitor/utils/validators.dart';
+import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart';
 
 /// ViewModel for managing blood pressure readings with validation and averaging.
 ///
 /// This ViewModel handles CRUD operations for blood pressure readings,
 /// enforces medical validation rules, and automatically triggers averaging
 /// group recomputation after data changes.
+///
+/// Automatically reloads data when the active profile changes.
 class BloodPressureViewModel extends ChangeNotifier {
   final ReadingService _readingService;
   final AveragingService _averagingService;
-  final int _profileId;
+  final ActiveProfileViewModel _activeProfileViewModel;
   List<Reading> _readings = [];
   bool _isLoading = false;
   String? _error;
@@ -23,12 +26,30 @@ class BloodPressureViewModel extends ChangeNotifier {
   /// Parameters:
   /// - [readingService]: Service for reading CRUD operations
   /// - [averagingService]: Service for computing reading group averages
-  /// - [profileId]: The profile ID to manage (defaults to 1)
+  /// - [activeProfileViewModel]: ViewModel managing the active profile
   BloodPressureViewModel(
     this._readingService,
-    this._averagingService, {
-    int profileId = 1,
-  }) : _profileId = profileId;
+    this._averagingService,
+    this._activeProfileViewModel,
+  ) {
+    _activeProfileViewModel.addListener(_onProfileChanged);
+  }
+
+  @override
+  void dispose() {
+    _activeProfileViewModel.removeListener(_onProfileChanged);
+    super.dispose();
+  }
+
+  /// Callback invoked when the active profile changes.
+  ///
+  /// Clears current data immediately to prevent ghosting, then reloads.
+  void _onProfileChanged() {
+    _readings = [];
+    _error = null;
+    notifyListeners();
+    loadReadings();
+  }
 
   List<Reading> get readings => _readings;
   bool get isLoading => _isLoading;
@@ -52,7 +73,9 @@ class BloodPressureViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _readings = await _readingService.getReadingsByProfile(_profileId);
+      _readings = await _readingService.getReadingsByProfile(
+        _activeProfileViewModel.activeProfileId,
+      );
     } catch (e) {
       _error = 'Failed to load readings: $e';
     } finally {

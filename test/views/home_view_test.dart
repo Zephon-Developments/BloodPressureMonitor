@@ -8,6 +8,7 @@ import 'package:blood_pressure_monitor/models/analytics.dart';
 import 'package:blood_pressure_monitor/models/health_data.dart';
 import 'package:blood_pressure_monitor/models/lock_state.dart';
 import 'package:blood_pressure_monitor/models/reading.dart';
+import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/analytics_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/history_viewmodel.dart';
@@ -19,7 +20,8 @@ import 'package:blood_pressure_monitor/views/analytics/analytics_view.dart';
 
 @GenerateMocks([BloodPressureViewModel, LockViewModel])
 import 'home_view_test.mocks.dart';
-import '../test_mocks.mocks.dart' show MockHistoryService;
+import '../test_mocks.mocks.dart'
+    show MockHistoryService, MockActiveProfileViewModel;
 import '../viewmodels/analytics_viewmodel_test.mocks.dart'
     show MockAnalyticsService;
 
@@ -29,6 +31,7 @@ void main() {
     late MockLockViewModel mockLockViewModel;
     late MockHistoryService mockHistoryService;
     late MockAnalyticsService mockAnalyticsService;
+    late MockActiveProfileViewModel mockActiveProfileViewModel;
     late HistoryViewModel historyViewModel;
     late AnalyticsViewModel analyticsViewModel;
 
@@ -37,6 +40,9 @@ void main() {
       mockLockViewModel = MockLockViewModel();
       mockHistoryService = MockHistoryService();
       mockAnalyticsService = MockAnalyticsService();
+      mockActiveProfileViewModel = MockActiveProfileViewModel();
+      when(mockActiveProfileViewModel.activeProfileId).thenReturn(1);
+      when(mockActiveProfileViewModel.activeProfileName).thenReturn('Default');
       when(mockViewModel.loadReadings()).thenAnswer((_) async {});
       when(mockViewModel.isLoading).thenReturn(false);
       when(mockViewModel.error).thenReturn(null);
@@ -67,11 +73,13 @@ void main() {
       );
       historyViewModel = HistoryViewModel(
         mockHistoryService,
+        mockActiveProfileViewModel,
         clock: () => DateTime.utc(2025, 1, 1),
       );
 
       analyticsViewModel = AnalyticsViewModel(
         analyticsService: mockAnalyticsService,
+        activeProfileViewModel: mockActiveProfileViewModel,
         clock: () => DateTime.utc(2025, 1, 10),
       );
 
@@ -119,6 +127,9 @@ void main() {
     Widget createWidget() {
       return MultiProvider(
         providers: [
+          ChangeNotifierProvider<ActiveProfileViewModel>.value(
+            value: mockActiveProfileViewModel,
+          ),
           ChangeNotifierProvider<BloodPressureViewModel>.value(
             value: mockViewModel,
           ),

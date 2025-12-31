@@ -1,27 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 
 import 'package:blood_pressure_monitor/models/reading.dart';
 import 'package:blood_pressure_monitor/utils/validators.dart';
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
+import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart';
 import 'package:blood_pressure_monitor/views/readings/add_reading_view.dart';
 import 'package:blood_pressure_monitor/views/readings/widgets/session_control_widget.dart';
 import 'package:blood_pressure_monitor/widgets/common/loading_button.dart';
 import 'package:blood_pressure_monitor/widgets/common/validation_message_widget.dart';
 
-@GenerateMocks([BloodPressureViewModel])
-import 'add_reading_view_test.mocks.dart';
+import '../../test_mocks.mocks.dart';
 
 void main() {
   group('AddReadingView Widget Tests', () {
     late MockBloodPressureViewModel mockViewModel;
+    late MockActiveProfileViewModel mockActiveProfileViewModel;
     late Reading editingReading;
 
     setUp(() {
       mockViewModel = MockBloodPressureViewModel();
+      mockActiveProfileViewModel = MockActiveProfileViewModel();
+      when(mockActiveProfileViewModel.activeProfileId).thenReturn(1);
+      when(mockViewModel.readings).thenReturn([]);
+      when(mockViewModel.isLoading).thenReturn(false);
       when(
         mockViewModel.addReading(
           any,
@@ -50,8 +54,15 @@ void main() {
     });
 
     Widget createWidget({Reading? editing}) {
-      return ChangeNotifierProvider<BloodPressureViewModel>.value(
-        value: mockViewModel,
+      return MultiProvider(
+        providers: [
+          ChangeNotifierProvider<BloodPressureViewModel>.value(
+            value: mockViewModel,
+          ),
+          ChangeNotifierProvider<ActiveProfileViewModel>.value(
+            value: mockActiveProfileViewModel,
+          ),
+        ],
         child: MaterialApp(
           home: AddReadingView(editingReading: editing),
         ),

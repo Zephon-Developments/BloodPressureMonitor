@@ -4,21 +4,24 @@ import 'package:flutter/material.dart';
 import 'package:blood_pressure_monitor/models/analytics.dart';
 import 'package:blood_pressure_monitor/services/analytics_service.dart';
 import 'package:blood_pressure_monitor/utils/time_range.dart';
+import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart';
 
 /// ViewModel coordinating analytics range selection, caching, and overlay state.
 class AnalyticsViewModel extends ChangeNotifier {
   AnalyticsViewModel({
     required AnalyticsService analyticsService,
-    int profileId = 1,
+    required ActiveProfileViewModel activeProfileViewModel,
     Duration cacheTtl = const Duration(minutes: 5),
     DateTime Function()? clock,
   })  : _analyticsService = analyticsService,
-        _profileId = profileId,
+        _activeProfileViewModel = activeProfileViewModel,
         _cacheTtl = cacheTtl,
-        _clock = clock ?? DateTime.now;
+        _clock = clock ?? DateTime.now {
+    _activeProfileViewModel.addListener(_onProfileChanged);
+  }
 
   final AnalyticsService _analyticsService;
-  final int _profileId;
+  final ActiveProfileViewModel _activeProfileViewModel;
   final Duration _cacheTtl;
   final DateTime Function() _clock;
 
@@ -34,6 +37,24 @@ class AnalyticsViewModel extends ChangeNotifier {
   bool _showSleepOverlay = false;
   String? _error;
   DateTime? _lastUpdated;
+
+  @override
+  void dispose() {
+    _activeProfileViewModel.removeListener(_onProfileChanged);
+    super.dispose();
+  }
+
+  /// Callback invoked when the active profile changes.
+  void _onProfileChanged() {
+    invalidateCache();
+    _stats = null;
+    _chartData = null;
+    _sleepCorrelation = null;
+    _sleepStages = null;
+    _error = null;
+    notifyListeners();
+    loadData();
+  }
 
   /// Currently selected time range.
   TimeRange get selectedRange => _selectedRange;
@@ -132,12 +153,12 @@ class AnalyticsViewModel extends ChangeNotifier {
 
       final fetches = <Future<dynamic>>[
         _analyticsService.calculateStats(
-          profileId: _profileId,
+          profileId: _activeProfileViewModel.activeProfileId,
           startDate: start,
           endDate: end,
         ),
         _analyticsService.getChartData(
-          profileId: _profileId,
+          profileId: _activeProfileViewModel.activeProfileId,
           startDate: start,
           endDate: end,
           range: range,
@@ -148,14 +169,14 @@ class AnalyticsViewModel extends ChangeNotifier {
         fetches
           ..add(
             _analyticsService.getSleepCorrelation(
-              profileId: _profileId,
+              profileId: _activeProfileViewModel.activeProfileId,
               startDate: start,
               endDate: end,
             ),
           )
           ..add(
             _analyticsService.getSleepStageSeries(
-              profileId: _profileId,
+              profileId: _activeProfileViewModel.activeProfileId,
               startDate: start,
               endDate: end,
             ),

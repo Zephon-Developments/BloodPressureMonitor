@@ -3,18 +3,24 @@ import 'package:blood_pressure_monitor/models/health_data.dart';
 import 'package:blood_pressure_monitor/models/reading.dart';
 import 'package:blood_pressure_monitor/services/analytics_service.dart';
 import 'package:blood_pressure_monitor/viewmodels/analytics_viewmodel.dart';
+import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
 import 'analytics_viewmodel_test.mocks.dart';
 
-@GenerateMocks([AnalyticsService])
+@GenerateMocks([AnalyticsService, ActiveProfileViewModel])
 void main() {
   late AnalyticsViewModel viewModel;
   late MockAnalyticsService mockService;
+  late MockActiveProfileViewModel mockActiveProfileViewModel;
 
   void stubBaseFetches() {
+    when(mockActiveProfileViewModel.activeProfileId).thenReturn(1);
+    when(mockActiveProfileViewModel.addListener(any)).thenReturn(null);
+    when(mockActiveProfileViewModel.removeListener(any)).thenReturn(null);
+
     when(
       mockService.calculateStats(
         profileId: anyNamed('profileId'),
@@ -35,12 +41,14 @@ void main() {
 
   setUp(() {
     mockService = MockAnalyticsService();
+    mockActiveProfileViewModel = MockActiveProfileViewModel();
+    stubBaseFetches();
+
     viewModel = AnalyticsViewModel(
       analyticsService: mockService,
+      activeProfileViewModel: mockActiveProfileViewModel,
       clock: () => DateTime.utc(2025, 1, 10),
     );
-
-    stubBaseFetches();
   });
 
   test('loadData populates stats and chart data', () async {
