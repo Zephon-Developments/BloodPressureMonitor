@@ -14,6 +14,7 @@ import 'package:blood_pressure_monitor/views/report_view.dart';
 import 'package:blood_pressure_monitor/views/file_manager_view.dart';
 import 'package:blood_pressure_monitor/views/medication/medication_list_view.dart';
 import 'package:blood_pressure_monitor/views/medication/medication_history_view.dart';
+import 'package:blood_pressure_monitor/widgets/profile_switcher.dart';
 
 /// Main home screen with navigation shell.
 ///
@@ -50,6 +51,11 @@ class _HomeViewState extends State<HomeView> {
       appBar: AppBar(
         title: Text(_getTitle()),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        leading: const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: ProfileSwitcher(),
+        ),
+        leadingWidth: 140,
         actions: [
           if (_selectedIndex == 2)
             Consumer<AnalyticsViewModel>(
