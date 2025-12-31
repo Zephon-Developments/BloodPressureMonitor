@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document defines the coding standards for the Blood Pressure Monitor application. All code must adhere to these standards. The Review Specialist will enforce compliance during code review.
+This document defines the coding standards for the HyperTrack application. All code must adhere to these standards. The Review Specialist will enforce compliance during code review.
 
 **Last Updated:** December 2024
 **Applies To:** All Dart/Flutter code in this project

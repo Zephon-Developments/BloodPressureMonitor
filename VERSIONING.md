@@ -1,6 +1,6 @@
 # Versioning Guide
 
-This document describes how versioning works in the Blood Pressure Monitor application.
+This document describes how versioning works in the HyperTrack application.
 
 ## Semantic Versioning
 

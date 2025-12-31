@@ -1,5 +1,5 @@
 name: blood_pressure_monitor
-description: A personal application for recording and visualising blood pressure and pulse readings over time
+description: HyperTrack - A private, offline health data logger for blood pressure, medications, weight, and sleep tracking
 publish_to: 'none'
 version: 1.3.0+3
 
