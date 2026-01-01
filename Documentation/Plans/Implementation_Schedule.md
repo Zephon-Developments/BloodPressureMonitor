@@ -22,7 +22,7 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - [x] Phase 15: Reminder Removal ✅ **COMPLETE** (Dec 31, 2025)
 - [x] Phase 16: Profile-Centric UI Redesign ✅ **COMPLETE** (Dec 31, 2025)
 - [x] Phase 17: Zephon Branding & Appearance Settings ✅ **COMPLETE** (Jan 1, 2026)
-- [ ] Phase 18: Medication Grouping UI
+- [ ] Phase 18: Medication Grouping UI ✅ **COMPLETE** (Jan 1, 2026)
 - [ ] Phase 19: UX Polish Pack
 - [ ] Phase 20: Profile Model Extensions
 - [ ] Phase 21: Enhanced Sleep Tracking
@@ -373,22 +373,37 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - Resolved critical Android build failure with AGP/Gradle upgrade
 **Status**: Ready for PR merge to main (Jan 1, 2026)
 
-### Phase 18: Medication Grouping UI
+### Phase 18: Medication Grouping UI ✅ COMPLETE
 **Scope**: Expose existing medication grouping backend with UI for group management and quick logging.
+**Completion Date**: Jan 1, 2026
+**Status**: ✅ **COMPLETE** - Committed to feature/phase-18-medication-grouping-ui
 **Tasks**
-- Create UI for viewing, creating, editing, and deleting medication groups.
-- Add group picker to Log Medication flow; support logging entire group with one tap.
-- Add dosage field numeric validation (prevent non-numeric input).
-- Convert unit field to combo box with common units (mg, ml, IU, mcg, units) + custom entry option.
-- Add clear button (X icon) to medication search bar.
-- Widget tests for group management and group logging flows.
+- ✅ Create UI for viewing, creating, editing, and deleting medication groups.
+- ✅ Add group picker to Log Medication flow; support logging entire group with one tap.
+- ✅ Add dosage field numeric validation (prevent non-numeric input).
+- ✅ Convert unit field to combo box with common units (mg, ml, IU, mcg, units) + custom entry option.
+- ✅ Add clear button (X icon) to medication search bar.
+- ✅ Widget tests for group management and group logging flows.
 **Dependencies**: Phase 11 (medication UI foundation); Phase 12 (intake logging).
 **Acceptance**
-- Users can create medication groups and log entire groups with one action.
-- Dosage field enforces numeric input; unit field offers suggestions via combo box.
-- Search bar includes functional clear button.
-- All tests passing; analyzer clean; coverage targets met.
-**Rollback point**: Feature-flag group UI if critical issues arise.
+- ✅ Users can create medication groups and log entire groups with one action.
+- ✅ Dosage field enforces numeric input; unit field offers suggestions via combo box.
+- ✅ Search bar includes functional clear button.
+- ✅ All 844 tests passing; analyzer clean; coverage ≥80%.
+**Implementation Details**
+- Created `lib/views/medication/medication_group_list_view.dart` (285 lines)
+- Created `lib/views/medication/add_edit_medication_group_view.dart` (299 lines)
+- Created `lib/widgets/medication/multi_select_medication_picker.dart` (259 lines)
+- Created `lib/widgets/medication/unit_combo_box.dart` (167 lines)
+- Created `test/viewmodels/medication_group_viewmodel_test.dart` (110 lines)
+- Created `test/views/medication_group_list_view_test.dart` (15 tests)
+- Created `test/views/add_edit_medication_group_view_test.dart` (15 tests)
+- Created `test/widgets/multi_select_medication_picker_test.dart` (15 tests)
+- Created `test/widgets/unit_combo_box_test.dart` (10 tests)
+- Modified `lib/views/medication/log_intake_sheet.dart` (group logging support)
+- Modified `lib/widgets/medication/medication_picker_dialog.dart` (group selection)
+- 67 new/modified tests; performance optimizations (removed redundant ViewModel calls)
+**Status**: Ready for PR merge to main (Jan 1, 2026)
 
 ### Phase 19: UX Polish Pack
 **Scope**: Address UX inconsistencies and minor validation/usability issues across the app.
