@@ -1,106 +1,209 @@
-# Handoff: Steve to User - Phase 16 Extension Ready for PR Merge
+# Steve to User Handoff: Phase 17 PR Merge Instructions
 
-## Status: ✅ AWAITING MANUAL PR MERGE
+**Date**: 2026-01-01  
+**From**: Steve (Project Lead)  
+**To**: User  
+**Phase**: 17 - Zephon Branding & Appearance Settings  
+**Status**: READY FOR USER PR MERGE ✅
+
+---
 
 ## Summary
-Phase 16 Extension (Profile Management CRUD with Full Reactivity) has been successfully prepared, tested, reviewed, and committed to the `feature/phase-16-profile-ui` branch. All automated checks have passed, and the code has been approved by Clive (automated reviewer).
 
-**The feature branch is ready for integration into `main` via Pull Request.**
+Phase 17 implementation is **COMPLETE** and has passed all quality gates:
+- ✅ **Tests**: 777/777 passing (100%)
+- ✅ **Analyzer**: 0 issues
+- ✅ **Build**: Verified (Android with AGP 8.9.1)
+- ✅ **Clive Review**: Approved ([reviews/2026-01-01-clive-phase-17-review.md](reviews/2026-01-01-clive-phase-17-review.md))
+- ✅ **Feature Branch**: `feature/phase-17-branding-appearance` pushed to remote
 
-## What Has Been Completed
-1. ✅ **Implementation**: All CRUD operations for profiles completed
-2. ✅ **Reactivity Fixes**: All ViewModels now properly listen to profile changes
-3. ✅ **Testing**: 686/686 tests passing (100% success rate)
-4. ✅ **Code Quality**: Zero lint issues, zero compiler warnings
-5. ✅ **Code Review**: Approved by Clive with zero blockers
-6. ✅ **Git Commit**: Changes committed to feature branch
-7. ✅ **Git Push**: Feature branch pushed to remote repository
+**⚠️ CRITICAL**: Due to branch protection rules, this PR **MUST** be merged manually via GitHub. Do NOT use `git merge` locally.
 
-## Required Action: Manual PR Merge
+---
 
-Due to branch protection rules on the `main` branch, direct merges are not permitted. You must manually create and merge a Pull Request through GitHub:
+## PR Merge Instructions
 
 ### Step 1: Create Pull Request
-Navigate to the PR creation URL:
+
+Navigate to:
 ```
-https://github.com/Zephon-Development/BloodPressureMonitor/pull/new/feature/phase-16-profile-ui
+https://github.com/Zephon-Development/BloodPressureMonitor/pull/new/feature/phase-17-branding-appearance
 ```
 
 Or use the GitHub CLI:
-```bash
-gh pr create --base main --head feature/phase-16-profile-ui --title "Phase 16 Extension: Profile Management CRUD" --body-file reviews/2025-12-31-clive-phase-16-extension-review-v2.md
+```powershell
+gh pr create --base main --head feature/phase-17-branding-appearance --title "Phase 17: Zephon Branding & Appearance Settings" --body-file "Documentation/implementation-summaries/Phase-17-Final-Deployment-Summary.md"
 ```
 
-### Step 2: Review PR Details
-- **Base Branch**: `main`
-- **Compare Branch**: `feature/phase-16-profile-ui`
-- **Title**: Phase 16 Extension: Profile Management CRUD
-- **Description**: (See review documentation or commit message)
+### Step 2: PR Details
+
+**Title**: `Phase 17: Zephon Branding & Appearance Settings`
+
+**Description** (use the following):
+```markdown
+## Phase 17: Zephon Branding & Appearance Settings
+
+### Summary
+Implements comprehensive Material 3 theming system with customizable appearance settings and professional Zephon branding.
+
+### Key Features
+- **Dynamic Theming**: Light/Dark/System modes with Material 3 ColorScheme.fromSeed
+- **8 Accent Colors**: Teal, Blue, Green, Cyan, Indigo, Blue Grey, Emerald, Turquoise
+- **Font Scaling**: Normal (1.0), Large (1.15), Extra Large (1.3)
+- **High Contrast Mode**: Enhanced accessibility support
+- **Zephon Branding**: Professional About view with www.zephon.org and medical disclaimers
+- **Persistent Settings**: SharedPreferences-based theme persistence
+
+### Quality Metrics
+- **Tests**: 777/777 passing (100%)
+- **Test Coverage**: 100% on models, >80% on services/viewmodels/views
+- **Analyzer**: 0 issues
+- **Build**: ✅ Android verified with AGP 8.9.1
+
+### Files Changed
+- **Models**: 1 new (ThemeSettings)
+- **Services**: 1 new (ThemePersistenceService)
+- **ViewModels**: 1 new (ThemeViewModel)
+- **Views**: 2 new (AppearanceView, AboutView)
+- **Widgets**: 1 new (ThemeWidgets)
+- **Tests**: 6 new test files
+- **Build Config**: Android AGP 8.9.1, Gradle 8.11.1
+
+### Review
+- **Reviewed by**: Clive
+- **Approval Document**: [reviews/2026-01-01-clive-phase-17-review.md](reviews/2026-01-01-clive-phase-17-review.md)
+- **Implementation Summary**: [Documentation/implementation-summaries/Phase-17-Final-Deployment-Summary.md](Documentation/implementation-summaries/Phase-17-Final-Deployment-Summary.md)
+
+### Breaking Changes
+None. All changes are additive.
+
+### Migration Notes
+- First launch after merge will use default theme settings (System mode, Teal accent)
+- Users can customize appearance via Settings → Appearance
+- Android Gradle Plugin upgraded to 8.9.1 (compatible with existing tooling)
+
+### Deployment Checklist
+- [x] All tests passing
+- [x] Analyzer clean
+- [x] Build verified
+- [x] Documentation complete
+- [x] Clive approval obtained
+- [x] Feature branch pushed
+```
 
 ### Step 3: Verify CI/CD Checks
+
 Wait for all automated checks to complete:
-- ✅ Build status
-- ✅ Test suite (should show 686 passing)
-- ✅ Linting
-- ✅ Code coverage
+- ✅ Tests pass
+- ✅ Analyzer passes
+- ✅ Build succeeds
 
-### Step 4: Merge Pull Request
-1. Click "Merge pull request" button in GitHub
-2. Choose merge strategy (recommend "Squash and merge" for clean history)
-3. Confirm merge
-4. Delete the feature branch after successful merge
+If any checks fail, notify Steve immediately.
 
-### Step 5: Local Cleanup (After PR Merge)
-```bash
+### Step 4: Merge the PR
+
+1. Click the **"Merge pull request"** button on GitHub
+2. Select merge strategy: **"Squash and merge"** or **"Create a merge commit"** (your preference)
+3. Confirm the merge
+4. **Delete the feature branch** after successful merge (GitHub will prompt you)
+
+### Step 5: Tag the Release
+
+After the PR is merged, tag the release locally:
+
+```powershell
+# Switch to main and pull the merged changes
 git checkout main
 git pull origin main
-git branch -d feature/phase-16-profile-ui
-git remote prune origin
+
+# Create and push the version tag
+git tag -a v1.3.0+3 -m "Phase 17: Zephon Branding & Appearance Settings"
+git push origin v1.3.0+3
 ```
 
-## Changes Included in This PR
+### Step 6: Post-Merge Cleanup
 
-### New Features
-- Profile CRUD operations (Create, Read, Update, Delete)
-- ProfileFormView for data entry and editing
-- Enhanced ProfilePickerView with management actions
-- Conditional back button for mandatory vs optional selection
+**After successful merge**, run the following to clean up workspace:
 
-### Critical Fixes
-- **Reactivity Gaps**: Added listeners to Analytics, MedicationIntake, MedicationGroup, FileManager ViewModels
-- **LockGate Race Condition**: Fixed with `_hasCheckedProfiles` flag
-- **Data Isolation**: All ViewModels now properly invalidate cache on profile switch
+```powershell
+# Archive handoff documents
+Move-Item -Path "Documentation\Handoffs\Clive_to_Steve.md" -Destination "Documentation\archive\handoffs\Phase-17-Clive-to-Steve.md" -Force
 
-### Updated Architecture
-- ActiveProfileViewModel is now the single source of truth for profile state
-- All data-scoped ViewModels dynamically use `activeProfileViewModel.activeProfileId`
-- Implemented consistent `_onProfileChanged()` pattern across all ViewModels
+# Archive the deployment summary
+Move-Item -Path "Documentation\implementation-summaries\Phase-17-Final-Deployment-Summary.md" -Destination "Documentation\archive\summaries\Phase-17-Final-Deployment-Summary.md" -Force
 
-## Quality Assurance
-- **Tests**: 686/686 passing (100%)
-- **Coverage**: Meets ≥80% threshold per CODING_STANDARDS.md
-- **Lint**: 0 issues reported by `flutter analyze`
-- **Compilation**: No errors or warnings
-- **Code Review**: Approved by Clive (zero blockers)
-
-## Documentation Updated
-- [Phase 16 Extension Deployment Summary](../implementation-summaries/Phase-16-Extension-Deployment.md)
-- [Clive's Final Review](../../reviews/2025-12-31-clive-phase-16-extension-review-v2.md)
-- [Claudette's Handoff](Claudette_to_Clive_Phase16Extension.md)
-
-## Next Steps After PR Merge
-1. **Verify Deployment**: Confirm main branch has all changes
-2. **Update Tracking**: Mark Phase 16 Extension as complete in Implementation_Schedule.md
-3. **Archive Artifacts**: Move handoff notes to archive folder
-4. **Initiate Phase 17**: Begin Settings & Preferences UI development
-
-## Support
-If you encounter any issues during the PR merge process:
-1. Check the GitHub Actions logs for CI/CD failure details
-2. Review the [Deployment Summary](../implementation-summaries/Phase-16-Extension-Deployment.md) for technical details
-3. Consult [Clive's Review](../../reviews/2025-12-31-clive-phase-16-extension-review-v2.md) for approval confirmation
+# Verify workspace is clean
+git status
+```
 
 ---
-**Workflow Conductor**: Steve  
-**Status**: ✅ Ready for Manual PR Merge  
-**PR URL**: https://github.com/Zephon-Development/BloodPressureMonitor/pull/new/feature/phase-16-profile-ui
+
+## Alternative: Using GitHub CLI
+
+If you have `gh` installed:
+
+```powershell
+# Create PR
+gh pr create --base main --head feature/phase-17-branding-appearance --title "Phase 17: Zephon Branding & Appearance Settings" --body-file "Documentation\implementation-summaries\Phase-17-Final-Deployment-Summary.md"
+
+# View PR status
+gh pr status
+
+# Merge PR (after checks pass)
+gh pr merge --squash --delete-branch
+
+# Tag release
+git checkout main
+git pull origin main
+git tag -a v1.3.0+3 -m "Phase 17: Zephon Branding & Appearance Settings"
+git push origin v1.3.0+3
+```
+
+---
+
+## Rollback Plan (If Needed)
+
+If issues are discovered after merge:
+
+1. **Revert the merge commit**:
+   ```powershell
+   git revert -m 1 <merge-commit-sha>
+   git push origin main
+   ```
+
+2. **Create a hotfix branch**:
+   ```powershell
+   git checkout -b hotfix/phase-17-issues
+   # Fix issues
+   git push origin hotfix/phase-17-issues
+   # Create new PR
+   ```
+
+3. **Notify Steve** for triage and re-review.
+
+---
+
+## Support
+
+If you encounter any issues during the PR merge process:
+
+1. Check GitHub Actions/CI logs for specific error messages
+2. Verify branch protection rules are not blocking the merge
+3. Ensure you have appropriate repository permissions
+4. Contact Steve for assistance
+
+---
+
+## Next Steps
+
+Once Phase 17 is merged and tagged:
+- Steve will initiate **Phase 18 Planning** (Encrypted Full-App Backup)
+- Tracy will create the implementation plan
+- The workflow will continue through the usual cycle
+
+---
+
+**Status**: AWAITING USER ACTION - Please proceed with PR merge as outlined above.
+
+**Conductor**: Steve  
+**Prepared**: 2026-01-01
