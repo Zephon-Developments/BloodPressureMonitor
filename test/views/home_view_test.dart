@@ -312,7 +312,8 @@ void main() {
       expect(find.byIcon(Icons.bedtime_outlined), findsOneWidget);
     });
 
-    testWidgets('settings tab has Appearance and About items enabled', (WidgetTester tester) async {
+    testWidgets('settings tab has Appearance and About items enabled',
+        (WidgetTester tester) async {
       await tester.pumpWidget(createWidget());
       await tester.pumpAndSettle();
 

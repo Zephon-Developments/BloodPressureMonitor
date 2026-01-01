@@ -109,7 +109,8 @@ void main() {
 
       expect(viewModel.highContrastMode, false);
       // Total calls should be at least 2 (one for each toggle)
-      verify(mockPersistenceService.saveThemeSettings(any)).called(greaterThanOrEqualTo(1));
+      verify(mockPersistenceService.saveThemeSettings(any))
+          .called(greaterThanOrEqualTo(1));
     });
 
     test('resetToDefaults restores default settings and persists', () async {
@@ -130,7 +131,8 @@ void main() {
       expect(viewModel.fontScale, FontScaleOption.normal);
       expect(viewModel.highContrastMode, false);
       expect(notified, true);
-      verify(mockPersistenceService.saveThemeSettings(any)).called(greaterThan(4));
+      verify(mockPersistenceService.saveThemeSettings(any))
+          .called(greaterThan(4));
     });
 
     test('lightTheme generates valid ThemeData', () {

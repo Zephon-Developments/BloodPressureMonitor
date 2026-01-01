@@ -118,8 +118,8 @@ class AppearanceView extends StatelessWidget {
   }
 
   Widget _buildPreviewSection(
-      BuildContext context,
-      ThemeViewModel themeViewModel,
+    BuildContext context,
+    ThemeViewModel themeViewModel,
   ) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
