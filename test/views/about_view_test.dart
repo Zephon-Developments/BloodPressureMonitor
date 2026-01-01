@@ -66,10 +66,9 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('Website'), findsOneWidget);
-      expect(find.text('GitHub'), findsOneWidget);
     });
 
-    testWidgets('displays license section', (tester) async {
+    testWidgets('displays medical disclaimer section', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: AboutView(),
@@ -78,9 +77,15 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.text('License'), findsOneWidget);
-      expect(find.textContaining('MIT License'), findsOneWidget);
-      expect(find.text('View Open Source Licenses'), findsOneWidget);
+      expect(find.text('Medical Disclaimer'), findsOneWidget);
+      expect(
+        find.textContaining('HyperTrack is not a medical device'),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining('Always consult a qualified healthcare professional'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('displays copyright notice', (tester) async {
@@ -104,7 +109,7 @@ void main() {
 
       // Initially should show loading indicator
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
-      
+
       // After settling, loading should be gone
       await tester.pumpAndSettle();
       expect(find.byType(CircularProgressIndicator), findsNothing);
@@ -128,31 +133,7 @@ void main() {
       expect(
         find.descendant(
           of: websiteTile,
-          matching: find.text('zephondevelopments.com'),
-        ),
-        findsOneWidget,
-      );
-    });
-
-    testWidgets('github link tile has correct properties', (tester) async {
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: AboutView(),
-        ),
-      );
-
-      await tester.pumpAndSettle();
-
-      final githubTile = find.ancestor(
-        of: find.text('GitHub'),
-        matching: find.byType(ListTile),
-      );
-
-      expect(githubTile, findsOneWidget);
-      expect(
-        find.descendant(
-          of: githubTile,
-          matching: find.text('View source code'),
+          matching: find.text('www.zephon.org'),
         ),
         findsOneWidget,
       );

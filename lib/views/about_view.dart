@@ -4,8 +4,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 /// Screen displaying information about the application and Zephon Developments.
 ///
-/// Shows the Zephon branding, app version, license information, and links to
-/// external resources such as the website and GitHub repository.
+/// Shows the Zephon branding, app version, medical disclaimers, and link to
+/// the Zephon Developments website.
 class AboutView extends StatefulWidget {
   const AboutView({super.key});
 
@@ -169,16 +169,8 @@ class _AboutViewState extends State<AboutView> {
                             context,
                             icon: Icons.language,
                             title: 'Website',
-                            subtitle: 'zephondevelopments.com',
-                            url: 'https://zephondevelopments.com',
-                          ),
-                          const Divider(),
-                          _buildLinkTile(
-                            context,
-                            icon: Icons.code,
-                            title: 'GitHub',
-                            subtitle: 'View source code',
-                            url: 'https://github.com/zephondevelopments',
+                            subtitle: 'www.zephon.org',
+                            url: 'https://www.zephon.org',
                           ),
                         ],
                       ),
@@ -186,29 +178,42 @@ class _AboutViewState extends State<AboutView> {
                   ),
                   const SizedBox(height: 16),
 
-                  // License Card
+                  // Medical Disclaimer Card
                   Card(
+                    color: colorScheme.errorContainer,
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'License',
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.warning_amber_rounded,
+                                color: colorScheme.onErrorContainer,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Medical Disclaimer',
+                                  style: theme.textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: colorScheme.onErrorContainer,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'This application is open source and available under the MIT License.',
-                            style: theme.textTheme.bodyMedium,
-                          ),
-                          const SizedBox(height: 16),
-                          TextButton.icon(
-                            onPressed: () => _showLicenses(),
-                            icon: const Icon(Icons.description),
-                            label: const Text('View Open Source Licenses'),
+                            'HyperTrack is not a medical device and is not intended to diagnose, treat, cure, or prevent any disease or health condition.\n\n'
+                            'It is a personal health data logging tool designed solely to help you record, organize, and collate your blood pressure readings, medication intake, weight, sleep, and related notes.\n\n'
+                            'All generated charts, averages, correlations, and PDF reports are for informational purposes only and are intended to support discussions with your healthcare professional.\n\n'
+                            'The app provides no medical advice, recommendations, alerts, or interpretations. All medical decisions and treatment remain the sole responsibility of you and your doctor.\n\n'
+                            'Always consult a qualified healthcare professional for any medical concerns.',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onErrorContainer,
+                            ),
                           ),
                         ],
                       ),
@@ -245,25 +250,6 @@ class _AboutViewState extends State<AboutView> {
       subtitle: Text(subtitle),
       trailing: Icon(Icons.open_in_new, color: colorScheme.onSurfaceVariant),
       onTap: () => _launchUrl(url),
-    );
-  }
-
-  void _showLicenses() {
-    showLicensePage(
-      context: context,
-      applicationName: 'HyperTrack',
-      applicationVersion: '$_appVersion (Build $_buildNumber)',
-      applicationIcon: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Image.asset(
-          'Assets/ZephonDevelopmentsIcon.png',
-          height: 48,
-          errorBuilder: (context, error, stackTrace) {
-            return const Icon(Icons.health_and_safety, size: 48);
-          },
-        ),
-      ),
-      applicationLegalese: '© 2025 Zephon Developments',
     );
   }
 }
