@@ -40,27 +40,19 @@ class _MedicationGroupListViewState extends State<MedicationGroupListView> {
   }
 
   Future<void> _addNewGroup() async {
-    final result = await Navigator.of(context).push<bool>(
+    await Navigator.of(context).push<bool>(
       MaterialPageRoute(
         builder: (context) => const AddEditMedicationGroupView(),
       ),
     );
-
-    if (result == true && mounted) {
-      context.read<MedicationGroupViewModel>().loadGroups();
-    }
   }
 
   Future<void> _editGroup(MedicationGroup group) async {
-    final result = await Navigator.of(context).push<bool>(
+    await Navigator.of(context).push<bool>(
       MaterialPageRoute(
         builder: (context) => AddEditMedicationGroupView(group: group),
       ),
     );
-
-    if (result == true && mounted) {
-      context.read<MedicationGroupViewModel>().loadGroups();
-    }
   }
 
   Future<void> _deleteGroup(MedicationGroup group) async {
