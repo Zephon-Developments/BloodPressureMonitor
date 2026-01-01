@@ -32,6 +32,58 @@ class _AddSleepViewState extends State<AddSleepView> {
 
   bool get _isEditing => widget.editingEntry != null;
 
+  /// Check if form has unsaved changes.
+  bool get _isDirty {
+    final editing = widget.editingEntry;
+    if (editing == null) {
+      // New entry - always dirty if user has selected times/quality/notes
+      return _notesController.text.isNotEmpty || _quality != null;
+    } else {
+      // Editing - dirty if any field differs from original
+      final originalStarted = editing.startedAt.toLocal();
+      final originalEnded = (editing.endedAt ?? editing.startedAt).toLocal();
+      final originalDate = DateTime(
+        originalStarted.year,
+        originalStarted.month,
+        originalStarted.day,
+      );
+      final originalStartTime = TimeOfDay.fromDateTime(originalStarted);
+      final originalEndTime = TimeOfDay.fromDateTime(originalEnded);
+
+      return originalDate != _sleepDate ||
+          originalStartTime != _startTime ||
+          originalEndTime != _endTime ||
+          editing.quality != _quality ||
+          (editing.notes ?? '') != _notesController.text;
+    }
+  }
+
+  Future<bool> _confirmDiscard() async {
+    if (!_isDirty) return true;
+
+    final shouldDiscard = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Discard changes?'),
+        content: const Text(
+          'You have unsaved changes. Are you sure you want to discard them?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Discard'),
+          ),
+        ],
+      ),
+    );
+
+    return shouldDiscard ?? false;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -58,98 +110,108 @@ class _AddSleepViewState extends State<AddSleepView> {
     final viewModel = context.watch<SleepViewModel>();
     final durationMinutes = _calculatedDurationMinutes();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditing ? 'Edit Sleep Session' : 'Log Sleep Session'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
-      body: Form(
-        key: _formKey,
-        autovalidateMode:
-            _submitted ? AutovalidateMode.always : AutovalidateMode.disabled,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (viewModel.error != null)
-                ValidationMessageWidget(
-                  message: viewModel.error!,
-                  isError: true,
+    return PopScope(
+      canPop: !_isDirty,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        final shouldPop = await _confirmDiscard();
+        if (shouldPop && context.mounted) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(_isEditing ? 'Edit Sleep Session' : 'Log Sleep Session'),
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        ),
+        body: Form(
+          key: _formKey,
+          autovalidateMode:
+              _submitted ? AutovalidateMode.always : AutovalidateMode.disabled,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (viewModel.error != null)
+                  ValidationMessageWidget(
+                    message: viewModel.error!,
+                    isError: true,
+                  ),
+                const SizedBox(height: 12),
+                _buildPickerTile(
+                  icon: Icons.calendar_today,
+                  title: 'Night of ${DateFormats.longDate.format(_sleepDate)}',
+                  subtitle: 'Tap to change date',
+                  onTap: _pickDate,
                 ),
-              const SizedBox(height: 12),
-              _buildPickerTile(
-                icon: Icons.calendar_today,
-                title: 'Night of ${DateFormats.longDate.format(_sleepDate)}',
-                subtitle: 'Tap to change date',
-                onTap: _pickDate,
-              ),
-              const SizedBox(height: 12),
-              _buildPickerTile(
-                icon: Icons.bedtime,
-                title: 'Bedtime: ${_startTime.format(context)}',
-                subtitle: 'Tap to change start time',
-                onTap: () => _pickTime(isStart: true),
-              ),
-              const SizedBox(height: 12),
-              _buildPickerTile(
-                icon: Icons.wb_sunny,
-                title: 'Wake time: ${_endTime.format(context)}',
-                subtitle: 'Tap to change wake time',
-                onTap: () => _pickTime(isStart: false),
-              ),
-              const SizedBox(height: 12),
-              if (durationMinutes != null)
-                Text(
-                  'Duration: ${durationMinutes ~/ 60}h ${durationMinutes % 60}m',
-                  style: Theme.of(context).textTheme.bodyLarge,
+                const SizedBox(height: 12),
+                _buildPickerTile(
+                  icon: Icons.bedtime,
+                  title: 'Bedtime: ${_startTime.format(context)}',
+                  subtitle: 'Tap to change start time',
+                  onTap: () => _pickTime(isStart: true),
                 ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<int>(
-                decoration: const InputDecoration(
-                  labelText: 'Sleep Quality (1-5)',
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 12),
+                _buildPickerTile(
+                  icon: Icons.wb_sunny,
+                  title: 'Wake time: ${_endTime.format(context)}',
+                  subtitle: 'Tap to change wake time',
+                  onTap: () => _pickTime(isStart: false),
                 ),
-                initialValue: _quality,
-                items: List<DropdownMenuItem<int>>.generate(5, (index) {
-                  final value = index + 1;
-                  return DropdownMenuItem<int>(
-                    value: value,
-                    child: Text('$value - ${_qualityLabel(value)}'),
-                  );
-                }),
-                onChanged: (value) => setState(() => _quality = value),
-                hint: const Text('Optional'),
-              ),
-              const SizedBox(height: 16),
-              CustomTextField(
-                label: 'Notes',
-                controller: _notesController,
-                maxLines: 4,
-                helperText: 'Optional context (up to 500 characters)',
-                validator: (value) {
-                  if (value != null && value.length > 500) {
-                    return 'Notes cannot exceed 500 characters';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 24),
-              LoadingButton(
-                onPressed: viewModel.isSubmitting ? null : _submit,
-                isLoading: viewModel.isSubmitting,
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                const SizedBox(height: 12),
+                if (durationMinutes != null)
+                  Text(
+                    'Duration: ${durationMinutes ~/ 60}h ${durationMinutes % 60}m',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<int>(
+                  decoration: const InputDecoration(
+                    labelText: 'Sleep Quality (1-5)',
+                    border: OutlineInputBorder(),
+                  ),
+                  initialValue: _quality,
+                  items: List<DropdownMenuItem<int>>.generate(5, (index) {
+                    final value = index + 1;
+                    return DropdownMenuItem<int>(
+                      value: value,
+                      child: Text('$value - ${_qualityLabel(value)}'),
+                    );
+                  }),
+                  onChanged: (value) => setState(() => _quality = value),
+                  hint: const Text('Optional'),
                 ),
-                child: Text(
-                  _isEditing ? 'Update Sleep Session' : 'Save Sleep Session',
+                const SizedBox(height: 16),
+                CustomTextField(
+                  label: 'Notes',
+                  controller: _notesController,
+                  maxLines: 4,
+                  helperText: 'Optional context (up to 500 characters)',
+                  validator: (value) {
+                    if (value != null && value.length > 500) {
+                      return 'Notes cannot exceed 500 characters';
+                    }
+                    return null;
+                  },
                 ),
-              ),
-            ],
+                const SizedBox(height: 24),
+                LoadingButton(
+                  onPressed: viewModel.isSubmitting ? null : _submit,
+                  isLoading: viewModel.isSubmitting,
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  child: Text(
+                    _isEditing ? 'Update Sleep Session' : 'Save Sleep Session',
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      ), // Scaffold
+    ); // PopScope
   }
 
   Widget _buildPickerTile({

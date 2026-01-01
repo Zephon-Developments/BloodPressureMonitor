@@ -1,73 +1,46 @@
-# Clive to Claudette Handoff: Phase 18 Review Follow-ups
+# Handoff: Clive to Claudette
 
-**Date:** 2026-01-01  
-**Phase:** 18 - Medication Grouping UI  
-**Status:** ❌ Blocked - Missing Test Coverage  
-**Assignee:** Clive → Claudette
+**Project**: HyperTrack (Blood Pressure Monitor)
+**Phase**: 19 (UX Polish Pack)
+**Status**: Ready for Implementation
 
----
+## Overview
+Phase 19 focuses on UX polish, addressing inconsistencies in idle timeouts, search functionality, numeric validation, and navigation safety.
 
-## Review Summary
+## Tasks for Claudette
+1.  **Global Idle Timeout**:
+    - Move the `Listener` from `_LockGate` in `lib/main.dart` to `MaterialApp.builder`.
+    - Ensure `lockViewModel.recordActivity()` is called for all pointer events globally.
+    - Verify that medication entry screens now trigger the lock screen after the idle period.
 
-The implementation of the Medication Grouping UI is visually and functionally sound, following the project's MVVM and Material 3 standards. Documentation is excellent, with comprehensive DartDoc comments on all new public APIs.
+2.  **Search Bar Enhancements**:
+    - Audit all search bars (Medications, History, etc.).
+    - Ensure they have a clear button (X icon) that appears only when text is present.
+    - Use `ValueListenableBuilder` or `setState` to ensure the clear button visibility updates immediately.
 
-However, the implementation is currently **blocked** due to a lack of test coverage for all new components. Per `CODING_STANDARDS.md`, all new logic must have ≥80% test coverage.
+3.  **Navigation Safety (PopScope)**:
+    - Add `PopScope` to all "Add/Edit" views to prevent accidental data loss.
+    - Show a confirmation dialog if the form is "dirty" (has unsaved changes).
 
----
+4.  **Numeric Validation Audit**:
+    - Ensure all numeric fields (Weight, BP, Pulse, Dosage) use the correct `keyboardType`.
+    - Verify that validators are robust and provide clear error messages.
 
-## Blockers
+5.  **Performance & Pagination**:
+    - Update `HistoryView` to use 50-item pages and a "Load More" button if requested by the plan, or optimize the existing infinite scroll.
+    - Ensure `MedicationListView` handles large datasets efficiently.
 
-### 1. Missing Test Coverage (Severity: High)
-The following new components have 0% test coverage:
-- `lib/views/medication/medication_group_list_view.dart`
-- `lib/widgets/medication/multi_select_medication_picker.dart`
-- `lib/views/medication/add_edit_medication_group_view.dart`
-- `lib/widgets/medication/unit_combo_box.dart`
+6.  **General Polish**:
+    - Audit spacing, alignment, and theme consistency across the app.
 
-**Required Action:** Implement widget and unit tests for these components to reach the ≥80% threshold.
+## Reference Materials
+- [Phase 19 Plan](../../Plans/Phase_19_UX_Polish_Pack_Plan.md)
+- [Phase 19 Review](../../reviews/2026-01-01-clive-phase-19-plan-review.md)
+- [Coding Standards](../../Standards/Coding_Standards.md)
 
-### 2. Incomplete Picker Tests (Severity: Medium)
-While `test/widgets/medication_picker_dialog_test.dart` was updated to prevent crashes, it does not yet test the new group-related functionality:
-- [ ] Verify that medication groups are displayed in the picker.
-- [ ] Verify that searching for a group name works.
-- [ ] Verify that selecting a group returns the `MedicationGroup` object.
-
----
-
-## Findings
-
-### 1. Documentation (Status: ✅ Pass)
-- All new public classes and methods have triple-slash `///` doc comments.
-- Usage examples are provided in the doc comments for complex widgets.
-
-### 2. Typing (Status: ✅ Pass)
-- `dynamic` usage in `showMedicationPicker` is acceptable as `Medication` and `MedicationGroup` do not share a common "Loggable" interface.
-- No unjustified `any` or `dynamic` usages found in ViewModels or Services.
-
-### 3. Standards Compliance (Status: ✅ Pass)
-- Follows MVVM architecture.
-- Uses Material 3 components.
-- Correctly uses `withValues` instead of deprecated `withOpacity`.
-
----
-
-## Requested Follow-ups
-
-1. **Implement Unit/Widget Tests:**
-   - `UnitComboBox`: Test unit selection and "Custom" field logic.
-   - `MultiSelectMedicationPicker`: Test search and multi-selection logic.
-   - `AddEditMedicationGroupView`: Test form validation (name length, minimum 1 medication).
-   - `MedicationGroupListView`: Test rendering of groups and swipe-to-delete confirmation.
-
-2. **Enhance Picker Tests:**
-   - Add test cases to `medication_picker_dialog_test.dart` for group display and selection.
-
-3. **Verify Coverage:**
-   - Run `flutter test --coverage` and ensure the new files meet the ≥80% requirement.
-
----
-
-Please address these blockers and hand back to Clive for final approval.
-
-**Reviewer:** Clive  
-**Date:** 2026-01-01
+## Success Criteria
+- All 844+ tests passing.
+- Zero analyzer issues.
+- Idle timeout works on all screens.
+- Navigation confirmation prevents data loss.
+- Search bars are user-friendly.
