@@ -119,7 +119,7 @@ void main() {
       // Scroll to make Large option visible
       await tester.ensureVisible(find.text('Large'));
       await tester.pumpAndSettle();
-      
+
       await tester.tap(find.text('Large'));
       await tester.pumpAndSettle();
 
@@ -133,7 +133,7 @@ void main() {
       final switchWidget = find.byType(Switch);
       await tester.ensureVisible(switchWidget);
       await tester.pumpAndSettle();
-      
+
       await tester.tap(switchWidget);
       await tester.pumpAndSettle();
 
@@ -215,8 +215,7 @@ void main() {
         matching: find.byType(RadioListTile<AppThemeMode>),
       );
 
-      final radioTile =
-          tester.widget<RadioListTile<AppThemeMode>>(darkRadio);
+      final radioTile = tester.widget<RadioListTile<AppThemeMode>>(darkRadio);
       // ignore: deprecated_member_use
       expect(radioTile.groupValue, AppThemeMode.dark);
     });

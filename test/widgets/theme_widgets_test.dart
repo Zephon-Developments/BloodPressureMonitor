@@ -137,7 +137,7 @@ void main() {
       expect(find.text('Normal'), findsOneWidget);
       expect(find.text('Large'), findsOneWidget);
       expect(find.text('Extra Large'), findsOneWidget);
-      
+
       // Verify RadioListTile widgets exist for each option
       expect(find.byType(RadioListTile<FontScaleOption>), findsNWidgets(3));
     });
