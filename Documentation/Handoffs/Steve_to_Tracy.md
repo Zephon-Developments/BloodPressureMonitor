@@ -1,159 +1,267 @@
-# Handoff: Steve → Tracy
+# Steve → Tracy Handoff: User Feedback Analysis & Implementation Planning
 
-**Date**: December 31, 2025  
+**Date**: January 1, 2026  
+**Handoff Version**: 2.0 (Comprehensive User Feedback Integration)  
 **From**: Steve (Project Manager / DevOps)  
-**To**: Tracy (Architectural Planner)  
-**Task**: Phase 15 - Reminder Removal Planning & Kickoff
+**To**: Tracy (Architectural Planner)
 
 ---
 
-## 1. Context
+## Objective
+Analyze comprehensive user feedback and update the Implementation Schedule with new phases to address all identified issues and feature requests. Ensure a final Test & Polish phase remains at the end.
 
-Phase 14 (App Rebrand to HyperTrack) has been successfully merged to main via PR #27. We are now ready to proceed with **Phase 15: Reminder Removal**.
-
-### 1.1 Phase 14 Completion Summary
-- ✅ All user-facing strings rebranded to "HyperTrack"
-- ✅ Package IDs preserved for upgrade continuity
-- ✅ 667/667 tests passing, analyzer clean
-- ✅ Documentation fully updated
-- ✅ Workflow artifacts archived to `Documentation/archive/handoffs/phase-14/`
-- ✅ Implementation summary created: `Documentation/implementation-summaries/Phase-14-Rebrand-HyperTrack.md`
-
-### 1.2 Current Status
-- **Main Branch**: Up to date with Phase 14 merge
-- **Cleanup PR**: chore/phase-14-cleanup pending (archival commit)
-- **Next Phase**: Phase 15 - Reminder Removal
-- **Available Plan**: `Documentation/Plans/Phase_15_Reminder_Removal_Plan.md`
+## Current State
+- **Current Phase**: Phase 19 (Polish & Comprehensive Testing) - in progress
+- **Completed Phases**: 1-17 (all merged to main)
+- **Pending Phases**: 18 (Encrypted Backup), 19 (Polish/Testing)
+- **Branch**: Currently on main, feature/phase-19-polish created for testing work
+- **Test Status**: 777/777 tests passing, analyzer clean
+- **Recent Work**: ProGuard/R8 configuration issues resolved
 
 ---
 
-## 2. Phase 15 Overview
+## User Feedback Summary
 
-### 2.1 Objective
-Remove all reminder-related functionality, schema, and code from the application while preserving existing health data and maintaining system stability.
+### Critical Issues
+1. **Idle Timeout Inconsistency**: Medications entry screen doesn't time out to login like other screens
+2. **Release Build Stability**: Recent ProGuard/R8 issues resolved but comprehensive testing needed
 
-### 2.2 Rationale
-The reminder system is no longer aligned with the application's direction. Removing it will:
-- Simplify the codebase and reduce maintenance burden
-- Eliminate unused features that could confuse users
-- Streamline medication intake flows to manual-only logging
+### High-Priority Features
 
-### 2.3 Existing Plan Summary
-The high-level plan exists at [Documentation/Plans/Phase_15_Reminder_Removal_Plan.md](../Plans/Phase_15_Reminder_Removal_Plan.md) and covers:
-- Database migration to drop Reminder table and FKs
-- Code deletion (models, services, DAOs, notification hooks)
-- UI cleanup (views, widgets, schedule-derived indicators)
-- Documentation updates
+#### 1. Medications
+- **Missing grouping functionality**: Medication groups exist in backend but not exposed in UI
+- **Dosage field**: Needs numeric validation
+- **Unit field**: Should be combo box (common units + custom entry option)
+- **Search bar**: Needs clear button (X icon)
+
+#### 2. Sleep Tracking Enhancement
+**New schema required**:
+- **Date**: Record at end of sleep period
+- **Two modes**:
+  - Detailed metrics: Hours/minutes of REM, Light, Deep sleep
+  - Basic: Total hours + textual notes
+
+#### 3. Profile Homepage Redesign
+- **Current state**: Post-unlock profile selection is good
+- **Required**: Array of large, friendly buttons:
+  - Log Blood Pressure
+  - Log Medication
+  - Log Sleep
+  - Log Weight
+- Each button opens respective entry screen
+
+#### 4. History Page Overhaul
+**Sections** (all collapsible, closed by default):
+- Blood Pressure
+- Pulse
+- Medication
+- Weight
+- Sleep
+
+**Each section displays**:
+- Button to open full history
+- Summary of 10 most recent readings
+- Mini-stats (e.g., "Latest: 128/82 (avg last 7 days)")
+
+#### 5. Settings Page
+- **Remove**: Medication log entry (medications should only be accessed via dedicated screens)
+
+#### 6. Analytics Improvements
+
+**Graph Style**:
+- **Current problem**: Bezier curves are misleading (curl inappropriately)
+- **Solution**: Default to raw line graph
+- **Enhancement**: Add toggle for smoothing (rolling average, window = 10% of readings)
+
+**Blood Pressure Graph Restructure** (dual Y-axis design):
+
+**Upper Y-Axis (Systolic: 50-200 mmHg)**:
+- Red zone: 180-200 (Hypertensive Crisis)
+- Yellow zone: 140-179 (High Blood Pressure)
+- Green zone: 90-139 (Normal)
+- Yellow zone: 50-89 (Low)
+
+**X-Axis**: Time/Date in clear zone (horizontal timeline)
+
+**Lower Y-Axis (Diastolic: 30-150 mmHg)**:
+- Red zone: 120-150 (Hypertensive Crisis)
+- Yellow zone: 90-119 (High Blood Pressure)
+- Green zone: 60-89 (Normal)
+- Yellow zone: 30-59 (Low)
+
+**Clear Zone**:
+- Neutral horizontal band between upper and lower graphs
+- Contains X-axis labels
+- Provides visual separation
+
+**Plotting**: Each reading plots two points (systolic upper, diastolic lower), connected vertically to show relationship.
+
+#### 7. Doctor's PDF Report Enhancement
+
+**New Schema Fields Required**:
+- **Profile Model Extensions**:
+  - Date of Birth (required for report)
+  - Patient ID (optional, e.g., NHS number)
+  - Doctor's Name (optional, pre-fill PDF default)
+  - Clinic Name (optional, pre-fill PDF default)
+
+**Enhanced Report Layout**:
+
+**Front Page - Patient Details**:
+- Patient Name: [Full Name]
+- Date of Birth: [MM/DD/YYYY]
+- Gender: [Gender]
+- Patient ID: [Unique Identifier]
+- Report Date: [MM/DD/YYYY]
+- Doctor's Name: [Doctor's Full Name]
+- Clinic Name: [Clinic Name]
+
+**Summary of Most Recent Readings**:
+- Blood Pressure: [Systolic/Diastolic mmHg] (Date) - rounded to nearest integer
+- Pulse: [BPM] (Date) - rounded to nearest integer
+- Medication: [Last Medication Taken] (Date) - last date for each different medication
+- Weight: [kg/lbs] (Date) - rounded to 0.1kg or 0.05lb
+- Sleep: [Total Hours] (Date)
+
+**Detailed Readings**:
+- Time Period: [7/30/90 Days] - selector required
+- Blood Pressure:
+  - Graph: Systolic/Diastolic over time
+  - Table: Date, Time, Systolic, Diastolic, Pulse (all rounded to integer)
+- Pulse:
+  - Graph: Pulse over time
+  - Table: Date, Time, Pulse (rounded to integer)
+- Medication:
+  - Table: Date, Time, Medication Name, Dosage, Notes
+  - Grouped by medication name
+- Weight:
+  - Graph: Weight over time
+  - Table: Date, Time, Weight
+- Sleep:
+  - Graph: Sleep metrics (REM, Light, Deep) over time
+  - Table: Date, Total Hours, Notes
+
+**Notes Section**: Space for doctor annotations
+
+**Footer**: Disclaimer (informational only, not medical advice)
+
+### Medium-Priority Enhancements
+
+#### 8. Units Consistency
+- Add app-wide units preference (kg vs lbs, future: °C vs °F)
+- Settings → Appearance or new Units section
+- Persist user preference
+
+#### 9. Medication Quick Actions
+- After implementing grouping, Log Medication button should open group picker
+- Show most common medications first
+- Fallback to individual picker if needed
+
+#### 10. Accessibility
+- Semantic labels for all large buttons (screen reader support)
+- Color contrast verification for all chart zones and UI elements
+- Special attention to high-contrast mode
+
+#### 11. General Polish
+- Uniform idle timeout across all entry screens (match medication screen behavior)
+- Consistent navigation patterns
+- Performance optimization for large datasets
 
 ---
 
-## 3. Tracy's Assignment
+## Required Actions
 
-### 3.1 Review Existing Plan
-Review [Phase_15_Reminder_Removal_Plan.md](../Plans/Phase_15_Reminder_Removal_Plan.md) against:
-- Current codebase architecture
-- [CODING_STANDARDS.md](../Standards/CODING_STANDARDS.md)
-- Dependencies from Phases 1-14
+### 1. Update Implementation Schedule
+- Insert new phases between Phase 17 (completed) and Phase 19 (final)
+- Renumber phases as needed
+- Keep Phase 19 (or renumbered equivalent) as "Polish & Comprehensive Testing" final phase
+- Ensure logical dependency ordering
+- Update progress tracking section with new phases
 
-### 3.2 Identify Reminder References
-Conduct a comprehensive audit of the codebase to identify:
-- All files containing reminder-related code (models, services, UI, tests)
-- Database schema references (tables, FKs, columns)
-- Import statements and DI registrations
-- Documentation references
+### 2. Create Detailed Phase Plans
+For each new phase, create a comprehensive plan document in `Documentation/Plans/` including:
+- **Scope definition**: Clear boundaries
+- **Task breakdown**: Detailed implementation steps
+- **Dependencies**: Other phases, external libraries
+- **Acceptance criteria**: Measurable success metrics
+- **Implementation details**: Technical approach
+- **Test requirements**: Coverage targets, test types
+- **Rollback points**: Safe fallback strategy
 
-### 3.3 Refine Implementation Plan
-Expand the existing plan with:
-- **Detailed file-by-file deletion checklist**
-- **Migration script specifics** (SQL statements, defensive checks)
-- **Test coverage requirements** for remaining medication flows
-- **Risk mitigation strategies** for legacy database migrations
+### 3. Suggested Phase Organization (Preliminary)
+Consider organizing feedback into phases such as:
+- **Medication Grouping UI**: Expose existing backend, add group picker, dosage validation, unit combo box
+- **Enhanced Sleep Tracking**: Schema update (dual-mode), migration, UI for REM/Light/Deep + basic mode
+- **History Redesign**: Collapsible sections, mini-stats, full history links, performance optimization
+- **Analytics Graph Overhaul**: Dual Y-axis BP charts, smoothing toggle, line graph default
+- **Profile Extensions**: DOB (required), Patient ID, Doctor/Clinic (optional), migration
+- **PDF Report v2**: Enhanced layout with new fields, time period selector, proper rounding/grouping
+- **UX Polish Pack**: Idle timeout consistency, search clear buttons, numeric validations
+- **Units & Accessibility**: App-wide units preference, semantic labels, contrast verification
+- **Final**: **Polish & Comprehensive Testing** (existing Phase 19, expanded scope)
 
-### 3.4 Create Dependency Map
-Document:
-- Which files depend on reminder code
-- Which tests need updating/removal
-- Any potential cascading effects on medication intake flows
-
----
-
-## 4. Constraints & Requirements
-
-### 4.1 Must Preserve
-- All existing medication, intake, profile, reading, weight, and sleep data
-- Manual medication intake logging functionality
-- Full test coverage (Services/ViewModels ≥85%, Models/Utils ≥90%, Widgets ≥70%)
-
-### 4.2 Must Remove
-- Reminder model and service
-- Reminder table from database schema
-- All UI for creating/editing reminders
-- Scheduled notification hooks
-- Late/missed indicators derived from reminder schedules
-
-### 4.3 Quality Gates
-- `flutter analyze`: Zero issues
-- `dart format`: All code formatted
-- `flutter test`: All tests pass
-- Migration tested on legacy databases with reminder data
+**Note**: You may merge, split, or reorder these as makes technical sense. This is a starting suggestion.
 
 ---
 
-## 5. Deliverables
-
-### 5.1 Updated Implementation Plan
-Create or update a detailed plan that includes:
-- Complete file inventory (to delete, to modify)
-- Migration SQL with defensive checks
-- Test strategy for regression and migration validation
-- Step-by-step implementation sequence
-
-### 5.2 Handoff to Clive
-Once the plan is complete:
-1. Create `Documentation/Handoffs/Tracy_to_Clive.md` (overwrite prior)
-2. Include all planning details and risk assessments
-3. Request Clive's review against CODING_STANDARDS.md
+## Standards Reference
+- Ensure all plans comply with [Documentation/Standards/CODING_STANDARDS.md](Documentation/Standards/CODING_STANDARDS.md)
+- Follow existing phase plan format from [Documentation/Plans/](Documentation/Plans/)
+- Reference completed phases (1-17) for precedent
+- Maintain backward compatibility unless explicitly approved for breaking changes
 
 ---
 
-## 6. Resources
+## Deliverables
 
-### 6.1 Documentation
-- [Phase_15_Reminder_Removal_Plan.md](../Plans/Phase_15_Reminder_Removal_Plan.md) - Existing high-level plan
-- [CODING_STANDARDS.md](../Standards/CODING_STANDARDS.md) - Project standards
-- [Implementation_Schedule.md](../Plans/Implementation_Schedule.md) - Overall roadmap
+1. **Updated Implementation Schedule**: [Documentation/Plans/Implementation_Schedule.md](Documentation/Plans/Implementation_Schedule.md)
+   - Updated progress tracking
+   - New phases inserted with proper numbering
+   - Dependencies clearly mapped
+   - Phase 19 (or final phase) remains "Polish & Comprehensive Testing"
 
-### 6.2 Search Hints
-Use these keywords to find reminder references:
-- "Reminder", "reminder", "schedule", "notification"
-- File patterns: `*reminder*`, `*notification*`
-- Database: Check migration files and schema documentation
+2. **Individual Phase Plan Documents**: In `Documentation/Plans/`
+   - One plan per new phase
+   - Follow naming convention: `Phase_XX_Name_Plan.md`
+   - Complete task breakdowns
+   - Acceptance criteria
+   - Test requirements
 
----
-
-## 7. Timeline Expectations
-
-This is a moderately complex refactoring task. Expected timeline:
-- **Planning & Audit**: 1-2 hours
-- **Plan Refinement**: 1 hour
-- **Clive Review**: 30 minutes
-- **Implementation** (by Claudette/Georgina): 2-3 hours
-- **Testing & Verification**: 1 hour
+3. **Summary Document**: Brief rationale for phase ordering and grouping decisions
 
 ---
 
-## 8. Success Criteria
-
-Tracy's planning phase is complete when:
-- [ ] All reminder references identified in codebase
-- [ ] Detailed deletion/modification checklist created
-- [ ] Migration script specified with defensive checks
-- [ ] Test strategy defined for regression and migration
-- [ ] Handoff document created for Clive's review
+## Success Criteria
+- ✅ All user feedback addressed in phase plans
+- ✅ Logical dependency flow maintained
+- ✅ Test & Polish remains final phase
+- ✅ Each phase is independently reviewable/mergeable
+- ✅ Plans are detailed enough for handoff to implementation agents
+- ✅ No breaking changes without explicit approval
+- ✅ Schema migrations properly sequenced
 
 ---
 
-**Status**: 🔄 **PLANNING IN PROGRESS**
+## Technical Constraints
+- **Branch Protection**: All changes must go through PR (no direct main commits)
+- **Current Branch**: feature/phase-19-polish exists for testing work
+- **Build System**: ProGuard/R8 configuration recently stabilized
+- **Test Suite**: 777/777 tests passing on main (must maintain or improve)
+- **Coverage Targets**: Models/Utils ≥90%, Services/ViewModels ≥85%, Widgets ≥70%
 
-Please begin by reviewing the existing plan and conducting a comprehensive audit of reminder references in the codebase. Once you have a complete picture, refine the implementation plan with specific file-level details and hand off to Clive for review.
+---
+
+## Notes
+- Phase 18 (Encrypted Backup) is already planned but not yet implemented
+- Some user requests (medication grouping) may leverage existing backend code
+- Sleep schema change will require careful migration planning
+- Profile model extensions impact both UI and PDF generation
+- Analytics overhaul is substantial (consider multiple phases if needed)
+
+---
+
+**Handoff Status**: Ready for Tracy analysis and planning  
+**Next Agent**: Tracy (Plan Review & Schedule Update)  
+**Expected Return**: Updated Implementation_Schedule.md + new phase plan documents  
+**Prompt for User**: "Invoke Tracy to review this handoff and update the implementation schedule"
 

@@ -22,8 +22,16 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - [x] Phase 15: Reminder Removal ✅ **COMPLETE** (Dec 31, 2025)
 - [x] Phase 16: Profile-Centric UI Redesign ✅ **COMPLETE** (Dec 31, 2025)
 - [x] Phase 17: Zephon Branding & Appearance Settings ✅ **COMPLETE** (Jan 1, 2026)
-- [ ] Phase 18: Encrypted Full-App Backup
-- [ ] Phase 19: Polish & Comprehensive Testing
+- [ ] Phase 18: Medication Grouping UI
+- [ ] Phase 19: UX Polish Pack
+- [ ] Phase 20: Profile Model Extensions
+- [ ] Phase 21: Enhanced Sleep Tracking
+- [ ] Phase 22: History Page Redesign
+- [ ] Phase 23: Analytics Graph Overhaul
+- [ ] Phase 24: Units & Accessibility
+- [ ] Phase 25: PDF Report v2
+- [ ] Phase 26: Encrypted Full-App Backup
+- [ ] Phase 27: Polish & Comprehensive Testing
 
 ---
 
@@ -365,7 +373,161 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - Resolved critical Android build failure with AGP/Gradle upgrade
 **Status**: Ready for PR merge to main (Jan 1, 2026)
 
-### Phase 18: Encrypted Full-App Backup
+### Phase 18: Medication Grouping UI
+**Scope**: Expose existing medication grouping backend with UI for group management and quick logging.
+**Tasks**
+- Create UI for viewing, creating, editing, and deleting medication groups.
+- Add group picker to Log Medication flow; support logging entire group with one tap.
+- Add dosage field numeric validation (prevent non-numeric input).
+- Convert unit field to combo box with common units (mg, ml, IU, mcg, units) + custom entry option.
+- Add clear button (X icon) to medication search bar.
+- Widget tests for group management and group logging flows.
+**Dependencies**: Phase 11 (medication UI foundation); Phase 12 (intake logging).
+**Acceptance**
+- Users can create medication groups and log entire groups with one action.
+- Dosage field enforces numeric input; unit field offers suggestions via combo box.
+- Search bar includes functional clear button.
+- All tests passing; analyzer clean; coverage targets met.
+**Rollback point**: Feature-flag group UI if critical issues arise.
+
+### Phase 19: UX Polish Pack
+**Scope**: Address UX inconsistencies and minor validation/usability issues across the app.
+**Tasks**
+- Fix idle timeout inconsistency: ensure medications entry screen times out like other screens.
+- Add clear buttons (X icons) to all search bars across the app.
+- Add numeric validation to all numeric input fields (dosage, weight, BP values).
+- Audit and fix any inconsistent navigation patterns.
+- Performance optimization pass for large datasets (medications, history).
+**Dependencies**: Phase 18 (medication UI complete).
+**Acceptance**
+- Idle timeout works consistently across all screens.
+- All search bars have clear buttons.
+- Numeric fields reject non-numeric input with helpful error messages.
+- Navigation is consistent and intuitive.
+- All tests passing; analyzer clean.
+**Rollback point**: Individual fixes can be feature-flagged if needed.
+
+### Phase 20: Profile Model Extensions
+**Scope**: Extend Profile model with medical metadata fields for PDF reports and doctor coordination.
+**Tasks**
+- Add new Profile model fields: dateOfBirth (required), patientId (optional), doctorName (optional), clinicName (optional).
+- Create migration to add new columns to Profile table (schema version bump).
+- Update ProfileService with CRUD for new fields.
+- Update ProfileViewModel and profile management UI to support new fields.
+- Add date picker for DOB; validation to ensure DOB is in the past and reasonable (e.g., not future, not >150 years ago).
+- Update profile forms with optional fields (graceful empty states).
+- Unit and widget tests for new fields and validation.
+**Dependencies**: Phase 16 (profile UI complete).
+**Acceptance**
+- Profile model includes all new fields with proper validation.
+- Migration succeeds on existing databases without data loss.
+- UI allows editing new fields with appropriate controls.
+- All tests passing; analyzer clean; coverage ≥85% for services/viewmodels.
+**Rollback point**: Migration includes fallback; fields are nullable (optional) to allow gradual adoption.
+
+### Phase 21: Enhanced Sleep Tracking
+**Scope**: Redesign sleep tracking to support dual-mode entry (detailed metrics or basic) with schema changes.
+**Tasks**
+- Redesign SleepEntry schema: add optional fields for remHours, remMinutes, lightHours, lightMinutes, deepHours, deepMinutes, textualNotes.
+- Create migration to add new columns to SleepEntry table (schema version bump).
+- Update SleepService to support new fields.
+- Update SleepViewModel with dual-mode logic.
+- Create new Add/Edit Sleep UI with mode toggle: Detailed (REM/Light/Deep sliders or pickers) vs Basic (total hours + notes).
+- Validation: ensure sleep metrics are reasonable (0-24 hours total; components sum correctly in detailed mode).
+- Update sleep history and analytics to display new metrics when available.
+- Unit and widget tests for dual-mode entry and validation.
+**Dependencies**: Phase 4 (basic sleep tracking); Phase 20 (migration pattern established).
+**Acceptance**
+- Users can choose detailed or basic sleep entry mode.
+- Detailed mode captures REM, Light, Deep sleep metrics; basic mode captures total + notes.
+- Migration succeeds without data loss.
+- Analytics and history display new metrics when available.
+- All tests passing; analyzer clean; coverage targets met.
+**Rollback point**: Default to basic mode if detailed mode has issues; migration includes rollback support.
+
+### Phase 22: History Page Redesign
+**Scope**: Redesign History page with collapsible sections, mini-stats, and improved UX.
+**Tasks**
+- Create collapsible section UI for History page: Blood Pressure, Pulse, Medication, Weight, Sleep (all closed by default).
+- Each section displays button to open full history + summary of 10 most recent readings + mini-stats (e.g., "Latest: 128/82 (avg last 7 days)").
+- Implement mini-stats calculation service (latest value, 7-day average, trend indicator).
+- Optimize performance for large datasets (lazy loading, pagination).
+- Widget tests for collapsible sections, mini-stats display, and full history navigation.
+**Dependencies**: Phase 7 (history foundation); Phase 21 (sleep metrics for display).
+**Acceptance**
+- History page shows collapsible sections with mini-stats.
+- Performance is smooth with large datasets (1000+ readings).
+- Full history opens from section button.
+- All tests passing; analyzer clean; widget coverage ≥70%.
+**Rollback point**: Feature-flag new layout; fall back to existing history view if critical issues.
+
+### Phase 23: Analytics Graph Overhaul
+**Scope**: Redesign analytics graphs with dual Y-axis BP charts, smoothing toggle, and improved clarity.
+**Tasks**
+- Replace Bezier curves with raw line graphs as default.
+- Add smoothing toggle (rolling average, window = 10% of readings) for all graphs.
+- Redesign BP graph with dual Y-axis layout:
+  - Upper Y-axis: Systolic (50-200 mmHg) with color zones (red 180-200, yellow 140-179, green 90-139, yellow 50-89).
+  - Lower Y-axis: Diastolic (30-150 mmHg) with color zones (red 120-150, yellow 90-119, green 60-89, yellow 30-59).
+  - Clear zone: Horizontal band between graphs for X-axis labels.
+  - Plotting: Each reading plots two points (systolic upper, diastolic lower), connected vertically.
+- Update chart legend to reflect new layout.
+- Performance optimization for chart rendering with large datasets.
+- Widget tests for smoothing toggle and dual Y-axis layout.
+**Dependencies**: Phase 8 (analytics foundation); Phase 22 (history complete).
+**Acceptance**
+- BP charts use dual Y-axis layout with proper color zones.
+- Smoothing toggle works for all graph types.
+- Default graph style is raw line (no Bezier).
+- Performance is smooth with 1000+ data points.
+- All tests passing; analyzer clean; widget coverage ≥70%.
+**Rollback point**: Feature-flag new chart layout; fall back to existing charts if rendering issues arise.
+
+### Phase 24: Units & Accessibility
+**Scope**: Add app-wide units preference and comprehensive accessibility support.
+**Tasks**
+- Add units preference to Settings (kg vs lbs; future-ready for °C vs °F).
+- Create UnitsPreferenceService to persist and retrieve unit preferences.
+- Update all weight-related UI to respect unit preference (display and input).
+- Add semantic labels to all large buttons and interactive elements (screen reader support).
+- Verify color contrast for all chart zones and UI elements (WCAG AA compliance).
+- Add high-contrast mode support (test with system high-contrast enabled).
+- Audit all text for readability with large text scaling (1.5x, 2x).
+- Unit and widget tests for units preference and accessibility features.
+**Dependencies**: Phase 17 (appearance settings); Phase 23 (charts complete).
+**Acceptance**
+- Users can select kg or lbs in Settings; preference persists and applies app-wide.
+- All interactive elements have semantic labels for screen readers.
+- Color contrast meets WCAG AA standards; high-contrast mode works correctly.
+- App is usable with large text scaling (up to 2x).
+- All tests passing; analyzer clean; coverage targets met.
+**Rollback point**: Units preference can be feature-flagged; accessibility labels can be added incrementally.
+
+### Phase 25: PDF Report v2
+**Scope**: Enhanced PDF report layout with new profile fields, time period selector, and improved formatting.
+**Tasks**
+- Update PDF report to include new profile fields: DOB, Patient ID, Doctor Name, Clinic Name.
+- Add time period selector to PDF generation UI (7/30/90 days).
+- Implement enhanced report layout:
+  - Front page: Patient details (name, DOB, gender, patient ID, report date, doctor, clinic).
+  - Summary: Most recent readings (BP, pulse, medication, weight, sleep) with proper rounding.
+  - Detailed readings: Time period-filtered data with graphs and tables.
+  - Notes section: Space for doctor annotations.
+  - Footer: Disclaimer (informational only, not medical advice).
+- Proper rounding: BP/pulse to nearest integer; weight to 0.1kg or 0.05lb.
+- Medication grouping in report: Group by medication name; show last date for each.
+- Sleep metrics: Display REM/Light/Deep when available; fall back to total + notes for basic entries.
+- Unit tests for PDF generation with new fields and rounding logic.
+**Dependencies**: Phase 20 (profile extensions); Phase 21 (sleep metrics); Phase 24 (units).
+**Acceptance**
+- PDF report includes all new profile fields with graceful empty states.
+- Time period selector allows filtering data (7/30/90 days).
+- Rounding is correct for all metrics per spec.
+- Medication grouping and sleep metrics display correctly.
+- All tests passing; analyzer clean; coverage ≥85% for services.
+**Rollback point**: Feature-flag new report layout; fall back to existing PDF format if generation issues arise.
+
+### Phase 26: Encrypted Full-App Backup
 **Scope**: Passphrase-protected backup/restore of the full encrypted database.
 **Tasks**
 - Export SQLCipher DB as a single blob with an added AES layer using a user passphrase; name
@@ -373,21 +535,25 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - Backup/Restore UI in Settings with progress, warnings, and passphrase entry.
 - Restore modes: replace all (default) with rollback on failure; merge mode optional if feasible.
 - Version stamps and checksums to validate compatibility and corruption.
-**Dependencies**: Phase 14 naming; stable schema through Phase 17 features.
+**Dependencies**: Phase 14 naming; stable schema through Phase 25 features.
 **Acceptance**
 - Round-trip backup/restore succeeds with test data; wrong passphrase or corrupt file fails
   cleanly without partial writes.
 - Service/widget tests for happy path and failure paths; analyzer/tests pass.
 
-### Phase 19: Polish & Comprehensive Testing
-**Scope**: Lint, coverage, performance, accessibility, and release readiness.
+### Phase 27: Polish & Comprehensive Testing
+**Scope**: Final lint, coverage, performance, accessibility, and release readiness sweep.
 **Tasks**
 - Achieve coverage targets (Models/Utils ≥90%, Services/ViewModels ≥85%, Widgets ≥70%).
 - Accessibility labels for charts + table fallback; verify large text/high-contrast modes.
 - Performance sweep on lists/charts; fix remaining analyzer warnings; finalize docs and release
   checklist.
-**Dependencies**: All prior phases (14–18).
+- Comprehensive regression testing across all features with multiple profiles and large datasets.
+- Release build testing on Android (ProGuard/R8 validation) and iOS.
+- Update all documentation (README, QUICKSTART, CHANGELOG) for release.
+**Dependencies**: All prior phases (18–26).
 **Acceptance**
-- Analyzer clean; coverage targets met; accessibility checks complete; ready for Clive
-  greenlight.
+- Analyzer clean; coverage targets met; accessibility checks complete; ready for production release.
+- All 777+ tests passing; zero static analysis issues.
+- Release builds succeed on Android and iOS without ProGuard/R8 errors.
 **Rollback point**: N/A (release readiness).
