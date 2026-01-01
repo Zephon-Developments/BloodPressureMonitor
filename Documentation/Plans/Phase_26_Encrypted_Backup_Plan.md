@@ -1,4 +1,4 @@
-# Phase 18 Plan: Encrypted Full-App Backup
+# Phase 26 Plan: Encrypted Full-App Backup
 
 **Objective**: Deliver passphrase-protected, reliable full-app backup/restore with authenticity.
 
