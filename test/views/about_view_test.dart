@@ -84,7 +84,8 @@ void main() {
       );
       expect(
         find.textContaining(
-            'Always consult a qualified healthcare professional'),
+          'Always consult a qualified healthcare professional',
+        ),
         findsOneWidget,
       );
     });
