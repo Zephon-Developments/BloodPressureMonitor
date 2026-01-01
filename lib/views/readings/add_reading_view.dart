@@ -47,6 +47,55 @@ class _AddReadingViewState extends State<AddReadingView> {
 
   bool get _isEditing => widget.editingReading != null;
 
+  /// Check if form has unsaved changes.
+  bool get _isDirty {
+    final editing = widget.editingReading;
+    if (editing == null) {
+      // New entry - dirty if any field has content
+      return _systolicController.text.isNotEmpty ||
+          _diastolicController.text.isNotEmpty ||
+          _pulseController.text.isNotEmpty ||
+          _notesController.text.isNotEmpty ||
+          _tagsController.text.isNotEmpty;
+    } else {
+      // Editing - dirty if any field differs from original
+      return editing.systolic.toString() != _systolicController.text ||
+          editing.diastolic.toString() != _diastolicController.text ||
+          editing.pulse.toString() != _pulseController.text ||
+          (editing.note ?? '') != _notesController.text ||
+          (editing.tags ?? '') != _tagsController.text ||
+          editing.arm != _selectedArm ||
+          editing.posture != _selectedPosture ||
+          editing.takenAt != _selectedDateTime;
+    }
+  }
+
+  Future<bool> _confirmDiscard() async {
+    if (!_isDirty) return true;
+
+    final shouldDiscard = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Discard changes?'),
+        content: const Text(
+          'You have unsaved changes. Are you sure you want to discard them?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Discard'),
+          ),
+        ],
+      ),
+    );
+
+    return shouldDiscard ?? false;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -177,147 +226,160 @@ class _AddReadingViewState extends State<AddReadingView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditing ? 'Edit Reading' : 'Add Reading'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Validation message banner
-              if (_validationResult != null &&
-                  _validationResult!.level != ValidationLevel.valid &&
-                  _validationResult!.message != null)
-                ValidationMessageWidget(
-                  message: _validationResult!.message!,
-                  isError: _validationResult!.level == ValidationLevel.error,
-                ),
+    return PopScope(
+      canPop: !_isDirty,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        final shouldPop = await _confirmDiscard();
+        if (shouldPop && context.mounted) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(_isEditing ? 'Edit Reading' : 'Add Reading'),
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        ),
+        body: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Validation message banner
+                if (_validationResult != null &&
+                    _validationResult!.level != ValidationLevel.valid &&
+                    _validationResult!.message != null)
+                  ValidationMessageWidget(
+                    message: _validationResult!.message!,
+                    isError: _validationResult!.level == ValidationLevel.error,
+                  ),
 
-              if (_showOverrideConfirmation)
-                Card(
-                  color: Theme.of(context).colorScheme.errorContainer,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        Text(
-                          'Override Confirmation Required',
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onErrorContainer,
-                                  ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          _validationResult?.message ?? '',
-                          style: TextStyle(
-                            color:
-                                Theme.of(context).colorScheme.onErrorContainer,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _showOverrideConfirmation = false;
-                                  });
-                                },
-                                child: const Text('Cancel'),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: FilledButton(
-                                onPressed: () => _submitReading(
-                                  confirmOverride: true,
+                if (_showOverrideConfirmation)
+                  Card(
+                    color: Theme.of(context).colorScheme.errorContainer,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          Text(
+                            'Override Confirmation Required',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onErrorContainer,
                                 ),
-                                child: const Text('Confirm Override'),
-                              ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            _validationResult?.message ?? '',
+                            style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onErrorContainer,
                             ),
-                          ],
-                        ),
-                      ],
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _showOverrideConfirmation = false;
+                                    });
+                                  },
+                                  child: const Text('Cancel'),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: FilledButton(
+                                  onPressed: () => _submitReading(
+                                    confirmOverride: true,
+                                  ),
+                                  child: const Text('Confirm Override'),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+
+                const SizedBox(height: 16),
+
+                // Basic fields
+                ReadingFormBasic(
+                  systolicController: _systolicController,
+                  diastolicController: _diastolicController,
+                  pulseController: _pulseController,
+                  selectedDateTime: _selectedDateTime,
+                  onDateTimeChanged: _selectDateTime,
                 ),
 
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              // Basic fields
-              ReadingFormBasic(
-                systolicController: _systolicController,
-                diastolicController: _diastolicController,
-                pulseController: _pulseController,
-                selectedDateTime: _selectedDateTime,
-                onDateTimeChanged: _selectDateTime,
-              ),
+                // Advanced section (expandable)
+                ExpandableSection(
+                  title: 'Advanced Options',
+                  children: [
+                    ReadingFormAdvanced(
+                      notesController: _notesController,
+                      tagsController: _tagsController,
+                      selectedArm: _selectedArm,
+                      selectedPosture: _selectedPosture,
+                      onArmChanged: (arm) {
+                        setState(() {
+                          _selectedArm = arm;
+                        });
+                      },
+                      onPostureChanged: (posture) {
+                        setState(() {
+                          _selectedPosture = posture;
+                        });
+                      },
+                    ),
+                  ],
+                ),
 
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              // Advanced section (expandable)
-              ExpandableSection(
-                title: 'Advanced Options',
-                children: [
-                  ReadingFormAdvanced(
-                    notesController: _notesController,
-                    tagsController: _tagsController,
-                    selectedArm: _selectedArm,
-                    selectedPosture: _selectedPosture,
-                    onArmChanged: (arm) {
+                if (!_isEditing) ...[
+                  SessionControlWidget(
+                    startNewSession: _startNewSession,
+                    onChanged: (value) {
                       setState(() {
-                        _selectedArm = arm;
-                      });
-                    },
-                    onPostureChanged: (posture) {
-                      setState(() {
-                        _selectedPosture = posture;
+                        _startNewSession = value;
                       });
                     },
                   ),
+                  const SizedBox(height: 24),
                 ],
-              ),
 
-              const SizedBox(height: 16),
-
-              if (!_isEditing) ...[
-                SessionControlWidget(
-                  startNewSession: _startNewSession,
-                  onChanged: (value) {
-                    setState(() {
-                      _startNewSession = value;
-                    });
-                  },
+                // Submit button
+                LoadingButton(
+                  onPressed: _isSubmitting || _showOverrideConfirmation
+                      ? null
+                      : () => _submitReading(),
+                  isLoading: _isSubmitting,
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  child: Text(_isEditing ? 'Update Reading' : 'Save Reading'),
                 ),
-                const SizedBox(height: 24),
+
+                const SizedBox(height: 16),
               ],
-
-              // Submit button
-              LoadingButton(
-                onPressed: _isSubmitting || _showOverrideConfirmation
-                    ? null
-                    : () => _submitReading(),
-                isLoading: _isSubmitting,
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: Text(_isEditing ? 'Update Reading' : 'Save Reading'),
-              ),
-
-              const SizedBox(height: 16),
-            ],
+            ),
           ),
         ),
-      ),
-    );
+      ), // Scaffold
+    ); // PopScope
   }
 }
