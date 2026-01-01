@@ -227,7 +227,7 @@ Final polish phase to achieve production quality across all features implemented
 <!-- User will populate this section after testing -->
 
 ### Critical (Must Fix)
-- [ ] TBD
+- [x] **Release APK crashes immediately after install** - FIXED: Added ProGuard rules for SQLCipher and Flutter plugins
 
 ### High Priority (Should Fix)
 - [ ] TBD
