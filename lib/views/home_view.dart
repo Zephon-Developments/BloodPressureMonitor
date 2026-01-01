@@ -4,9 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:blood_pressure_monitor/viewmodels/analytics_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
 import 'package:blood_pressure_monitor/views/analytics/analytics_view.dart';
+import 'package:blood_pressure_monitor/views/home/profile_homepage_view.dart';
 import 'package:blood_pressure_monitor/views/history/history_view.dart';
-import 'package:blood_pressure_monitor/views/home/widgets/quick_actions.dart';
-import 'package:blood_pressure_monitor/views/home/widgets/recent_readings_card.dart';
 import 'package:blood_pressure_monitor/views/settings/security_settings_view.dart';
 import 'package:blood_pressure_monitor/views/export_view.dart';
 import 'package:blood_pressure_monitor/views/import_view.dart';
@@ -142,18 +141,7 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Widget _buildHomeTab() {
-    return const SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 16),
-          QuickActions(),
-          SizedBox(height: 16),
-          RecentReadingsCard(),
-          SizedBox(height: 16),
-        ],
-      ),
-    );
+    return const ProfileHomepageView();
   }
 
   Widget _buildHistoryTab() => const HistoryView();
