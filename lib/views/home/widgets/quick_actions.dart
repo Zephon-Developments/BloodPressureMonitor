@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:blood_pressure_monitor/models/medication.dart';
 import 'package:blood_pressure_monitor/views/history/history_view.dart';
 import 'package:blood_pressure_monitor/views/readings/add_reading_view.dart';
 import 'package:blood_pressure_monitor/views/sleep/sleep_history_view.dart';
@@ -47,9 +48,13 @@ class QuickActions extends StatelessWidget {
           const SizedBox(height: 12),
           OutlinedButton.icon(
             onPressed: () async {
-              final medication = await showMedicationPicker(context);
-              if (medication != null && context.mounted) {
-                showLogIntakeSheet(context, medication);
+              final selected = await showMedicationPicker(context);
+              if (selected != null && context.mounted) {
+                if (selected is MedicationGroup) {
+                  showLogGroupIntakeSheet(context, selected);
+                } else if (selected is Medication) {
+                  showLogIntakeSheet(context, selected);
+                }
               }
             },
             icon: const Icon(Icons.medication),

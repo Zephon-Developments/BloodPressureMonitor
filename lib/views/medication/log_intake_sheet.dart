@@ -2,14 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:blood_pressure_monitor/models/medication.dart';
 import 'package:blood_pressure_monitor/viewmodels/medication_intake_viewmodel.dart';
+import 'package:blood_pressure_monitor/viewmodels/medication_viewmodel.dart';
 
 /// Bottom sheet for logging medication intake.
 ///
-/// Supports single medication intake with optional scheduled time.
+/// Supports both individual medication intake and medication group logging.
+/// For groups, all medications in the group are logged with a single timestamp.
 class LogIntakeSheet extends StatefulWidget {
-  final Medication medication;
+  /// The individual medication to log. Either this or [group] must be provided.
+  final Medication? medication;
 
-  const LogIntakeSheet({super.key, required this.medication});
+  /// The medication group to log. Either this or [medication] must be provided.
+  final MedicationGroup? group;
+
+  const LogIntakeSheet({super.key, this.medication, this.group})
+      : assert(medication != null || group != null,
+            'Either medication or group must be provided');
 
   @override
   State<LogIntakeSheet> createState() => _LogIntakeSheetState();
@@ -29,6 +37,11 @@ class _LogIntakeSheetState extends State<LogIntakeSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final isGroup = widget.group != null;
+    final title = isGroup
+        ? 'Log Group: ${widget.group!.name}'
+        : 'Log Intake: ${widget.medication!.name}';
+
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -41,9 +54,26 @@ class _LogIntakeSheetState extends State<LogIntakeSheet> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Log Intake: ${widget.medication.name}',
+            title,
             style: Theme.of(context).textTheme.titleLarge,
           ),
+          if (isGroup) ...[
+            const SizedBox(height: 8),
+            Consumer<MedicationViewModel>(
+              builder: (context, viewModel, child) {
+                final groupMeds = viewModel.medications
+                    .where(
+                        (m) => widget.group!.memberMedicationIds.contains(m.id))
+                    .toList();
+                return Text(
+                  '${groupMeds.length} medication${groupMeds.length != 1 ? 's' : ''} will be logged',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                );
+              },
+            ),
+          ],
           const SizedBox(height: 16),
           ListTile(
             leading: const Icon(Icons.calendar_today),
@@ -171,23 +201,50 @@ class _LogIntakeSheetState extends State<LogIntakeSheet> {
     try {
       final intakeViewModel = context.read<MedicationIntakeViewModel>();
 
-      final intake = MedicationIntake(
-        medicationId: widget.medication.id!,
-        profileId: widget.medication.profileId,
-        takenAt: _takenAt,
-        scheduledFor: _scheduledFor,
-        note: _noteController.text.trim().isEmpty
-            ? null
-            : _noteController.text.trim(),
-      );
-
-      await intakeViewModel.logIntake(intake);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Intake logged successfully')),
+      if (widget.group != null) {
+        // Log group intake
+        await intakeViewModel.logGroupIntake(
+          groupId: widget.group!.id!,
+          medicationIds: widget.group!.memberMedicationIds,
+          takenAt: _takenAt,
+          scheduledFor: _scheduledFor,
+          note: _noteController.text.trim().isEmpty
+              ? null
+              : _noteController.text.trim(),
         );
-        Navigator.of(context).pop();
+
+        if (mounted) {
+          final medicationVM = context.read<MedicationViewModel>();
+          final groupMeds = medicationVM.medications
+              .where((m) => widget.group!.memberMedicationIds.contains(m.id))
+              .length;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text(
+                    'Logged ${widget.group!.name} ($groupMeds medication${groupMeds != 1 ? 's' : ''})')),
+          );
+          Navigator.of(context).pop();
+        }
+      } else {
+        // Log individual intake
+        final intake = MedicationIntake(
+          medicationId: widget.medication!.id!,
+          profileId: widget.medication!.profileId,
+          takenAt: _takenAt,
+          scheduledFor: _scheduledFor,
+          note: _noteController.text.trim().isEmpty
+              ? null
+              : _noteController.text.trim(),
+        );
+
+        await intakeViewModel.logIntake(intake);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Intake logged successfully')),
+          );
+          Navigator.of(context).pop();
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -208,11 +265,20 @@ class _LogIntakeSheetState extends State<LogIntakeSheet> {
   }
 }
 
-/// Displays a button to show the intake logging sheet.
+/// Displays the intake logging sheet for an individual medication.
 void showLogIntakeSheet(BuildContext context, Medication medication) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     builder: (context) => LogIntakeSheet(medication: medication),
+  );
+}
+
+/// Displays the intake logging sheet for a medication group.
+void showLogGroupIntakeSheet(BuildContext context, MedicationGroup group) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    builder: (context) => LogIntakeSheet(group: group),
   );
 }
