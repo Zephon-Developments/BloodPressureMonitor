@@ -54,7 +54,9 @@ void main() {
 
       expect(viewModel.groups, isEmpty);
       expect(
-          viewModel.errorMessage, contains('Failed to load medication groups'));
+        viewModel.errorMessage,
+        contains('Failed to load medication groups'),
+      );
     });
 
     test('createGroup calls service and reloads', () async {
