@@ -240,6 +240,16 @@ class MyApp extends StatelessWidget {
       darkTheme: themeViewModel.darkTheme,
       themeMode: themeViewModel.materialThemeMode,
       home: const _LockGate(),
+      builder: (context, child) {
+        // Global activity tracker for idle timeout
+        // Wraps entire app to catch pointer events on all routes
+        final lockViewModel = context.watch<LockViewModel>();
+        return Listener(
+          onPointerDown: (_) => lockViewModel.recordActivity(),
+          onPointerMove: (_) => lockViewModel.recordActivity(),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
   }
 }
@@ -342,29 +352,19 @@ class _LockGateState extends State<_LockGate> with WidgetsBindingObserver {
 
       // Show ProfilePickerView if multiple profiles exist
       if (_needsProfileSelection) {
-        mainContent = Listener(
-          onPointerDown: (_) => lockViewModel.recordActivity(),
-          onPointerMove: (_) => lockViewModel.recordActivity(),
-          child: ProfilePickerView(
-            allowBack: false,
-            onProfileSelected: () {
-              if (mounted) {
-                setState(() {
-                  _needsProfileSelection = false;
-                });
-              }
-            },
-          ),
+        mainContent = ProfilePickerView(
+          allowBack: false,
+          onProfileSelected: () {
+            if (mounted) {
+              setState(() {
+                _needsProfileSelection = false;
+              });
+            }
+          },
         );
       } else {
-        // Wrap entire app content to track activity globally
-        // This ensures navigation to other screens still records user activity
-        mainContent = Listener(
-          // Listen to all pointer events to catch interactions anywhere in the app
-          onPointerDown: (_) => lockViewModel.recordActivity(),
-          onPointerMove: (_) => lockViewModel.recordActivity(),
-          child: const HomeView(),
-        );
+        // Home view - activity tracking handled by MaterialApp.builder
+        mainContent = const HomeView();
       }
     }
 
