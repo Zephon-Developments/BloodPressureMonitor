@@ -19,22 +19,24 @@ import 'package:blood_pressure_monitor/services/medication_intake_service.dart'
     as _i14;
 import 'package:blood_pressure_monitor/services/medication_service.dart'
     as _i13;
-import 'package:blood_pressure_monitor/services/profile_service.dart' as _i22;
+import 'package:blood_pressure_monitor/services/profile_service.dart' as _i23;
 import 'package:blood_pressure_monitor/services/reading_service.dart' as _i7;
 import 'package:blood_pressure_monitor/services/sleep_service.dart' as _i11;
 import 'package:blood_pressure_monitor/services/weight_service.dart' as _i12;
-import 'package:blood_pressure_monitor/utils/time_range.dart' as _i25;
+import 'package:blood_pressure_monitor/utils/time_range.dart' as _i26;
 import 'package:blood_pressure_monitor/utils/validators.dart' as _i4;
 import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart'
     as _i16;
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart'
+    as _i22;
+import 'package:blood_pressure_monitor/viewmodels/medication_group_viewmodel.dart'
     as _i21;
 import 'package:blood_pressure_monitor/viewmodels/medication_viewmodel.dart'
     as _i20;
-import 'package:flutter/material.dart' as _i24;
+import 'package:flutter/material.dart' as _i25;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i17;
-import 'package:shared_preferences/shared_preferences.dart' as _i23;
+import 'package:shared_preferences/shared_preferences.dart' as _i24;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -1243,11 +1245,126 @@ class MockMedicationViewModel extends _i1.Mock
       );
 }
 
+/// A class which mocks [MedicationGroupViewModel].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockMedicationGroupViewModel extends _i1.Mock
+    implements _i21.MedicationGroupViewModel {
+  MockMedicationGroupViewModel() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  List<_i3.MedicationGroup> get groups => (super.noSuchMethod(
+        Invocation.getter(#groups),
+        returnValue: <_i3.MedicationGroup>[],
+      ) as List<_i3.MedicationGroup>);
+
+  @override
+  bool get isLoading => (super.noSuchMethod(
+        Invocation.getter(#isLoading),
+        returnValue: false,
+      ) as bool);
+
+  @override
+  bool get hasListeners => (super.noSuchMethod(
+        Invocation.getter(#hasListeners),
+        returnValue: false,
+      ) as bool);
+
+  @override
+  void dispose() => super.noSuchMethod(
+        Invocation.method(
+          #dispose,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  _i8.Future<void> loadGroups() => (super.noSuchMethod(
+        Invocation.method(
+          #loadGroups,
+          [],
+        ),
+        returnValue: _i8.Future<void>.value(),
+        returnValueForMissingStub: _i8.Future<void>.value(),
+      ) as _i8.Future<void>);
+
+  @override
+  _i8.Future<void> createGroup(_i3.MedicationGroup? group) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #createGroup,
+          [group],
+        ),
+        returnValue: _i8.Future<void>.value(),
+        returnValueForMissingStub: _i8.Future<void>.value(),
+      ) as _i8.Future<void>);
+
+  @override
+  _i8.Future<void> updateGroup(_i3.MedicationGroup? group) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #updateGroup,
+          [group],
+        ),
+        returnValue: _i8.Future<void>.value(),
+        returnValueForMissingStub: _i8.Future<void>.value(),
+      ) as _i8.Future<void>);
+
+  @override
+  _i8.Future<void> deleteGroup(int? id) => (super.noSuchMethod(
+        Invocation.method(
+          #deleteGroup,
+          [id],
+        ),
+        returnValue: _i8.Future<void>.value(),
+        returnValueForMissingStub: _i8.Future<void>.value(),
+      ) as _i8.Future<void>);
+
+  @override
+  void clearError() => super.noSuchMethod(
+        Invocation.method(
+          #clearError,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void addListener(_i19.VoidCallback? listener) => super.noSuchMethod(
+        Invocation.method(
+          #addListener,
+          [listener],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void removeListener(_i19.VoidCallback? listener) => super.noSuchMethod(
+        Invocation.method(
+          #removeListener,
+          [listener],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void notifyListeners() => super.noSuchMethod(
+        Invocation.method(
+          #notifyListeners,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+}
+
 /// A class which mocks [BloodPressureViewModel].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockBloodPressureViewModel extends _i1.Mock
-    implements _i21.BloodPressureViewModel {
+    implements _i22.BloodPressureViewModel {
   MockBloodPressureViewModel() {
     _i1.throwOnMissingStub(this);
   }
@@ -1376,7 +1493,7 @@ class MockBloodPressureViewModel extends _i1.Mock
 /// A class which mocks [ProfileService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockProfileService extends _i1.Mock implements _i22.ProfileService {
+class MockProfileService extends _i1.Mock implements _i23.ProfileService {
   MockProfileService() {
     _i1.throwOnMissingStub(this);
   }
@@ -1439,7 +1556,7 @@ class MockProfileService extends _i1.Mock implements _i22.ProfileService {
 /// A class which mocks [SharedPreferences].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockSharedPreferences extends _i1.Mock implements _i23.SharedPreferences {
+class MockSharedPreferences extends _i1.Mock implements _i24.SharedPreferences {
   MockSharedPreferences() {
     _i1.throwOnMissingStub(this);
   }
@@ -1630,7 +1747,7 @@ class MockAnalyticsService extends _i1.Mock implements _i6.AnalyticsService {
     required int? profileId,
     required DateTime? startDate,
     required DateTime? endDate,
-    _i24.TimeOfDay? cutoff,
+    _i25.TimeOfDay? cutoff,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -1663,7 +1780,7 @@ class MockAnalyticsService extends _i1.Mock implements _i6.AnalyticsService {
     required int? profileId,
     required DateTime? startDate,
     required DateTime? endDate,
-    required _i25.TimeRange? range,
+    required _i26.TimeRange? range,
     int? maxPoints = 90,
   }) =>
       (super.noSuchMethod(
@@ -1699,7 +1816,7 @@ class MockAnalyticsService extends _i1.Mock implements _i6.AnalyticsService {
     required int? profileId,
     required DateTime? startDate,
     required DateTime? endDate,
-    _i24.TimeOfDay? cutoff,
+    _i25.TimeOfDay? cutoff,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -1762,7 +1879,7 @@ class MockAnalyticsService extends _i1.Mock implements _i6.AnalyticsService {
   @override
   _i6.TimeOfDayClassification classifyByTimeOfDay(
     List<_i9.ReadingGroup>? groups,
-    _i24.TimeOfDay? cutoff,
+    _i25.TimeOfDay? cutoff,
   ) =>
       (super.noSuchMethod(
         Invocation.method(

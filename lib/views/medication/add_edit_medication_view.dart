@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:blood_pressure_monitor/models/medication.dart';
 import 'package:blood_pressure_monitor/viewmodels/medication_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart';
+import 'package:blood_pressure_monitor/widgets/medication/unit_combo_box.dart';
 
 /// View for adding or editing a medication.
 ///
@@ -20,10 +21,10 @@ class _AddEditMedicationViewState extends State<AddEditMedicationView> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _dosageController = TextEditingController();
-  final _unitController = TextEditingController();
   final _frequencyController = TextEditingController();
   final _notesController = TextEditingController();
 
+  String _selectedUnit = 'mg';
   bool _isActive = true;
   bool _isSaving = false;
 
@@ -33,7 +34,7 @@ class _AddEditMedicationViewState extends State<AddEditMedicationView> {
     if (widget.medication != null) {
       _nameController.text = widget.medication!.name;
       _dosageController.text = widget.medication!.dosage ?? '';
-      _unitController.text = widget.medication!.unit ?? '';
+      _selectedUnit = widget.medication!.unit ?? 'mg';
       _frequencyController.text = widget.medication!.frequency ?? '';
       _isActive = widget.medication!.isActive;
     }
@@ -43,7 +44,6 @@ class _AddEditMedicationViewState extends State<AddEditMedicationView> {
   void dispose() {
     _nameController.dispose();
     _dosageController.dispose();
-    _unitController.dispose();
     _frequencyController.dispose();
     _notesController.dispose();
     super.dispose();
@@ -87,15 +87,25 @@ class _AddEditMedicationViewState extends State<AddEditMedicationView> {
                 hintText: 'e.g., 10',
                 border: OutlineInputBorder(),
               ),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              validator: (value) {
+                if (value != null && value.trim().isNotEmpty) {
+                  if (!RegExp(r'^\d+(\.\d+)?$').hasMatch(value.trim())) {
+                    return 'Dosage must be a number';
+                  }
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 16),
-            TextFormField(
-              controller: _unitController,
-              decoration: const InputDecoration(
-                labelText: 'Unit',
-                hintText: 'e.g., mg, tablets, mL',
-                border: OutlineInputBorder(),
-              ),
+            UnitComboBox(
+              initialValue: _selectedUnit,
+              onChanged: (value) {
+                setState(() {
+                  _selectedUnit = value;
+                });
+              },
             ),
             const SizedBox(height: 16),
             TextFormField(
@@ -157,9 +167,7 @@ class _AddEditMedicationViewState extends State<AddEditMedicationView> {
         dosage: _dosageController.text.trim().isEmpty
             ? null
             : _dosageController.text.trim(),
-        unit: _unitController.text.trim().isEmpty
-            ? null
-            : _unitController.text.trim(),
+        unit: _selectedUnit,
         frequency: _frequencyController.text.trim().isEmpty
             ? null
             : _frequencyController.text.trim(),
