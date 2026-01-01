@@ -67,6 +67,9 @@ class _UnitComboBoxState extends State<UnitComboBox> {
   void initState() {
     super.initState();
 
+    // Initialize the controller unconditionally
+    _customUnitController = TextEditingController();
+
     // Determine if initial value is a common unit or custom
     if (widget.initialValue != null && widget.initialValue!.isNotEmpty) {
       if (_commonUnits.contains(widget.initialValue)) {
@@ -75,12 +78,10 @@ class _UnitComboBoxState extends State<UnitComboBox> {
       } else {
         _selectedUnit = 'Custom';
         _showCustomField = true;
-        _customUnitController =
-            TextEditingController(text: widget.initialValue);
+        _customUnitController.text = widget.initialValue!;
       }
     } else {
       _selectedUnit = _commonUnits.first;
-      _customUnitController = TextEditingController();
       _showCustomField = false;
     }
 
