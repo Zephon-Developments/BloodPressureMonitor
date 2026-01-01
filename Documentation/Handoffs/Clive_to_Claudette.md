@@ -1,41 +1,73 @@
-# Handoff: Clive → Claudette
+# Clive to Claudette Handoff: Phase 18 Review Follow-ups
 
-**Date**: January 1, 2026  
-**Phase**: Phase 18 - Medication Grouping UI  
-**Status**: Approved for Implementation
+**Date:** 2026-01-01  
+**Phase:** 18 - Medication Grouping UI  
+**Status:** ❌ Blocked - Missing Test Coverage  
+**Assignee:** Clive → Claudette
+
+---
+
+## Review Summary
+
+The implementation of the Medication Grouping UI is visually and functionally sound, following the project's MVVM and Material 3 standards. Documentation is excellent, with comprehensive DartDoc comments on all new public APIs.
+
+However, the implementation is currently **blocked** due to a lack of test coverage for all new components. Per `CODING_STANDARDS.md`, all new logic must have ≥80% test coverage.
 
 ---
 
-## 1. Objective
-Implement the Medication Grouping UI and associated UX polish items as defined in the [Phase 18 Plan](../Plans/Phase_18_Medication_Grouping_UI_Plan.md).
+## Blockers
 
-## 2. Scope
-- **Medication Groups**: Full UI for viewing, creating, editing, and deleting groups.
-- **Group Logging**: Integration into `LogIntakeSheet` and `MedicationPickerDialog`.
-- **Dosage Validation**: Numeric-only validation in `AddEditMedicationView`.
-- **Unit Combo Box**: New `UnitComboBox` widget with predefined and custom units.
-- **Search Polish**: Clear (X) buttons on all medication search bars.
+### 1. Missing Test Coverage (Severity: High)
+The following new components have 0% test coverage:
+- `lib/views/medication/medication_group_list_view.dart`
+- `lib/widgets/medication/multi_select_medication_picker.dart`
+- `lib/views/medication/add_edit_medication_group_view.dart`
+- `lib/widgets/medication/unit_combo_box.dart`
 
-## 3. Standards & Requirements
-- **Coding Standards**: Strict adherence to [CODING_STANDARDS.md](../Standards/CODING_STANDARDS.md).
-- **Typing**: No `any` types; strict Dart typing throughout.
-- **Documentation**: DartDoc for all new public APIs, classes, and methods.
-- **Test Coverage**: 
-    - Models/Utils: ≥90%
-    - Services/ViewModels: ≥85%
-    - Widgets: ≥70%
-- **Accessibility**: Semantic labels for all new buttons; WCAG AA contrast compliance.
+**Required Action:** Implement widget and unit tests for these components to reach the ≥80% threshold.
 
-## 4. Implementation Notes
-- Leverage the existing `MedicationGroupService` and `MedicationGroupViewModel`.
-- Ensure the `UnitComboBox` persists custom units for the session or profile.
-- Use `flutter_slidable` for group deletion to maintain consistency with the History page.
-
-## 5. Deliverables
-- Implementation of all UI components and logic.
-- Complete test suite (Unit, Widget, and Integration).
-- `flutter analyze` and `dart format` compliance.
+### 2. Incomplete Picker Tests (Severity: Medium)
+While `test/widgets/medication_picker_dialog_test.dart` was updated to prevent crashes, it does not yet test the new group-related functionality:
+- [ ] Verify that medication groups are displayed in the picker.
+- [ ] Verify that searching for a group name works.
+- [ ] Verify that selecting a group returns the `MedicationGroup` object.
 
 ---
-**Reviewer**: Clive (Review Specialist)  
-**Assigned To**: Claudette (Implementation Agent)
+
+## Findings
+
+### 1. Documentation (Status: ✅ Pass)
+- All new public classes and methods have triple-slash `///` doc comments.
+- Usage examples are provided in the doc comments for complex widgets.
+
+### 2. Typing (Status: ✅ Pass)
+- `dynamic` usage in `showMedicationPicker` is acceptable as `Medication` and `MedicationGroup` do not share a common "Loggable" interface.
+- No unjustified `any` or `dynamic` usages found in ViewModels or Services.
+
+### 3. Standards Compliance (Status: ✅ Pass)
+- Follows MVVM architecture.
+- Uses Material 3 components.
+- Correctly uses `withValues` instead of deprecated `withOpacity`.
+
+---
+
+## Requested Follow-ups
+
+1. **Implement Unit/Widget Tests:**
+   - `UnitComboBox`: Test unit selection and "Custom" field logic.
+   - `MultiSelectMedicationPicker`: Test search and multi-selection logic.
+   - `AddEditMedicationGroupView`: Test form validation (name length, minimum 1 medication).
+   - `MedicationGroupListView`: Test rendering of groups and swipe-to-delete confirmation.
+
+2. **Enhance Picker Tests:**
+   - Add test cases to `medication_picker_dialog_test.dart` for group display and selection.
+
+3. **Verify Coverage:**
+   - Run `flutter test --coverage` and ensure the new files meet the ≥80% requirement.
+
+---
+
+Please address these blockers and hand back to Clive for final approval.
+
+**Reviewer:** Clive  
+**Date:** 2026-01-01
