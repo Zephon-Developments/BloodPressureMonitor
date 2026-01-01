@@ -83,7 +83,8 @@ void main() {
         findsOneWidget,
       );
       expect(
-        find.textContaining('Always consult a qualified healthcare professional'),
+        find.textContaining(
+            'Always consult a qualified healthcare professional'),
         findsOneWidget,
       );
     });
