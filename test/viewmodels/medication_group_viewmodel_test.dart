@@ -37,8 +37,7 @@ void main() {
         ),
       ];
 
-      when(mockService.listGroupsByProfile(1))
-          .thenAnswer((_) async => groups);
+      when(mockService.listGroupsByProfile(1)).thenAnswer((_) async => groups);
 
       await viewModel.loadGroups();
 
@@ -54,7 +53,8 @@ void main() {
       await viewModel.loadGroups();
 
       expect(viewModel.groups, isEmpty);
-      expect(viewModel.errorMessage, contains('Failed to load medication groups'));
+      expect(
+          viewModel.errorMessage, contains('Failed to load medication groups'));
     });
 
     test('createGroup calls service and reloads', () async {
@@ -64,7 +64,8 @@ void main() {
         memberMedicationIds: [1],
       );
 
-      when(mockService.createGroup(any)).thenAnswer((_) async => newGroup.copyWith(id: 1));
+      when(mockService.createGroup(any))
+          .thenAnswer((_) async => newGroup.copyWith(id: 1));
       when(mockService.listGroupsByProfile(1)).thenAnswer((_) async => []);
 
       await viewModel.createGroup(newGroup);

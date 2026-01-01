@@ -246,7 +246,8 @@ void main() {
       verifyNever(mockGroupViewModel.deleteGroup(any));
     });
 
-    testWidgets('should call deleteGroup when Delete is confirmed', (tester) async {
+    testWidgets('should call deleteGroup when Delete is confirmed',
+        (tester) async {
       when(mockGroupViewModel.groups).thenReturn(testGroups);
 
       await tester.pumpWidget(createWidgetUnderTest());
