@@ -6,6 +6,13 @@
 -keep class io.flutter.**  { *; }
 -keep class io.flutter.plugins.** { *; }
 
+# Google Play Core (optional split APK support - not used but referenced by Flutter)
+-dontwarn com.google.android.play.core.splitcompat.**
+-dontwarn com.google.android.play.core.splitinstall.**
+-dontwarn com.google.android.play.core.tasks.**
+-keep class com.google.android.play.core.** { *; }
+-keep interface com.google.android.play.core.** { *; }
+
 # SQLCipher - critical for encrypted database
 -keep class net.sqlcipher.** { *; }
 -keep class net.sqlcipher.database.** { *; }
