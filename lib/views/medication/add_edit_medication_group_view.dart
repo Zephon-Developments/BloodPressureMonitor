@@ -55,6 +55,53 @@ class _AddEditMedicationGroupViewState
 
   bool get _isEditing => widget.group != null;
 
+  /// Check if form has unsaved changes.
+  bool get _isDirty {
+    final group = widget.group;
+    if (group == null) {
+      // New group - dirty if name or medications are set
+      return _nameController.text.isNotEmpty ||
+          _selectedMedicationIds.isNotEmpty;
+    } else {
+      // Editing - dirty if name or medications differ
+      return group.name != _nameController.text ||
+          _listsDiffer(group.memberMedicationIds, _selectedMedicationIds);
+    }
+  }
+
+  bool _listsDiffer(List<int> a, List<int> b) {
+    if (a.length != b.length) return true;
+    final aSet = Set<int>.from(a);
+    final bSet = Set<int>.from(b);
+    return !aSet.containsAll(bSet) || !bSet.containsAll(aSet);
+  }
+
+  Future<bool> _confirmDiscard() async {
+    if (!_isDirty) return true;
+
+    final shouldDiscard = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Discard changes?'),
+        content: const Text(
+          'You have unsaved changes. Are you sure you want to discard them?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Discard'),
+          ),
+        ],
+      ),
+    );
+
+    return shouldDiscard ?? false;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -182,117 +229,128 @@ class _AddEditMedicationGroupViewState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditing ? 'Edit Group' : 'Add Group'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Group Name',
-                hintText: 'e.g., Morning Medications',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.label),
-              ),
-              textCapitalization: TextCapitalization.words,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Please enter a group name';
-                }
-                if (value.trim().length < 2) {
-                  return 'Group name must be at least 2 characters';
-                }
-                return null;
-              },
-              enabled: !_isSubmitting,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Medications',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            if (_isLoadingMedications)
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(32),
-                  child: CircularProgressIndicator(),
-                ),
-              )
-            else ...[
-              OutlinedButton.icon(
-                onPressed: _isSubmitting ? null : _selectMedications,
-                icon: const Icon(Icons.add),
-                label: Text(
-                  _selectedMedicationIds.isEmpty
-                      ? 'Select Medications'
-                      : 'Change Selection',
-                ),
-              ),
-              if (_selectedMedications.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                Card(
-                  child: Column(
-                    children: _selectedMedications.map((medication) {
-                      return ListTile(
-                        leading: const Icon(Icons.medication),
-                        title: Text(medication.name),
-                        subtitle: medication.dosage != null &&
-                                medication.unit != null
-                            ? Text('${medication.dosage} ${medication.unit}')
-                            : null,
-                        trailing: IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: _isSubmitting
-                              ? null
-                              : () {
-                                  setState(() {
-                                    _selectedMedicationIds
-                                        .remove(medication.id);
-                                  });
-                                },
-                          tooltip: 'Remove from group',
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ],
-              if (_selectedMedicationIds.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(
-                    'Select at least one medication for this group',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-            ],
-            const SizedBox(height: 24),
-            FilledButton(
-              onPressed: _isSubmitting ? null : _save,
-              style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-              ),
-              child: _isSubmitting
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(_isEditing ? 'Update Group' : 'Create Group'),
-            ),
-          ],
+    return PopScope(
+      canPop: !_isDirty,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        final shouldPop = await _confirmDiscard();
+        if (shouldPop && context.mounted) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(_isEditing ? 'Edit Group' : 'Add Group'),
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         ),
-      ),
-    );
+        body: Form(
+          key: _formKey,
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              TextFormField(
+                controller: _nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Group Name',
+                  hintText: 'e.g., Morning Medications',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.label),
+                ),
+                textCapitalization: TextCapitalization.words,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Please enter a group name';
+                  }
+                  if (value.trim().length < 2) {
+                    return 'Group name must be at least 2 characters';
+                  }
+                  return null;
+                },
+                enabled: !_isSubmitting,
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Medications',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              if (_isLoadingMedications)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(32),
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              else ...[
+                OutlinedButton.icon(
+                  onPressed: _isSubmitting ? null : _selectMedications,
+                  icon: const Icon(Icons.add),
+                  label: Text(
+                    _selectedMedicationIds.isEmpty
+                        ? 'Select Medications'
+                        : 'Change Selection',
+                  ),
+                ),
+                if (_selectedMedications.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Card(
+                    child: Column(
+                      children: _selectedMedications.map((medication) {
+                        return ListTile(
+                          leading: const Icon(Icons.medication),
+                          title: Text(medication.name),
+                          subtitle: medication.dosage != null &&
+                                  medication.unit != null
+                              ? Text('${medication.dosage} ${medication.unit}')
+                              : null,
+                          trailing: IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: _isSubmitting
+                                ? null
+                                : () {
+                                    setState(() {
+                                      _selectedMedicationIds
+                                          .remove(medication.id);
+                                    });
+                                  },
+                            tooltip: 'Remove from group',
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+                if (_selectedMedicationIds.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      'Select at least one medication for this group',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+              ],
+              const SizedBox(height: 24),
+              FilledButton(
+                onPressed: _isSubmitting ? null : _save,
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                child: _isSubmitting
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text(_isEditing ? 'Update Group' : 'Create Group'),
+              ),
+            ],
+          ),
+        ),
+      ), // Scaffold
+    ); // PopScope
   }
 }

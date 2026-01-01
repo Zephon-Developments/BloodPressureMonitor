@@ -209,9 +209,11 @@ void main() {
       await tester.pumpWidget(createWidget());
       await tester.pumpAndSettle();
 
-      // Should show Quick Actions and Recent Readings
-      expect(find.text('Quick Actions'), findsOneWidget);
-      expect(find.text('Recent Readings'), findsOneWidget);
+      // Should show Profile Homepage buttons
+      expect(find.text('Log Blood Pressure'), findsOneWidget);
+      expect(find.text('Log Medication'), findsOneWidget);
+      expect(find.text('Log Sleep'), findsOneWidget);
+      expect(find.text('Log Weight'), findsOneWidget);
     });
 
     testWidgets('switches to history tab when tapped',
@@ -289,7 +291,7 @@ void main() {
       await tester.pumpWidget(createWidget());
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Add Blood Pressure Reading'));
+      await tester.tap(find.text('Log Blood Pressure'));
       await tester.pumpAndSettle();
 
       expect(find.byType(AddReadingView), findsOneWidget);
