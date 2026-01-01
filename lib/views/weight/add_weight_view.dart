@@ -44,6 +44,64 @@ class _AddWeightViewState extends State<AddWeightView> {
 
   bool get _isEditing => widget.editingEntry != null;
 
+  /// Check if form has unsaved changes.
+  bool get _isDirty {
+    final editing = widget.editingEntry;
+    if (editing == null) {
+      // New entry - dirty if weight field has content
+      return _weightController.text.isNotEmpty ||
+          _notesController.text.isNotEmpty;
+    } else {
+      // Editing - dirty if any field differs from original
+      return editing.weightValue.toString() != _weightController.text ||
+          (editing.notes ?? '') != _notesController.text ||
+          editing.unit != _unit ||
+          !_isSameDateTime(editing.takenAt, _recordedAt) ||
+          editing.saltIntake != _saltLevel ||
+          editing.exerciseLevel != _exerciseLevel ||
+          (editing.stressLevel == null
+                  ? null
+                  : int.tryParse(editing.stressLevel!)) !=
+              _stressRating;
+    }
+  }
+
+  /// Compare DateTimes ignoring microseconds/milliseconds.
+  /// Only compares user-visible components: year, month, day, hour, minute.
+  bool _isSameDateTime(DateTime a, DateTime b) {
+    return a.year == b.year &&
+        a.month == b.month &&
+        a.day == b.day &&
+        a.hour == b.hour &&
+        a.minute == b.minute;
+  }
+
+  Future<bool> _confirmDiscard() async {
+    if (!_isDirty) return true;
+
+    final shouldDiscard = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Discard changes?'),
+        content: const Text(
+          'You have unsaved changes. Are you sure you want to discard them?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Discard'),
+          ),
+        ],
+      ),
+    );
+
+    return shouldDiscard ?? false;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -72,149 +130,160 @@ class _AddWeightViewState extends State<AddWeightView> {
   Widget build(BuildContext context) {
     final viewModel = context.watch<WeightViewModel>();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditing ? 'Edit Weight Entry' : 'Add Weight Entry'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
-      body: Form(
-        key: _formKey,
-        autovalidateMode:
-            _submitted ? AutovalidateMode.always : AutovalidateMode.disabled,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (viewModel.error != null)
-                ValidationMessageWidget(
-                  message: viewModel.error!,
-                  isError: true,
-                ),
-              const SizedBox(height: 12),
-              CustomTextField(
-                label: 'Weight',
-                controller: _weightController,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                inputFormatters: <TextInputFormatter>[
-                  FilteringTextInputFormatter.allow(
-                    RegExp(r'^[0-9]*[.]?[0-9]*'),
+    return PopScope(
+      canPop: !_isDirty,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        final shouldPop = await _confirmDiscard();
+        if (shouldPop && context.mounted) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(_isEditing ? 'Edit Weight Entry' : 'Add Weight Entry'),
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        ),
+        body: Form(
+          key: _formKey,
+          autovalidateMode:
+              _submitted ? AutovalidateMode.always : AutovalidateMode.disabled,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (viewModel.error != null)
+                  ValidationMessageWidget(
+                    message: viewModel.error!,
+                    isError: true,
                   ),
-                ],
-                helperText: _unit == WeightUnit.kg
-                    ? 'Enter value in kilograms (25-310 kg)'
-                    : 'Enter value in pounds (55-670 lbs)',
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Enter a weight value';
-                  }
-                  final parsed = double.tryParse(value);
-                  if (parsed == null) {
-                    return 'Invalid number';
-                  }
-                  final validation = validateWeight(parsed, _unit.toDbString());
-                  if (validation.level == ValidationLevel.error) {
-                    return validation.message ?? 'Invalid weight';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              Text('Unit', style: Theme.of(context).textTheme.labelLarge),
-              const SizedBox(height: 8),
-              SegmentedButton<WeightUnit>(
-                segments: const <ButtonSegment<WeightUnit>>[
-                  ButtonSegment<WeightUnit>(
-                    value: WeightUnit.kg,
-                    label: Text('Kilograms'),
+                const SizedBox(height: 12),
+                CustomTextField(
+                  label: 'Weight',
+                  controller: _weightController,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
                   ),
-                  ButtonSegment<WeightUnit>(
-                    value: WeightUnit.lbs,
-                    label: Text('Pounds'),
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(
+                      RegExp(r'^[0-9]*[.]?[0-9]*'),
+                    ),
+                  ],
+                  helperText: _unit == WeightUnit.kg
+                      ? 'Enter value in kilograms (25-310 kg)'
+                      : 'Enter value in pounds (55-670 lbs)',
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Enter a weight value';
+                    }
+                    final parsed = double.tryParse(value);
+                    if (parsed == null) {
+                      return 'Invalid number';
+                    }
+                    final validation =
+                        validateWeight(parsed, _unit.toDbString());
+                    if (validation.level == ValidationLevel.error) {
+                      return validation.message ?? 'Invalid weight';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                Text('Unit', style: Theme.of(context).textTheme.labelLarge),
+                const SizedBox(height: 8),
+                SegmentedButton<WeightUnit>(
+                  segments: const <ButtonSegment<WeightUnit>>[
+                    ButtonSegment<WeightUnit>(
+                      value: WeightUnit.kg,
+                      label: Text('Kilograms'),
+                    ),
+                    ButtonSegment<WeightUnit>(
+                      value: WeightUnit.lbs,
+                      label: Text('Pounds'),
+                    ),
+                  ],
+                  selected: <WeightUnit>{_unit},
+                  onSelectionChanged: (selection) {
+                    setState(() {
+                      _unit = selection.first;
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+                ListTile(
+                  leading: const Icon(Icons.access_time),
+                  title: Text(DateFormats.shortDateTime.format(_recordedAt)),
+                  subtitle: const Text('Tap to change date & time'),
+                  onTap: _pickDateTime,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(
+                      color: Theme.of(context).colorScheme.outlineVariant,
+                    ),
                   ),
-                ],
-                selected: <WeightUnit>{_unit},
-                onSelectionChanged: (selection) {
-                  setState(() {
-                    _unit = selection.first;
-                  });
-                },
-              ),
-              const SizedBox(height: 16),
-              ListTile(
-                leading: const Icon(Icons.access_time),
-                title: Text(DateFormats.shortDateTime.format(_recordedAt)),
-                subtitle: const Text('Tap to change date & time'),
-                onTap: _pickDateTime,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(
-                    color: Theme.of(context).colorScheme.outlineVariant,
+                ),
+                const SizedBox(height: 16),
+                _buildDropdown(
+                  label: 'Salt Intake',
+                  value: _saltLevel,
+                  items: _saltLevels,
+                  onChanged: (value) => setState(() => _saltLevel = value),
+                ),
+                const SizedBox(height: 16),
+                _buildDropdown(
+                  label: 'Exercise Level',
+                  value: _exerciseLevel,
+                  items: _exerciseLevels,
+                  onChanged: (value) => setState(() => _exerciseLevel = value),
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<int>(
+                  decoration: const InputDecoration(
+                    labelText: 'Stress Rating',
+                    border: OutlineInputBorder(),
+                  ),
+                  initialValue: _stressRating,
+                  items: List<DropdownMenuItem<int>>.generate(5, (index) {
+                    final value = index + 1;
+                    return DropdownMenuItem<int>(
+                      value: value,
+                      child: Text('$value - ${_stressLabel(value)}'),
+                    );
+                  }),
+                  onChanged: (value) => setState(() => _stressRating = value),
+                  hint: const Text('Optional'),
+                ),
+                const SizedBox(height: 16),
+                CustomTextField(
+                  label: 'Notes',
+                  controller: _notesController,
+                  maxLines: 4,
+                  helperText: 'Optional context (up to 500 characters)',
+                  validator: (value) {
+                    if (value != null && value.length > 500) {
+                      return 'Notes cannot exceed 500 characters';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24),
+                LoadingButton(
+                  onPressed: viewModel.isSubmitting ? null : _submit,
+                  isLoading: viewModel.isSubmitting,
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  child: Text(
+                    _isEditing ? 'Update Weight Entry' : 'Save Weight Entry',
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              _buildDropdown(
-                label: 'Salt Intake',
-                value: _saltLevel,
-                items: _saltLevels,
-                onChanged: (value) => setState(() => _saltLevel = value),
-              ),
-              const SizedBox(height: 16),
-              _buildDropdown(
-                label: 'Exercise Level',
-                value: _exerciseLevel,
-                items: _exerciseLevels,
-                onChanged: (value) => setState(() => _exerciseLevel = value),
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<int>(
-                decoration: const InputDecoration(
-                  labelText: 'Stress Rating',
-                  border: OutlineInputBorder(),
-                ),
-                initialValue: _stressRating,
-                items: List<DropdownMenuItem<int>>.generate(5, (index) {
-                  final value = index + 1;
-                  return DropdownMenuItem<int>(
-                    value: value,
-                    child: Text('$value - ${_stressLabel(value)}'),
-                  );
-                }),
-                onChanged: (value) => setState(() => _stressRating = value),
-                hint: const Text('Optional'),
-              ),
-              const SizedBox(height: 16),
-              CustomTextField(
-                label: 'Notes',
-                controller: _notesController,
-                maxLines: 4,
-                helperText: 'Optional context (up to 500 characters)',
-                validator: (value) {
-                  if (value != null && value.length > 500) {
-                    return 'Notes cannot exceed 500 characters';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 24),
-              LoadingButton(
-                onPressed: viewModel.isSubmitting ? null : _submit,
-                isLoading: viewModel.isSubmitting,
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: Text(
-                  _isEditing ? 'Update Weight Entry' : 'Save Weight Entry',
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      ), // Scaffold
+    ); // PopScope
   }
 
   Widget _buildDropdown({

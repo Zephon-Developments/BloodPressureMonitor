@@ -22,8 +22,8 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - [x] Phase 15: Reminder Removal ✅ **COMPLETE** (Dec 31, 2025)
 - [x] Phase 16: Profile-Centric UI Redesign ✅ **COMPLETE** (Dec 31, 2025)
 - [x] Phase 17: Zephon Branding & Appearance Settings ✅ **COMPLETE** (Jan 1, 2026)
-- [ ] Phase 18: Medication Grouping UI ✅ **COMPLETE** (Jan 1, 2026)
-- [ ] Phase 19: UX Polish Pack
+- [x] Phase 18: Medication Grouping UI ✅ **COMPLETE** (Jan 1, 2026)
+- [x] Phase 19: UX Polish Pack ✅ **COMPLETE** (Jan 1, 2026)
 - [ ] Phase 20: Profile Model Extensions
 - [ ] Phase 21: Enhanced Sleep Tracking
 - [ ] Phase 22: History Page Redesign
