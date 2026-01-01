@@ -68,9 +68,12 @@ Phase 17 has been successfully implemented per the approved plan. All core funct
 - ✅ Dynamic theme application to MaterialApp
 - ✅ Settings menu entries linked to views
 
-#### **7. Dependencies** (`pubspec.yaml`)
-- ✅ url_launcher: ^6.2.0 added
+#### **7. Dependencies & Build Configuration**
+- ✅ url_launcher: ^6.2.0 added (pubspec.yaml)
 - ✅ Assets declared (ZephonDevelopmentsLogo.jpg, ZephonDevelopmentsIcon.png)
+- ✅ Android Gradle Plugin upgraded to 8.9.1 (from 8.6.0)
+- ✅ Gradle wrapper upgraded to 8.11.1 (from 8.7)
+- Required for androidx.browser:1.9.0 compatibility with url_launcher
 
 ---
 
