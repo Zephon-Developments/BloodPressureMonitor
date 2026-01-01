@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:blood_pressure_monitor/models/medication.dart';
 import 'package:blood_pressure_monitor/viewmodels/medication_viewmodel.dart';
 import 'package:blood_pressure_monitor/views/medication/add_edit_medication_view.dart';
+import 'package:blood_pressure_monitor/views/medication/medication_group_list_view.dart';
 import 'package:blood_pressure_monitor/views/medication/log_intake_sheet.dart';
 import 'package:blood_pressure_monitor/widgets/common/confirm_delete_dialog.dart';
 
@@ -41,6 +42,11 @@ class _MedicationListViewState extends State<MedicationListView> {
       appBar: AppBar(
         title: const Text('Medications'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.folder),
+            onPressed: () => _navigateToManageGroups(context),
+            tooltip: 'Manage Groups',
+          ),
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () => _navigateToAddMedication(context),
@@ -262,6 +268,17 @@ class _MedicationListViewState extends State<MedicationListView> {
 
   void _logIntake(BuildContext context, Medication medication) {
     showLogIntakeSheet(context, medication);
+  }
+
+  Future<void> _navigateToManageGroups(BuildContext context) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const MedicationGroupListView(),
+      ),
+    );
+    if (mounted) {
+      this.context.read<MedicationViewModel>().loadMedications();
+    }
   }
 
   Future<void> _navigateToEditMedication(
