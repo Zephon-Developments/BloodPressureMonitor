@@ -1,40 +1,58 @@
-# Handoff: Clive to Claudette - Phase 16 Extension (Profile Management)
+# Handoff: Clive to Claudette
 
-## Context
-I have implemented the core functionality for Profile CRUD (Create, Edit, Delete) and resolved the profile-related TODOs as requested by the user. However, the user has requested that you perform a final pass to "correct the coding errors and ensure all functionality is implemented."
+**Date:** December 31, 2025  
+**From:** Clive (Reviewer)  
+**To:** Claudette (Implementer)  
+**Scope:** Phase 17 – Zephon Branding & Appearance Settings
 
-## Current State
-- **Profile CRUD**: Implemented in `ActiveProfileViewModel` and `ProfilePickerView`.
-- **Profile Form**: Created `ProfileFormView` for adding/editing profiles.
-- **TODOs**:
-  - `ProfilePickerView`: "Add Profile" button is now functional.
-  - `AddReadingView`: Now uses `ActiveProfileViewModel` to get the current profile ID.
-- **Tests**: Added unit tests for `ActiveProfileViewModel` and widget tests for `ProfileFormView`. Total tests: 684 (all passing).
+---
 
-## Tasks for Claudette
-1. **Correct Coding Errors**:
-   - There are a few minor lint issues (missing trailing commas) in `test/viewmodels/active_profile_viewmodel_test.dart` and `test/views/profile/profile_form_view_test.dart`.
-   - Perform a general code review of my implementation to ensure it meets your standards for reactivity and state management.
-2. **Ensure Full Functionality**:
-   - Verify the "Add Profile" flow from both the empty state and the list end in `ProfilePickerView`.
-   - Verify that deleting the active profile correctly switches to another profile or creates a default one.
-   - Check if `ProfilePickerView` needs a "Cancel" or "Back" button when opened from the `ProfileSwitcher` (currently `automaticallyImplyLeading: false`).
-3. **Refinement**:
-   - Ensure all new public APIs have proper JSDoc/DartDoc.
-   - Check if any other ViewModels need to be updated to be reactive to profile changes (I already updated `BloodPressureViewModel` in the previous turn, but others like `MedicationViewModel` might need a check).
+## 1. Status: APPROVED (WITH CONDITIONS) ✅
 
-## Files Modified/Created
-- `lib/viewmodels/active_profile_viewmodel.dart` (Modified)
-- `lib/views/profile/profile_picker_view.dart` (Modified)
-- `lib/views/profile/profile_form_view.dart` (Created)
-- `lib/views/readings/add_reading_view.dart` (Modified)
-- `test/viewmodels/active_profile_viewmodel_test.dart` (Created)
-- `test/views/profile/profile_form_view_test.dart` (Created)
-- `test/views/readings/add_reading_view_test.dart` (Modified)
-- `test/test_mocks.dart` (Modified)
+The implementation plan for Phase 17 has been reviewed. It is approved for implementation provided the following conditions and standards are met.
 
-## Verification
-- Run `flutter test` to ensure all 684 tests pass.
-- Run `flutter analyze` to check for remaining lint issues.
+## 2. Scope & Acceptance Criteria
 
-**Status**: Implementation complete but requires final "correction" and verification by Claudette.
+Refer to the finalized plan in [Documentation/Plans/Phase_17_Zephon_Branding_Appearance_Plan.md](../Plans/Phase_17_Zephon_Branding_Appearance_Plan.md) for full details.
+
+### 2.1 About HyperTrack
+- **View**: `Settings → About`
+- **Content**: App name, version (via `package_info_plus`), Zephon tagline, and privacy disclaimer.
+- **Branding**: Use `Assets/ZephonDevelopmentsLogo.jpg` and `Assets/ZephonDevelopmentsIcon.png`.
+- **Security**: Implement a confirmation dialog before launching external links. Ensure `url_launcher` is added to `pubspec.yaml`.
+
+### 2.2 Appearance Settings
+- **Theme Mode**: Light, Dark, System.
+- **Accent Palette**: 5–8 curated health-friendly colors (Teals, Blues, Greens).
+- **Font Scaling**: Normal, Large, XL.
+- **High-Contrast**: Toggle that increases contrast for text, backgrounds, and borders.
+
+### 2.3 Architecture
+- **ViewModel**: `ThemeViewModel` to manage state and generate `ThemeData` (Material 3).
+- **Persistence**: Use `SharedPreferences` to save user preferences.
+- **Reactivity**: Changes must apply live across the entire app without requiring a restart.
+
+## 3. Mandatory Standards (CODING_STANDARDS.md)
+
+- **Test Coverage**: **CRITICAL**: You must achieve **≥80% coverage** for all new code, including Widgets. The previous plan's 70% target for widgets is rejected.
+- **Typing**: Strict typing required; avoid `dynamic` unless absolutely necessary.
+- **Documentation**: All new public APIs must have DartDoc comments.
+- **Assets**: Note that the `Assets/` directory is capitalized. Ensure casing matches in `pubspec.yaml` and code.
+
+## 4. Implementation Guidance
+
+- **High-Contrast**: When enabled, ensure `onPrimary`, `onSurface`, and divider colors meet WCAG AAA standards where possible.
+- **Large Fonts**: Use `Flexible`, `Wrap`, and `SingleChildScrollView` to prevent overflows in the settings and about screens when XL font scaling is active.
+- **Theme Jitter**: Initialize the `ThemeViewModel` and load preferences *before* `runApp()` to prevent a theme flash on startup.
+
+## 5. Next Steps
+
+1. Create feature branch: `feature/phase-17-branding-appearance`.
+2. Update `pubspec.yaml` with `url_launcher` and asset declarations.
+3. Implement `ThemeViewModel` and persistence service.
+4. Build the About and Appearance views.
+5. Verify with full test suite and accessibility audit.
+
+---
+**Reviewer:** Clive  
+**Status:** Green-lit for Implementation (subject to 80% coverage mandate)
