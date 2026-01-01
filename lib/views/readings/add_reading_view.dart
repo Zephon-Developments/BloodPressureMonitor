@@ -66,8 +66,18 @@ class _AddReadingViewState extends State<AddReadingView> {
           (editing.tags ?? '') != _tagsController.text ||
           editing.arm != _selectedArm ||
           editing.posture != _selectedPosture ||
-          editing.takenAt != _selectedDateTime;
+          !_isSameDateTime(editing.takenAt, _selectedDateTime);
     }
+  }
+
+  /// Compare DateTimes ignoring microseconds/milliseconds.
+  /// Only compares user-visible components: year, month, day, hour, minute.
+  bool _isSameDateTime(DateTime a, DateTime b) {
+    return a.year == b.year &&
+        a.month == b.month &&
+        a.day == b.day &&
+        a.hour == b.hour &&
+        a.minute == b.minute;
   }
 
   Future<bool> _confirmDiscard() async {

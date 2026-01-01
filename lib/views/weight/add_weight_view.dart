@@ -56,7 +56,7 @@ class _AddWeightViewState extends State<AddWeightView> {
       return editing.weightValue.toString() != _weightController.text ||
           (editing.notes ?? '') != _notesController.text ||
           editing.unit != _unit ||
-          editing.takenAt != _recordedAt ||
+          !_isSameDateTime(editing.takenAt, _recordedAt) ||
           editing.saltIntake != _saltLevel ||
           editing.exerciseLevel != _exerciseLevel ||
           (editing.stressLevel == null
@@ -64,6 +64,16 @@ class _AddWeightViewState extends State<AddWeightView> {
                   : int.tryParse(editing.stressLevel!)) !=
               _stressRating;
     }
+  }
+
+  /// Compare DateTimes ignoring microseconds/milliseconds.
+  /// Only compares user-visible components: year, month, day, hour, minute.
+  bool _isSameDateTime(DateTime a, DateTime b) {
+    return a.year == b.year &&
+        a.month == b.month &&
+        a.day == b.day &&
+        a.hour == b.hour &&
+        a.minute == b.minute;
   }
 
   Future<bool> _confirmDiscard() async {
