@@ -160,6 +160,42 @@ class _SleepEntryCard extends StatelessWidget {
               const SizedBox(height: 8),
               Text(entry.notes!),
             ],
+            if (_hasDetailedMetrics(entry)) ...[
+              const SizedBox(height: 12),
+              const Divider(),
+              const SizedBox(height: 8),
+              Text(
+                'Sleep Stages',
+                style: Theme.of(context).textTheme.labelMedium,
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 4,
+                children: [
+                  if (entry.deepMinutes != null && entry.deepMinutes! > 0)
+                    _Chip(
+                      label: 'Deep: ${_formatDuration(entry.deepMinutes!)}',
+                      color: Colors.indigo,
+                    ),
+                  if (entry.lightMinutes != null && entry.lightMinutes! > 0)
+                    _Chip(
+                      label: 'Light: ${_formatDuration(entry.lightMinutes!)}',
+                      color: Colors.lightBlue,
+                    ),
+                  if (entry.remMinutes != null && entry.remMinutes! > 0)
+                    _Chip(
+                      label: 'REM: ${_formatDuration(entry.remMinutes!)}',
+                      color: Colors.purple,
+                    ),
+                  if (entry.awakeMinutes != null && entry.awakeMinutes! > 0)
+                    _Chip(
+                      label: 'Awake: ${_formatDuration(entry.awakeMinutes!)}',
+                      color: Colors.orange,
+                    ),
+                ],
+              ),
+            ],
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -183,6 +219,13 @@ class _SleepEntryCard extends StatelessWidget {
       return '$remainingMinutes min';
     }
     return '${hours}h ${remainingMinutes}m';
+  }
+
+  bool _hasDetailedMetrics(SleepEntry entry) {
+    return (entry.deepMinutes != null && entry.deepMinutes! > 0) ||
+        (entry.lightMinutes != null && entry.lightMinutes! > 0) ||
+        (entry.remMinutes != null && entry.remMinutes! > 0) ||
+        (entry.awakeMinutes != null && entry.awakeMinutes! > 0);
   }
 
   String _sourceLabel(SleepSource source) {
@@ -261,16 +304,24 @@ class _SleepEntryCard extends StatelessWidget {
 enum _SleepEntryAction { edit, delete }
 
 class _Chip extends StatelessWidget {
-  const _Chip({required this.label});
+  const _Chip({required this.label, this.color});
 
   final String label;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
     return Chip(
-      label: Text(label),
-      side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
-      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+      label: Text(
+        label,
+        style: color != null ? TextStyle(color: color) : null,
+      ),
+      side: BorderSide(
+        color: color ?? Theme.of(context).colorScheme.outlineVariant,
+      ),
+      backgroundColor: color != null
+          ? color!.withValues(alpha: 0.1)
+          : Theme.of(context).colorScheme.surfaceContainerHighest,
     );
   }
 }

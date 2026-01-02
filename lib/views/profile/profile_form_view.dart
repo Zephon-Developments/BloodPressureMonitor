@@ -29,9 +29,9 @@ class _ProfileFormViewState extends State<ProfileFormView> {
   late TextEditingController _patientIdController;
   late TextEditingController _doctorNameController;
   late TextEditingController _clinicNameController;
-  late int? _selectedYearOfBirth;
   late DateTime? _selectedDateOfBirth;
   late String _selectedUnits;
+  late String _selectedWeightUnit;
   bool _isSubmitting = false;
 
   @override
@@ -44,9 +44,9 @@ class _ProfileFormViewState extends State<ProfileFormView> {
         TextEditingController(text: widget.profile?.doctorName ?? '');
     _clinicNameController =
         TextEditingController(text: widget.profile?.clinicName ?? '');
-    _selectedYearOfBirth = widget.profile?.yearOfBirth;
     _selectedDateOfBirth = widget.profile?.dateOfBirth;
     _selectedUnits = widget.profile?.preferredUnits ?? 'mmHg';
+    _selectedWeightUnit = widget.profile?.preferredWeightUnit ?? 'kg';
   }
 
   @override
@@ -68,7 +68,6 @@ class _ProfileFormViewState extends State<ProfileFormView> {
       final profile = Profile(
         id: widget.profile?.id,
         name: _nameController.text.trim(),
-        yearOfBirth: _selectedYearOfBirth,
         dateOfBirth: _selectedDateOfBirth,
         patientId: _patientIdController.text.trim().isEmpty
             ? null
@@ -80,6 +79,7 @@ class _ProfileFormViewState extends State<ProfileFormView> {
             ? null
             : _clinicNameController.text.trim(),
         preferredUnits: _selectedUnits,
+        preferredWeightUnit: _selectedWeightUnit,
         colorHex: widget.profile?.colorHex,
         avatarIcon: widget.profile?.avatarIcon,
         createdAt: widget.profile?.createdAt,
@@ -140,30 +140,6 @@ class _ProfileFormViewState extends State<ProfileFormView> {
                 }
                 return null;
               },
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<int>(
-              initialValue: _selectedYearOfBirth,
-              decoration: const InputDecoration(
-                labelText: 'Year of Birth (Optional)',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.cake),
-              ),
-              items: [
-                const DropdownMenuItem<int>(
-                  value: null,
-                  child: Text('Not specified'),
-                ),
-                ...List.generate(100, (index) {
-                  final year = DateTime.now().year - index;
-                  return DropdownMenuItem(
-                    value: year,
-                    child: Text(year.toString()),
-                  );
-                }),
-              ],
-              onChanged: (value) =>
-                  setState(() => _selectedYearOfBirth = value),
             ),
             const SizedBox(height: 24),
             Text(
@@ -263,7 +239,7 @@ class _ProfileFormViewState extends State<ProfileFormView> {
             DropdownButtonFormField<String>(
               initialValue: _selectedUnits,
               decoration: const InputDecoration(
-                labelText: 'Preferred Units',
+                labelText: 'Blood Pressure Units',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.straighten),
               ),
@@ -272,6 +248,21 @@ class _ProfileFormViewState extends State<ProfileFormView> {
                 DropdownMenuItem(value: 'kPa', child: Text('kPa')),
               ],
               onChanged: (value) => setState(() => _selectedUnits = value!),
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              initialValue: _selectedWeightUnit,
+              decoration: const InputDecoration(
+                labelText: 'Weight Units',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.monitor_weight),
+              ),
+              items: const [
+                DropdownMenuItem(value: 'kg', child: Text('Kilograms (kg)')),
+                DropdownMenuItem(value: 'lbs', child: Text('Pounds (lbs)')),
+              ],
+              onChanged: (value) =>
+                  setState(() => _selectedWeightUnit = value!),
             ),
             const SizedBox(height: 32),
             ElevatedButton(
