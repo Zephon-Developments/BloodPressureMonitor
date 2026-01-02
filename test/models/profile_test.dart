@@ -473,6 +473,59 @@ void main() {
         expect(restored.doctorName, original.doctorName);
         expect(restored.clinicName, original.clinicName);
       });
+
+      test('copyWith can explicitly set medical metadata to null', () {
+        final original = Profile(
+          id: 20,
+          name: 'Clear Medical Data',
+          dateOfBirth: testDateOfBirth,
+          patientId: 'PAT-999',
+          doctorName: 'Dr. Original',
+          clinicName: 'Original Clinic',
+          preferredUnits: 'mmHg',
+          createdAt: testDate,
+        );
+
+        // Clear all medical metadata fields
+        final cleared = original.copyWith(
+          dateOfBirth: null,
+          patientId: null,
+          doctorName: null,
+          clinicName: null,
+        );
+
+        expect(cleared.id, original.id);
+        expect(cleared.name, original.name);
+        expect(cleared.dateOfBirth, isNull);
+        expect(cleared.patientId, isNull);
+        expect(cleared.doctorName, isNull);
+        expect(cleared.clinicName, isNull);
+        expect(cleared.preferredUnits, original.preferredUnits);
+        expect(cleared.createdAt, original.createdAt);
+      });
+
+      test('copyWith preserves unspecified medical metadata', () {
+        final original = Profile(
+          id: 21,
+          name: 'Partial Update',
+          dateOfBirth: testDateOfBirth,
+          patientId: 'PAT-123',
+          doctorName: 'Dr. Keep',
+          clinicName: 'Keep Clinic',
+          preferredUnits: 'mmHg',
+          createdAt: testDate,
+        );
+
+        // Update only one field, others should remain
+        final updated = original.copyWith(
+          patientId: 'PAT-NEW',
+        );
+
+        expect(updated.dateOfBirth, original.dateOfBirth);
+        expect(updated.patientId, 'PAT-NEW');
+        expect(updated.doctorName, original.doctorName);
+        expect(updated.clinicName, original.clinicName);
+      });
     });
   });
 }
