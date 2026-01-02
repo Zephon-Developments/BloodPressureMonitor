@@ -154,7 +154,7 @@ void main() {
 
       test('formats with custom fraction digits', () {
         final result = UnitConversion.formatWeight(70.123, WeightUnit.kg,
-            fractionDigits: 2);
+            fractionDigits: 2,);
 
         expect(result, '70.12 kg');
       });
