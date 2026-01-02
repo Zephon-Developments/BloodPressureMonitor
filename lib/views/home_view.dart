@@ -5,7 +5,7 @@ import 'package:blood_pressure_monitor/viewmodels/analytics_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
 import 'package:blood_pressure_monitor/views/analytics/analytics_view.dart';
 import 'package:blood_pressure_monitor/views/home/profile_homepage_view.dart';
-import 'package:blood_pressure_monitor/views/history/history_view.dart';
+import 'package:blood_pressure_monitor/views/history/history_home_view.dart';
 import 'package:blood_pressure_monitor/views/settings/security_settings_view.dart';
 import 'package:blood_pressure_monitor/views/export_view.dart';
 import 'package:blood_pressure_monitor/views/import_view.dart';
@@ -144,7 +144,7 @@ class _HomeViewState extends State<HomeView> {
     return const ProfileHomepageView();
   }
 
-  Widget _buildHistoryTab() => const HistoryView();
+  Widget _buildHistoryTab() => const HistoryHomeView();
 
   Widget _buildSettingsTab() {
     return ListView(

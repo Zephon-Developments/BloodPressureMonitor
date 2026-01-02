@@ -8,12 +8,12 @@ void main() {
       // Arrange
       const title = 'Blood Pressure';
       const icon = Icons.favorite;
-      final miniStatsPreview = const Text('120/80');
-      final expandedContent = const Text('Expanded content');
+      const miniStatsPreview = Text('120/80');
+      const expandedContent = Text('Expanded content');
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: CollapsibleSection(
               title: title,
@@ -36,13 +36,13 @@ void main() {
     testWidgets('expands when tapped', (tester) async {
       // Arrange
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: CollapsibleSection(
               title: 'Weight',
               icon: Icons.scale,
-              miniStatsPreview: const Text('75 kg'),
-              expandedContent: const Text('Recent readings'),
+              miniStatsPreview: Text('75 kg'),
+              expandedContent: Text('Recent readings'),
             ),
           ),
         ),
@@ -66,13 +66,13 @@ void main() {
     testWidgets('collapses when tapped again', (tester) async {
       // Arrange
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: CollapsibleSection(
               title: 'Sleep',
               icon: Icons.bedtime,
-              miniStatsPreview: const Text('7.5 hrs'),
-              expandedContent: const Text('Sleep data'),
+              miniStatsPreview: Text('7.5 hrs'),
+              expandedContent: Text('Sleep data'),
             ),
           ),
         ),
@@ -135,13 +135,13 @@ void main() {
     testWidgets('initiallyExpanded prop works correctly', (tester) async {
       // Arrange & Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: CollapsibleSection(
               title: 'Blood Pressure',
               icon: Icons.favorite,
-              miniStatsPreview: const Text('Preview'),
-              expandedContent: const Text('Content'),
+              miniStatsPreview: Text('Preview'),
+              expandedContent: Text('Content'),
               initiallyExpanded: true,
             ),
           ),
@@ -157,13 +157,13 @@ void main() {
     testWidgets('accessibility labels are present', (tester) async {
       // Arrange & Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: CollapsibleSection(
               title: 'Test Section',
               icon: Icons.star,
-              miniStatsPreview: const Text('Stats'),
-              expandedContent: const Text('Content'),
+              miniStatsPreview: Text('Stats'),
+              expandedContent: Text('Content'),
             ),
           ),
         ),
@@ -185,13 +185,13 @@ void main() {
     testWidgets('animation completes properly', (tester) async {
       // Arrange
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: CollapsibleSection(
               title: 'Animated Section',
               icon: Icons.animation,
-              miniStatsPreview: const Text('Preview'),
-              expandedContent: const Text('Expanded'),
+              miniStatsPreview: Text('Preview'),
+              expandedContent: Text('Expanded'),
             ),
           ),
         ),
@@ -219,12 +219,12 @@ void main() {
             useMaterial3: true,
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
           ),
-          home: Scaffold(
+          home: const Scaffold(
             body: CollapsibleSection(
               title: 'Styled Section',
               icon: Icons.palette,
-              miniStatsPreview: const Text('Preview'),
-              expandedContent: const Text('Content'),
+              miniStatsPreview: Text('Preview'),
+              expandedContent: Text('Content'),
             ),
           ),
         ),
@@ -234,7 +234,9 @@ void main() {
       final card = tester.widget<Card>(find.byType(Card));
       expect(card.elevation, 1);
       expect(
-          card.margin, const EdgeInsets.symmetric(horizontal: 16, vertical: 8));
+        card.margin,
+        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      );
 
       // Act - expand to check elevation change
       await tester.tap(find.byType(InkWell));
