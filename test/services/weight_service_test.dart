@@ -2,11 +2,13 @@ import 'package:blood_pressure_monitor/models/health_data.dart';
 import 'package:blood_pressure_monitor/services/database_service.dart';
 import 'package:blood_pressure_monitor/services/weight_service.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
   late DatabaseService dbService;
   late WeightService weightService;
+  late SharedPreferences prefs;
 
   setUpAll(() {
     // Initialize FFI for in-memory database testing
@@ -15,6 +17,10 @@ void main() {
   });
 
   setUp(() async {
+    // Reset SharedPreferences before each test
+    SharedPreferences.setMockInitialValues({});
+    prefs = await SharedPreferences.getInstance();
+
     // Create in-memory database for each test
     final db = await databaseFactoryFfi.openDatabase(
       inMemoryDatabasePath,
@@ -69,11 +75,254 @@ void main() {
     );
 
     dbService = DatabaseService(testDatabase: db);
-    weightService = WeightService(dbService);
+    weightService = WeightService(dbService, prefs);
   });
 
   tearDown(() async {
     await dbService.close();
+  });
+
+  group('WeightService - Migration to SI Storage', () {
+    test('migrates lbs entries to kg', () async {
+      final db = await dbService.database;
+
+      // Insert entries in lbs directly to database (simulating legacy data)
+      await db.insert('WeightEntry', {
+        'profileId': 1,
+        'takenAt': DateTime(2025, 12, 27, 8, 0).toIso8601String(),
+        'localOffsetMinutes': 0,
+        'weightValue': 154.32, // Should convert to ~70 kg
+        'unit': 'lbs',
+        'source': 'manual',
+        'createdAt': DateTime.now().toIso8601String(),
+      });
+
+      await db.insert('WeightEntry', {
+        'profileId': 1,
+        'takenAt': DateTime(2025, 12, 28, 8, 0).toIso8601String(),
+        'localOffsetMinutes': 0,
+        'weightValue': 220.46, // Should convert to ~100 kg
+        'unit': 'lbs',
+        'source': 'manual',
+        'createdAt': DateTime.now().toIso8601String(),
+      });
+
+      // Run migration
+      await weightService.migrateToSIStorage();
+
+      // Verify all entries are now in kg
+      final results = await db.query('WeightEntry');
+      expect(results.length, 2);
+
+      for (final result in results) {
+        expect(result['unit'], 'kg');
+      }
+
+      // Verify values were converted correctly
+      expect(results[0]['weightValue'], closeTo(70.0, 0.1));
+      expect(results[1]['weightValue'], closeTo(100.0, 0.1));
+    });
+
+    test('migration is idempotent (safe to run multiple times)', () async {
+      final db = await dbService.database;
+
+      // Insert lbs entry
+      await db.insert('WeightEntry', {
+        'profileId': 1,
+        'takenAt': DateTime(2025, 12, 27, 8, 0).toIso8601String(),
+        'localOffsetMinutes': 0,
+        'weightValue': 154.32,
+        'unit': 'lbs',
+        'source': 'manual',
+        'createdAt': DateTime.now().toIso8601String(),
+      });
+
+      // Run migration twice
+      await weightService.migrateToSIStorage();
+      await weightService.migrateToSIStorage();
+
+      // Verify value is still correct (not double-converted)
+      final results = await db.query('WeightEntry');
+      expect(results.length, 1);
+      expect(results[0]['unit'], 'kg');
+      expect(results[0]['weightValue'], closeTo(70.0, 0.1));
+    });
+
+    test('migration preserves kg entries unchanged', () async {
+      final db = await dbService.database;
+
+      // Insert kg entry
+      await db.insert('WeightEntry', {
+        'profileId': 1,
+        'takenAt': DateTime(2025, 12, 27, 8, 0).toIso8601String(),
+        'localOffsetMinutes': 0,
+        'weightValue': 70.0,
+        'unit': 'kg',
+        'source': 'manual',
+        'createdAt': DateTime.now().toIso8601String(),
+      });
+
+      // Run migration
+      await weightService.migrateToSIStorage();
+
+      // Verify entry is unchanged
+      final results = await db.query('WeightEntry');
+      expect(results.length, 1);
+      expect(results[0]['unit'], 'kg');
+      expect(results[0]['weightValue'], 70.0);
+    });
+
+    test('migration handles mixed units correctly', () async {
+      final db = await dbService.database;
+
+      // Insert mixed entries
+      await db.insert('WeightEntry', {
+        'profileId': 1,
+        'takenAt': DateTime(2025, 12, 26, 8, 0).toIso8601String(),
+        'localOffsetMinutes': 0,
+        'weightValue': 154.32,
+        'unit': 'lbs',
+        'source': 'manual',
+        'createdAt': DateTime.now().toIso8601String(),
+      });
+
+      await db.insert('WeightEntry', {
+        'profileId': 1,
+        'takenAt': DateTime(2025, 12, 27, 8, 0).toIso8601String(),
+        'localOffsetMinutes': 0,
+        'weightValue': 75.0,
+        'unit': 'kg',
+        'source': 'manual',
+        'createdAt': DateTime.now().toIso8601String(),
+      });
+
+      await db.insert('WeightEntry', {
+        'profileId': 1,
+        'takenAt': DateTime(2025, 12, 28, 8, 0).toIso8601String(),
+        'localOffsetMinutes': 0,
+        'weightValue': 165.35,
+        'unit': 'lbs',
+        'source': 'manual',
+        'createdAt': DateTime.now().toIso8601String(),
+      });
+
+      // Run migration
+      await weightService.migrateToSIStorage();
+
+      // Verify all are now in kg
+      final results = await db.query('WeightEntry', orderBy: 'takenAt ASC');
+      expect(results.length, 3);
+
+      for (final result in results) {
+        expect(result['unit'], 'kg');
+      }
+
+      // Verify values
+      expect(
+        results[0]['weightValue'],
+        closeTo(70.0, 0.1),
+      ); // Converted from lbs
+      expect(results[1]['weightValue'], 75.0); // Already kg
+      expect(
+        results[2]['weightValue'],
+        closeTo(75.0, 0.1),
+      ); // Converted from lbs
+    });
+
+    test('migration marks completion in SharedPreferences', () async {
+      await weightService.migrateToSIStorage();
+
+      final completed = prefs.getBool('weight_si_migration_v1_completed');
+      expect(completed, true);
+    });
+
+    test('migration skips when already completed', () async {
+      final db = await dbService.database;
+
+      // Mark migration as complete
+      await prefs.setBool('weight_si_migration_v1_completed', true);
+
+      // Insert lbs entry (should NOT be migrated)
+      await db.insert('WeightEntry', {
+        'profileId': 1,
+        'takenAt': DateTime(2025, 12, 27, 8, 0).toIso8601String(),
+        'localOffsetMinutes': 0,
+        'weightValue': 154.32,
+        'unit': 'lbs',
+        'source': 'manual',
+        'createdAt': DateTime.now().toIso8601String(),
+      });
+
+      // Run migration (should skip)
+      await weightService.migrateToSIStorage();
+
+      // Verify entry was NOT converted (migration was skipped)
+      final results = await db.query('WeightEntry');
+      expect(results.length, 1);
+      expect(results[0]['unit'], 'lbs'); // Still in lbs
+      expect(results[0]['weightValue'], 154.32);
+    });
+  });
+
+  group('WeightService - SI Storage Enforcement', () {
+    test('createWeightEntry converts lbs to kg before storage', () async {
+      final entry = WeightEntry(
+        profileId: 1,
+        takenAt: DateTime(2025, 12, 29, 8, 0),
+        weightValue: 154.32,
+        unit: WeightUnit.lbs,
+      );
+
+      final created = await weightService.createWeightEntry(entry);
+
+      // Verify stored value is in kg
+      expect(created.unit, WeightUnit.kg);
+      expect(created.weightValue, closeTo(70.0, 0.1));
+
+      // Verify in database
+      final db = await dbService.database;
+      final results = await db.query('WeightEntry');
+      expect(results.length, 1);
+      expect(results[0]['unit'], 'kg');
+      expect(results[0]['weightValue'], closeTo(70.0, 0.1));
+    });
+
+    test('createWeightEntry preserves kg entries', () async {
+      final entry = WeightEntry(
+        profileId: 1,
+        takenAt: DateTime(2025, 12, 29, 8, 0),
+        weightValue: 70.0,
+        unit: WeightUnit.kg,
+      );
+
+      final created = await weightService.createWeightEntry(entry);
+
+      expect(created.unit, WeightUnit.kg);
+      expect(created.weightValue, 70.0);
+    });
+
+    test('updateWeightEntry converts lbs to kg before storage', () async {
+      final entry = WeightEntry(
+        profileId: 1,
+        takenAt: DateTime(2025, 12, 29, 8, 0),
+        weightValue: 70.0,
+        unit: WeightUnit.kg,
+      );
+
+      final created = await weightService.createWeightEntry(entry);
+
+      // Update with lbs value
+      final updated = await weightService.updateWeightEntry(
+        created.copyWith(
+          weightValue: 165.35,
+          unit: WeightUnit.lbs,
+        ),
+      );
+
+      // Verify stored value is in kg
+      expect(updated.unit, WeightUnit.kg);
+      expect(updated.weightValue, closeTo(75.0, 0.1));
+    });
   });
 
   group('WeightService - Create', () {
@@ -110,8 +359,9 @@ void main() {
       final created = await weightService.createWeightEntry(entry);
 
       expect(created.id, isNotNull);
-      expect(created.weightValue, equals(155.0));
-      expect(created.unit, equals(WeightUnit.lbs));
+      // Value should be converted to kg (~70.3 kg)
+      expect(created.weightValue, closeTo(70.3, 0.1));
+      expect(created.unit, WeightUnit.kg);
       expect(created.notes, isNull);
     });
 
