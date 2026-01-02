@@ -16,7 +16,7 @@ import 'package:blood_pressure_monitor/services/secure_password_manager.dart';
 class DatabaseService {
   static Database? _database;
   static const String _databaseName = 'blood_pressure.db';
-  static const int _databaseVersion = 5;
+  static const int _databaseVersion = 6;
 
   final Database? _testDatabase;
 
@@ -134,6 +134,10 @@ class DatabaseService {
         colorHex TEXT,
         avatarIcon TEXT,
         yearOfBirth INTEGER,
+        dateOfBirth TEXT,
+        patientId TEXT,
+        doctorName TEXT,
+        clinicName TEXT,
         preferredUnits TEXT NOT NULL DEFAULT 'mmHg',
         createdAt TEXT NOT NULL
       )
@@ -445,6 +449,14 @@ class DatabaseService {
     if (oldVersion < 5) {
       // Migration from v4 to v5: Remove Reminder feature
       await db.execute('DROP TABLE IF EXISTS Reminder');
+    }
+
+    if (oldVersion < 6) {
+      // Migration from v5 to v6: Add medical metadata to Profile table
+      await db.execute('ALTER TABLE Profile ADD COLUMN dateOfBirth TEXT');
+      await db.execute('ALTER TABLE Profile ADD COLUMN patientId TEXT');
+      await db.execute('ALTER TABLE Profile ADD COLUMN doctorName TEXT');
+      await db.execute('ALTER TABLE Profile ADD COLUMN clinicName TEXT');
     }
   }
 

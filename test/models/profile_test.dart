@@ -262,5 +262,270 @@ void main() {
 
       expect(profile.preferredUnits, 'kPa');
     });
+
+    group('Medical Metadata Tests', () {
+      final testDateOfBirth = DateTime.utc(1990, 5, 15);
+
+      test('Profile creation with all medical metadata fields', () {
+        final profile = Profile(
+          id: 12,
+          name: 'Medical User',
+          dateOfBirth: testDateOfBirth,
+          patientId: 'NHS-123456789',
+          doctorName: 'Dr. Jane Smith',
+          clinicName: 'City General Hospital',
+          preferredUnits: 'mmHg',
+          createdAt: testDate,
+        );
+
+        expect(profile.dateOfBirth, testDateOfBirth);
+        expect(profile.patientId, 'NHS-123456789');
+        expect(profile.doctorName, 'Dr. Jane Smith');
+        expect(profile.clinicName, 'City General Hospital');
+      });
+
+      test('Profile creation with null medical metadata fields', () {
+        final profile = Profile(
+          name: 'Basic User',
+          preferredUnits: 'mmHg',
+          createdAt: testDate,
+        );
+
+        expect(profile.dateOfBirth, isNull);
+        expect(profile.patientId, isNull);
+        expect(profile.doctorName, isNull);
+        expect(profile.clinicName, isNull);
+      });
+
+      test('toMap serialization includes medical metadata', () {
+        final profile = Profile(
+          id: 13,
+          name: 'Test Patient',
+          dateOfBirth: testDateOfBirth,
+          patientId: 'MRN-987654',
+          doctorName: 'Dr. John Doe',
+          clinicName: 'Memorial Hospital',
+          preferredUnits: 'mmHg',
+          createdAt: testDate,
+        );
+
+        final map = profile.toMap();
+
+        expect(map['dateOfBirth'], '1990-05-15');
+        expect(map['patientId'], 'MRN-987654');
+        expect(map['doctorName'], 'Dr. John Doe');
+        expect(map['clinicName'], 'Memorial Hospital');
+      });
+
+      test('toMap serialization handles null medical metadata', () {
+        final profile = Profile(
+          name: 'Null Fields',
+          preferredUnits: 'mmHg',
+          createdAt: testDate,
+        );
+
+        final map = profile.toMap();
+
+        expect(map['dateOfBirth'], isNull);
+        expect(map['patientId'], isNull);
+        expect(map['doctorName'], isNull);
+        expect(map['clinicName'], isNull);
+      });
+
+      test('fromMap deserialization with medical metadata', () {
+        final map = {
+          'id': 14,
+          'name': 'Patient From Map',
+          'dateOfBirth': '1990-05-15',
+          'patientId': 'PAT-456',
+          'doctorName': 'Dr. Sarah Wilson',
+          'clinicName': 'St. Mary\'s Clinic',
+          'preferredUnits': 'mmHg',
+          'createdAt': testDate.toIso8601String(),
+        };
+
+        final profile = Profile.fromMap(map);
+
+        expect(profile.dateOfBirth, testDateOfBirth);
+        expect(profile.patientId, 'PAT-456');
+        expect(profile.doctorName, 'Dr. Sarah Wilson');
+        expect(profile.clinicName, 'St. Mary\'s Clinic');
+      });
+
+      test('fromMap deserialization with null medical metadata', () {
+        final map = {
+          'id': 15,
+          'name': 'No Medical Data',
+          'dateOfBirth': null,
+          'patientId': null,
+          'doctorName': null,
+          'clinicName': null,
+          'preferredUnits': 'mmHg',
+          'createdAt': testDate.toIso8601String(),
+        };
+
+        final profile = Profile.fromMap(map);
+
+        expect(profile.dateOfBirth, isNull);
+        expect(profile.patientId, isNull);
+        expect(profile.doctorName, isNull);
+        expect(profile.clinicName, isNull);
+      });
+
+      test('copyWith updates medical metadata fields', () {
+        final original = Profile(
+          id: 16,
+          name: 'Original Patient',
+          dateOfBirth: testDateOfBirth,
+          patientId: 'OLD-123',
+          doctorName: 'Dr. Old',
+          clinicName: 'Old Clinic',
+          preferredUnits: 'mmHg',
+          createdAt: testDate,
+        );
+
+        final newDate = DateTime(1985, 10, 20);
+        final updated = original.copyWith(
+          dateOfBirth: newDate,
+          patientId: 'NEW-456',
+          doctorName: 'Dr. New',
+          clinicName: 'New Hospital',
+        );
+
+        expect(updated.dateOfBirth, newDate);
+        expect(updated.patientId, 'NEW-456');
+        expect(updated.doctorName, 'Dr. New');
+        expect(updated.clinicName, 'New Hospital');
+        // Verify other fields remain unchanged
+        expect(updated.id, original.id);
+        expect(updated.name, original.name);
+      });
+
+      test('equality considers medical metadata fields', () {
+        final profile1 = Profile(
+          id: 17,
+          name: 'Equal Medical',
+          dateOfBirth: testDateOfBirth,
+          patientId: 'PAT-123',
+          doctorName: 'Dr. Smith',
+          clinicName: 'Clinic A',
+          preferredUnits: 'mmHg',
+          createdAt: testDate,
+        );
+
+        final profile2 = Profile(
+          id: 17,
+          name: 'Equal Medical',
+          dateOfBirth: testDateOfBirth,
+          patientId: 'PAT-123',
+          doctorName: 'Dr. Smith',
+          clinicName: 'Clinic A',
+          preferredUnits: 'mmHg',
+          createdAt: testDate,
+        );
+
+        expect(profile1, equals(profile2));
+        expect(profile1.hashCode, equals(profile2.hashCode));
+      });
+
+      test('inequality when medical metadata differs', () {
+        final base = Profile(
+          id: 18,
+          name: 'Base',
+          dateOfBirth: testDateOfBirth,
+          patientId: 'PAT-100',
+          doctorName: 'Dr. Base',
+          clinicName: 'Base Clinic',
+          preferredUnits: 'mmHg',
+          createdAt: testDate,
+        );
+
+        final diffDob = base.copyWith(dateOfBirth: DateTime(1991, 1, 1));
+        final diffPatientId = base.copyWith(patientId: 'PAT-999');
+        final diffDoctor = base.copyWith(doctorName: 'Dr. Different');
+        final diffClinic = base.copyWith(clinicName: 'Different Clinic');
+
+        expect(base, isNot(equals(diffDob)));
+        expect(base, isNot(equals(diffPatientId)));
+        expect(base, isNot(equals(diffDoctor)));
+        expect(base, isNot(equals(diffClinic)));
+      });
+
+      test('round-trip serialization preserves medical metadata', () {
+        final original = Profile(
+          id: 19,
+          name: 'Round Trip Medical',
+          dateOfBirth: testDateOfBirth,
+          patientId: 'RT-456',
+          doctorName: 'Dr. Round',
+          clinicName: 'Trip Hospital',
+          yearOfBirth: 1990,
+          preferredUnits: 'kPa',
+          createdAt: testDate,
+        );
+
+        final map = original.toMap();
+        final restored = Profile.fromMap(map);
+
+        expect(restored, equals(original));
+        expect(restored.dateOfBirth, original.dateOfBirth);
+        expect(restored.patientId, original.patientId);
+        expect(restored.doctorName, original.doctorName);
+        expect(restored.clinicName, original.clinicName);
+      });
+
+      test('copyWith can explicitly set medical metadata to null', () {
+        final original = Profile(
+          id: 20,
+          name: 'Clear Medical Data',
+          dateOfBirth: testDateOfBirth,
+          patientId: 'PAT-999',
+          doctorName: 'Dr. Original',
+          clinicName: 'Original Clinic',
+          preferredUnits: 'mmHg',
+          createdAt: testDate,
+        );
+
+        // Clear all medical metadata fields
+        final cleared = original.copyWith(
+          dateOfBirth: null,
+          patientId: null,
+          doctorName: null,
+          clinicName: null,
+        );
+
+        expect(cleared.id, original.id);
+        expect(cleared.name, original.name);
+        expect(cleared.dateOfBirth, isNull);
+        expect(cleared.patientId, isNull);
+        expect(cleared.doctorName, isNull);
+        expect(cleared.clinicName, isNull);
+        expect(cleared.preferredUnits, original.preferredUnits);
+        expect(cleared.createdAt, original.createdAt);
+      });
+
+      test('copyWith preserves unspecified medical metadata', () {
+        final original = Profile(
+          id: 21,
+          name: 'Partial Update',
+          dateOfBirth: testDateOfBirth,
+          patientId: 'PAT-123',
+          doctorName: 'Dr. Keep',
+          clinicName: 'Keep Clinic',
+          preferredUnits: 'mmHg',
+          createdAt: testDate,
+        );
+
+        // Update only one field, others should remain
+        final updated = original.copyWith(
+          patientId: 'PAT-NEW',
+        );
+
+        expect(updated.dateOfBirth, original.dateOfBirth);
+        expect(updated.patientId, 'PAT-NEW');
+        expect(updated.doctorName, original.doctorName);
+        expect(updated.clinicName, original.clinicName);
+      });
+    });
   });
 }
