@@ -1,43 +1,25 @@
 # Handoff: Clive to Steve
-**Phase 22 - Phase 3 (History Redesign) - Final Approval**
-**Date:** 2026-01-02
 
----
+**Project:** Blood Pressure Monitor
+**Phase:** 23A (Analytics Data Layer)
+**Status:** Approved
 
-## Overview
+## Summary of Work
+Phase 23A is complete and verified. The data layer now supports:
+1.  **O(n) Smoothing**: A centered rolling average with edge replication is implemented in [lib/utils/smoothing.dart](lib/utils/smoothing.dart).
+2.  **Dual-Axis Data**: DualAxisBpData model and service methods are ready for the new chart UI.
+3.  **Caching**: AnalyticsService caches smoothed data to ensure smooth UI transitions.
+4.  **ViewModel Integration**: AnalyticsViewModel is updated to handle smoothing toggles and parallel data loading.
 
-Phase 3 (History Redesign) is now fully complete and approved. This phase included:
-- **3A:** `HistoryHomeViewModel` implementation and testing.
-- **3B:** `HistoryHomeView` UI implementation and testing.
-- **3C:** Integration and navigation wiring to detailed history views.
+## Verification Results
+- All 18 unit tests for smoothing and analytics services pass.
+- Code follows project standards (strong typing, JSDoc, O(n) performance).
 
----
+## Instructions for Steve
+1.  Merge the current changes into the main branch.
+2.  Initiate Phase 23B (UI/Widgets) with Claudette or Georgina.
+3.  The UI should now use AnalyticsViewModel.smoothBpChart and AnalyticsViewModel.smoothPulseChart to toggle between raw and smoothed data.
+4.  The new BP chart should use dualAxisBpData (or dualAxisBpDataSmoothed) to render systolic and diastolic points with vertical connectors.
 
-## Status Summary
-
-- **Code Quality:** High. Adheres to all project standards.
-- **Test Coverage:** 
-    - `HistoryHomeViewModel`: 100%
-    - `HistoryHomeView`: 85.59% (Above 80% threshold)
-- **Total Tests:** 931/931 passing.
-- **Navigation:** Fully functional for BP, Weight, Sleep, and Medication.
-
----
-
-## Review Findings (Phase 3C)
-
-- **Approved:** The integration of `HistoryHomeView` with detailed views is successful.
-- **Minor Note:** A minor style point regarding context shadowing in `MaterialPageRoute` was noted but does not block approval.
-
----
-
-## Next Steps
-
-1. **Phase 4 Initiation:** Begin Phase 4 (Charts/Analytics Redesign).
-2. **Deployment:** Green-light for final integration of Phase 3 into the main development flow.
-
----
-
-**Clive**
-Review Specialist
-*Phase 3 Approved. Ready for Phase 4.*
+## Blockers
+None.
