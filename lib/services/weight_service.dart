@@ -20,6 +20,8 @@ class WeightService {
   /// [prefs] is optional for testing, but required for production to support migration.
   WeightService(this._databaseService, [this._prefs]);
 
+  /// Migrates all existing weight entries from lbs to kg storage.
+  ///
   /// - Is idempotent (safe to run multiple times)
   /// - Logs completion to SharedPreferences
   ///
@@ -75,7 +77,7 @@ class WeightService {
       // Mark migration as complete
       await _prefs!.setBool(_migrationKey, true);
     } catch (e) {
-      // Log error but don't throw - allow app to continue
+      // Log error and rethrow so the caller can decide how to handle it.
       // In production, would use proper logging
       rethrow;
     }
