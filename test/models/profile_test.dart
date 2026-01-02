@@ -264,7 +264,7 @@ void main() {
     });
 
     group('Medical Metadata Tests', () {
-      final testDateOfBirth = DateTime(1990, 5, 15);
+      final testDateOfBirth = DateTime.utc(1990, 5, 15);
 
       test('Profile creation with all medical metadata fields', () {
         final profile = Profile(
@@ -311,7 +311,7 @@ void main() {
 
         final map = profile.toMap();
 
-        expect(map['dateOfBirth'], testDateOfBirth.toIso8601String());
+        expect(map['dateOfBirth'], '1990-05-15');
         expect(map['patientId'], 'MRN-987654');
         expect(map['doctorName'], 'Dr. John Doe');
         expect(map['clinicName'], 'Memorial Hospital');
@@ -336,7 +336,7 @@ void main() {
         final map = {
           'id': 14,
           'name': 'Patient From Map',
-          'dateOfBirth': testDateOfBirth.toIso8601String(),
+          'dateOfBirth': '1990-05-15',
           'patientId': 'PAT-456',
           'doctorName': 'Dr. Sarah Wilson',
           'clinicName': 'St. Mary\'s Clinic',

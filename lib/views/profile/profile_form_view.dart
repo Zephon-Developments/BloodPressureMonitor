@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:blood_pressure_monitor/models/profile.dart';
 import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart';
@@ -176,13 +177,21 @@ class _ProfileFormViewState extends State<ProfileFormView> {
               onTap: () async {
                 final picked = await showDatePicker(
                   context: context,
-                  initialDate: _selectedDateOfBirth ?? DateTime.now(),
+                  initialDate: _selectedDateOfBirth ??
+                      DateTime.now().subtract(const Duration(days: 365)),
                   firstDate: DateTime(1900),
-                  lastDate: DateTime.now(),
+                  lastDate: DateTime.now().subtract(const Duration(days: 365)),
                   helpText: 'Select Date of Birth',
                 );
                 if (picked != null) {
-                  setState(() => _selectedDateOfBirth = picked);
+                  // Normalize to UTC midnight to avoid timezone issues
+                  setState(
+                    () => _selectedDateOfBirth = DateTime.utc(
+                      picked.year,
+                      picked.month,
+                      picked.day,
+                    ),
+                  );
                 }
               },
               child: InputDecorator(
@@ -194,7 +203,7 @@ class _ProfileFormViewState extends State<ProfileFormView> {
                 ),
                 child: Text(
                   _selectedDateOfBirth != null
-                      ? '${_selectedDateOfBirth!.month}/${_selectedDateOfBirth!.day}/${_selectedDateOfBirth!.year}'
+                      ? DateFormat.yMMMd().format(_selectedDateOfBirth!)
                       : 'Not specified',
                   style: TextStyle(
                     color: _selectedDateOfBirth != null

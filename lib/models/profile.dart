@@ -72,7 +72,7 @@ class Profile {
       avatarIcon: map['avatarIcon'] as String?,
       yearOfBirth: map['yearOfBirth'] as int?,
       dateOfBirth: map['dateOfBirth'] != null
-          ? DateTime.parse(map['dateOfBirth'] as String)
+          ? _parseDateOnly(map['dateOfBirth'] as String)
           : null,
       patientId: map['patientId'] as String?,
       doctorName: map['doctorName'] as String?,
@@ -90,7 +90,7 @@ class Profile {
       'colorHex': colorHex,
       'avatarIcon': avatarIcon,
       'yearOfBirth': yearOfBirth,
-      'dateOfBirth': dateOfBirth?.toIso8601String(),
+      'dateOfBirth': dateOfBirth != null ? _formatDateOnly(dateOfBirth!) : null,
       'patientId': patientId,
       'doctorName': doctorName,
       'clinicName': clinicName,
@@ -193,5 +193,36 @@ class Profile {
   @override
   String toString() {
     return 'Profile(id: $id, name: $name, units: $preferredUnits)';
+  }
+
+  /// Parses a date-only string (YYYY-MM-DD) to a DateTime normalized to UTC midnight.
+  ///
+  /// This ensures timezone-safe handling of dates of birth by always storing
+  /// them as UTC midnight, eliminating edge cases where timezone conversions
+  /// could shift the date by +/- 1 day.
+  static DateTime _parseDateOnly(String dateString) {
+    // Parse YYYY-MM-DD format and create UTC midnight DateTime
+    final parts = dateString.split('-');
+    if (parts.length != 3) {
+      throw FormatException(
+        'Invalid date format: $dateString. Expected YYYY-MM-DD',
+      );
+    }
+    return DateTime.utc(
+      int.parse(parts[0]), // year
+      int.parse(parts[1]), // month
+      int.parse(parts[2]), // day
+    );
+  }
+
+  /// Formats a DateTime as a date-only string (YYYY-MM-DD).
+  ///
+  /// Extracts only the date portion, ignoring time and timezone information.
+  static String _formatDateOnly(DateTime date) {
+    // Format as YYYY-MM-DD using UTC components to avoid timezone shifts
+    final utcDate = date.toUtc();
+    return '${utcDate.year.toString().padLeft(4, '0')}-'
+        '${utcDate.month.toString().padLeft(2, '0')}-'
+        '${utcDate.day.toString().padLeft(2, '0')}';
   }
 }
