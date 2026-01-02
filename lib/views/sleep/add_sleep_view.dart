@@ -29,6 +29,11 @@ class _AddSleepViewState extends State<AddSleepView> {
   TimeOfDay _endTime = const TimeOfDay(hour: 6, minute: 30);
   int? _quality;
   bool _submitted = false;
+  bool _isDetailedMode = false;
+  int _deepMinutes = 0;
+  int _lightMinutes = 0;
+  int _remMinutes = 0;
+  int _awakeMinutes = 0;
 
   bool get _isEditing => widget.editingEntry != null;
 
@@ -96,6 +101,18 @@ class _AddSleepViewState extends State<AddSleepView> {
       _endTime = TimeOfDay.fromDateTime(ended);
       _quality = editing.quality;
       _notesController.text = editing.notes ?? '';
+
+      // Load detailed metrics if available
+      if (editing.deepMinutes != null ||
+          editing.lightMinutes != null ||
+          editing.remMinutes != null ||
+          editing.awakeMinutes != null) {
+        _isDetailedMode = true;
+        _deepMinutes = editing.deepMinutes ?? 0;
+        _lightMinutes = editing.lightMinutes ?? 0;
+        _remMinutes = editing.remMinutes ?? 0;
+        _awakeMinutes = editing.awakeMinutes ?? 0;
+      }
     }
   }
 
@@ -183,6 +200,60 @@ class _AddSleepViewState extends State<AddSleepView> {
                   hint: const Text('Optional'),
                 ),
                 const SizedBox(height: 16),
+                SwitchListTile(
+                  title: const Text('Detailed Sleep Tracking'),
+                  subtitle: const Text('Track sleep stages (REM, Light, Deep)'),
+                  value: _isDetailedMode,
+                  onChanged: (value) => setState(() => _isDetailedMode = value),
+                ),
+                if (_isDetailedMode) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    'Sleep Stages',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Total: ${_deepMinutes + _lightMinutes + _remMinutes + _awakeMinutes} min',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: 12),
+                  _buildStageSlider(
+                    label: 'Deep Sleep',
+                    value: _deepMinutes,
+                    max: durationMinutes?.toDouble() ?? 480,
+                    onChanged: (value) =>
+                        setState(() => _deepMinutes = value.toInt()),
+                    color: Colors.indigo,
+                  ),
+                  _buildStageSlider(
+                    label: 'Light Sleep',
+                    value: _lightMinutes,
+                    max: durationMinutes?.toDouble() ?? 480,
+                    onChanged: (value) =>
+                        setState(() => _lightMinutes = value.toInt()),
+                    color: Colors.blue,
+                  ),
+                  _buildStageSlider(
+                    label: 'REM Sleep',
+                    value: _remMinutes,
+                    max: durationMinutes?.toDouble() ?? 480,
+                    onChanged: (value) =>
+                        setState(() => _remMinutes = value.toInt()),
+                    color: Colors.purple,
+                  ),
+                  _buildStageSlider(
+                    label: 'Awake',
+                    value: _awakeMinutes,
+                    max: durationMinutes?.toDouble() ?? 480,
+                    onChanged: (value) =>
+                        setState(() => _awakeMinutes = value.toInt()),
+                    color: Colors.orange,
+                  ),
+                ],
+                const SizedBox(height: 16),
                 CustomTextField(
                   label: 'Notes',
                   controller: _notesController,
@@ -232,6 +303,45 @@ class _AddSleepViewState extends State<AddSleepView> {
       title: Text(title),
       subtitle: Text(subtitle),
       trailing: const Icon(Icons.edit),
+    );
+  }
+
+  Widget _buildStageSlider({
+    required String label,
+    required int value,
+    required double max,
+    required ValueChanged<double> onChanged,
+    required Color color,
+  }) {
+    final hours = value ~/ 60;
+    final minutes = value % 60;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+            Text(
+              '${hours}h ${minutes}m',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
+            ),
+          ],
+        ),
+        Slider(
+          value: value.toDouble(),
+          max: max,
+          divisions: max.toInt(),
+          onChanged: onChanged,
+          activeColor: color,
+        ),
+      ],
     );
   }
 
@@ -326,12 +436,32 @@ class _AddSleepViewState extends State<AddSleepView> {
       return;
     }
 
+    // Validate detailed mode stages
+    if (_isDetailedMode) {
+      final totalStages =
+          _deepMinutes + _lightMinutes + _remMinutes + _awakeMinutes;
+      if (totalStages > duration) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Sleep stages total ($totalStages min) exceeds sleep duration ($duration min)',
+            ),
+          ),
+        );
+        return;
+      }
+    }
+
     final viewModel = context.read<SleepViewModel>();
     final error = await viewModel.saveSleepEntry(
       id: widget.editingEntry?.id,
       start: start,
       end: end,
       quality: _quality,
+      deepMinutes: _isDetailedMode ? _deepMinutes : null,
+      lightMinutes: _isDetailedMode ? _lightMinutes : null,
+      remMinutes: _isDetailedMode ? _remMinutes : null,
+      awakeMinutes: _isDetailedMode ? _awakeMinutes : null,
       notes: _notesController.text,
     );
 
