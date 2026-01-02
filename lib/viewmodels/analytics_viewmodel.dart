@@ -31,10 +31,15 @@ class AnalyticsViewModel extends ChangeNotifier {
   TimeRange _selectedRange = TimeRange.thirtyDays;
   HealthStats? _stats;
   ChartDataSet? _chartData;
+  ChartDataSet? _chartDataSmoothed;
+  DualAxisBpData? _dualAxisBpData;
+  DualAxisBpData? _dualAxisBpDataSmoothed;
   SleepCorrelationData? _sleepCorrelation;
   SleepStageSeries? _sleepStages;
   bool _isLoading = false;
   bool _showSleepOverlay = false;
+  bool _smoothBpChart = false;
+  bool _smoothPulseChart = false;
   String? _error;
   DateTime? _lastUpdated;
 
@@ -47,8 +52,14 @@ class AnalyticsViewModel extends ChangeNotifier {
   /// Callback invoked when the active profile changes.
   void _onProfileChanged() {
     invalidateCache();
+    _analyticsService.invalidateSmoothedCache(
+      _activeProfileViewModel.activeProfileId,
+    );
     _stats = null;
     _chartData = null;
+    _chartDataSmoothed = null;
+    _dualAxisBpData = null;
+    _dualAxisBpDataSmoothed = null;
     _sleepCorrelation = null;
     _sleepStages = null;
     _error = null;
@@ -64,6 +75,15 @@ class AnalyticsViewModel extends ChangeNotifier {
 
   /// Chart dataset for the selected range.
   ChartDataSet? get chartData => _chartData;
+
+  /// Smoothed chart dataset for the selected range.
+  ChartDataSet? get chartDataSmoothed => _chartDataSmoothed;
+
+  /// Dual-axis BP data for the selected range.
+  DualAxisBpData? get dualAxisBpData => _dualAxisBpData;
+
+  /// Smoothed dual-axis BP data for the selected range.
+  DualAxisBpData? get dualAxisBpDataSmoothed => _dualAxisBpDataSmoothed;
 
   /// Sleep correlation metadata when overlay is enabled.
   SleepCorrelationData? get sleepCorrelation => _sleepCorrelation;
@@ -83,6 +103,12 @@ class AnalyticsViewModel extends ChangeNotifier {
   /// Whether the sleep overlay is visible.
   bool get showSleepOverlay => _showSleepOverlay;
 
+  /// Whether BP chart smoothing is enabled.
+  bool get smoothBpChart => _smoothBpChart;
+
+  /// Whether pulse chart smoothing is enabled.
+  bool get smoothPulseChart => _smoothPulseChart;
+
   /// Timestamp for the last successful refresh.
   DateTime? get lastUpdated => _lastUpdated;
 
@@ -99,6 +125,23 @@ class AnalyticsViewModel extends ChangeNotifier {
   /// Forces cached data to be cleared for all ranges.
   void invalidateCache() {
     _rangeCache.clear();
+  }
+
+  /// Toggles BP chart smoothing and reloads dual-axis data if needed.
+  Future<void> toggleBpSmoothing() async {
+    _smoothBpChart = !_smoothBpChart;
+    notifyListeners();
+
+    // Reload dual-axis BP data with new smoothing state
+    if (_dualAxisBpData != null) {
+      await _loadDualAxisBpData();
+    }
+  }
+
+  /// Toggles pulse chart smoothing.
+  void togglePulseSmoothing() {
+    _smoothPulseChart = !_smoothPulseChart;
+    notifyListeners();
   }
 
   /// Toggles the sleep overlay, fetching correlation data when necessary.
@@ -163,6 +206,26 @@ class AnalyticsViewModel extends ChangeNotifier {
           endDate: end,
           range: range,
         ),
+        _analyticsService.getChartDataSmoothed(
+          profileId: _activeProfileViewModel.activeProfileId,
+          startDate: start,
+          endDate: end,
+          range: range,
+        ),
+        _analyticsService.getDualAxisBpData(
+          profileId: _activeProfileViewModel.activeProfileId,
+          startDate: start,
+          endDate: end,
+          range: range,
+          smoothed: false,
+        ),
+        _analyticsService.getDualAxisBpData(
+          profileId: _activeProfileViewModel.activeProfileId,
+          startDate: start,
+          endDate: end,
+          range: range,
+          smoothed: true,
+        ),
       ];
 
       if (_showSleepOverlay) {
@@ -186,13 +249,19 @@ class AnalyticsViewModel extends ChangeNotifier {
       final results = await Future.wait(fetches);
       final stats = results[0] as HealthStats;
       final chart = results[1] as ChartDataSet;
+      final chartSmoothed = results[2] as ChartDataSet;
+      final dualAxisBp = results[3] as DualAxisBpData;
+      final dualAxisBpSmoothed = results[4] as DualAxisBpData;
       final sleepCorrelation =
-          _showSleepOverlay ? results[2] as SleepCorrelationData : null;
+          _showSleepOverlay ? results[5] as SleepCorrelationData : null;
       final sleepStages =
-          _showSleepOverlay ? results[3] as SleepStageSeries : null;
+          _showSleepOverlay ? results[6] as SleepStageSeries : null;
 
       _stats = stats;
       _chartData = chart;
+      _chartDataSmoothed = chartSmoothed;
+      _dualAxisBpData = dualAxisBp;
+      _dualAxisBpDataSmoothed = dualAxisBpSmoothed;
       _sleepCorrelation = sleepCorrelation;
       _sleepStages = sleepStages;
       _lastUpdated = now;
@@ -201,6 +270,9 @@ class AnalyticsViewModel extends ChangeNotifier {
         timestamp: now,
         stats: stats,
         chartData: chart,
+        chartDataSmoothed: chartSmoothed,
+        dualAxisBpData: dualAxisBp,
+        dualAxisBpDataSmoothed: dualAxisBpSmoothed,
         sleepCorrelation: sleepCorrelation,
         sleepStages: sleepStages,
       );
@@ -215,9 +287,57 @@ class AnalyticsViewModel extends ChangeNotifier {
   void _applyCache(_RangeCacheEntry cache) {
     _stats = cache.stats;
     _chartData = cache.chartData;
+    _chartDataSmoothed = cache.chartDataSmoothed;
+    _dualAxisBpData = cache.dualAxisBpData;
+    _dualAxisBpDataSmoothed = cache.dualAxisBpDataSmoothed;
     _sleepCorrelation = _showSleepOverlay ? cache.sleepCorrelation : null;
     _sleepStages = _showSleepOverlay ? cache.sleepStages : null;
     _lastUpdated = cache.timestamp;
+  }
+
+  Future<void> _loadDualAxisBpData() async {
+    final range = _selectedRange;
+    final DateTime anchor = _clock().toUtc();
+    final (start, end) = range.toDateRange(anchor: anchor);
+
+    try {
+      _dualAxisBpData = await _analyticsService.getDualAxisBpData(
+        profileId: _activeProfileViewModel.activeProfileId,
+        startDate: start,
+        endDate: end,
+        range: range,
+        smoothed: false,
+      );
+      _dualAxisBpDataSmoothed = await _analyticsService.getDualAxisBpData(
+        profileId: _activeProfileViewModel.activeProfileId,
+        startDate: start,
+        endDate: end,
+        range: range,
+        smoothed: true,
+      );
+
+      // Update the range cache to prevent stale data
+      final cache = _rangeCache[range];
+      if (cache != null) {
+        _rangeCache[range] = _RangeCacheEntry(
+          timestamp: cache.timestamp,
+          stats: cache.stats,
+          chartData: cache.chartData,
+          chartDataSmoothed: cache.chartDataSmoothed,
+          dualAxisBpData: _dualAxisBpData!,
+          dualAxisBpDataSmoothed: _dualAxisBpDataSmoothed!,
+          sleepCorrelation: cache.sleepCorrelation,
+          sleepStages: cache.sleepStages,
+        );
+      }
+
+      notifyListeners();
+    } catch (error, stackTrace) {
+      debugPrint('Failed to load dual-axis BP data: $error');
+      debugPrint('$stackTrace');
+      _error = 'Failed to load dual-axis BP data: $error';
+      notifyListeners();
+    }
   }
 }
 
@@ -226,6 +346,9 @@ class _RangeCacheEntry {
     required this.timestamp,
     required this.stats,
     required this.chartData,
+    required this.chartDataSmoothed,
+    required this.dualAxisBpData,
+    required this.dualAxisBpDataSmoothed,
     this.sleepCorrelation,
     this.sleepStages,
   });
@@ -233,6 +356,9 @@ class _RangeCacheEntry {
   final DateTime timestamp;
   final HealthStats stats;
   final ChartDataSet chartData;
+  final ChartDataSet chartDataSmoothed;
+  final DualAxisBpData dualAxisBpData;
+  final DualAxisBpData dualAxisBpDataSmoothed;
   final SleepCorrelationData? sleepCorrelation;
   final SleepStageSeries? sleepStages;
 }
