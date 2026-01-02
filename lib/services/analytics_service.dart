@@ -209,9 +209,10 @@ class AnalyticsService {
 
   /// Returns a smoothed version of chart data using rolling average.
   ///
-  /// Applies 10% window rolling average to systolic, diastolic, and pulse
-  /// series. Timestamps are preserved. The result is cached per profile and
-  /// range combination.
+  /// Applies centered rolling average with 10% window size to systolic,
+  /// diastolic, and pulse series. Edge values are replicated to maintain
+  /// window size consistency. Timestamps are preserved. The result is cached
+  /// per profile and range combination.
   Future<ChartDataSet> getChartDataSmoothed({
     required int profileId,
     required TimeRange range,
