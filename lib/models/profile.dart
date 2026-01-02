@@ -100,33 +100,60 @@ class Profile {
   }
 
   /// Creates a copy of this [Profile] with the given fields replaced.
+  ///
+  /// To explicitly set a nullable field to null, pass the special value
+  /// `Object()` is not used. Instead, if a parameter is provided (even if null),
+  /// it will be used. Only omitted parameters will preserve existing values.
+  ///
+  /// For nullable fields that need to be cleared, you can pass `null` directly
+  /// when calling this method with named parameters.
   Profile copyWith({
-    int? id,
-    String? name,
-    String? colorHex,
-    String? avatarIcon,
-    int? yearOfBirth,
-    DateTime? dateOfBirth,
-    String? patientId,
-    String? doctorName,
-    String? clinicName,
-    String? preferredUnits,
-    DateTime? createdAt,
+    Object? id = _undefined,
+    Object? name = _undefined,
+    Object? colorHex = _undefined,
+    Object? avatarIcon = _undefined,
+    Object? yearOfBirth = _undefined,
+    Object? dateOfBirth = _undefined,
+    Object? patientId = _undefined,
+    Object? doctorName = _undefined,
+    Object? clinicName = _undefined,
+    Object? preferredUnits = _undefined,
+    Object? createdAt = _undefined,
   }) {
     return Profile(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      colorHex: colorHex ?? this.colorHex,
-      avatarIcon: avatarIcon ?? this.avatarIcon,
-      yearOfBirth: yearOfBirth ?? this.yearOfBirth,
-      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
-      patientId: patientId ?? this.patientId,
-      doctorName: doctorName ?? this.doctorName,
-      clinicName: clinicName ?? this.clinicName,
-      preferredUnits: preferredUnits ?? this.preferredUnits,
-      createdAt: createdAt ?? this.createdAt,
+      id: identical(id, _undefined) ? this.id : id as int?,
+      name: identical(name, _undefined) ? this.name : name as String,
+      colorHex:
+          identical(colorHex, _undefined) ? this.colorHex : colorHex as String?,
+      avatarIcon: identical(avatarIcon, _undefined)
+          ? this.avatarIcon
+          : avatarIcon as String?,
+      yearOfBirth: identical(yearOfBirth, _undefined)
+          ? this.yearOfBirth
+          : yearOfBirth as int?,
+      dateOfBirth: identical(dateOfBirth, _undefined)
+          ? this.dateOfBirth
+          : dateOfBirth as DateTime?,
+      patientId: identical(patientId, _undefined)
+          ? this.patientId
+          : patientId as String?,
+      doctorName: identical(doctorName, _undefined)
+          ? this.doctorName
+          : doctorName as String?,
+      clinicName: identical(clinicName, _undefined)
+          ? this.clinicName
+          : clinicName as String?,
+      preferredUnits: identical(preferredUnits, _undefined)
+          ? this.preferredUnits
+          : preferredUnits as String,
+      createdAt: identical(createdAt, _undefined)
+          ? this.createdAt
+          : createdAt as DateTime,
     );
   }
+
+  /// Sentinel value for [copyWith] to distinguish between null and omitted parameters.
+  static const _undefined = Object();
 
   @override
   bool operator ==(Object other) {
