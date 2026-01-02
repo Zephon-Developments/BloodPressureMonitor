@@ -1,264 +1,185 @@
-# Steve → User: Phase 18 Deployment Complete
+# Handoff: Steve to User
 
-**Project:** Blood Pressure Monitor - HyperTrack
-**Phase:** 18 (Medication Groups & Unit Management)
-**Date:** January 1, 2026
-**Status:** ✅ READY FOR PR MERGE
-
-## Deployment Summary
-
-Phase 18 has been successfully integrated into the feature branch `feature/phase-18-medication-grouping-ui` and is ready for Pull Request merge to `main`.
-
-### Implementation Status
-
-**Branch:** `feature/phase-18-medication-grouping-ui`
-**Commit:** `58e853b - feat: Phase 18 - Medication Groups & Unit Management`
-
-### Quality Metrics
-
-| Metric | Status | Details |
-|--------|--------|---------|
-| Tests Passing | ✅ 844/844 | 100% pass rate |
-| Analyzer | ✅ Clean | Zero errors, warnings, or infos |
-| Code Coverage | ✅ ≥80% | All new components meet threshold |
-| Documentation | ✅ Complete | Full DartDoc for public APIs |
-
-### Components Delivered
-
-**New Views:**
-- [lib/views/medication/medication_group_list_view.dart](lib/views/medication/medication_group_list_view.dart) - Group management UI
-- [lib/views/medication/add_edit_medication_group_view.dart](lib/views/medication/add_edit_medication_group_view.dart) - Group creation/editing form
-
-**New Widgets:**
-- [lib/widgets/medication/multi_select_medication_picker.dart](lib/widgets/medication/multi_select_medication_picker.dart) - Multi-select dialog
-- [lib/widgets/medication/unit_combo_box.dart](lib/widgets/medication/unit_combo_box.dart) - Unit dropdown with custom entry
-
-**Modified Components:**
-- [lib/views/medication/log_intake_sheet.dart](lib/views/medication/log_intake_sheet.dart) - Added group logging support
-- [lib/widgets/medication/medication_picker_dialog.dart](lib/widgets/medication/medication_picker_dialog.dart) - Integrated group selection
-
-**Test Coverage:**
-- 67 new/modified tests across 5 test files
-- 7 ViewModel tests for `MedicationGroupViewModel`
-- 60 Widget tests for UI components
-
-### Features Delivered
-
-1. **Medication Group Management**
-   - Create, edit, and delete medication groups
-   - Profile-isolated group storage
-   - Swipe-to-delete with confirmation dialogs
-
-2. **Quick Group Logging**
-   - Log entire medication groups atomically
-   - Unified timestamp for all medications in a group
-   - Integration with existing intake logging flow
-
-3. **Enhanced Unit Management**
-   - Preset units dropdown (mg, ml, IU, mcg, tablets, capsules, drops, puffs)
-   - Custom unit entry option
-   - Flutter 3.33+ compliant (using `initialValue`)
-
-4. **Search UX Improvements**
-   - Clear buttons (X icon) on all medication search fields
-   - Debounced search for better performance
-   - Empty state messaging
-
-5. **Input Validation**
-   - Numeric validation for dosage fields
-   - Required field validation for group names
-   - Minimum member count validation for groups
-
-### Performance Optimizations
-
-- Removed redundant `loadGroups()` calls from View layer
-- Internal state refresh in `MedicationGroupViewModel` after CRUD operations
-- Reduced database query overhead by ~40%
-
-### Review Trail
-
-- **Tracy**: Plan approved (Dec 31, 2025)
-- **Claudette**: Implementation complete (Jan 1, 2026)
-- **Clive**: Code review approved (Jan 1, 2026)
-- **Steve**: Deployment ready (Jan 1, 2026)
-
-### Artifacts & Documentation
-
-- **Implementation Summary**: [Documentation/implementation-summaries/phase-18-test-fixes.md](Documentation/implementation-summaries/phase-18-test-fixes.md)
-- **Final Review**: [reviews/2026-01-01-clive-phase-18-final-review.md](reviews/2026-01-01-clive-phase-18-final-review.md)
-- **Updated Schedule**: [Documentation/Plans/Implementation_Schedule.md](Documentation/Plans/Implementation_Schedule.md)
+**Project:** HyperTrack (Blood Pressure Monitor)  
+**Phase:** 20 (Profile Model Extensions)  
+**Date:** January 1, 2026  
+**Status:** 🚀 **READY FOR PR MERGE**
 
 ---
 
-## Next Steps: Pull Request Merge
+## Summary
 
-**CRITICAL**: Due to branch protection rules on `main`, this integration MUST go through a Pull Request. Direct merges to `main` are not permitted.
+Phase 20 implementation has been completed, reviewed by Clive, and is now committed to feature branch `feature/phase-20-profile-extensions`. All quality gates have passed:
 
-### PR Merge Instructions
-
-1. **Push the feature branch to remote:**
-   ```powershell
-   git push origin feature/phase-18-medication-grouping-ui
-   ```
-
-2. **Create Pull Request on GitHub:**
-   - Navigate to: https://github.com/Zephon-Development/BloodPressureMonitor
-   - Click "Compare & pull request" for `feature/phase-18-medication-grouping-ui`
-   - Title: `Phase 18: Medication Groups & Unit Management`
-   - Description: Use the commit message or link to the review documents
-
-3. **Verify CI/CD Checks:**
-   - Ensure all automated tests pass
-   - Review any code quality reports
-   - Confirm build succeeds
-
-4. **Merge the PR:**
-   - Use "Squash and merge" or "Merge commit" (per project convention)
-   - Delete the feature branch after merge
-   - Verify the merge in `main`
-
-5. **Post-Merge Cleanup:**
-   - Archive workflow handoff documents to `Documentation/archive/handoffs/`
-   - Archive review documents to `reviews/archive/`
-   - Update project board or issue tracker
-   - Notify stakeholders of successful deployment
+- ✅ **854/854 tests passing** (100% success rate)
+- ✅ **Zero analyzer errors or warnings**
+- ✅ **>80% code coverage** on new functionality
+- ✅ **Clive's approval** received (green-lighted for integration)
+- ✅ **Feature branch committed** with all changes
 
 ---
 
-**Deployment conducted by:** Steve (Workflow Conductor)  
-**Reviewed by:** Clive (QA Specialist)  
-**Implemented by:** Claudette (Implementation Specialist)
+## What Was Implemented
 
-- Documentation/Plans/Phase_24_Units_Accessibility_Plan.md
-- Documentation/Plans/Phase_25_PDF_Report_v2_Plan.md
-- Documentation/Plans/Phase_26_Encrypted_Backup_Plan.md (renamed from Phase_18)
-- Documentation/Implementation-Schedule-Update-Summary.md
-- Documentation/Handoffs/User_to_Steve.md
-- Documentation/Handoffs/Steve_to_Tracy.md
-- Documentation/Handoffs/Tracy_Implementation_Summary.md
-- Documentation/Handoffs/Clive_to_Steve.md
+### Medical Metadata Extension
+Extended the Profile model with 4 new optional fields for enhanced clinical documentation:
 
-**Files Modified**:
-- Documentation/Plans/Implementation_Schedule.md (10 new phases added)
-- Documentation/Tasks/Phase-19-Polish-Checklist.md
+1. **Date of Birth** - Full date for precise age calculation
+2. **Patient ID** - External medical records identifier (e.g., NHS number)
+3. **Doctor Name** - Primary care physician
+4. **Clinic Name** - Healthcare facility
 
-**Purpose**: Incorporate comprehensive user feedback into implementation roadmap with detailed phase plans.
+**Security:** All fields stored encrypted via existing sqflite_sqlcipher database (AES-256).
 
 ---
 
-## Integration Plan
+## Changes Summary
 
-### Step 1: Create Pull Request ✅ COMPLETE
-Pull Request has been created successfully.
+| Component | Changes | Impact |
+|-----------|---------|--------|
+| **Database** | Schema v5 → v6 (4 new columns) | ✅ Backward compatible |
+| **Profile Model** | +4 nullable fields (+35 lines) | ✅ No breaking changes |
+| **UI Form** | Medical Information section (+92 lines) | ✅ Optional inputs |
+| **Tests** | +10 model tests, 4 updated widget tests (+200 lines) | ✅ 100% passing |
 
-**PR Details**:
-- **PR Number**: #31
-- **URL**: https://github.com/Zephon-Development/BloodPressureMonitor/pull/31
-- **Title**: "Phase 19: ProGuard Fixes + Implementation Schedule Updates"
-- **Base**: main
-- **Head**: feature/phase-19-polish
-- **Commits**: 7 commits
-- **Files Changed**: 17 files (2 code, 15 documentation)
-- **Status**: Open, ready for review
-
-### Step 2: PR Review & CI Checks
-- ✅ All tests passing (777/777)
-- ✅ Analyzer clean (0 issues)
-- ✅ Release build successful
-- ⏳ Awaiting user approval for PR merge
-
-### Step 3: Merge to Main (Manual via GitHub)
-**CRITICAL**: Due to branch protection rules, the user must manually merge the PR via GitHub web interface.
-
-**Instructions for User**:
-1. Navigate to the PR in GitHub
-2. Review the changes one final time
-3. Ensure all CI checks are green
-4. Click "Merge Pull Request"
-5. Confirm the merge
-6. Delete the feature/phase-19-polish branch (optional cleanup)
-
-### Step 4: Post-Merge Cleanup
-After successful merge:
-1. Archive workflow artifacts to `Documentation/archive/handoffs/`
-2. Update Implementation_Schedule.md progress tracking (mark Phase 19 as in-progress or complete)
-3. Clean up temporary handoff files
-4. Tag the release if appropriate
+**Total Code:** +340 lines across 5 files
 
 ---
 
-## Deployment Checklist
+## **CRITICAL: Manual PR Merge Required**
 
-- [x] All code changes committed and pushed
-- [x] Documentation updates committed and pushed
-- [x] All tests passing (777/777)
-- [x] Analyzer clean (0 issues)
-- [x] Release build tested and successful
-- [x] **Pull Request created** - PR #31
-- [ ] **PR merged by user via GitHub** ← USER ACTION REQUIRED
-- [ ] Post-merge cleanup completed
-- [ ] Phase 19 tracking updated
+Due to branch protection rules on the `main` branch, **you must manually merge this PR via GitHub**. I cannot merge directly to main.
 
----
+### Steps to Complete Deployment:
 
-## Next Steps
+#### 1. I Will Push Feature Branch
+I will now push the feature branch to GitHub. Please wait for confirmation.
 
-### ⏳ Awaiting User Action: Merge PR #31
+#### 2. Create Pull Request on GitHub
+Once pushed, navigate to:
+- **GitHub Repository:** https://github.com/Zephon-Development/BloodPressureMonitor
+- Click **"Compare & pull request"** for branch `feature/phase-20-profile-extensions`
+- **PR Title:** `Phase 20: Profile Model Extensions (Medical Metadata)`
+- **PR Description:** (Use the template below)
 
-**Pull Request URL**: https://github.com/Zephon-Development/BloodPressureMonitor/pull/31
+```markdown
+# Phase 20: Profile Model Extensions
 
-**Instructions**:
-1. Navigate to PR #31 in GitHub
-2. Review the changes (7 commits, 17 files)
-3. Verify all CI checks are green
-4. Click "Merge Pull Request"
-5. Confirm the merge
-6. Optionally delete the feature/phase-19-polish branch
+## Summary
+Extends Profile model with medical metadata fields (Date of Birth, Patient ID, Doctor Name, Clinic Name) for enhanced PDF reports and clinical documentation.
 
-**What's in the PR**:
-- ✅ Critical ProGuard/R8 fixes for release builds
-- ✅ 10 new phase plans (comprehensive user feedback coverage)
-- ✅ Updated implementation schedule
-- ✅ 777/777 tests passing, 0 analyzer issues
+## Changes
+- **Database:** Schema migration v5 → v6 (4 new nullable columns)
+- **Model:** Added 4 PHI fields with full serialization support
+- **UI:** Medical Information section with DatePicker and text inputs
+- **Tests:** 10 new model tests + 4 updated widget tests
 
-### After PR Merge
-1. Archive handoff documents
-2. Clean up temporary files
-3. Update phase tracking
-4. Prepare for next phase implementation
+## Quality Gates
+- ✅ 854/854 tests passing
+- ✅ Zero analyzer errors
+- ✅ >80% coverage
+- ✅ Clive approved
 
----
+## Security
+All PHI fields encrypted via existing sqflite_sqlcipher database (AES-256).
 
-## Risk Assessment
+## Backward Compatibility
+All new fields nullable. Existing profiles work without changes.
 
-### Low Risk ✅
-- ProGuard rules are conservative (keep more than necessary)
-- No breaking changes to existing functionality
-- All tests passing
-- Documentation-only changes have no runtime impact
+## References
+- Implementation: Documentation/Handoffs/Claudette_to_Clive.md
+- Deployment Summary: Documentation/implementation-summaries/Phase_20_Deployment_Summary.md
+```
 
-### Medium Risk ⚠️
-- First release build with minification enabled
-- Recommend thorough testing of release APK before production deployment
+#### 3. Verify CI/CD Checks
+Wait for all automated checks to pass (if configured):
+- ✅ Build passes
+- ✅ Tests pass
+- ✅ Linting passes
 
-### Mitigation
-- ProGuard rules tested with release build
-- All critical classes explicitly preserved
-- Fallback: Can disable minification in build.gradle if issues arise
+#### 4. Merge Pull Request
+- Click **"Merge pull request"**
+- Select **"Squash and merge"** or **"Create a merge commit"** (your preference)
+- Confirm merge
 
----
-
-## Success Criteria
-
-- ✅ PR created successfully
-- ⏳ PR merged to main by user
-- ⏳ Release APK builds without errors
-- ⏳ Release APK runs without crashes
-- ⏳ All features functional in release mode
-- ⏳ Documentation accessible and up-to-date
+#### 5. Notify Steve
+Once merged, reply with: **"Phase 20 PR has been merged"** so I can:
+- Archive workflow artifacts
+- Clean up temporary files
+- Update Implementation_Schedule.md
+- Prepare for Phase 21
 
 ---
 
-**Status**: Awaiting PR creation and user merge  
-**Blocker**: Branch protection requires Pull Request workflow  
-**Next Agent**: User (for PR merge) → Steve (for post-merge cleanup)
+## Files in This Commit
+
+### Modified Files (5)
+1. `lib/models/profile.dart` - Medical metadata fields (+35 lines)
+2. `lib/services/database_service.dart` - Schema v6 migration (+13 lines)
+3. `lib/views/profile/profile_form_view.dart` - Medical metadata UI (+92 lines)
+4. `test/models/profile_test.dart` - New medical metadata tests (+165 lines)
+5. `test/views/profile/profile_form_view_test.dart` - Updated widget tests (+35 lines)
+
+### New Documentation (3)
+6. `Documentation/implementation-summaries/Phase_20_Deployment_Summary.md` - Deployment docs
+7. `Documentation/archive/handoffs/Phase19_Claudette_to_Clive.md` - Archived Phase 19
+8. `Documentation/archive/handoffs/Phase19_Clive_to_Steve.md` - Archived Phase 19
+
+### Updated Documentation (3)
+9. `Documentation/Handoffs/Claudette_to_Clive.md` - Phase 20 handoff
+10. `Documentation/Handoffs/Clive_to_Claudette.md` - Phase 20 planning
+11. `Documentation/Plans/Implementation_Schedule.md` - Progress tracking
+
+---
+
+## Deployment Verification
+
+Before pushing, I verified:
+- ✅ All 854 tests passing locally
+- ✅ Zero analyzer errors (`flutter analyze`)
+- ✅ Code formatted (`dart format`)
+- ✅ Git status clean on feature branch
+- ✅ Deployment summary created
+- ✅ Handoff documentation updated
+
+---
+
+## Post-Merge Actions (Steve Will Handle)
+
+After you merge the PR, I will automatically:
+
+1. **Archive Workflow Artifacts:**
+   - Move `Claudette_to_Clive.md` to `archive/handoffs/Phase20_Claudette_to_Clive.md`
+   - Move `Clive_to_Claudette.md` to `archive/handoffs/Phase20_Clive_to_Claudette.md`
+
+2. **Update Tracking:**
+   - Mark Phase 20 complete in [Implementation_Schedule.md](../Plans/Implementation_Schedule.md)
+   - Record completion date: January 1, 2026
+
+3. **Clean Up:**
+   - Remove `Steve_to_User.md` (this file)
+   - Keep `Steve_to_Tracy.md` for next phase planning
+
+4. **Prepare Phase 21:**
+   - Enhanced Sleep Tracking
+   - Tracy to review and create detailed plan
+
+---
+
+## Rollback Plan (If Needed)
+
+If critical issues are discovered post-merge:
+
+1. **Revert PR:** Use GitHub's "Revert" button on the merged PR
+2. **Database:** No rollback needed (nullable columns, backward compatible)
+3. **User Impact:** None (optional fields, existing data preserved)
+
+**Risk:** Low (additive changes, comprehensive testing, Clive approved)
+
+---
+
+**Workflow Conductor:** Steve  
+**Date:** January 1, 2026  
+**Next Action:** Push feature branch and guide user through PR merge
+
+✅ **Phase 20 is production-ready. Proceeding to push...**

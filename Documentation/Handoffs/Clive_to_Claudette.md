@@ -1,46 +1,45 @@
-# Handoff: Clive to Claudette
+# Handoff: Phase 20 - Profile Model Extensions
 
-**Project**: HyperTrack (Blood Pressure Monitor)
-**Phase**: 19 (UX Polish Pack)
-**Status**: Ready for Implementation
+**From:** Clive (Reviewer)
+**To:** Claudette (Implementation)
+**Status:** Approved for Implementation
 
-## Overview
-Phase 19 focuses on UX polish, addressing inconsistencies in idle timeouts, search functionality, numeric validation, and navigation safety.
+## Scope
+Extend the `Profile` model to include medical metadata (Date of Birth, Patient ID, Doctor Name, Clinic Name) and update the database, services, and UI to support these new fields.
 
-## Tasks for Claudette
-1.  **Global Idle Timeout**:
-    - Move the `Listener` from `_LockGate` in `lib/main.dart` to `MaterialApp.builder`.
-    - Ensure `lockViewModel.recordActivity()` is called for all pointer events globally.
-    - Verify that medication entry screens now trigger the lock screen after the idle period.
+## Technical Requirements
 
-2.  **Search Bar Enhancements**:
-    - Audit all search bars (Medications, History, etc.).
-    - Ensure they have a clear button (X icon) that appears only when text is present.
-    - Use `ValueListenableBuilder` or `setState` to ensure the clear button visibility updates immediately.
+### 1. Model Extension ([lib/models/profile.dart](lib/models/profile.dart))
+- Add the following fields to the `Profile` class:
+    - `dateOfBirth` (DateTime?)
+    - `patientId` (String?)
+    - `doctorName` (String?)
+    - `clinicName` (String?)
+- Update `fromMap`, `toMap`, `copyWith`, and equality operators.
+- Ensure `yearOfBirth` is still handled (can be derived from `dateOfBirth` if provided).
 
-3.  **Navigation Safety (PopScope)**:
-    - Add `PopScope` to all "Add/Edit" views to prevent accidental data loss.
-    - Show a confirmation dialog if the form is "dirty" (has unsaved changes).
+### 2. Database Migration ([lib/services/database_service.dart](lib/services/database_service.dart))
+- Bump `_databaseVersion` from `5` to `6`.
+- Implement migration in `_onUpgrade` for `oldVersion < 6`:
+    - Add columns to `Profile` table: `dateOfBirth` (TEXT), `patientId` (TEXT), `doctorName` (TEXT), `clinicName` (TEXT).
+- Update `_onCreate` to include these columns in the initial table definition.
 
-4.  **Numeric Validation Audit**:
-    - Ensure all numeric fields (Weight, BP, Pulse, Dosage) use the correct `keyboardType`.
-    - Verify that validators are robust and provide clear error messages.
+### 3. Service Updates ([lib/services/profile_service.dart](lib/services/profile_service.dart))
+- Ensure CRUD operations correctly handle the new fields (should be automatic if `toMap`/`fromMap` are updated).
 
-5.  **Performance & Pagination**:
-    - Update `HistoryView` to use 50-item pages and a "Load More" button if requested by the plan, or optimize the existing infinite scroll.
-    - Ensure `MedicationListView` handles large datasets efficiently.
+### 4. ViewModel Updates ([lib/viewmodels/active_profile_viewmodel.dart](lib/viewmodels/active_profile_viewmodel.dart))
+- Ensure the `ActiveProfileViewModel` correctly propagates updates to the UI when profile metadata changes.
 
-6.  **General Polish**:
-    - Audit spacing, alignment, and theme consistency across the app.
+### 5. UI Implementation ([lib/views/profile/profile_form_view.dart](lib/views/profile/profile_form_view.dart))
+- Add input fields for the new metadata:
+    - `dateOfBirth`: Use a `DatePicker`.
+    - `patientId`, `doctorName`, `clinicName`: Use `TextFormField`s.
+- Ensure validation and proper saving logic.
 
-## Reference Materials
-- [Phase 19 Plan](../../Plans/Phase_19_UX_Polish_Pack_Plan.md)
-- [Phase 19 Review](../../reviews/2026-01-01-clive-phase-19-plan-review.md)
-- [Coding Standards](../../Standards/Coding_Standards.md)
+## Standards Compliance
+- **Test Coverage:** Ensure new logic is covered by unit tests in `test/models/profile_test.dart` and `test/viewmodels/active_profile_viewmodel_test.dart`.
+- **Documentation:** Add JSDoc-style comments for all new fields and methods.
+- **Typing:** No `any` types. Use explicit Dart types.
 
-## Success Criteria
-- All 844+ tests passing.
-- Zero analyzer issues.
-- Idle timeout works on all screens.
-- Navigation confirmation prevents data loss.
-- Search bars are user-friendly.
+## Blockers/Notes
+- None identified. The database is already encrypted, so PHI security is inherited.
