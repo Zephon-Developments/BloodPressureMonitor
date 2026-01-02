@@ -272,8 +272,8 @@ class _ProfilePickerViewState extends State<ProfilePickerView> {
                 fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
               ),
             ),
-            subtitle: profile.yearOfBirth != null
-                ? Text('Born: ${profile.yearOfBirth}')
+            subtitle: profile.dateOfBirth != null
+                ? Text('Born: ${profile.dateOfBirth!.year}')
                 : null,
             trailing: Row(
               mainAxisSize: MainAxisSize.min,

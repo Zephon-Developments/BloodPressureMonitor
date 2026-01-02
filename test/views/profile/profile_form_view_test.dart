@@ -45,7 +45,6 @@ void main() {
       final profile = Profile(
         id: 1,
         name: 'John Doe',
-        yearOfBirth: 1990,
         preferredUnits: 'kPa',
         createdAt: DateTime.now(),
       );
@@ -56,7 +55,6 @@ void main() {
 
       expect(find.text('Edit Profile'), findsOneWidget);
       expect(find.text('John Doe'), findsOneWidget);
-      expect(find.text('1990'), findsOneWidget);
       expect(find.text('Medical Information'), findsOneWidget);
     });
 
