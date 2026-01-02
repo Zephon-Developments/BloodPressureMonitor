@@ -77,9 +77,11 @@ class StatsService {
 
     // Calculate previous week average for trend
     final previousWeekReadings = allReadings
-        .where((r) =>
-            r.takenAt.isAfter(previousWeekStart) &&
-            r.takenAt.isBefore(weekStart))
+        .where(
+          (r) =>
+              r.takenAt.isAfter(previousWeekStart) &&
+              r.takenAt.isBefore(weekStart),
+        )
         .toList();
 
     TrendDirection trend = TrendDirection.stable;
@@ -150,9 +152,11 @@ class StatsService {
 
     // Calculate previous week average for trend
     final previousWeekWeights = allWeights
-        .where((w) =>
-            w.takenAt.isAfter(previousWeekStart) &&
-            w.takenAt.isBefore(weekStart))
+        .where(
+          (w) =>
+              w.takenAt.isAfter(previousWeekStart) &&
+              w.takenAt.isBefore(weekStart),
+        )
         .toList();
 
     TrendDirection trend = TrendDirection.stable;
@@ -311,9 +315,11 @@ class StatsService {
 
     // Calculate previous week for trend
     final previousIntakes = allIntakes
-        .where((i) =>
-            i.takenAt.isAfter(previousWeekStart) &&
-            i.takenAt.isBefore(weekStart))
+        .where(
+          (i) =>
+              i.takenAt.isAfter(previousWeekStart) &&
+              i.takenAt.isBefore(weekStart),
+        )
         .toList();
 
     TrendDirection trend = TrendDirection.stable;
