@@ -5,7 +5,8 @@ class Smoothing {
   /// Applies a rolling average smoothing to the input data.
   ///
   /// Window size is calculated as max(1, ceil(0.1 * data.length)).
-  /// Uses centered window with edge padding (replicating edge values).
+  /// Uses a centered window with edge replication (indices clamped to bounds)
+  /// to maintain consistent window size across all points.
   ///
   /// Returns a list of the same length as the input with smoothed values.
   static List<double> rollingAverage(List<double> data) {
