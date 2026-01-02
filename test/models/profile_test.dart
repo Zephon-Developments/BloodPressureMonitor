@@ -11,7 +11,6 @@ void main() {
         name: 'John Doe',
         colorHex: '#FF5733',
         avatarIcon: '👤',
-        yearOfBirth: 1980,
         preferredUnits: 'mmHg',
         createdAt: testDate,
       );
@@ -20,7 +19,7 @@ void main() {
       expect(profile.name, 'John Doe');
       expect(profile.colorHex, '#FF5733');
       expect(profile.avatarIcon, '👤');
-      expect(profile.yearOfBirth, 1980);
+
       expect(profile.preferredUnits, 'mmHg');
       expect(profile.createdAt, testDate);
     });
@@ -36,7 +35,7 @@ void main() {
       expect(profile.name, 'Jane Doe');
       expect(profile.colorHex, isNull);
       expect(profile.avatarIcon, isNull);
-      expect(profile.yearOfBirth, isNull);
+
       expect(profile.preferredUnits, 'kPa');
       expect(profile.createdAt, testDate);
     });
@@ -47,7 +46,6 @@ void main() {
         name: 'Test User',
         colorHex: '#00FF00',
         avatarIcon: '🏃',
-        yearOfBirth: 1995,
         preferredUnits: 'mmHg',
         createdAt: testDate,
       );
@@ -58,7 +56,7 @@ void main() {
       expect(map['name'], 'Test User');
       expect(map['colorHex'], '#00FF00');
       expect(map['avatarIcon'], '🏃');
-      expect(map['yearOfBirth'], 1995);
+
       expect(map['preferredUnits'], 'mmHg');
       expect(map['createdAt'], testDate.toIso8601String());
     });
@@ -81,7 +79,6 @@ void main() {
         'name': 'Alice',
         'colorHex': '#0000FF',
         'avatarIcon': '💪',
-        'yearOfBirth': 1988,
         'preferredUnits': 'kPa',
         'createdAt': testDate.toIso8601String(),
       };
@@ -92,7 +89,7 @@ void main() {
       expect(profile.name, 'Alice');
       expect(profile.colorHex, '#0000FF');
       expect(profile.avatarIcon, '💪');
-      expect(profile.yearOfBirth, 1988);
+
       expect(profile.preferredUnits, 'kPa');
       expect(profile.createdAt, testDate);
     });
@@ -103,7 +100,6 @@ void main() {
         'name': 'Bob',
         'colorHex': null,
         'avatarIcon': null,
-        'yearOfBirth': null,
         'preferredUnits': 'mmHg',
         'createdAt': testDate.toIso8601String(),
       };
@@ -114,7 +110,7 @@ void main() {
       expect(profile.name, 'Bob');
       expect(profile.colorHex, isNull);
       expect(profile.avatarIcon, isNull);
-      expect(profile.yearOfBirth, isNull);
+
       expect(profile.preferredUnits, 'mmHg');
       expect(profile.createdAt, testDate);
     });
@@ -125,21 +121,19 @@ void main() {
         name: 'Original',
         colorHex: '#FFFFFF',
         avatarIcon: '🎯',
-        yearOfBirth: 1990,
         preferredUnits: 'mmHg',
         createdAt: testDate,
       );
 
       final updated = original.copyWith(
         name: 'Updated',
-        yearOfBirth: 1991,
       );
 
       expect(updated.id, 5);
       expect(updated.name, 'Updated');
       expect(updated.colorHex, '#FFFFFF');
       expect(updated.avatarIcon, '🎯');
-      expect(updated.yearOfBirth, 1991);
+
       expect(updated.preferredUnits, 'mmHg');
       expect(updated.createdAt, testDate);
     });
@@ -205,7 +199,6 @@ void main() {
         name: 'Base',
         colorHex: '#000000',
         avatarIcon: '⭐',
-        yearOfBirth: 2000,
         preferredUnits: 'mmHg',
         createdAt: testDate,
       );
@@ -213,7 +206,6 @@ void main() {
       final diffName = base.copyWith(name: 'Different');
       final diffColor = base.copyWith(colorHex: '#111111');
       final diffIcon = base.copyWith(avatarIcon: '🌟');
-      final diffYear = base.copyWith(yearOfBirth: 2001);
       final diffUnits = base.copyWith(preferredUnits: 'kPa');
       final diffDate =
           base.copyWith(createdAt: testDate.add(const Duration(days: 1)));
@@ -221,7 +213,6 @@ void main() {
       expect(base, isNot(equals(diffName)));
       expect(base, isNot(equals(diffColor)));
       expect(base, isNot(equals(diffIcon)));
-      expect(base, isNot(equals(diffYear)));
       expect(base, isNot(equals(diffUnits)));
       expect(base, isNot(equals(diffDate)));
     });
@@ -232,7 +223,6 @@ void main() {
         name: 'Round Trip',
         colorHex: '#ABCDEF',
         avatarIcon: '🔄',
-        yearOfBirth: 1985,
         preferredUnits: 'kPa',
         createdAt: testDate,
       );
@@ -459,7 +449,6 @@ void main() {
           patientId: 'RT-456',
           doctorName: 'Dr. Round',
           clinicName: 'Trip Hospital',
-          yearOfBirth: 1990,
           preferredUnits: 'kPa',
           createdAt: testDate,
         );

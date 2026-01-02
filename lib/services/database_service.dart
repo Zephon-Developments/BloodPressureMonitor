@@ -16,7 +16,7 @@ import 'package:blood_pressure_monitor/services/secure_password_manager.dart';
 class DatabaseService {
   static Database? _database;
   static const String _databaseName = 'blood_pressure.db';
-  static const int _databaseVersion = 6;
+  static const int _databaseVersion = 7;
 
   final Database? _testDatabase;
 
@@ -133,12 +133,12 @@ class DatabaseService {
         name TEXT NOT NULL,
         colorHex TEXT,
         avatarIcon TEXT,
-        yearOfBirth INTEGER,
         dateOfBirth TEXT,
         patientId TEXT,
         doctorName TEXT,
         clinicName TEXT,
         preferredUnits TEXT NOT NULL DEFAULT 'mmHg',
+        preferredWeightUnit TEXT NOT NULL DEFAULT 'kg',
         createdAt TEXT NOT NULL
       )
     ''');
@@ -457,6 +457,15 @@ class DatabaseService {
       await db.execute('ALTER TABLE Profile ADD COLUMN patientId TEXT');
       await db.execute('ALTER TABLE Profile ADD COLUMN doctorName TEXT');
       await db.execute('ALTER TABLE Profile ADD COLUMN clinicName TEXT');
+    }
+
+    if (oldVersion < 7) {
+      // Migration from v6 to v7: Remove yearOfBirth, add preferredWeightUnit
+      await db.execute(
+        'ALTER TABLE Profile ADD COLUMN preferredWeightUnit TEXT NOT NULL DEFAULT "kg"',
+      );
+      // Note: SQLite doesn't support DROP COLUMN, but yearOfBirth will simply be ignored
+      // New installs via _onCreate won't have yearOfBirth column
     }
   }
 

@@ -1,12 +1,13 @@
-# Phase 24 Plan: Units & Accessibility
+# Phase 24 Plan: Units, Accessibility & Landscape Mode
 
-**Objective**: Add app-wide units preference (kg vs lbs) and comprehensive accessibility support (semantic labels, contrast verification, high-contrast mode).
+**Objective**: Add app-wide units preference (kg vs lbs), comprehensive accessibility support (semantic labels, contrast verification, high-contrast mode), and proper landscape mode support for all screens.
 
 ## Current State (Audit)
 - **Units**: Weight is currently hardcoded to kg; no user preference for units.
 - **Future**: Temperature fields (if added) would need °C vs °F preference.
 - **Accessibility**: Some widgets lack semantic labels; color contrast not verified; high-contrast mode not tested.
-- **User Feedback**: Users in US prefer lbs; UK/Europe prefer kg. Accessibility needed for screen reader users.
+- **Landscape Mode**: App likely portrait-only or has suboptimal landscape layouts; charts and forms may not adapt well to landscape orientation.
+- **User Feedback**: Users in US prefer lbs; UK/Europe prefer kg. Accessibility needed for screen reader users. Tablet users request better landscape support.
 
 ## Scope
 - Add units preference to Settings (kg vs lbs; future-ready for °C vs °F).
@@ -17,7 +18,9 @@
 - Verify color contrast for all chart zones and UI elements (WCAG AA compliance).
 - Add high-contrast mode support (test with system high-contrast enabled).
 - Audit all text for readability with large text scaling (1.5x, 2x).
-- Unit and widget tests for units preference and accessibility features.
+- Implement responsive landscape layouts for all screens (adaptive layouts for tablet/phone landscape).
+- Ensure charts, forms, and list views work well in both portrait and landscape orientations.
+- Unit and widget tests for units preference, accessibility features, and landscape layouts.
 
 ## Architecture & Components
 
@@ -236,6 +239,107 @@ Semantics(
 **Files to Modify**: Any views with layout issues.
 **Estimated Changes**: ~10 lines per view × ~10 views = ~100 lines.
 
+### Task 9: Landscape Mode Support
+**Objective**: Ensure all screens adapt sensibly to landscape orientation.
+
+**Strategy**:
+1. Use `OrientationBuilder` or `MediaQuery.of(context).orientation` to detect orientation.
+2. Use `LayoutBuilder` to get available screen dimensions.
+3. Adapt layouts based on width/height ratio.
+
+**Key Patterns**:
+- **Forms**: Switch from vertical to horizontal or two-column layout in landscape.
+- **Charts**: Expand chart width; reduce padding; adjust legend position.
+- **Lists**: Consider two-column grid layout for landscape on tablets.
+- **Navigation**: Bottom nav remains; consider side nav for tablets in landscape.
+
+**Files to Modify**:
+
+**Modified File**: `lib/views/home/home_view.dart`
+**Subtasks**:
+1. Detect orientation using `MediaQuery.of(context).orientation`.
+2. In landscape, arrange quick actions in 2 rows × 3 columns or single row if space allows.
+3. Adjust chart heights to fit screen better (shorter charts in landscape).
+4. Test on phone and tablet simulators.
+
+**Estimated Changes**: +40 lines.
+
+**Modified File**: `lib/views/blood_pressure/add_edit_bp_view.dart`
+**Subtasks**:
+1. In landscape, arrange form fields in two columns:
+   - Left column: Systolic, Diastolic, Pulse
+   - Right column: Date/Time, Notes, Tags
+2. Use `Row` with two `Expanded` widgets containing form sections.
+3. Ensure keyboard doesn't obscure input (use `SingleChildScrollView`).
+
+**Estimated Changes**: +60 lines.
+
+**Modified File**: `lib/views/weight/add_edit_weight_view.dart`
+**Subtasks**:
+1. In landscape, arrange weight and date/time fields horizontally.
+2. Notes field remains full-width below.
+
+**Estimated Changes**: +30 lines.
+
+**Modified File**: `lib/views/analytics/analytics_view.dart`
+**Subtasks**:
+1. In landscape, expand chart width to full screen width (reduce padding).
+2. Move time range selector to top row (horizontal layout).
+3. Adjust chart height based on available space.
+
+**Estimated Changes**: +50 lines.
+
+**Modified File**: `lib/views/analytics/widgets/bp_chart.dart` and `weight_chart.dart`
+**Subtasks**:
+1. Accept orientation parameter or detect internally.
+2. In landscape, reduce vertical padding; increase horizontal padding.
+3. Adjust legend position (move to right side in landscape if space).
+
+**Estimated Changes**: +30 lines per chart widget.
+
+**Modified File**: `lib/views/history/bp_full_history_view.dart` and `weight_full_history_view.dart`
+**Subtasks**:
+1. In landscape on tablets, consider two-column grid layout using `GridView`.
+2. On phones, keep single-column list in landscape.
+3. Use `LayoutBuilder` to check available width (>600dp = tablet).
+
+**Estimated Changes**: +40 lines per history view.
+
+**Modified File**: `lib/views/medication/medication_view.dart` (if applicable)
+**Subtasks**:
+1. In landscape, consider two-column layout for medication cards.
+2. Form views use horizontal layout pattern as above.
+
+**Estimated Changes**: +40 lines.
+
+**Modified File**: `lib/views/settings/settings_view.dart` and sub-views
+**Subtasks**:
+1. Settings list remains single-column (standard pattern).
+2. Ensure scrollable in landscape if needed.
+
+**Estimated Changes**: +10 lines.
+
+**New Utility File**: `lib/utils/responsive_utils.dart`
+**Subtasks**:
+1. Create helper functions:
+   ```dart
+   bool isTablet(BuildContext context) => MediaQuery.of(context).size.shortestSide >= 600;
+   bool isLandscape(BuildContext context) => MediaQuery.of(context).orientation == Orientation.landscape;
+   bool shouldUseTwoColumns(BuildContext context) => isLandscape(context) && isTablet(context);
+   ```
+2. Add DartDoc explaining responsive design patterns.
+
+**Estimated Lines**: ~60 lines.
+
+**Testing**:
+- Test all screens in portrait and landscape on phone simulator (iPhone, Pixel).
+- Test all screens in portrait and landscape on tablet simulator (iPad, Android tablet).
+- Verify no layout overflow errors.
+- Verify charts readable in landscape.
+- Verify forms usable in landscape (keyboard doesn't obscure fields).
+
+**Estimated Total Changes for Task 9**: ~400 lines.
+
 ## Acceptance Criteria
 
 ### Functional
@@ -263,6 +367,14 @@ Semantics(
 - ✅ High-contrast mode displays correctly.
 - ✅ Large text scaling doesn't break layouts.
 
+### Landscape Mode
+- ✅ All screens adapt sensibly to landscape orientation.
+- ✅ Forms use horizontal or two-column layouts in landscape.
+- ✅ Charts expand appropriately in landscape without distortion.
+- ✅ No layout overflow errors in landscape mode.
+- ✅ Keyboard doesn't obscure input fields in landscape.
+- ✅ Tablet landscape layouts use available space effectively (two-column where appropriate).
+
 ## Dependencies
 - Phase 17 (Appearance Settings): Settings UI exists; can extend with units section.
 - Phase 23 (Charts complete): Weight chart exists and can be updated.
@@ -275,6 +387,8 @@ Semantics(
 | Users confused by unit preference location | Low | Place in Settings → Appearance or create dedicated Units section |
 | Accessibility audit reveals many issues | Medium | Prioritize critical issues (screen reader, contrast); defer minor polish to Phase 27 |
 | High-contrast mode requires theme redesign | Medium | Start with minor adjustments; full redesign if needed can be deferred |
+| Landscape layouts break on small phones | Medium | Test on multiple device sizes; use `LayoutBuilder` and breakpoints; fallback to portrait-like layout on very small screens |
+| Tablet users expect side navigation in landscape | Low | Defer side nav to future phase; bottom nav acceptable for now |
 
 ## Testing Strategy
 
@@ -301,6 +415,27 @@ Semantics(
 **Modified Files**: Weight view tests to verify unit display.
 **Estimated**: 15 widget tests.
 
+### Landscape Mode Tests
+**Modified Files**: All widget tests for views with landscape support.
+- Mock `MediaQuery` to test portrait and landscape orientations.
+- Verify layout switches correctly (e.g., form fields in two columns in landscape).
+- Verify no overflow errors in landscape.
+
+**Example Pattern**:
+```dart
+testWidgets('BP form uses two-column layout in landscape', (tester) async {
+  tester.binding.window.physicalSizeTestValue = Size(800, 400); // Landscape
+  tester.binding.window.devicePixelRatioTestValue = 1.0;
+  addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+  
+  await tester.pumpWidget(/* BP form */);
+  
+  expect(find.byType(Row), findsWidgets); // Expect horizontal layout
+});
+```
+
+**Estimated**: 20 widget tests (2 per major view).
+
 ### Accessibility Tests
 **Manual Testing**:
 - Enable TalkBack (Android) or VoiceOver (iOS); navigate app; verify all elements announced.
@@ -312,6 +447,23 @@ Semantics(
 
 **Estimated**: 10 manual test scenarios.
 
+### Landscape Mode Manual Testing
+**Device Matrix**:
+- iPhone SE (small phone): Portrait + Landscape
+- iPhone 15 Pro (standard phone): Portrait + Landscape
+- iPad (tablet): Portrait + Landscape
+- Android Pixel (phone): Portrait + Landscape
+- Android tablet: Portrait + Landscape
+
+**Test Scenarios** (per device):
+1. Navigate all screens in portrait; verify layouts.
+2. Rotate to landscape; verify layouts adapt.
+3. Test form entry in landscape (BP, Weight); verify keyboard doesn't obscure fields.
+4. Test charts in landscape; verify readable and properly scaled.
+5. Test history lists in landscape; verify scrolling works.
+
+**Estimated**: 25 manual test scenarios (5 scenarios × 5 devices).
+
 ### Integration Tests
 **New File**: `test_driver/units_preference_test.dart`
 - Change weight unit to lbs in Settings.
@@ -321,28 +473,32 @@ Semantics(
 **Estimated**: 3 integration tests.
 
 ## Branching & Workflow
-- **Branch**: `feature/phase-24-units-accessibility`
+- **Branch**: `feature/phase-24-units-accessibility-landscape`
 - Follow [CODING_STANDARDS.md](../Standards/CODING_STANDARDS.md) §2.1 (branching) and §2.4 (CI gates).
 - All changes via PR; require CI green + review approval before merge.
 
 ## Rollback Plan
 - Units preference can be feature-flagged; fall back to kg-only if critical issues.
 - Accessibility enhancements are additive; can be reverted individually if needed.
+- Landscape layouts are additive; app remains functional in portrait if landscape support needs rollback.
 - No schema changes; rollback is non-destructive.
 
 ## Performance Considerations
 - Unit conversion is lightweight (simple arithmetic); no performance impact.
 - Semantic labels add minimal overhead.
 - High-contrast theme is static; no runtime performance impact.
+- Landscape layout rebuilds on orientation change; standard Flutter behavior, no performance concerns.
+- Use `OrientationBuilder` or `MediaQuery` for efficient orientation detection.
 
 ## Documentation Updates
-- **User-facing**: Add note to QUICKSTART.md explaining units preference location.
+- **User-facing**: Add note to QUICKSTART.md explaining units preference location and landscape mode support.
 - **Developer-facing**: Update [Implementation_Schedule.md](Implementation_Schedule.md) to mark Phase 24 complete upon merge.
 - **Accessibility notes**: Document semantic label patterns for future widget development.
+- **Responsive design notes**: Document landscape layout patterns and breakpoints in coding standards or dedicated responsive design guide.
 
 ---
 
 **Phase Owner**: Implementation Agent  
 **Reviewer**: Clive (Review Specialist)  
-**Estimated Effort**: 3-5 days (including accessibility audit, testing, and review)  
+**Estimated Effort**: 5-7 days (including accessibility audit, landscape implementation, testing, and review)  
 **Target Completion**: TBD based on sprint schedule

@@ -15,13 +15,9 @@ class Profile {
   /// Optional avatar/icon identifier.
   final String? avatarIcon;
 
-  /// Optional year of birth for age-related context.
-  final int? yearOfBirth;
-
   /// Optional full date of birth for medical reports and precise age calculation.
   ///
   /// This is Protected Health Information (PHI) and is stored encrypted.
-  /// When set, takes precedence over [yearOfBirth] for age calculations.
   final DateTime? dateOfBirth;
 
   /// Optional patient identifier (e.g., NHS number, medical record number).
@@ -39,8 +35,11 @@ class Profile {
   /// This is Protected Health Information (PHI) and is stored encrypted.
   final String? clinicName;
 
-  /// Preferred units: 'mmHg' or 'kPa'.
+  /// Preferred units for blood pressure: 'mmHg' or 'kPa'.
   final String preferredUnits;
+
+  /// Preferred units for weight: 'kg' or 'lbs'.
+  final String preferredWeightUnit;
 
   /// Timestamp when the profile was created (UTC).
   final DateTime createdAt;
@@ -54,12 +53,12 @@ class Profile {
     required this.name,
     this.colorHex,
     this.avatarIcon,
-    this.yearOfBirth,
     this.dateOfBirth,
     this.patientId,
     this.doctorName,
     this.clinicName,
     this.preferredUnits = 'mmHg',
+    this.preferredWeightUnit = 'kg',
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now().toUtc();
 
@@ -70,7 +69,6 @@ class Profile {
       name: map['name'] as String,
       colorHex: map['colorHex'] as String?,
       avatarIcon: map['avatarIcon'] as String?,
-      yearOfBirth: map['yearOfBirth'] as int?,
       dateOfBirth: map['dateOfBirth'] != null
           ? _parseDateOnly(map['dateOfBirth'] as String)
           : null,
@@ -78,6 +76,7 @@ class Profile {
       doctorName: map['doctorName'] as String?,
       clinicName: map['clinicName'] as String?,
       preferredUnits: map['preferredUnits'] as String? ?? 'mmHg',
+      preferredWeightUnit: map['preferredWeightUnit'] as String? ?? 'kg',
       createdAt: DateTime.parse(map['createdAt'] as String),
     );
   }
@@ -89,12 +88,12 @@ class Profile {
       'name': name,
       'colorHex': colorHex,
       'avatarIcon': avatarIcon,
-      'yearOfBirth': yearOfBirth,
       'dateOfBirth': dateOfBirth != null ? _formatDateOnly(dateOfBirth!) : null,
       'patientId': patientId,
       'doctorName': doctorName,
       'clinicName': clinicName,
       'preferredUnits': preferredUnits,
+      'preferredWeightUnit': preferredWeightUnit,
       'createdAt': createdAt.toIso8601String(),
     };
   }
@@ -112,12 +111,12 @@ class Profile {
     Object? name = _undefined,
     Object? colorHex = _undefined,
     Object? avatarIcon = _undefined,
-    Object? yearOfBirth = _undefined,
     Object? dateOfBirth = _undefined,
     Object? patientId = _undefined,
     Object? doctorName = _undefined,
     Object? clinicName = _undefined,
     Object? preferredUnits = _undefined,
+    Object? preferredWeightUnit = _undefined,
     Object? createdAt = _undefined,
   }) {
     return Profile(
@@ -128,9 +127,6 @@ class Profile {
       avatarIcon: identical(avatarIcon, _undefined)
           ? this.avatarIcon
           : avatarIcon as String?,
-      yearOfBirth: identical(yearOfBirth, _undefined)
-          ? this.yearOfBirth
-          : yearOfBirth as int?,
       dateOfBirth: identical(dateOfBirth, _undefined)
           ? this.dateOfBirth
           : dateOfBirth as DateTime?,
@@ -146,6 +142,9 @@ class Profile {
       preferredUnits: identical(preferredUnits, _undefined)
           ? this.preferredUnits
           : preferredUnits as String,
+      preferredWeightUnit: identical(preferredWeightUnit, _undefined)
+          ? this.preferredWeightUnit
+          : preferredWeightUnit as String,
       createdAt: identical(createdAt, _undefined)
           ? this.createdAt
           : createdAt as DateTime,
@@ -164,12 +163,12 @@ class Profile {
         other.name == name &&
         other.colorHex == colorHex &&
         other.avatarIcon == avatarIcon &&
-        other.yearOfBirth == yearOfBirth &&
         other.dateOfBirth == dateOfBirth &&
         other.patientId == patientId &&
         other.doctorName == doctorName &&
         other.clinicName == clinicName &&
         other.preferredUnits == preferredUnits &&
+        other.preferredWeightUnit == preferredWeightUnit &&
         other.createdAt == createdAt;
   }
 
@@ -180,12 +179,12 @@ class Profile {
       name,
       colorHex,
       avatarIcon,
-      yearOfBirth,
       dateOfBirth,
       patientId,
       doctorName,
       clinicName,
       preferredUnits,
+      preferredWeightUnit,
       createdAt,
     );
   }
