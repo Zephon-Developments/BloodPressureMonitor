@@ -60,7 +60,6 @@ void main() {
         Profile(
           id: 2,
           name: 'Jane Smith',
-          yearOfBirth: 1980,
           createdAt: DateTime.now(),
         ),
       ];
@@ -74,7 +73,6 @@ void main() {
       // Assert
       expect(find.text('John Doe'), findsOneWidget);
       expect(find.text('Jane Smith'), findsOneWidget);
-      expect(find.text('Born: 1980'), findsOneWidget);
       expect(find.text('Add New Profile'), findsOneWidget);
     });
 
