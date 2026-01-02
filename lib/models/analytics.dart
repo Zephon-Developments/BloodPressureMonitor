@@ -211,3 +211,27 @@ extension SleepQualityParsing on SleepQualityLevel {
 
   int get score => index + 1;
 }
+
+/// Dual-axis Blood Pressure chart data structure.
+///
+/// Contains separate series for systolic (upper axis) and diastolic (lower axis)
+/// with paired timestamps to enable vertical connector lines.
+class DualAxisBpData {
+  const DualAxisBpData({
+    required this.timestamps,
+    required this.systolic,
+    required this.diastolic,
+    required this.minDate,
+    required this.maxDate,
+  });
+
+  final List<DateTime> timestamps;
+  final List<double> systolic;
+  final List<double> diastolic;
+  final DateTime minDate;
+  final DateTime maxDate;
+
+  bool get hasData => timestamps.isNotEmpty;
+
+  int get length => timestamps.length;
+}
