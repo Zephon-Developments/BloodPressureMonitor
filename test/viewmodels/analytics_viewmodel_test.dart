@@ -37,6 +37,27 @@ void main() {
         range: anyNamed('range'),
       ),
     ).thenAnswer((_) async => _chart());
+
+    when(
+      mockService.getChartDataSmoothed(
+        profileId: anyNamed('profileId'),
+        startDate: anyNamed('startDate'),
+        endDate: anyNamed('endDate'),
+        range: anyNamed('range'),
+        maxPoints: anyNamed('maxPoints'),
+      ),
+    ).thenAnswer((_) async => _chart());
+
+    when(
+      mockService.getDualAxisBpData(
+        profileId: anyNamed('profileId'),
+        startDate: anyNamed('startDate'),
+        endDate: anyNamed('endDate'),
+        range: anyNamed('range'),
+        maxPoints: anyNamed('maxPoints'),
+        smoothed: anyNamed('smoothed'),
+      ),
+    ).thenAnswer((_) async => _dualAxisBpData());
   }
 
   setUp(() {
@@ -206,5 +227,16 @@ SleepCorrelationData _sleepCorrelation() {
     correlationPoints: [
       CorrelationPoint(date: date, sleepEntry: sleep, reading: reading),
     ],
+  );
+}
+
+DualAxisBpData _dualAxisBpData() {
+  final now = DateTime.utc(2025, 1, 1);
+  return DualAxisBpData(
+    timestamps: [now, now.add(const Duration(days: 1))],
+    systolic: [120.0, 125.0],
+    diastolic: [80.0, 82.0],
+    minDate: now,
+    maxDate: now.add(const Duration(days: 1)),
   );
 }

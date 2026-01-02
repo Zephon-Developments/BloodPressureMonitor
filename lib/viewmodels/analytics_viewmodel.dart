@@ -315,9 +315,27 @@ class AnalyticsViewModel extends ChangeNotifier {
         range: range,
         smoothed: true,
       );
+
+      // Update the range cache to prevent stale data
+      final cache = _rangeCache[range];
+      if (cache != null) {
+        _rangeCache[range] = _RangeCacheEntry(
+          timestamp: cache.timestamp,
+          stats: cache.stats,
+          chartData: cache.chartData,
+          chartDataSmoothed: cache.chartDataSmoothed,
+          dualAxisBpData: _dualAxisBpData!,
+          dualAxisBpDataSmoothed: _dualAxisBpDataSmoothed!,
+          sleepCorrelation: cache.sleepCorrelation,
+          sleepStages: cache.sleepStages,
+        );
+      }
+
       notifyListeners();
-    } catch (error) {
-      _error = 'Failed to load dual-axis BP data';
+    } catch (error, stackTrace) {
+      debugPrint('Failed to load dual-axis BP data: $error');
+      debugPrint('$stackTrace');
+      _error = 'Failed to load dual-axis BP data: $error';
       notifyListeners();
     }
   }
