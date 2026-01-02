@@ -28,6 +28,7 @@ class AnalyticsService {
 
   final ReadingService _readingService;
   final SleepService _sleepService;
+  final Map<String, ChartDataSet> _smoothedCache = {};
 
   /// Calculates aggregated statistics for the provided range.
   Future<HealthStats> calculateStats({
@@ -334,8 +335,6 @@ class AnalyticsService {
   void clearSmoothedCache() {
     _smoothedCache.clear();
   }
-
-  final Map<String, ChartDataSet> _smoothedCache = {};
 
   /// Correlates sleep sessions with morning readings in the range.
   Future<SleepCorrelationData> getSleepCorrelation({

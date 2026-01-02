@@ -37,7 +37,7 @@ class Smoothing {
       // Slide window: remove (i - 1 - halfWindow), add (i + halfWindow)
       final oldIdx = (i - 1 - halfWindow).clamp(0, n - 1);
       final newIdx = (i + halfWindow).clamp(0, n - 1);
-      
+
       currentSum = currentSum - data[oldIdx] + data[newIdx];
       smoothed[i] = currentSum / divisor;
     }
