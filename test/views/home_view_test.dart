@@ -12,13 +12,14 @@ import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart'
 import 'package:blood_pressure_monitor/viewmodels/analytics_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/history_viewmodel.dart';
+import 'package:blood_pressure_monitor/viewmodels/history_home_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/lock_viewmodel.dart';
 import 'package:blood_pressure_monitor/views/home_view.dart';
 import 'package:blood_pressure_monitor/views/readings/add_reading_view.dart';
 import 'package:blood_pressure_monitor/views/settings/security_settings_view.dart';
 import 'package:blood_pressure_monitor/views/analytics/analytics_view.dart';
 
-@GenerateMocks([BloodPressureViewModel, LockViewModel])
+@GenerateMocks([BloodPressureViewModel, LockViewModel, HistoryHomeViewModel])
 import 'home_view_test.mocks.dart';
 import '../test_mocks.mocks.dart'
     show MockHistoryService, MockActiveProfileViewModel;
@@ -32,6 +33,7 @@ void main() {
     late MockHistoryService mockHistoryService;
     late MockAnalyticsService mockAnalyticsService;
     late MockActiveProfileViewModel mockActiveProfileViewModel;
+    late MockHistoryHomeViewModel mockHistoryHomeViewModel;
     late HistoryViewModel historyViewModel;
     late AnalyticsViewModel analyticsViewModel;
 
@@ -41,8 +43,23 @@ void main() {
       mockHistoryService = MockHistoryService();
       mockAnalyticsService = MockAnalyticsService();
       mockActiveProfileViewModel = MockActiveProfileViewModel();
+      mockHistoryHomeViewModel = MockHistoryHomeViewModel();
       when(mockActiveProfileViewModel.activeProfileId).thenReturn(1);
       when(mockActiveProfileViewModel.activeProfileName).thenReturn('Default');
+      when(mockHistoryHomeViewModel.loadAllStats()).thenAnswer((_) async {});
+      when(mockHistoryHomeViewModel.isLoading).thenReturn(false);
+      when(mockHistoryHomeViewModel.bloodPressureStats).thenReturn(null);
+      when(mockHistoryHomeViewModel.weightStats).thenReturn(null);
+      when(mockHistoryHomeViewModel.sleepStats).thenReturn(null);
+      when(mockHistoryHomeViewModel.medicationStats).thenReturn(null);
+      when(mockHistoryHomeViewModel.isLoadingBP).thenReturn(false);
+      when(mockHistoryHomeViewModel.isLoadingWeight).thenReturn(false);
+      when(mockHistoryHomeViewModel.isLoadingSleep).thenReturn(false);
+      when(mockHistoryHomeViewModel.isLoadingMedication).thenReturn(false);
+      when(mockHistoryHomeViewModel.errorBP).thenReturn(null);
+      when(mockHistoryHomeViewModel.errorWeight).thenReturn(null);
+      when(mockHistoryHomeViewModel.errorSleep).thenReturn(null);
+      when(mockHistoryHomeViewModel.errorMedication).thenReturn(null);
       when(mockViewModel.loadReadings()).thenAnswer((_) async {});
       when(mockViewModel.isLoading).thenReturn(false);
       when(mockViewModel.error).thenReturn(null);
@@ -139,6 +156,9 @@ void main() {
           ChangeNotifierProvider<HistoryViewModel>.value(
             value: historyViewModel,
           ),
+          ChangeNotifierProvider<HistoryHomeViewModel>.value(
+            value: mockHistoryHomeViewModel,
+          ),
           ChangeNotifierProvider<AnalyticsViewModel>.value(
             value: analyticsViewModel,
           ),
@@ -225,8 +245,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('History'), findsAtLeastNWidgets(2));
-      expect(find.text('Filters'), findsOneWidget);
-      expect(find.text('No history yet'), findsOneWidget);
+      // HistoryHomeView has sections, not "Filters" and "No history yet"
+      expect(find.text('Blood Pressure'), findsOneWidget);
+      expect(find.text('Weight'), findsOneWidget);
+      expect(find.text('Sleep'), findsOneWidget);
     });
 
     testWidgets('switches to charts tab when tapped',
@@ -305,7 +327,8 @@ void main() {
       // History stub
       await tester.tap(find.text('History'));
       await tester.pumpAndSettle();
-      expect(find.text('No history yet'), findsOneWidget);
+      // HistoryHomeView shows section titles even when empty
+      expect(find.text('Blood Pressure'), findsOneWidget);
 
       // Charts stub
       await tester.tap(find.text('Charts'));

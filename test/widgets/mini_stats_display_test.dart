@@ -32,7 +32,7 @@ void main() {
 
     testWidgets('displays 7-day average correctly', (tester) async {
       // Arrange
-      final stats = MiniStats(
+      const stats = MiniStats(
         latestValue: '75 kg',
         weekAverage: '76 kg',
         trend: TrendDirection.down,
@@ -40,7 +40,7 @@ void main() {
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: MiniStatsDisplay(
               miniStats: stats,
@@ -58,7 +58,7 @@ void main() {
     testWidgets('shows correct trend indicator for TrendDirection.up',
         (tester) async {
       // Arrange
-      final stats = MiniStats(
+      const stats = MiniStats(
         latestValue: '140/90',
         weekAverage: '130/85',
         trend: TrendDirection.up,
@@ -66,7 +66,7 @@ void main() {
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: MiniStatsDisplay(
               miniStats: stats,
@@ -84,7 +84,7 @@ void main() {
     testWidgets('shows correct trend indicator for TrendDirection.down',
         (tester) async {
       // Arrange
-      final stats = MiniStats(
+      const stats = MiniStats(
         latestValue: '120/78',
         weekAverage: '130/85',
         trend: TrendDirection.down,
@@ -92,7 +92,7 @@ void main() {
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: MiniStatsDisplay(
               miniStats: stats,
@@ -110,7 +110,7 @@ void main() {
     testWidgets('shows correct trend indicator for TrendDirection.stable',
         (tester) async {
       // Arrange
-      final stats = MiniStats(
+      const stats = MiniStats(
         latestValue: '130/85',
         weekAverage: '130/85',
         trend: TrendDirection.stable,
@@ -118,7 +118,7 @@ void main() {
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: MiniStatsDisplay(
               miniStats: stats,
@@ -136,7 +136,7 @@ void main() {
     testWidgets('applies correct colors for BP trends - up is red',
         (tester) async {
       // Arrange
-      final stats = MiniStats(
+      const stats = MiniStats(
         latestValue: '150/95',
         weekAverage: '135/88',
         trend: TrendDirection.up,
@@ -144,7 +144,7 @@ void main() {
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: MiniStatsDisplay(
               miniStats: stats,
@@ -165,7 +165,7 @@ void main() {
     testWidgets('applies correct colors for BP trends - down is green',
         (tester) async {
       // Arrange
-      final stats = MiniStats(
+      const stats = MiniStats(
         latestValue: '115/75',
         weekAverage: '130/85',
         trend: TrendDirection.down,
@@ -173,7 +173,7 @@ void main() {
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: MiniStatsDisplay(
               miniStats: stats,
@@ -192,7 +192,7 @@ void main() {
     testWidgets('applies correct colors for Weight trends - up is red',
         (tester) async {
       // Arrange
-      final stats = MiniStats(
+      const stats = MiniStats(
         latestValue: '80 kg',
         weekAverage: '75 kg',
         trend: TrendDirection.up,
@@ -200,7 +200,7 @@ void main() {
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: MiniStatsDisplay(
               miniStats: stats,
@@ -221,7 +221,7 @@ void main() {
     testWidgets('applies correct colors for Sleep trends - up is green',
         (tester) async {
       // Arrange
-      final stats = MiniStats(
+      const stats = MiniStats(
         latestValue: '8.5 hrs',
         weekAverage: '7.2 hrs',
         trend: TrendDirection.up,
@@ -229,7 +229,7 @@ void main() {
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: MiniStatsDisplay(
               miniStats: stats,
@@ -248,7 +248,7 @@ void main() {
     testWidgets('applies correct colors for stable trend - blue',
         (tester) async {
       // Arrange
-      final stats = MiniStats(
+      const stats = MiniStats(
         latestValue: '130/85',
         weekAverage: '130/85',
         trend: TrendDirection.stable,
@@ -256,7 +256,7 @@ void main() {
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: MiniStatsDisplay(
               miniStats: stats,
@@ -275,7 +275,7 @@ void main() {
     testWidgets('compact mode renders differently than normal mode',
         (tester) async {
       // Arrange
-      final stats = MiniStats(
+      const stats = MiniStats(
         latestValue: '128/82',
         weekAverage: '130/85',
         trend: TrendDirection.down,
@@ -283,7 +283,7 @@ void main() {
 
       // Act - normal mode
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: MiniStatsDisplay(
               miniStats: stats,
@@ -301,7 +301,7 @@ void main() {
 
       // Act - compact mode
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: MiniStatsDisplay(
               miniStats: stats,
@@ -323,7 +323,7 @@ void main() {
 
     testWidgets('handles null lastUpdate gracefully', (tester) async {
       // Arrange
-      final stats = MiniStats(
+      const stats = MiniStats(
         latestValue: '130/85',
         weekAverage: '128/83',
         trend: TrendDirection.stable,
@@ -332,7 +332,7 @@ void main() {
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: MiniStatsDisplay(
               miniStats: stats,
@@ -375,7 +375,7 @@ void main() {
 
     testWidgets('accessibility semantics are correct', (tester) async {
       // Arrange
-      final stats = MiniStats(
+      const stats = MiniStats(
         latestValue: '128/82',
         weekAverage: '130/85',
         trend: TrendDirection.down,
@@ -383,7 +383,7 @@ void main() {
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: MiniStatsDisplay(
               miniStats: stats,
@@ -396,14 +396,15 @@ void main() {
       // Assert - verify semantic label is present
       expect(
         find.bySemanticsLabel(
-            'Latest: 128/82, 7-day average: 130/85, Trend: Decreasing'),
+          'Latest: 128/82, 7-day average: 130/85, Trend: Decreasing',
+        ),
         findsOneWidget,
       );
     });
 
     testWidgets('compact mode has accessibility semantics', (tester) async {
       // Arrange
-      final stats = MiniStats(
+      const stats = MiniStats(
         latestValue: '75 kg',
         weekAverage: '76 kg',
         trend: TrendDirection.up,
@@ -411,7 +412,7 @@ void main() {
 
       // Act
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: MiniStatsDisplay(
               miniStats: stats,
@@ -425,7 +426,8 @@ void main() {
       // Assert - verify semantic label is present
       expect(
         find.bySemanticsLabel(
-            'Latest: 75 kg, 7-day average: 76 kg, Trend: Increasing'),
+          'Latest: 75 kg, 7-day average: 76 kg, Trend: Increasing',
+        ),
         findsOneWidget,
       );
     });
