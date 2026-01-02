@@ -9,6 +9,7 @@ import 'dart:ui' as _i19;
 import 'package:blood_pressure_monitor/models/analytics.dart' as _i5;
 import 'package:blood_pressure_monitor/models/health_data.dart' as _i2;
 import 'package:blood_pressure_monitor/models/medication.dart' as _i3;
+import 'package:blood_pressure_monitor/models/mini_stats.dart' as _i28;
 import 'package:blood_pressure_monitor/models/profile.dart' as _i18;
 import 'package:blood_pressure_monitor/models/reading.dart' as _i9;
 import 'package:blood_pressure_monitor/services/analytics_service.dart' as _i6;
@@ -22,6 +23,7 @@ import 'package:blood_pressure_monitor/services/medication_service.dart'
 import 'package:blood_pressure_monitor/services/profile_service.dart' as _i23;
 import 'package:blood_pressure_monitor/services/reading_service.dart' as _i7;
 import 'package:blood_pressure_monitor/services/sleep_service.dart' as _i11;
+import 'package:blood_pressure_monitor/services/stats_service.dart' as _i27;
 import 'package:blood_pressure_monitor/services/weight_service.dart' as _i12;
 import 'package:blood_pressure_monitor/utils/time_range.dart' as _i26;
 import 'package:blood_pressure_monitor/utils/validators.dart' as _i4;
@@ -1900,4 +1902,81 @@ class MockAnalyticsService extends _i1.Mock implements _i6.AnalyticsService {
           ),
         ),
       ) as _i6.TimeOfDayClassification);
+}
+
+/// A class which mocks [StatsService].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockStatsService extends _i1.Mock implements _i27.StatsService {
+  MockStatsService() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i8.Future<_i28.MiniStats?> getBloodPressureStats({
+    required int? profileId,
+    int? daysBack = 7,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getBloodPressureStats,
+          [],
+          {
+            #profileId: profileId,
+            #daysBack: daysBack,
+          },
+        ),
+        returnValue: _i8.Future<_i28.MiniStats?>.value(),
+      ) as _i8.Future<_i28.MiniStats?>);
+
+  @override
+  _i8.Future<_i28.MiniStats?> getWeightStats({
+    required int? profileId,
+    int? daysBack = 7,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getWeightStats,
+          [],
+          {
+            #profileId: profileId,
+            #daysBack: daysBack,
+          },
+        ),
+        returnValue: _i8.Future<_i28.MiniStats?>.value(),
+      ) as _i8.Future<_i28.MiniStats?>);
+
+  @override
+  _i8.Future<_i28.MiniStats?> getSleepStats({
+    required int? profileId,
+    int? daysBack = 7,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getSleepStats,
+          [],
+          {
+            #profileId: profileId,
+            #daysBack: daysBack,
+          },
+        ),
+        returnValue: _i8.Future<_i28.MiniStats?>.value(),
+      ) as _i8.Future<_i28.MiniStats?>);
+
+  @override
+  _i8.Future<_i28.MiniStats?> getMedicationStats({
+    required int? profileId,
+    int? daysBack = 7,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getMedicationStats,
+          [],
+          {
+            #profileId: profileId,
+            #daysBack: daysBack,
+          },
+        ),
+        returnValue: _i8.Future<_i28.MiniStats?>.value(),
+      ) as _i8.Future<_i28.MiniStats?>);
 }

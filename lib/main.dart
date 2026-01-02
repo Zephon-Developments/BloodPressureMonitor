@@ -11,6 +11,7 @@ import 'package:blood_pressure_monitor/services/history_service.dart';
 import 'package:blood_pressure_monitor/services/profile_service.dart';
 import 'package:blood_pressure_monitor/services/reading_service.dart';
 import 'package:blood_pressure_monitor/services/sleep_service.dart';
+import 'package:blood_pressure_monitor/services/stats_service.dart';
 import 'package:blood_pressure_monitor/services/weight_service.dart';
 import 'package:blood_pressure_monitor/services/medication_service.dart';
 import 'package:blood_pressure_monitor/services/medication_intake_service.dart';
@@ -25,6 +26,7 @@ import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart'
 import 'package:blood_pressure_monitor/viewmodels/analytics_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/history_viewmodel.dart';
+import 'package:blood_pressure_monitor/viewmodels/history_home_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/lock_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/sleep_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/weight_viewmodel.dart';
@@ -65,6 +67,12 @@ void main() async {
   final medicationService = MedicationService(databaseService);
   final intakeService = MedicationIntakeService(databaseService);
   final medicationGroupService = MedicationGroupService(databaseService);
+  final statsService = StatsService(
+    readingService: readingService,
+    weightService: weightService,
+    sleepService: sleepService,
+    medicationIntakeService: intakeService,
+  );
   const appInfoService = AppInfoService();
   final analyticsService = AnalyticsService(
     readingService: readingService,
@@ -124,6 +132,7 @@ void main() async {
         Provider<HistoryService>.value(value: historyService),
         Provider<WeightService>.value(value: weightService),
         Provider<SleepService>.value(value: sleepService),
+        Provider<StatsService>.value(value: statsService),
         Provider<MedicationService>.value(value: medicationService),
         Provider<MedicationIntakeService>.value(value: intakeService),
         Provider<MedicationGroupService>.value(value: medicationGroupService),
@@ -157,6 +166,12 @@ void main() async {
         ChangeNotifierProvider<HistoryViewModel>(
           create: (context) => HistoryViewModel(
             context.read<HistoryService>(),
+            context.read<ActiveProfileViewModel>(),
+          ),
+        ),
+        ChangeNotifierProvider<HistoryHomeViewModel>(
+          create: (context) => HistoryHomeViewModel(
+            context.read<StatsService>(),
             context.read<ActiveProfileViewModel>(),
           ),
         ),
