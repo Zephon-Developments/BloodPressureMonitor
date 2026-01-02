@@ -1,6 +1,8 @@
 import 'package:blood_pressure_monitor/models/health_data.dart';
 import 'package:blood_pressure_monitor/services/database_service.dart';
+import 'package:blood_pressure_monitor/utils/unit_conversion.dart';
 import 'package:blood_pressure_monitor/utils/validators.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_sqlcipher/sqflite.dart';
 
 /// Service for managing weight entry CRUD operations.
@@ -9,11 +11,80 @@ import 'package:sqflite_sqlcipher/sqflite.dart';
 /// unit conversion support.
 class WeightService {
   final DatabaseService _databaseService;
+  final SharedPreferences? _prefs;
+
+  static const String _migrationKey = 'weight_si_migration_v1_completed';
 
   /// Creates a [WeightService] with the given database service.
-  WeightService(this._databaseService);
+  ///
+  /// [prefs] is optional for testing, but required for production to support migration.
+  WeightService(this._databaseService, [this._prefs]);
+
+  /// - Is idempotent (safe to run multiple times)
+  /// - Logs completion to SharedPreferences
+  ///
+  /// Should be called during app initialization before any weight operations.
+  Future<void> migrateToSIStorage() async {
+    // Skip migration if prefs not available (testing scenario)
+    if (_prefs == null) {
+      return;
+    }
+
+    // Check if migration already completed
+    if (_prefs!.getBool(_migrationKey) == true) {
+      return; // Already migrated
+    }
+
+    final db = await _databaseService.database;
+
+    try {
+      await db.transaction((txn) async {
+        // Get all entries that need conversion (stored in lbs)
+        final lbsEntries = await txn.query(
+          'WeightEntry',
+          where: 'unit = ?',
+          whereArgs: ['lbs'],
+        );
+
+        // Convert each lbs entry to kg
+        for (final entry in lbsEntries) {
+          final id = entry['id'] as int;
+          final lbsValue = entry['weightValue'] as double;
+          final kgValue = UnitConversion.lbsToKg(lbsValue);
+
+          await txn.update(
+            'WeightEntry',
+            {
+              'weightValue': kgValue,
+              'unit': 'kg',
+            },
+            where: 'id = ?',
+            whereArgs: [id],
+          );
+        }
+
+        // Ensure all remaining entries are marked as kg
+        await txn.update(
+          'WeightEntry',
+          {'unit': 'kg'},
+          where: 'unit != ?',
+          whereArgs: ['kg'],
+        );
+      });
+
+      // Mark migration as complete
+      await _prefs!.setBool(_migrationKey, true);
+    } catch (e) {
+      // Log error but don't throw - allow app to continue
+      // In production, would use proper logging
+      rethrow;
+    }
+  }
 
   /// Creates a new weight entry in the database.
+  ///
+  /// **IMPORTANT:** All weights are stored internally in kg (SI units).
+  /// If the entry has a unit of lbs, it will be converted to kg before storage.
   ///
   /// Validates the weight value and unit before insertion.
   ///
@@ -21,9 +92,17 @@ class WeightService {
   ///
   /// Throws [ArgumentError] if validation fails.
   Future<WeightEntry> createWeightEntry(WeightEntry entry) async {
-    // Validate weight value and unit
+    // Always convert to kg for storage
+    final entryInKg = entry.unit == WeightUnit.kg
+        ? entry
+        : entry.copyWith(
+            weightValue: UnitConversion.lbsToKg(entry.weightValue),
+            unit: WeightUnit.kg,
+          );
+
+    // Validate weight value (now in kg)
     final weightValidation =
-        validateWeight(entry.weightValue, entry.unit.toDbString());
+        validateWeight(entryInKg.weightValue, entryInKg.unit.toDbString());
     if (weightValidation.level == ValidationLevel.error) {
       throw ArgumentError(weightValidation.message);
     }
@@ -31,11 +110,11 @@ class WeightService {
     final db = await _databaseService.database;
     final id = await db.insert(
       'WeightEntry',
-      entry.toMap(),
+      entryInKg.toMap(),
       conflictAlgorithm: ConflictAlgorithm.abort,
     );
 
-    return entry.copyWith(id: id);
+    return entryInKg.copyWith(id: id);
   }
 
   /// Retrieves a weight entry by its ID.
@@ -110,6 +189,9 @@ class WeightService {
 
   /// Updates an existing weight entry.
   ///
+  /// **IMPORTANT:** All weights are stored internally in kg (SI units).
+  /// If the entry has a unit of lbs, it will be converted to kg before storage.
+  ///
   /// Validates the weight value and unit before update.
   ///
   /// Returns the updated entry.
@@ -120,9 +202,17 @@ class WeightService {
       throw ArgumentError('Cannot update weight entry without an ID');
     }
 
-    // Validate weight value and unit
+    // Always convert to kg for storage
+    final entryInKg = entry.unit == WeightUnit.kg
+        ? entry
+        : entry.copyWith(
+            weightValue: UnitConversion.lbsToKg(entry.weightValue),
+            unit: WeightUnit.kg,
+          );
+
+    // Validate weight value (now in kg)
     final weightValidation =
-        validateWeight(entry.weightValue, entry.unit.toDbString());
+        validateWeight(entryInKg.weightValue, entryInKg.unit.toDbString());
     if (weightValidation.level == ValidationLevel.error) {
       throw ArgumentError(weightValidation.message);
     }
@@ -130,16 +220,16 @@ class WeightService {
     final db = await _databaseService.database;
     final count = await db.update(
       'WeightEntry',
-      entry.toMap(),
+      entryInKg.toMap(),
       where: 'id = ?',
-      whereArgs: [entry.id],
+      whereArgs: [entryInKg.id],
     );
 
     if (count == 0) {
-      throw ArgumentError('Weight entry with ID ${entry.id} not found');
+      throw ArgumentError('Weight entry with ID ${entryInKg.id} not found');
     }
 
-    return entry;
+    return entryInKg;
   }
 
   /// Deletes all weight entries for a profile.
