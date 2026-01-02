@@ -42,11 +42,13 @@ void main() {
 
   group('getBloodPressureStats', () {
     test('returns null when no readings available', () async {
-      when(mockReadingService.getReadingsInTimeRange(
-        any,
-        any,
-        any,
-      )).thenAnswer((_) async => []);
+      when(
+        mockReadingService.getReadingsInTimeRange(
+          any,
+          any,
+          any,
+        ),
+      ).thenAnswer((_) async => []);
 
       final result = await statsService.getBloodPressureStats(profileId: 1);
 
@@ -65,19 +67,23 @@ void main() {
         localOffsetMinutes: 0,
       );
 
-      when(mockReadingService.getReadingsInTimeRange(
-        any,
-        any,
-        any,
-      )).thenAnswer((_) async => [reading]);
+      when(
+        mockReadingService.getReadingsInTimeRange(
+          any,
+          any,
+          any,
+        ),
+      ).thenAnswer((_) async => [reading]);
 
       final result = await statsService.getBloodPressureStats(profileId: 1);
 
       expect(result, isNotNull);
       expect(result!.latestValue, contains('120/80'));
       expect(result.weekAverage, contains('Avg: 120/80'));
-      expect(result.trend,
-          TrendDirection.stable); // No previous week data for comparison
+      expect(
+        result.trend,
+        TrendDirection.stable,
+      ); // No previous week data for comparison
     });
 
     test('calculates correct average from multiple readings', () async {
@@ -114,17 +120,21 @@ void main() {
         ),
       ];
 
-      when(mockReadingService.getReadingsInTimeRange(
-        any,
-        any,
-        any,
-      )).thenAnswer((_) async => readings);
+      when(
+        mockReadingService.getReadingsInTimeRange(
+          any,
+          any,
+          any,
+        ),
+      ).thenAnswer((_) async => readings);
 
       final result = await statsService.getBloodPressureStats(profileId: 1);
 
       expect(result, isNotNull);
-      expect(result!.weekAverage,
-          'Avg: 120/80'); // (120+118+122)/3 = 120, (80+78+82)/3 = 80
+      expect(
+        result!.weekAverage,
+        'Avg: 120/80',
+      ); // (120+118+122)/3 = 120, (80+78+82)/3 = 80
       expect(result.trend, TrendDirection.stable); // No previous week data
     });
 
@@ -154,27 +164,33 @@ void main() {
         ),
       ];
 
-      when(mockReadingService.getReadingsInTimeRange(
-        any,
-        any,
-        any,
-      )).thenAnswer((_) async => readings);
+      when(
+        mockReadingService.getReadingsInTimeRange(
+          any,
+          any,
+          any,
+        ),
+      ).thenAnswer((_) async => readings);
 
       final result = await statsService.getBloodPressureStats(profileId: 1);
 
       expect(result, isNotNull);
-      expect(result!.trend,
-          TrendDirection.up); // BP decreased by ~15%, improvement
+      expect(
+        result!.trend,
+        TrendDirection.up,
+      ); // BP decreased by ~15%, improvement
     });
   });
 
   group('getWeightStats', () {
     test('returns null when no weight entries available', () async {
-      when(mockWeightService.listWeightEntries(
-        profileId: anyNamed('profileId'),
-        from: anyNamed('from'),
-        to: anyNamed('to'),
-      )).thenAnswer((_) async => []);
+      when(
+        mockWeightService.listWeightEntries(
+          profileId: anyNamed('profileId'),
+          from: anyNamed('from'),
+          to: anyNamed('to'),
+        ),
+      ).thenAnswer((_) async => []);
 
       final result = await statsService.getWeightStats(profileId: 1);
 
@@ -209,11 +225,13 @@ void main() {
         ),
       ];
 
-      when(mockWeightService.listWeightEntries(
-        profileId: anyNamed('profileId'),
-        from: anyNamed('from'),
-        to: anyNamed('to'),
-      )).thenAnswer((_) async => weights);
+      when(
+        mockWeightService.listWeightEntries(
+          profileId: anyNamed('profileId'),
+          from: anyNamed('from'),
+          to: anyNamed('to'),
+        ),
+      ).thenAnswer((_) async => weights);
 
       final result = await statsService.getWeightStats(profileId: 1);
 
@@ -243,11 +261,13 @@ void main() {
         ),
       ];
 
-      when(mockWeightService.listWeightEntries(
-        profileId: anyNamed('profileId'),
-        from: anyNamed('from'),
-        to: anyNamed('to'),
-      )).thenAnswer((_) async => weights);
+      when(
+        mockWeightService.listWeightEntries(
+          profileId: anyNamed('profileId'),
+          from: anyNamed('from'),
+          to: anyNamed('to'),
+        ),
+      ).thenAnswer((_) async => weights);
 
       final result = await statsService.getWeightStats(profileId: 1);
 
@@ -258,11 +278,13 @@ void main() {
 
   group('getSleepStats', () {
     test('returns null when no sleep entries available', () async {
-      when(mockSleepService.listSleepEntries(
-        profileId: anyNamed('profileId'),
-        from: anyNamed('from'),
-        to: anyNamed('to'),
-      )).thenAnswer((_) async => []);
+      when(
+        mockSleepService.listSleepEntries(
+          profileId: anyNamed('profileId'),
+          from: anyNamed('from'),
+          to: anyNamed('to'),
+        ),
+      ).thenAnswer((_) async => []);
 
       final result = await statsService.getSleepStats(profileId: 1);
 
@@ -297,11 +319,13 @@ void main() {
         ),
       ];
 
-      when(mockSleepService.listSleepEntries(
-        profileId: anyNamed('profileId'),
-        from: anyNamed('from'),
-        to: anyNamed('to'),
-      )).thenAnswer((_) async => sleepEntries);
+      when(
+        mockSleepService.listSleepEntries(
+          profileId: anyNamed('profileId'),
+          from: anyNamed('from'),
+          to: anyNamed('to'),
+        ),
+      ).thenAnswer((_) async => sleepEntries);
 
       final result = await statsService.getSleepStats(profileId: 1);
 
@@ -332,11 +356,13 @@ void main() {
         ),
       ];
 
-      when(mockSleepService.listSleepEntries(
-        profileId: anyNamed('profileId'),
-        from: anyNamed('from'),
-        to: anyNamed('to'),
-      )).thenAnswer((_) async => sleepEntries);
+      when(
+        mockSleepService.listSleepEntries(
+          profileId: anyNamed('profileId'),
+          from: anyNamed('from'),
+          to: anyNamed('to'),
+        ),
+      ).thenAnswer((_) async => sleepEntries);
 
       final result = await statsService.getSleepStats(profileId: 1);
 
@@ -347,11 +373,13 @@ void main() {
 
   group('getMedicationStats', () {
     test('returns null when no medication intakes available', () async {
-      when(mockMedicationIntakeService.listIntakes(
-        profileId: anyNamed('profileId'),
-        from: anyNamed('from'),
-        to: anyNamed('to'),
-      )).thenAnswer((_) async => []);
+      when(
+        mockMedicationIntakeService.listIntakes(
+          profileId: anyNamed('profileId'),
+          from: anyNamed('from'),
+          to: anyNamed('to'),
+        ),
+      ).thenAnswer((_) async => []);
 
       final result = await statsService.getMedicationStats(profileId: 1);
 
@@ -396,11 +424,13 @@ void main() {
         ),
       ];
 
-      when(mockMedicationIntakeService.listIntakes(
-        profileId: anyNamed('profileId'),
-        from: anyNamed('from'),
-        to: anyNamed('to'),
-      )).thenAnswer((_) async => intakes);
+      when(
+        mockMedicationIntakeService.listIntakes(
+          profileId: anyNamed('profileId'),
+          from: anyNamed('from'),
+          to: anyNamed('to'),
+        ),
+      ).thenAnswer((_) async => intakes);
 
       final result = await statsService.getMedicationStats(profileId: 1);
 
@@ -419,11 +449,13 @@ void main() {
         ),
       ];
 
-      when(mockMedicationIntakeService.listIntakes(
-        profileId: anyNamed('profileId'),
-        from: anyNamed('from'),
-        to: anyNamed('to'),
-      )).thenAnswer((_) async => recentIntake);
+      when(
+        mockMedicationIntakeService.listIntakes(
+          profileId: anyNamed('profileId'),
+          from: anyNamed('from'),
+          to: anyNamed('to'),
+        ),
+      ).thenAnswer((_) async => recentIntake);
 
       final result = await statsService.getMedicationStats(profileId: 1);
 
@@ -503,11 +535,13 @@ void main() {
         ),
       ];
 
-      when(mockMedicationIntakeService.listIntakes(
-        profileId: anyNamed('profileId'),
-        from: anyNamed('from'),
-        to: anyNamed('to'),
-      )).thenAnswer((_) async => allIntakes);
+      when(
+        mockMedicationIntakeService.listIntakes(
+          profileId: anyNamed('profileId'),
+          from: anyNamed('from'),
+          to: anyNamed('to'),
+        ),
+      ).thenAnswer((_) async => allIntakes);
 
       final result = await statsService.getMedicationStats(profileId: 1);
 
