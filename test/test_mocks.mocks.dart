@@ -3,42 +3,45 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i8;
-import 'dart:ui' as _i19;
+import 'dart:async' as _i9;
+import 'dart:ui' as _i20;
 
 import 'package:blood_pressure_monitor/models/analytics.dart' as _i5;
 import 'package:blood_pressure_monitor/models/health_data.dart' as _i2;
 import 'package:blood_pressure_monitor/models/medication.dart' as _i3;
-import 'package:blood_pressure_monitor/models/mini_stats.dart' as _i28;
-import 'package:blood_pressure_monitor/models/profile.dart' as _i18;
-import 'package:blood_pressure_monitor/models/reading.dart' as _i9;
+import 'package:blood_pressure_monitor/models/mini_stats.dart' as _i29;
+import 'package:blood_pressure_monitor/models/profile.dart' as _i19;
+import 'package:blood_pressure_monitor/models/reading.dart' as _i10;
+import 'package:blood_pressure_monitor/models/units_preference.dart' as _i7;
 import 'package:blood_pressure_monitor/services/analytics_service.dart' as _i6;
-import 'package:blood_pressure_monitor/services/history_service.dart' as _i10;
+import 'package:blood_pressure_monitor/services/history_service.dart' as _i11;
 import 'package:blood_pressure_monitor/services/medication_group_service.dart'
-    as _i15;
+    as _i16;
 import 'package:blood_pressure_monitor/services/medication_intake_service.dart'
-    as _i14;
+    as _i15;
 import 'package:blood_pressure_monitor/services/medication_service.dart'
-    as _i13;
-import 'package:blood_pressure_monitor/services/profile_service.dart' as _i23;
-import 'package:blood_pressure_monitor/services/reading_service.dart' as _i7;
-import 'package:blood_pressure_monitor/services/sleep_service.dart' as _i11;
-import 'package:blood_pressure_monitor/services/stats_service.dart' as _i27;
-import 'package:blood_pressure_monitor/services/weight_service.dart' as _i12;
-import 'package:blood_pressure_monitor/utils/time_range.dart' as _i26;
+    as _i14;
+import 'package:blood_pressure_monitor/services/profile_service.dart' as _i24;
+import 'package:blood_pressure_monitor/services/reading_service.dart' as _i8;
+import 'package:blood_pressure_monitor/services/sleep_service.dart' as _i12;
+import 'package:blood_pressure_monitor/services/stats_service.dart' as _i28;
+import 'package:blood_pressure_monitor/services/units_preference_service.dart'
+    as _i30;
+import 'package:blood_pressure_monitor/services/weight_service.dart' as _i13;
+import 'package:blood_pressure_monitor/utils/time_range.dart' as _i27;
 import 'package:blood_pressure_monitor/utils/validators.dart' as _i4;
 import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart'
-    as _i16;
+    as _i17;
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart'
-    as _i22;
+    as _i23;
 import 'package:blood_pressure_monitor/viewmodels/medication_group_viewmodel.dart'
-    as _i21;
+    as _i22;
 import 'package:blood_pressure_monitor/viewmodels/medication_viewmodel.dart'
-    as _i20;
-import 'package:flutter/material.dart' as _i25;
+    as _i21;
+import 'package:flutter/material.dart' as _i26;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:mockito/src/dummies.dart' as _i17;
-import 'package:shared_preferences/shared_preferences.dart' as _i24;
+import 'package:mockito/src/dummies.dart' as _i18;
+import 'package:shared_preferences/shared_preferences.dart' as _i25;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -182,34 +185,45 @@ class _FakeTimeOfDayClassification_11 extends _i1.SmartFake
         );
 }
 
+class _FakeUnitsPreference_12 extends _i1.SmartFake
+    implements _i7.UnitsPreference {
+  _FakeUnitsPreference_12(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
 /// A class which mocks [ReadingService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockReadingService extends _i1.Mock implements _i7.ReadingService {
+class MockReadingService extends _i1.Mock implements _i8.ReadingService {
   MockReadingService() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i8.Future<int> createReading(_i9.Reading? reading) => (super.noSuchMethod(
+  _i9.Future<int> createReading(_i10.Reading? reading) => (super.noSuchMethod(
         Invocation.method(
           #createReading,
           [reading],
         ),
-        returnValue: _i8.Future<int>.value(0),
-      ) as _i8.Future<int>);
+        returnValue: _i9.Future<int>.value(0),
+      ) as _i9.Future<int>);
 
   @override
-  _i8.Future<_i9.Reading?> getReading(int? id) => (super.noSuchMethod(
+  _i9.Future<_i10.Reading?> getReading(int? id) => (super.noSuchMethod(
         Invocation.method(
           #getReading,
           [id],
         ),
-        returnValue: _i8.Future<_i9.Reading?>.value(),
-      ) as _i8.Future<_i9.Reading?>);
+        returnValue: _i9.Future<_i10.Reading?>.value(),
+      ) as _i9.Future<_i10.Reading?>);
 
   @override
-  _i8.Future<List<_i9.Reading>> getReadingsByProfile(
+  _i9.Future<List<_i10.Reading>> getReadingsByProfile(
     int? profileId, {
     int? limit,
   }) =>
@@ -219,11 +233,11 @@ class MockReadingService extends _i1.Mock implements _i7.ReadingService {
           [profileId],
           {#limit: limit},
         ),
-        returnValue: _i8.Future<List<_i9.Reading>>.value(<_i9.Reading>[]),
-      ) as _i8.Future<List<_i9.Reading>>);
+        returnValue: _i9.Future<List<_i10.Reading>>.value(<_i10.Reading>[]),
+      ) as _i9.Future<List<_i10.Reading>>);
 
   @override
-  _i8.Future<List<_i9.Reading>> getReadingsInTimeRange(
+  _i9.Future<List<_i10.Reading>> getReadingsInTimeRange(
     int? profileId,
     DateTime? startTime,
     DateTime? endTime,
@@ -237,57 +251,57 @@ class MockReadingService extends _i1.Mock implements _i7.ReadingService {
             endTime,
           ],
         ),
-        returnValue: _i8.Future<List<_i9.Reading>>.value(<_i9.Reading>[]),
-      ) as _i8.Future<List<_i9.Reading>>);
+        returnValue: _i9.Future<List<_i10.Reading>>.value(<_i10.Reading>[]),
+      ) as _i9.Future<List<_i10.Reading>>);
 
   @override
-  _i8.Future<_i9.Reading?> getLatestReading(int? profileId) =>
+  _i9.Future<_i10.Reading?> getLatestReading(int? profileId) =>
       (super.noSuchMethod(
         Invocation.method(
           #getLatestReading,
           [profileId],
         ),
-        returnValue: _i8.Future<_i9.Reading?>.value(),
-      ) as _i8.Future<_i9.Reading?>);
+        returnValue: _i9.Future<_i10.Reading?>.value(),
+      ) as _i9.Future<_i10.Reading?>);
 
   @override
-  _i8.Future<int> updateReading(_i9.Reading? reading) => (super.noSuchMethod(
+  _i9.Future<int> updateReading(_i10.Reading? reading) => (super.noSuchMethod(
         Invocation.method(
           #updateReading,
           [reading],
         ),
-        returnValue: _i8.Future<int>.value(0),
-      ) as _i8.Future<int>);
+        returnValue: _i9.Future<int>.value(0),
+      ) as _i9.Future<int>);
 
   @override
-  _i8.Future<int> deleteReading(int? id) => (super.noSuchMethod(
+  _i9.Future<int> deleteReading(int? id) => (super.noSuchMethod(
         Invocation.method(
           #deleteReading,
           [id],
         ),
-        returnValue: _i8.Future<int>.value(0),
-      ) as _i8.Future<int>);
+        returnValue: _i9.Future<int>.value(0),
+      ) as _i9.Future<int>);
 
   @override
-  _i8.Future<int> deleteAllByProfile(int? profileId) => (super.noSuchMethod(
+  _i9.Future<int> deleteAllByProfile(int? profileId) => (super.noSuchMethod(
         Invocation.method(
           #deleteAllByProfile,
           [profileId],
         ),
-        returnValue: _i8.Future<int>.value(0),
-      ) as _i8.Future<int>);
+        returnValue: _i9.Future<int>.value(0),
+      ) as _i9.Future<int>);
 
   @override
-  _i8.Future<int> getReadingCount(int? profileId) => (super.noSuchMethod(
+  _i9.Future<int> getReadingCount(int? profileId) => (super.noSuchMethod(
         Invocation.method(
           #getReadingCount,
           [profileId],
         ),
-        returnValue: _i8.Future<int>.value(0),
-      ) as _i8.Future<int>);
+        returnValue: _i9.Future<int>.value(0),
+      ) as _i9.Future<int>);
 
   @override
-  _i8.Future<List<_i9.Reading>> getReadingsByTag(
+  _i9.Future<List<_i10.Reading>> getReadingsByTag(
     int? profileId,
     String? tag,
   ) =>
@@ -299,11 +313,11 @@ class MockReadingService extends _i1.Mock implements _i7.ReadingService {
             tag,
           ],
         ),
-        returnValue: _i8.Future<List<_i9.Reading>>.value(<_i9.Reading>[]),
-      ) as _i8.Future<List<_i9.Reading>>);
+        returnValue: _i9.Future<List<_i10.Reading>>.value(<_i10.Reading>[]),
+      ) as _i9.Future<List<_i10.Reading>>);
 
   @override
-  _i8.Future<List<_i9.ReadingGroup>> getGroupsInRange({
+  _i9.Future<List<_i10.ReadingGroup>> getGroupsInRange({
     required int? profileId,
     required DateTime? start,
     required DateTime? end,
@@ -319,30 +333,30 @@ class MockReadingService extends _i1.Mock implements _i7.ReadingService {
           },
         ),
         returnValue:
-            _i8.Future<List<_i9.ReadingGroup>>.value(<_i9.ReadingGroup>[]),
-      ) as _i8.Future<List<_i9.ReadingGroup>>);
+            _i9.Future<List<_i10.ReadingGroup>>.value(<_i10.ReadingGroup>[]),
+      ) as _i9.Future<List<_i10.ReadingGroup>>);
 
   @override
-  _i8.Future<List<_i9.Reading>> getReadingsByIds(List<int>? ids) =>
+  _i9.Future<List<_i10.Reading>> getReadingsByIds(List<int>? ids) =>
       (super.noSuchMethod(
         Invocation.method(
           #getReadingsByIds,
           [ids],
         ),
-        returnValue: _i8.Future<List<_i9.Reading>>.value(<_i9.Reading>[]),
-      ) as _i8.Future<List<_i9.Reading>>);
+        returnValue: _i9.Future<List<_i10.Reading>>.value(<_i10.Reading>[]),
+      ) as _i9.Future<List<_i10.Reading>>);
 }
 
 /// A class which mocks [HistoryService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockHistoryService extends _i1.Mock implements _i10.HistoryService {
+class MockHistoryService extends _i1.Mock implements _i11.HistoryService {
   MockHistoryService() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i8.Future<List<_i9.ReadingGroup>> fetchGroupedHistory({
+  _i9.Future<List<_i10.ReadingGroup>> fetchGroupedHistory({
     required int? profileId,
     DateTime? start,
     DateTime? end,
@@ -364,11 +378,11 @@ class MockHistoryService extends _i1.Mock implements _i10.HistoryService {
           },
         ),
         returnValue:
-            _i8.Future<List<_i9.ReadingGroup>>.value(<_i9.ReadingGroup>[]),
-      ) as _i8.Future<List<_i9.ReadingGroup>>);
+            _i9.Future<List<_i10.ReadingGroup>>.value(<_i10.ReadingGroup>[]),
+      ) as _i9.Future<List<_i10.ReadingGroup>>);
 
   @override
-  _i8.Future<List<_i9.Reading>> fetchRawHistory({
+  _i9.Future<List<_i10.Reading>> fetchRawHistory({
     required int? profileId,
     DateTime? start,
     DateTime? end,
@@ -389,55 +403,55 @@ class MockHistoryService extends _i1.Mock implements _i10.HistoryService {
             #tags: tags,
           },
         ),
-        returnValue: _i8.Future<List<_i9.Reading>>.value(<_i9.Reading>[]),
-      ) as _i8.Future<List<_i9.Reading>>);
+        returnValue: _i9.Future<List<_i10.Reading>>.value(<_i10.Reading>[]),
+      ) as _i9.Future<List<_i10.Reading>>);
 
   @override
-  _i8.Future<List<_i9.Reading>> fetchGroupMembers(_i9.ReadingGroup? group) =>
+  _i9.Future<List<_i10.Reading>> fetchGroupMembers(_i10.ReadingGroup? group) =>
       (super.noSuchMethod(
         Invocation.method(
           #fetchGroupMembers,
           [group],
         ),
-        returnValue: _i8.Future<List<_i9.Reading>>.value(<_i9.Reading>[]),
-      ) as _i8.Future<List<_i9.Reading>>);
+        returnValue: _i9.Future<List<_i10.Reading>>.value(<_i10.Reading>[]),
+      ) as _i9.Future<List<_i10.Reading>>);
 }
 
 /// A class which mocks [SleepService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockSleepService extends _i1.Mock implements _i11.SleepService {
+class MockSleepService extends _i1.Mock implements _i12.SleepService {
   MockSleepService() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i8.Future<_i2.SleepEntry> createSleepEntry(_i2.SleepEntry? entry) =>
+  _i9.Future<_i2.SleepEntry> createSleepEntry(_i2.SleepEntry? entry) =>
       (super.noSuchMethod(
         Invocation.method(
           #createSleepEntry,
           [entry],
         ),
-        returnValue: _i8.Future<_i2.SleepEntry>.value(_FakeSleepEntry_0(
+        returnValue: _i9.Future<_i2.SleepEntry>.value(_FakeSleepEntry_0(
           this,
           Invocation.method(
             #createSleepEntry,
             [entry],
           ),
         )),
-      ) as _i8.Future<_i2.SleepEntry>);
+      ) as _i9.Future<_i2.SleepEntry>);
 
   @override
-  _i8.Future<_i2.SleepEntry?> getSleepEntry(int? id) => (super.noSuchMethod(
+  _i9.Future<_i2.SleepEntry?> getSleepEntry(int? id) => (super.noSuchMethod(
         Invocation.method(
           #getSleepEntry,
           [id],
         ),
-        returnValue: _i8.Future<_i2.SleepEntry?>.value(),
-      ) as _i8.Future<_i2.SleepEntry?>);
+        returnValue: _i9.Future<_i2.SleepEntry?>.value(),
+      ) as _i9.Future<_i2.SleepEntry?>);
 
   @override
-  _i8.Future<List<_i2.SleepEntry>> listSleepEntries({
+  _i9.Future<List<_i2.SleepEntry>> listSleepEntries({
     required int? profileId,
     DateTime? from,
     DateTime? to,
@@ -452,45 +466,45 @@ class MockSleepService extends _i1.Mock implements _i11.SleepService {
             #to: to,
           },
         ),
-        returnValue: _i8.Future<List<_i2.SleepEntry>>.value(<_i2.SleepEntry>[]),
-      ) as _i8.Future<List<_i2.SleepEntry>>);
+        returnValue: _i9.Future<List<_i2.SleepEntry>>.value(<_i2.SleepEntry>[]),
+      ) as _i9.Future<List<_i2.SleepEntry>>);
 
   @override
-  _i8.Future<_i2.SleepEntry> updateSleepEntry(_i2.SleepEntry? entry) =>
+  _i9.Future<_i2.SleepEntry> updateSleepEntry(_i2.SleepEntry? entry) =>
       (super.noSuchMethod(
         Invocation.method(
           #updateSleepEntry,
           [entry],
         ),
-        returnValue: _i8.Future<_i2.SleepEntry>.value(_FakeSleepEntry_0(
+        returnValue: _i9.Future<_i2.SleepEntry>.value(_FakeSleepEntry_0(
           this,
           Invocation.method(
             #updateSleepEntry,
             [entry],
           ),
         )),
-      ) as _i8.Future<_i2.SleepEntry>);
+      ) as _i9.Future<_i2.SleepEntry>);
 
   @override
-  _i8.Future<bool> deleteSleepEntry(int? id) => (super.noSuchMethod(
+  _i9.Future<bool> deleteSleepEntry(int? id) => (super.noSuchMethod(
         Invocation.method(
           #deleteSleepEntry,
           [id],
         ),
-        returnValue: _i8.Future<bool>.value(false),
-      ) as _i8.Future<bool>);
+        returnValue: _i9.Future<bool>.value(false),
+      ) as _i9.Future<bool>);
 
   @override
-  _i8.Future<int> deleteAllByProfile(int? profileId) => (super.noSuchMethod(
+  _i9.Future<int> deleteAllByProfile(int? profileId) => (super.noSuchMethod(
         Invocation.method(
           #deleteAllByProfile,
           [profileId],
         ),
-        returnValue: _i8.Future<int>.value(0),
-      ) as _i8.Future<int>);
+        returnValue: _i9.Future<int>.value(0),
+      ) as _i9.Future<int>);
 
   @override
-  _i8.Future<_i2.SleepEntry?> findSleepForMorningReading({
+  _i9.Future<_i2.SleepEntry?> findSleepForMorningReading({
     required int? profileId,
     required DateTime? readingTime,
     int? lookbackHours = 18,
@@ -505,11 +519,11 @@ class MockSleepService extends _i1.Mock implements _i11.SleepService {
             #lookbackHours: lookbackHours,
           },
         ),
-        returnValue: _i8.Future<_i2.SleepEntry?>.value(),
-      ) as _i8.Future<_i2.SleepEntry?>);
+        returnValue: _i9.Future<_i2.SleepEntry?>.value(),
+      ) as _i9.Future<_i2.SleepEntry?>);
 
   @override
-  _i8.Future<bool> isDuplicate({
+  _i9.Future<bool> isDuplicate({
     required int? profileId,
     required DateTime? startedAt,
     required _i2.SleepSource? source,
@@ -526,55 +540,55 @@ class MockSleepService extends _i1.Mock implements _i11.SleepService {
             #sourceMetadata: sourceMetadata,
           },
         ),
-        returnValue: _i8.Future<bool>.value(false),
-      ) as _i8.Future<bool>);
+        returnValue: _i9.Future<bool>.value(false),
+      ) as _i9.Future<bool>);
 }
 
 /// A class which mocks [WeightService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockWeightService extends _i1.Mock implements _i12.WeightService {
+class MockWeightService extends _i1.Mock implements _i13.WeightService {
   MockWeightService() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i8.Future<void> migrateToSIStorage() => (super.noSuchMethod(
+  _i9.Future<void> migrateToSIStorage() => (super.noSuchMethod(
         Invocation.method(
           #migrateToSIStorage,
           [],
         ),
-        returnValue: _i8.Future<void>.value(),
-        returnValueForMissingStub: _i8.Future<void>.value(),
-      ) as _i8.Future<void>);
+        returnValue: _i9.Future<void>.value(),
+        returnValueForMissingStub: _i9.Future<void>.value(),
+      ) as _i9.Future<void>);
 
   @override
-  _i8.Future<_i2.WeightEntry> createWeightEntry(_i2.WeightEntry? entry) =>
+  _i9.Future<_i2.WeightEntry> createWeightEntry(_i2.WeightEntry? entry) =>
       (super.noSuchMethod(
         Invocation.method(
           #createWeightEntry,
           [entry],
         ),
-        returnValue: _i8.Future<_i2.WeightEntry>.value(_FakeWeightEntry_1(
+        returnValue: _i9.Future<_i2.WeightEntry>.value(_FakeWeightEntry_1(
           this,
           Invocation.method(
             #createWeightEntry,
             [entry],
           ),
         )),
-      ) as _i8.Future<_i2.WeightEntry>);
+      ) as _i9.Future<_i2.WeightEntry>);
 
   @override
-  _i8.Future<_i2.WeightEntry?> getWeightEntry(int? id) => (super.noSuchMethod(
+  _i9.Future<_i2.WeightEntry?> getWeightEntry(int? id) => (super.noSuchMethod(
         Invocation.method(
           #getWeightEntry,
           [id],
         ),
-        returnValue: _i8.Future<_i2.WeightEntry?>.value(),
-      ) as _i8.Future<_i2.WeightEntry?>);
+        returnValue: _i9.Future<_i2.WeightEntry?>.value(),
+      ) as _i9.Future<_i2.WeightEntry?>);
 
   @override
-  _i8.Future<List<_i2.WeightEntry>> listWeightEntries({
+  _i9.Future<List<_i2.WeightEntry>> listWeightEntries({
     required int? profileId,
     DateTime? from,
     DateTime? to,
@@ -590,55 +604,55 @@ class MockWeightService extends _i1.Mock implements _i12.WeightService {
           },
         ),
         returnValue:
-            _i8.Future<List<_i2.WeightEntry>>.value(<_i2.WeightEntry>[]),
-      ) as _i8.Future<List<_i2.WeightEntry>>);
+            _i9.Future<List<_i2.WeightEntry>>.value(<_i2.WeightEntry>[]),
+      ) as _i9.Future<List<_i2.WeightEntry>>);
 
   @override
-  _i8.Future<_i2.WeightEntry?> getLatestWeightEntry(int? profileId) =>
+  _i9.Future<_i2.WeightEntry?> getLatestWeightEntry(int? profileId) =>
       (super.noSuchMethod(
         Invocation.method(
           #getLatestWeightEntry,
           [profileId],
         ),
-        returnValue: _i8.Future<_i2.WeightEntry?>.value(),
-      ) as _i8.Future<_i2.WeightEntry?>);
+        returnValue: _i9.Future<_i2.WeightEntry?>.value(),
+      ) as _i9.Future<_i2.WeightEntry?>);
 
   @override
-  _i8.Future<_i2.WeightEntry> updateWeightEntry(_i2.WeightEntry? entry) =>
+  _i9.Future<_i2.WeightEntry> updateWeightEntry(_i2.WeightEntry? entry) =>
       (super.noSuchMethod(
         Invocation.method(
           #updateWeightEntry,
           [entry],
         ),
-        returnValue: _i8.Future<_i2.WeightEntry>.value(_FakeWeightEntry_1(
+        returnValue: _i9.Future<_i2.WeightEntry>.value(_FakeWeightEntry_1(
           this,
           Invocation.method(
             #updateWeightEntry,
             [entry],
           ),
         )),
-      ) as _i8.Future<_i2.WeightEntry>);
+      ) as _i9.Future<_i2.WeightEntry>);
 
   @override
-  _i8.Future<int> deleteAllByProfile(int? profileId) => (super.noSuchMethod(
+  _i9.Future<int> deleteAllByProfile(int? profileId) => (super.noSuchMethod(
         Invocation.method(
           #deleteAllByProfile,
           [profileId],
         ),
-        returnValue: _i8.Future<int>.value(0),
-      ) as _i8.Future<int>);
+        returnValue: _i9.Future<int>.value(0),
+      ) as _i9.Future<int>);
 
   @override
-  _i8.Future<bool> deleteWeightEntry(int? id) => (super.noSuchMethod(
+  _i9.Future<bool> deleteWeightEntry(int? id) => (super.noSuchMethod(
         Invocation.method(
           #deleteWeightEntry,
           [id],
         ),
-        returnValue: _i8.Future<bool>.value(false),
-      ) as _i8.Future<bool>);
+        returnValue: _i9.Future<bool>.value(false),
+      ) as _i9.Future<bool>);
 
   @override
-  _i8.Future<_i2.WeightEntry?> findWeightForReading({
+  _i9.Future<_i2.WeightEntry?> findWeightForReading({
     required int? profileId,
     required DateTime? readingTime,
     Duration? window = const Duration(hours: 1),
@@ -653,45 +667,45 @@ class MockWeightService extends _i1.Mock implements _i12.WeightService {
             #window: window,
           },
         ),
-        returnValue: _i8.Future<_i2.WeightEntry?>.value(),
-      ) as _i8.Future<_i2.WeightEntry?>);
+        returnValue: _i9.Future<_i2.WeightEntry?>.value(),
+      ) as _i9.Future<_i2.WeightEntry?>);
 }
 
 /// A class which mocks [MedicationService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockMedicationService extends _i1.Mock implements _i13.MedicationService {
+class MockMedicationService extends _i1.Mock implements _i14.MedicationService {
   MockMedicationService() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i8.Future<_i3.Medication> createMedication(_i3.Medication? medication) =>
+  _i9.Future<_i3.Medication> createMedication(_i3.Medication? medication) =>
       (super.noSuchMethod(
         Invocation.method(
           #createMedication,
           [medication],
         ),
-        returnValue: _i8.Future<_i3.Medication>.value(_FakeMedication_2(
+        returnValue: _i9.Future<_i3.Medication>.value(_FakeMedication_2(
           this,
           Invocation.method(
             #createMedication,
             [medication],
           ),
         )),
-      ) as _i8.Future<_i3.Medication>);
+      ) as _i9.Future<_i3.Medication>);
 
   @override
-  _i8.Future<_i3.Medication?> getMedication(int? id) => (super.noSuchMethod(
+  _i9.Future<_i3.Medication?> getMedication(int? id) => (super.noSuchMethod(
         Invocation.method(
           #getMedication,
           [id],
         ),
-        returnValue: _i8.Future<_i3.Medication?>.value(),
-      ) as _i8.Future<_i3.Medication?>);
+        returnValue: _i9.Future<_i3.Medication?>.value(),
+      ) as _i9.Future<_i3.Medication?>);
 
   @override
-  _i8.Future<List<_i3.Medication>> listMedicationsByProfile(
+  _i9.Future<List<_i3.Medication>> listMedicationsByProfile(
     int? profileId, {
     bool? includeInactive = false,
   }) =>
@@ -701,11 +715,11 @@ class MockMedicationService extends _i1.Mock implements _i13.MedicationService {
           [profileId],
           {#includeInactive: includeInactive},
         ),
-        returnValue: _i8.Future<List<_i3.Medication>>.value(<_i3.Medication>[]),
-      ) as _i8.Future<List<_i3.Medication>>);
+        returnValue: _i9.Future<List<_i3.Medication>>.value(<_i3.Medication>[]),
+      ) as _i9.Future<List<_i3.Medication>>);
 
   @override
-  _i8.Future<List<_i3.Medication>> searchMedicationsByName({
+  _i9.Future<List<_i3.Medication>> searchMedicationsByName({
     required int? profileId,
     required String? searchTerm,
   }) =>
@@ -718,72 +732,72 @@ class MockMedicationService extends _i1.Mock implements _i13.MedicationService {
             #searchTerm: searchTerm,
           },
         ),
-        returnValue: _i8.Future<List<_i3.Medication>>.value(<_i3.Medication>[]),
-      ) as _i8.Future<List<_i3.Medication>>);
+        returnValue: _i9.Future<List<_i3.Medication>>.value(<_i3.Medication>[]),
+      ) as _i9.Future<List<_i3.Medication>>);
 
   @override
-  _i8.Future<_i3.Medication> updateMedication(_i3.Medication? medication) =>
+  _i9.Future<_i3.Medication> updateMedication(_i3.Medication? medication) =>
       (super.noSuchMethod(
         Invocation.method(
           #updateMedication,
           [medication],
         ),
-        returnValue: _i8.Future<_i3.Medication>.value(_FakeMedication_2(
+        returnValue: _i9.Future<_i3.Medication>.value(_FakeMedication_2(
           this,
           Invocation.method(
             #updateMedication,
             [medication],
           ),
         )),
-      ) as _i8.Future<_i3.Medication>);
+      ) as _i9.Future<_i3.Medication>);
 
   @override
-  _i8.Future<bool> deleteMedication(int? id) => (super.noSuchMethod(
+  _i9.Future<bool> deleteMedication(int? id) => (super.noSuchMethod(
         Invocation.method(
           #deleteMedication,
           [id],
         ),
-        returnValue: _i8.Future<bool>.value(false),
-      ) as _i8.Future<bool>);
+        returnValue: _i9.Future<bool>.value(false),
+      ) as _i9.Future<bool>);
 
   @override
-  _i8.Future<int> deleteAllByProfile(int? profileId) => (super.noSuchMethod(
+  _i9.Future<int> deleteAllByProfile(int? profileId) => (super.noSuchMethod(
         Invocation.method(
           #deleteAllByProfile,
           [profileId],
         ),
-        returnValue: _i8.Future<int>.value(0),
-      ) as _i8.Future<int>);
+        returnValue: _i9.Future<int>.value(0),
+      ) as _i9.Future<int>);
 }
 
 /// A class which mocks [MedicationIntakeService].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockMedicationIntakeService extends _i1.Mock
-    implements _i14.MedicationIntakeService {
+    implements _i15.MedicationIntakeService {
   MockMedicationIntakeService() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i8.Future<_i3.MedicationIntake> logIntake(_i3.MedicationIntake? intake) =>
+  _i9.Future<_i3.MedicationIntake> logIntake(_i3.MedicationIntake? intake) =>
       (super.noSuchMethod(
         Invocation.method(
           #logIntake,
           [intake],
         ),
         returnValue:
-            _i8.Future<_i3.MedicationIntake>.value(_FakeMedicationIntake_3(
+            _i9.Future<_i3.MedicationIntake>.value(_FakeMedicationIntake_3(
           this,
           Invocation.method(
             #logIntake,
             [intake],
           ),
         )),
-      ) as _i8.Future<_i3.MedicationIntake>);
+      ) as _i9.Future<_i3.MedicationIntake>);
 
   @override
-  _i8.Future<List<_i3.MedicationIntake>> logGroupIntake({
+  _i9.Future<List<_i3.MedicationIntake>> logGroupIntake({
     int? groupId,
     required List<int>? medicationIds,
     required int? profileId,
@@ -804,21 +818,21 @@ class MockMedicationIntakeService extends _i1.Mock
             #note: note,
           },
         ),
-        returnValue: _i8.Future<List<_i3.MedicationIntake>>.value(
+        returnValue: _i9.Future<List<_i3.MedicationIntake>>.value(
             <_i3.MedicationIntake>[]),
-      ) as _i8.Future<List<_i3.MedicationIntake>>);
+      ) as _i9.Future<List<_i3.MedicationIntake>>);
 
   @override
-  _i8.Future<_i3.MedicationIntake?> getIntake(int? id) => (super.noSuchMethod(
+  _i9.Future<_i3.MedicationIntake?> getIntake(int? id) => (super.noSuchMethod(
         Invocation.method(
           #getIntake,
           [id],
         ),
-        returnValue: _i8.Future<_i3.MedicationIntake?>.value(),
-      ) as _i8.Future<_i3.MedicationIntake?>);
+        returnValue: _i9.Future<_i3.MedicationIntake?>.value(),
+      ) as _i9.Future<_i3.MedicationIntake?>);
 
   @override
-  _i8.Future<List<_i3.MedicationIntake>> listIntakes({
+  _i9.Future<List<_i3.MedicationIntake>> listIntakes({
     required int? profileId,
     DateTime? from,
     DateTime? to,
@@ -837,12 +851,12 @@ class MockMedicationIntakeService extends _i1.Mock
             #groupId: groupId,
           },
         ),
-        returnValue: _i8.Future<List<_i3.MedicationIntake>>.value(
+        returnValue: _i9.Future<List<_i3.MedicationIntake>>.value(
             <_i3.MedicationIntake>[]),
-      ) as _i8.Future<List<_i3.MedicationIntake>>);
+      ) as _i9.Future<List<_i3.MedicationIntake>>);
 
   @override
-  _i8.Future<List<_i3.MedicationIntake>> findIntakesAround({
+  _i9.Future<List<_i3.MedicationIntake>> findIntakesAround({
     required int? profileId,
     required DateTime? anchor,
     Duration? window = const Duration(minutes: 30),
@@ -857,20 +871,20 @@ class MockMedicationIntakeService extends _i1.Mock
             #window: window,
           },
         ),
-        returnValue: _i8.Future<List<_i3.MedicationIntake>>.value(
+        returnValue: _i9.Future<List<_i3.MedicationIntake>>.value(
             <_i3.MedicationIntake>[]),
-      ) as _i8.Future<List<_i3.MedicationIntake>>);
+      ) as _i9.Future<List<_i3.MedicationIntake>>);
 
   @override
-  _i8.Future<List<_i3.MedicationIntake>> intakesByIds(List<int>? ids) =>
+  _i9.Future<List<_i3.MedicationIntake>> intakesByIds(List<int>? ids) =>
       (super.noSuchMethod(
         Invocation.method(
           #intakesByIds,
           [ids],
         ),
-        returnValue: _i8.Future<List<_i3.MedicationIntake>>.value(
+        returnValue: _i9.Future<List<_i3.MedicationIntake>>.value(
             <_i3.MedicationIntake>[]),
-      ) as _i8.Future<List<_i3.MedicationIntake>>);
+      ) as _i9.Future<List<_i3.MedicationIntake>>);
 
   @override
   _i3.IntakeStatus calculateStatus({
@@ -890,102 +904,102 @@ class MockMedicationIntakeService extends _i1.Mock
       ) as _i3.IntakeStatus);
 
   @override
-  _i8.Future<bool> deleteIntake(int? id) => (super.noSuchMethod(
+  _i9.Future<bool> deleteIntake(int? id) => (super.noSuchMethod(
         Invocation.method(
           #deleteIntake,
           [id],
         ),
-        returnValue: _i8.Future<bool>.value(false),
-      ) as _i8.Future<bool>);
+        returnValue: _i9.Future<bool>.value(false),
+      ) as _i9.Future<bool>);
 
   @override
-  _i8.Future<int> deleteAllByProfile(int? profileId) => (super.noSuchMethod(
+  _i9.Future<int> deleteAllByProfile(int? profileId) => (super.noSuchMethod(
         Invocation.method(
           #deleteAllByProfile,
           [profileId],
         ),
-        returnValue: _i8.Future<int>.value(0),
-      ) as _i8.Future<int>);
+        returnValue: _i9.Future<int>.value(0),
+      ) as _i9.Future<int>);
 }
 
 /// A class which mocks [MedicationGroupService].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockMedicationGroupService extends _i1.Mock
-    implements _i15.MedicationGroupService {
+    implements _i16.MedicationGroupService {
   MockMedicationGroupService() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i8.Future<_i3.MedicationGroup> createGroup(_i3.MedicationGroup? group) =>
+  _i9.Future<_i3.MedicationGroup> createGroup(_i3.MedicationGroup? group) =>
       (super.noSuchMethod(
         Invocation.method(
           #createGroup,
           [group],
         ),
         returnValue:
-            _i8.Future<_i3.MedicationGroup>.value(_FakeMedicationGroup_4(
+            _i9.Future<_i3.MedicationGroup>.value(_FakeMedicationGroup_4(
           this,
           Invocation.method(
             #createGroup,
             [group],
           ),
         )),
-      ) as _i8.Future<_i3.MedicationGroup>);
+      ) as _i9.Future<_i3.MedicationGroup>);
 
   @override
-  _i8.Future<_i3.MedicationGroup?> getGroup(int? id) => (super.noSuchMethod(
+  _i9.Future<_i3.MedicationGroup?> getGroup(int? id) => (super.noSuchMethod(
         Invocation.method(
           #getGroup,
           [id],
         ),
-        returnValue: _i8.Future<_i3.MedicationGroup?>.value(),
-      ) as _i8.Future<_i3.MedicationGroup?>);
+        returnValue: _i9.Future<_i3.MedicationGroup?>.value(),
+      ) as _i9.Future<_i3.MedicationGroup?>);
 
   @override
-  _i8.Future<List<_i3.MedicationGroup>> listGroupsByProfile(int? profileId) =>
+  _i9.Future<List<_i3.MedicationGroup>> listGroupsByProfile(int? profileId) =>
       (super.noSuchMethod(
         Invocation.method(
           #listGroupsByProfile,
           [profileId],
         ),
-        returnValue: _i8.Future<List<_i3.MedicationGroup>>.value(
+        returnValue: _i9.Future<List<_i3.MedicationGroup>>.value(
             <_i3.MedicationGroup>[]),
-      ) as _i8.Future<List<_i3.MedicationGroup>>);
+      ) as _i9.Future<List<_i3.MedicationGroup>>);
 
   @override
-  _i8.Future<_i3.MedicationGroup> updateGroup(_i3.MedicationGroup? group) =>
+  _i9.Future<_i3.MedicationGroup> updateGroup(_i3.MedicationGroup? group) =>
       (super.noSuchMethod(
         Invocation.method(
           #updateGroup,
           [group],
         ),
         returnValue:
-            _i8.Future<_i3.MedicationGroup>.value(_FakeMedicationGroup_4(
+            _i9.Future<_i3.MedicationGroup>.value(_FakeMedicationGroup_4(
           this,
           Invocation.method(
             #updateGroup,
             [group],
           ),
         )),
-      ) as _i8.Future<_i3.MedicationGroup>);
+      ) as _i9.Future<_i3.MedicationGroup>);
 
   @override
-  _i8.Future<bool> deleteGroup(int? id) => (super.noSuchMethod(
+  _i9.Future<bool> deleteGroup(int? id) => (super.noSuchMethod(
         Invocation.method(
           #deleteGroup,
           [id],
         ),
-        returnValue: _i8.Future<bool>.value(false),
-      ) as _i8.Future<bool>);
+        returnValue: _i9.Future<bool>.value(false),
+      ) as _i9.Future<bool>);
 }
 
 /// A class which mocks [ActiveProfileViewModel].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockActiveProfileViewModel extends _i1.Mock
-    implements _i16.ActiveProfileViewModel {
+    implements _i17.ActiveProfileViewModel {
   MockActiveProfileViewModel() {
     _i1.throwOnMissingStub(this);
   }
@@ -999,7 +1013,7 @@ class MockActiveProfileViewModel extends _i1.Mock
   @override
   String get activeProfileName => (super.noSuchMethod(
         Invocation.getter(#activeProfileName),
-        returnValue: _i17.dummyValue<String>(
+        returnValue: _i18.dummyValue<String>(
           this,
           Invocation.getter(#activeProfileName),
         ),
@@ -1018,28 +1032,28 @@ class MockActiveProfileViewModel extends _i1.Mock
       ) as bool);
 
   @override
-  _i8.Future<void> loadInitial() => (super.noSuchMethod(
+  _i9.Future<void> loadInitial() => (super.noSuchMethod(
         Invocation.method(
           #loadInitial,
           [],
         ),
-        returnValue: _i8.Future<void>.value(),
-        returnValueForMissingStub: _i8.Future<void>.value(),
-      ) as _i8.Future<void>);
+        returnValue: _i9.Future<void>.value(),
+        returnValueForMissingStub: _i9.Future<void>.value(),
+      ) as _i9.Future<void>);
 
   @override
-  _i8.Future<void> setActive(_i18.Profile? profile) => (super.noSuchMethod(
+  _i9.Future<void> setActive(_i19.Profile? profile) => (super.noSuchMethod(
         Invocation.method(
           #setActive,
           [profile],
         ),
-        returnValue: _i8.Future<void>.value(),
-        returnValueForMissingStub: _i8.Future<void>.value(),
-      ) as _i8.Future<void>);
+        returnValue: _i9.Future<void>.value(),
+        returnValueForMissingStub: _i9.Future<void>.value(),
+      ) as _i9.Future<void>);
 
   @override
-  _i8.Future<int> createProfile(
-    _i18.Profile? profile, {
+  _i9.Future<int> createProfile(
+    _i19.Profile? profile, {
     bool? setAsActive = false,
   }) =>
       (super.noSuchMethod(
@@ -1048,31 +1062,31 @@ class MockActiveProfileViewModel extends _i1.Mock
           [profile],
           {#setAsActive: setAsActive},
         ),
-        returnValue: _i8.Future<int>.value(0),
-      ) as _i8.Future<int>);
+        returnValue: _i9.Future<int>.value(0),
+      ) as _i9.Future<int>);
 
   @override
-  _i8.Future<void> updateProfile(_i18.Profile? profile) => (super.noSuchMethod(
+  _i9.Future<void> updateProfile(_i19.Profile? profile) => (super.noSuchMethod(
         Invocation.method(
           #updateProfile,
           [profile],
         ),
-        returnValue: _i8.Future<void>.value(),
-        returnValueForMissingStub: _i8.Future<void>.value(),
-      ) as _i8.Future<void>);
+        returnValue: _i9.Future<void>.value(),
+        returnValueForMissingStub: _i9.Future<void>.value(),
+      ) as _i9.Future<void>);
 
   @override
-  _i8.Future<void> deleteProfile(int? id) => (super.noSuchMethod(
+  _i9.Future<void> deleteProfile(int? id) => (super.noSuchMethod(
         Invocation.method(
           #deleteProfile,
           [id],
         ),
-        returnValue: _i8.Future<void>.value(),
-        returnValueForMissingStub: _i8.Future<void>.value(),
-      ) as _i8.Future<void>);
+        returnValue: _i9.Future<void>.value(),
+        returnValueForMissingStub: _i9.Future<void>.value(),
+      ) as _i9.Future<void>);
 
   @override
-  void addListener(_i19.VoidCallback? listener) => super.noSuchMethod(
+  void addListener(_i20.VoidCallback? listener) => super.noSuchMethod(
         Invocation.method(
           #addListener,
           [listener],
@@ -1081,7 +1095,7 @@ class MockActiveProfileViewModel extends _i1.Mock
       );
 
   @override
-  void removeListener(_i19.VoidCallback? listener) => super.noSuchMethod(
+  void removeListener(_i20.VoidCallback? listener) => super.noSuchMethod(
         Invocation.method(
           #removeListener,
           [listener],
@@ -1112,7 +1126,7 @@ class MockActiveProfileViewModel extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockMedicationViewModel extends _i1.Mock
-    implements _i20.MedicationViewModel {
+    implements _i21.MedicationViewModel {
   MockMedicationViewModel() {
     _i1.throwOnMissingStub(this);
   }
@@ -1132,7 +1146,7 @@ class MockMedicationViewModel extends _i1.Mock
   @override
   String get searchTerm => (super.noSuchMethod(
         Invocation.getter(#searchTerm),
-        returnValue: _i17.dummyValue<String>(
+        returnValue: _i18.dummyValue<String>(
           this,
           Invocation.getter(#searchTerm),
         ),
@@ -1160,76 +1174,76 @@ class MockMedicationViewModel extends _i1.Mock
       );
 
   @override
-  _i8.Future<void> loadMedications() => (super.noSuchMethod(
+  _i9.Future<void> loadMedications() => (super.noSuchMethod(
         Invocation.method(
           #loadMedications,
           [],
         ),
-        returnValue: _i8.Future<void>.value(),
-        returnValueForMissingStub: _i8.Future<void>.value(),
-      ) as _i8.Future<void>);
+        returnValue: _i9.Future<void>.value(),
+        returnValueForMissingStub: _i9.Future<void>.value(),
+      ) as _i9.Future<void>);
 
   @override
-  _i8.Future<void> search(String? term) => (super.noSuchMethod(
+  _i9.Future<void> search(String? term) => (super.noSuchMethod(
         Invocation.method(
           #search,
           [term],
         ),
-        returnValue: _i8.Future<void>.value(),
-        returnValueForMissingStub: _i8.Future<void>.value(),
-      ) as _i8.Future<void>);
+        returnValue: _i9.Future<void>.value(),
+        returnValueForMissingStub: _i9.Future<void>.value(),
+      ) as _i9.Future<void>);
 
   @override
-  _i8.Future<void> toggleShowInactive() => (super.noSuchMethod(
+  _i9.Future<void> toggleShowInactive() => (super.noSuchMethod(
         Invocation.method(
           #toggleShowInactive,
           [],
         ),
-        returnValue: _i8.Future<void>.value(),
-        returnValueForMissingStub: _i8.Future<void>.value(),
-      ) as _i8.Future<void>);
+        returnValue: _i9.Future<void>.value(),
+        returnValueForMissingStub: _i9.Future<void>.value(),
+      ) as _i9.Future<void>);
 
   @override
-  _i8.Future<void> setGroupFilter(int? groupId) => (super.noSuchMethod(
+  _i9.Future<void> setGroupFilter(int? groupId) => (super.noSuchMethod(
         Invocation.method(
           #setGroupFilter,
           [groupId],
         ),
-        returnValue: _i8.Future<void>.value(),
-        returnValueForMissingStub: _i8.Future<void>.value(),
-      ) as _i8.Future<void>);
+        returnValue: _i9.Future<void>.value(),
+        returnValueForMissingStub: _i9.Future<void>.value(),
+      ) as _i9.Future<void>);
 
   @override
-  _i8.Future<void> createMedication(_i3.Medication? medication) =>
+  _i9.Future<void> createMedication(_i3.Medication? medication) =>
       (super.noSuchMethod(
         Invocation.method(
           #createMedication,
           [medication],
         ),
-        returnValue: _i8.Future<void>.value(),
-        returnValueForMissingStub: _i8.Future<void>.value(),
-      ) as _i8.Future<void>);
+        returnValue: _i9.Future<void>.value(),
+        returnValueForMissingStub: _i9.Future<void>.value(),
+      ) as _i9.Future<void>);
 
   @override
-  _i8.Future<void> updateMedication(_i3.Medication? medication) =>
+  _i9.Future<void> updateMedication(_i3.Medication? medication) =>
       (super.noSuchMethod(
         Invocation.method(
           #updateMedication,
           [medication],
         ),
-        returnValue: _i8.Future<void>.value(),
-        returnValueForMissingStub: _i8.Future<void>.value(),
-      ) as _i8.Future<void>);
+        returnValue: _i9.Future<void>.value(),
+        returnValueForMissingStub: _i9.Future<void>.value(),
+      ) as _i9.Future<void>);
 
   @override
-  _i8.Future<void> deleteMedication(int? id) => (super.noSuchMethod(
+  _i9.Future<void> deleteMedication(int? id) => (super.noSuchMethod(
         Invocation.method(
           #deleteMedication,
           [id],
         ),
-        returnValue: _i8.Future<void>.value(),
-        returnValueForMissingStub: _i8.Future<void>.value(),
-      ) as _i8.Future<void>);
+        returnValue: _i9.Future<void>.value(),
+        returnValueForMissingStub: _i9.Future<void>.value(),
+      ) as _i9.Future<void>);
 
   @override
   void clearError() => super.noSuchMethod(
@@ -1241,7 +1255,7 @@ class MockMedicationViewModel extends _i1.Mock
       );
 
   @override
-  void addListener(_i19.VoidCallback? listener) => super.noSuchMethod(
+  void addListener(_i20.VoidCallback? listener) => super.noSuchMethod(
         Invocation.method(
           #addListener,
           [listener],
@@ -1250,7 +1264,7 @@ class MockMedicationViewModel extends _i1.Mock
       );
 
   @override
-  void removeListener(_i19.VoidCallback? listener) => super.noSuchMethod(
+  void removeListener(_i20.VoidCallback? listener) => super.noSuchMethod(
         Invocation.method(
           #removeListener,
           [listener],
@@ -1272,7 +1286,7 @@ class MockMedicationViewModel extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockMedicationGroupViewModel extends _i1.Mock
-    implements _i21.MedicationGroupViewModel {
+    implements _i22.MedicationGroupViewModel {
   MockMedicationGroupViewModel() {
     _i1.throwOnMissingStub(this);
   }
@@ -1305,46 +1319,46 @@ class MockMedicationGroupViewModel extends _i1.Mock
       );
 
   @override
-  _i8.Future<void> loadGroups() => (super.noSuchMethod(
+  _i9.Future<void> loadGroups() => (super.noSuchMethod(
         Invocation.method(
           #loadGroups,
           [],
         ),
-        returnValue: _i8.Future<void>.value(),
-        returnValueForMissingStub: _i8.Future<void>.value(),
-      ) as _i8.Future<void>);
+        returnValue: _i9.Future<void>.value(),
+        returnValueForMissingStub: _i9.Future<void>.value(),
+      ) as _i9.Future<void>);
 
   @override
-  _i8.Future<void> createGroup(_i3.MedicationGroup? group) =>
+  _i9.Future<void> createGroup(_i3.MedicationGroup? group) =>
       (super.noSuchMethod(
         Invocation.method(
           #createGroup,
           [group],
         ),
-        returnValue: _i8.Future<void>.value(),
-        returnValueForMissingStub: _i8.Future<void>.value(),
-      ) as _i8.Future<void>);
+        returnValue: _i9.Future<void>.value(),
+        returnValueForMissingStub: _i9.Future<void>.value(),
+      ) as _i9.Future<void>);
 
   @override
-  _i8.Future<void> updateGroup(_i3.MedicationGroup? group) =>
+  _i9.Future<void> updateGroup(_i3.MedicationGroup? group) =>
       (super.noSuchMethod(
         Invocation.method(
           #updateGroup,
           [group],
         ),
-        returnValue: _i8.Future<void>.value(),
-        returnValueForMissingStub: _i8.Future<void>.value(),
-      ) as _i8.Future<void>);
+        returnValue: _i9.Future<void>.value(),
+        returnValueForMissingStub: _i9.Future<void>.value(),
+      ) as _i9.Future<void>);
 
   @override
-  _i8.Future<void> deleteGroup(int? id) => (super.noSuchMethod(
+  _i9.Future<void> deleteGroup(int? id) => (super.noSuchMethod(
         Invocation.method(
           #deleteGroup,
           [id],
         ),
-        returnValue: _i8.Future<void>.value(),
-        returnValueForMissingStub: _i8.Future<void>.value(),
-      ) as _i8.Future<void>);
+        returnValue: _i9.Future<void>.value(),
+        returnValueForMissingStub: _i9.Future<void>.value(),
+      ) as _i9.Future<void>);
 
   @override
   void clearError() => super.noSuchMethod(
@@ -1356,7 +1370,7 @@ class MockMedicationGroupViewModel extends _i1.Mock
       );
 
   @override
-  void addListener(_i19.VoidCallback? listener) => super.noSuchMethod(
+  void addListener(_i20.VoidCallback? listener) => super.noSuchMethod(
         Invocation.method(
           #addListener,
           [listener],
@@ -1365,7 +1379,7 @@ class MockMedicationGroupViewModel extends _i1.Mock
       );
 
   @override
-  void removeListener(_i19.VoidCallback? listener) => super.noSuchMethod(
+  void removeListener(_i20.VoidCallback? listener) => super.noSuchMethod(
         Invocation.method(
           #removeListener,
           [listener],
@@ -1387,16 +1401,16 @@ class MockMedicationGroupViewModel extends _i1.Mock
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockBloodPressureViewModel extends _i1.Mock
-    implements _i22.BloodPressureViewModel {
+    implements _i23.BloodPressureViewModel {
   MockBloodPressureViewModel() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  List<_i9.Reading> get readings => (super.noSuchMethod(
+  List<_i10.Reading> get readings => (super.noSuchMethod(
         Invocation.getter(#readings),
-        returnValue: <_i9.Reading>[],
-      ) as List<_i9.Reading>);
+        returnValue: <_i10.Reading>[],
+      ) as List<_i10.Reading>);
 
   @override
   bool get isLoading => (super.noSuchMethod(
@@ -1420,20 +1434,20 @@ class MockBloodPressureViewModel extends _i1.Mock
       );
 
   @override
-  _i8.Future<void> loadReadings({bool? clearError = true}) =>
+  _i9.Future<void> loadReadings({bool? clearError = true}) =>
       (super.noSuchMethod(
         Invocation.method(
           #loadReadings,
           [],
           {#clearError: clearError},
         ),
-        returnValue: _i8.Future<void>.value(),
-        returnValueForMissingStub: _i8.Future<void>.value(),
-      ) as _i8.Future<void>);
+        returnValue: _i9.Future<void>.value(),
+        returnValueForMissingStub: _i9.Future<void>.value(),
+      ) as _i9.Future<void>);
 
   @override
-  _i8.Future<_i4.ValidationResult> addReading(
-    _i9.Reading? reading, {
+  _i9.Future<_i4.ValidationResult> addReading(
+    _i10.Reading? reading, {
     bool? confirmOverride = false,
   }) =>
       (super.noSuchMethod(
@@ -1443,7 +1457,7 @@ class MockBloodPressureViewModel extends _i1.Mock
           {#confirmOverride: confirmOverride},
         ),
         returnValue:
-            _i8.Future<_i4.ValidationResult>.value(_FakeValidationResult_5(
+            _i9.Future<_i4.ValidationResult>.value(_FakeValidationResult_5(
           this,
           Invocation.method(
             #addReading,
@@ -1451,11 +1465,11 @@ class MockBloodPressureViewModel extends _i1.Mock
             {#confirmOverride: confirmOverride},
           ),
         )),
-      ) as _i8.Future<_i4.ValidationResult>);
+      ) as _i9.Future<_i4.ValidationResult>);
 
   @override
-  _i8.Future<_i4.ValidationResult> updateReading(
-    _i9.Reading? reading, {
+  _i9.Future<_i4.ValidationResult> updateReading(
+    _i10.Reading? reading, {
     bool? confirmOverride = false,
   }) =>
       (super.noSuchMethod(
@@ -1465,7 +1479,7 @@ class MockBloodPressureViewModel extends _i1.Mock
           {#confirmOverride: confirmOverride},
         ),
         returnValue:
-            _i8.Future<_i4.ValidationResult>.value(_FakeValidationResult_5(
+            _i9.Future<_i4.ValidationResult>.value(_FakeValidationResult_5(
           this,
           Invocation.method(
             #updateReading,
@@ -1473,20 +1487,20 @@ class MockBloodPressureViewModel extends _i1.Mock
             {#confirmOverride: confirmOverride},
           ),
         )),
-      ) as _i8.Future<_i4.ValidationResult>);
+      ) as _i9.Future<_i4.ValidationResult>);
 
   @override
-  _i8.Future<void> deleteReading(int? id) => (super.noSuchMethod(
+  _i9.Future<void> deleteReading(int? id) => (super.noSuchMethod(
         Invocation.method(
           #deleteReading,
           [id],
         ),
-        returnValue: _i8.Future<void>.value(),
-        returnValueForMissingStub: _i8.Future<void>.value(),
-      ) as _i8.Future<void>);
+        returnValue: _i9.Future<void>.value(),
+        returnValueForMissingStub: _i9.Future<void>.value(),
+      ) as _i9.Future<void>);
 
   @override
-  void addListener(_i19.VoidCallback? listener) => super.noSuchMethod(
+  void addListener(_i20.VoidCallback? listener) => super.noSuchMethod(
         Invocation.method(
           #addListener,
           [listener],
@@ -1495,7 +1509,7 @@ class MockBloodPressureViewModel extends _i1.Mock
       );
 
   @override
-  void removeListener(_i19.VoidCallback? listener) => super.noSuchMethod(
+  void removeListener(_i20.VoidCallback? listener) => super.noSuchMethod(
         Invocation.method(
           #removeListener,
           [listener],
@@ -1516,70 +1530,70 @@ class MockBloodPressureViewModel extends _i1.Mock
 /// A class which mocks [ProfileService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockProfileService extends _i1.Mock implements _i23.ProfileService {
+class MockProfileService extends _i1.Mock implements _i24.ProfileService {
   MockProfileService() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i8.Future<int> createProfile(_i18.Profile? profile) => (super.noSuchMethod(
+  _i9.Future<int> createProfile(_i19.Profile? profile) => (super.noSuchMethod(
         Invocation.method(
           #createProfile,
           [profile],
         ),
-        returnValue: _i8.Future<int>.value(0),
-      ) as _i8.Future<int>);
+        returnValue: _i9.Future<int>.value(0),
+      ) as _i9.Future<int>);
 
   @override
-  _i8.Future<_i18.Profile?> getProfile(int? id) => (super.noSuchMethod(
+  _i9.Future<_i19.Profile?> getProfile(int? id) => (super.noSuchMethod(
         Invocation.method(
           #getProfile,
           [id],
         ),
-        returnValue: _i8.Future<_i18.Profile?>.value(),
-      ) as _i8.Future<_i18.Profile?>);
+        returnValue: _i9.Future<_i19.Profile?>.value(),
+      ) as _i9.Future<_i19.Profile?>);
 
   @override
-  _i8.Future<List<_i18.Profile>> getAllProfiles() => (super.noSuchMethod(
+  _i9.Future<List<_i19.Profile>> getAllProfiles() => (super.noSuchMethod(
         Invocation.method(
           #getAllProfiles,
           [],
         ),
-        returnValue: _i8.Future<List<_i18.Profile>>.value(<_i18.Profile>[]),
-      ) as _i8.Future<List<_i18.Profile>>);
+        returnValue: _i9.Future<List<_i19.Profile>>.value(<_i19.Profile>[]),
+      ) as _i9.Future<List<_i19.Profile>>);
 
   @override
-  _i8.Future<int> updateProfile(_i18.Profile? profile) => (super.noSuchMethod(
+  _i9.Future<int> updateProfile(_i19.Profile? profile) => (super.noSuchMethod(
         Invocation.method(
           #updateProfile,
           [profile],
         ),
-        returnValue: _i8.Future<int>.value(0),
-      ) as _i8.Future<int>);
+        returnValue: _i9.Future<int>.value(0),
+      ) as _i9.Future<int>);
 
   @override
-  _i8.Future<int> deleteProfile(int? id) => (super.noSuchMethod(
+  _i9.Future<int> deleteProfile(int? id) => (super.noSuchMethod(
         Invocation.method(
           #deleteProfile,
           [id],
         ),
-        returnValue: _i8.Future<int>.value(0),
-      ) as _i8.Future<int>);
+        returnValue: _i9.Future<int>.value(0),
+      ) as _i9.Future<int>);
 
   @override
-  _i8.Future<int> getProfileCount() => (super.noSuchMethod(
+  _i9.Future<int> getProfileCount() => (super.noSuchMethod(
         Invocation.method(
           #getProfileCount,
           [],
         ),
-        returnValue: _i8.Future<int>.value(0),
-      ) as _i8.Future<int>);
+        returnValue: _i9.Future<int>.value(0),
+      ) as _i9.Future<int>);
 }
 
 /// A class which mocks [SharedPreferences].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockSharedPreferences extends _i1.Mock implements _i24.SharedPreferences {
+class MockSharedPreferences extends _i1.Mock implements _i25.SharedPreferences {
   MockSharedPreferences() {
     _i1.throwOnMissingStub(this);
   }
@@ -1640,7 +1654,7 @@ class MockSharedPreferences extends _i1.Mock implements _i24.SharedPreferences {
       )) as List<String>?);
 
   @override
-  _i8.Future<bool> setBool(
+  _i9.Future<bool> setBool(
     String? key,
     bool? value,
   ) =>
@@ -1652,11 +1666,11 @@ class MockSharedPreferences extends _i1.Mock implements _i24.SharedPreferences {
             value,
           ],
         ),
-        returnValue: _i8.Future<bool>.value(false),
-      ) as _i8.Future<bool>);
+        returnValue: _i9.Future<bool>.value(false),
+      ) as _i9.Future<bool>);
 
   @override
-  _i8.Future<bool> setInt(
+  _i9.Future<bool> setInt(
     String? key,
     int? value,
   ) =>
@@ -1668,11 +1682,11 @@ class MockSharedPreferences extends _i1.Mock implements _i24.SharedPreferences {
             value,
           ],
         ),
-        returnValue: _i8.Future<bool>.value(false),
-      ) as _i8.Future<bool>);
+        returnValue: _i9.Future<bool>.value(false),
+      ) as _i9.Future<bool>);
 
   @override
-  _i8.Future<bool> setDouble(
+  _i9.Future<bool> setDouble(
     String? key,
     double? value,
   ) =>
@@ -1684,11 +1698,11 @@ class MockSharedPreferences extends _i1.Mock implements _i24.SharedPreferences {
             value,
           ],
         ),
-        returnValue: _i8.Future<bool>.value(false),
-      ) as _i8.Future<bool>);
+        returnValue: _i9.Future<bool>.value(false),
+      ) as _i9.Future<bool>);
 
   @override
-  _i8.Future<bool> setString(
+  _i9.Future<bool> setString(
     String? key,
     String? value,
   ) =>
@@ -1700,11 +1714,11 @@ class MockSharedPreferences extends _i1.Mock implements _i24.SharedPreferences {
             value,
           ],
         ),
-        returnValue: _i8.Future<bool>.value(false),
-      ) as _i8.Future<bool>);
+        returnValue: _i9.Future<bool>.value(false),
+      ) as _i9.Future<bool>);
 
   @override
-  _i8.Future<bool> setStringList(
+  _i9.Future<bool> setStringList(
     String? key,
     List<String>? value,
   ) =>
@@ -1716,45 +1730,45 @@ class MockSharedPreferences extends _i1.Mock implements _i24.SharedPreferences {
             value,
           ],
         ),
-        returnValue: _i8.Future<bool>.value(false),
-      ) as _i8.Future<bool>);
+        returnValue: _i9.Future<bool>.value(false),
+      ) as _i9.Future<bool>);
 
   @override
-  _i8.Future<bool> remove(String? key) => (super.noSuchMethod(
+  _i9.Future<bool> remove(String? key) => (super.noSuchMethod(
         Invocation.method(
           #remove,
           [key],
         ),
-        returnValue: _i8.Future<bool>.value(false),
-      ) as _i8.Future<bool>);
+        returnValue: _i9.Future<bool>.value(false),
+      ) as _i9.Future<bool>);
 
   @override
-  _i8.Future<bool> commit() => (super.noSuchMethod(
+  _i9.Future<bool> commit() => (super.noSuchMethod(
         Invocation.method(
           #commit,
           [],
         ),
-        returnValue: _i8.Future<bool>.value(false),
-      ) as _i8.Future<bool>);
+        returnValue: _i9.Future<bool>.value(false),
+      ) as _i9.Future<bool>);
 
   @override
-  _i8.Future<bool> clear() => (super.noSuchMethod(
+  _i9.Future<bool> clear() => (super.noSuchMethod(
         Invocation.method(
           #clear,
           [],
         ),
-        returnValue: _i8.Future<bool>.value(false),
-      ) as _i8.Future<bool>);
+        returnValue: _i9.Future<bool>.value(false),
+      ) as _i9.Future<bool>);
 
   @override
-  _i8.Future<void> reload() => (super.noSuchMethod(
+  _i9.Future<void> reload() => (super.noSuchMethod(
         Invocation.method(
           #reload,
           [],
         ),
-        returnValue: _i8.Future<void>.value(),
-        returnValueForMissingStub: _i8.Future<void>.value(),
-      ) as _i8.Future<void>);
+        returnValue: _i9.Future<void>.value(),
+        returnValueForMissingStub: _i9.Future<void>.value(),
+      ) as _i9.Future<void>);
 }
 
 /// A class which mocks [AnalyticsService].
@@ -1766,11 +1780,11 @@ class MockAnalyticsService extends _i1.Mock implements _i6.AnalyticsService {
   }
 
   @override
-  _i8.Future<_i5.HealthStats> calculateStats({
+  _i9.Future<_i5.HealthStats> calculateStats({
     required int? profileId,
     required DateTime? startDate,
     required DateTime? endDate,
-    _i25.TimeOfDay? cutoff,
+    _i26.TimeOfDay? cutoff,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -1783,7 +1797,7 @@ class MockAnalyticsService extends _i1.Mock implements _i6.AnalyticsService {
             #cutoff: cutoff,
           },
         ),
-        returnValue: _i8.Future<_i5.HealthStats>.value(_FakeHealthStats_6(
+        returnValue: _i9.Future<_i5.HealthStats>.value(_FakeHealthStats_6(
           this,
           Invocation.method(
             #calculateStats,
@@ -1796,14 +1810,14 @@ class MockAnalyticsService extends _i1.Mock implements _i6.AnalyticsService {
             },
           ),
         )),
-      ) as _i8.Future<_i5.HealthStats>);
+      ) as _i9.Future<_i5.HealthStats>);
 
   @override
-  _i8.Future<_i5.ChartDataSet> getChartData({
+  _i9.Future<_i5.ChartDataSet> getChartData({
     required int? profileId,
     required DateTime? startDate,
     required DateTime? endDate,
-    required _i26.TimeRange? range,
+    required _i27.TimeRange? range,
     int? maxPoints = 90,
   }) =>
       (super.noSuchMethod(
@@ -1818,7 +1832,7 @@ class MockAnalyticsService extends _i1.Mock implements _i6.AnalyticsService {
             #maxPoints: maxPoints,
           },
         ),
-        returnValue: _i8.Future<_i5.ChartDataSet>.value(_FakeChartDataSet_7(
+        returnValue: _i9.Future<_i5.ChartDataSet>.value(_FakeChartDataSet_7(
           this,
           Invocation.method(
             #getChartData,
@@ -1832,12 +1846,12 @@ class MockAnalyticsService extends _i1.Mock implements _i6.AnalyticsService {
             },
           ),
         )),
-      ) as _i8.Future<_i5.ChartDataSet>);
+      ) as _i9.Future<_i5.ChartDataSet>);
 
   @override
-  _i8.Future<_i5.ChartDataSet> getChartDataSmoothed({
+  _i9.Future<_i5.ChartDataSet> getChartDataSmoothed({
     required int? profileId,
-    required _i26.TimeRange? range,
+    required _i27.TimeRange? range,
     required DateTime? startDate,
     required DateTime? endDate,
     int? maxPoints = 200,
@@ -1854,7 +1868,7 @@ class MockAnalyticsService extends _i1.Mock implements _i6.AnalyticsService {
             #maxPoints: maxPoints,
           },
         ),
-        returnValue: _i8.Future<_i5.ChartDataSet>.value(_FakeChartDataSet_7(
+        returnValue: _i9.Future<_i5.ChartDataSet>.value(_FakeChartDataSet_7(
           this,
           Invocation.method(
             #getChartDataSmoothed,
@@ -1868,12 +1882,12 @@ class MockAnalyticsService extends _i1.Mock implements _i6.AnalyticsService {
             },
           ),
         )),
-      ) as _i8.Future<_i5.ChartDataSet>);
+      ) as _i9.Future<_i5.ChartDataSet>);
 
   @override
-  _i8.Future<_i5.DualAxisBpData> getDualAxisBpData({
+  _i9.Future<_i5.DualAxisBpData> getDualAxisBpData({
     required int? profileId,
-    required _i26.TimeRange? range,
+    required _i27.TimeRange? range,
     required DateTime? startDate,
     required DateTime? endDate,
     int? maxPoints = 200,
@@ -1892,7 +1906,7 @@ class MockAnalyticsService extends _i1.Mock implements _i6.AnalyticsService {
             #smoothed: smoothed,
           },
         ),
-        returnValue: _i8.Future<_i5.DualAxisBpData>.value(_FakeDualAxisBpData_8(
+        returnValue: _i9.Future<_i5.DualAxisBpData>.value(_FakeDualAxisBpData_8(
           this,
           Invocation.method(
             #getDualAxisBpData,
@@ -1907,7 +1921,7 @@ class MockAnalyticsService extends _i1.Mock implements _i6.AnalyticsService {
             },
           ),
         )),
-      ) as _i8.Future<_i5.DualAxisBpData>);
+      ) as _i9.Future<_i5.DualAxisBpData>);
 
   @override
   void invalidateSmoothedCache(int? profileId) => super.noSuchMethod(
@@ -1928,11 +1942,11 @@ class MockAnalyticsService extends _i1.Mock implements _i6.AnalyticsService {
       );
 
   @override
-  _i8.Future<_i5.SleepCorrelationData> getSleepCorrelation({
+  _i9.Future<_i5.SleepCorrelationData> getSleepCorrelation({
     required int? profileId,
     required DateTime? startDate,
     required DateTime? endDate,
-    _i25.TimeOfDay? cutoff,
+    _i26.TimeOfDay? cutoff,
   }) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -1945,7 +1959,7 @@ class MockAnalyticsService extends _i1.Mock implements _i6.AnalyticsService {
             #cutoff: cutoff,
           },
         ),
-        returnValue: _i8.Future<_i5.SleepCorrelationData>.value(
+        returnValue: _i9.Future<_i5.SleepCorrelationData>.value(
             _FakeSleepCorrelationData_9(
           this,
           Invocation.method(
@@ -1959,10 +1973,10 @@ class MockAnalyticsService extends _i1.Mock implements _i6.AnalyticsService {
             },
           ),
         )),
-      ) as _i8.Future<_i5.SleepCorrelationData>);
+      ) as _i9.Future<_i5.SleepCorrelationData>);
 
   @override
-  _i8.Future<_i5.SleepStageSeries> getSleepStageSeries({
+  _i9.Future<_i5.SleepStageSeries> getSleepStageSeries({
     required int? profileId,
     required DateTime? startDate,
     required DateTime? endDate,
@@ -1978,7 +1992,7 @@ class MockAnalyticsService extends _i1.Mock implements _i6.AnalyticsService {
           },
         ),
         returnValue:
-            _i8.Future<_i5.SleepStageSeries>.value(_FakeSleepStageSeries_10(
+            _i9.Future<_i5.SleepStageSeries>.value(_FakeSleepStageSeries_10(
           this,
           Invocation.method(
             #getSleepStageSeries,
@@ -1990,12 +2004,12 @@ class MockAnalyticsService extends _i1.Mock implements _i6.AnalyticsService {
             },
           ),
         )),
-      ) as _i8.Future<_i5.SleepStageSeries>);
+      ) as _i9.Future<_i5.SleepStageSeries>);
 
   @override
   _i6.TimeOfDayClassification classifyByTimeOfDay(
-    List<_i9.ReadingGroup>? groups,
-    _i25.TimeOfDay? cutoff,
+    List<_i10.ReadingGroup>? groups,
+    _i26.TimeOfDay? cutoff,
   ) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -2021,13 +2035,13 @@ class MockAnalyticsService extends _i1.Mock implements _i6.AnalyticsService {
 /// A class which mocks [StatsService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockStatsService extends _i1.Mock implements _i27.StatsService {
+class MockStatsService extends _i1.Mock implements _i28.StatsService {
   MockStatsService() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i8.Future<_i28.MiniStats?> getBloodPressureStats({
+  _i9.Future<_i29.MiniStats?> getBloodPressureStats({
     required int? profileId,
     int? daysBack = 7,
   }) =>
@@ -2040,11 +2054,11 @@ class MockStatsService extends _i1.Mock implements _i27.StatsService {
             #daysBack: daysBack,
           },
         ),
-        returnValue: _i8.Future<_i28.MiniStats?>.value(),
-      ) as _i8.Future<_i28.MiniStats?>);
+        returnValue: _i9.Future<_i29.MiniStats?>.value(),
+      ) as _i9.Future<_i29.MiniStats?>);
 
   @override
-  _i8.Future<_i28.MiniStats?> getWeightStats({
+  _i9.Future<_i29.MiniStats?> getWeightStats({
     required int? profileId,
     int? daysBack = 7,
   }) =>
@@ -2057,11 +2071,11 @@ class MockStatsService extends _i1.Mock implements _i27.StatsService {
             #daysBack: daysBack,
           },
         ),
-        returnValue: _i8.Future<_i28.MiniStats?>.value(),
-      ) as _i8.Future<_i28.MiniStats?>);
+        returnValue: _i9.Future<_i29.MiniStats?>.value(),
+      ) as _i9.Future<_i29.MiniStats?>);
 
   @override
-  _i8.Future<_i28.MiniStats?> getSleepStats({
+  _i9.Future<_i29.MiniStats?> getSleepStats({
     required int? profileId,
     int? daysBack = 7,
   }) =>
@@ -2074,11 +2088,11 @@ class MockStatsService extends _i1.Mock implements _i27.StatsService {
             #daysBack: daysBack,
           },
         ),
-        returnValue: _i8.Future<_i28.MiniStats?>.value(),
-      ) as _i8.Future<_i28.MiniStats?>);
+        returnValue: _i9.Future<_i29.MiniStats?>.value(),
+      ) as _i9.Future<_i29.MiniStats?>);
 
   @override
-  _i8.Future<_i28.MiniStats?> getMedicationStats({
+  _i9.Future<_i29.MiniStats?> getMedicationStats({
     required int? profileId,
     int? daysBack = 7,
   }) =>
@@ -2091,6 +2105,53 @@ class MockStatsService extends _i1.Mock implements _i27.StatsService {
             #daysBack: daysBack,
           },
         ),
-        returnValue: _i8.Future<_i28.MiniStats?>.value(),
-      ) as _i8.Future<_i28.MiniStats?>);
+        returnValue: _i9.Future<_i29.MiniStats?>.value(),
+      ) as _i9.Future<_i29.MiniStats?>);
+}
+
+/// A class which mocks [UnitsPreferenceService].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockUnitsPreferenceService extends _i1.Mock
+    implements _i30.UnitsPreferenceService {
+  MockUnitsPreferenceService() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i9.Future<_i7.UnitsPreference> getUnitsPreference() => (super.noSuchMethod(
+        Invocation.method(
+          #getUnitsPreference,
+          [],
+        ),
+        returnValue:
+            _i9.Future<_i7.UnitsPreference>.value(_FakeUnitsPreference_12(
+          this,
+          Invocation.method(
+            #getUnitsPreference,
+            [],
+          ),
+        )),
+      ) as _i9.Future<_i7.UnitsPreference>);
+
+  @override
+  _i9.Future<void> saveUnitsPreference(_i7.UnitsPreference? preference) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #saveUnitsPreference,
+          [preference],
+        ),
+        returnValue: _i9.Future<void>.value(),
+        returnValueForMissingStub: _i9.Future<void>.value(),
+      ) as _i9.Future<void>);
+
+  @override
+  _i9.Future<void> clearUnitsPreference() => (super.noSuchMethod(
+        Invocation.method(
+          #clearUnitsPreference,
+          [],
+        ),
+        returnValue: _i9.Future<void>.value(),
+        returnValueForMissingStub: _i9.Future<void>.value(),
+      ) as _i9.Future<void>);
 }
