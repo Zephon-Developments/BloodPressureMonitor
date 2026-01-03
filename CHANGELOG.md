@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Units Preferences UI** (Phase 24C)
+  - User-configurable weight units (kg/lbs) in Settings → Appearance
+  - SI storage convention: all weight data stored in kg, converted for display only
+  - One-time migration of existing weight data to kg storage format
+  - ViewModel-driven unit conversion using `UnitConversion` utility
+  - Analytics resilience: charts and statistics update dynamically on unit change
+  - Temperature unit selector (UI-only, reserved for future body temperature tracking)
+
+### Changed
+- **MVVM Architecture Improvements** (Phase 24C)
+  - Moved all unit conversion logic from View layer to `WeightViewModel`
+  - Added `WeightViewModel.getDisplayWeight()` for centralized SI-to-display conversion
+  - Removed hardcoded conversion constants from UI components
+  - Migrated `DropdownButtonFormField` from deprecated `value` to `initialValue` property (Flutter 3.33+)
+
+### Fixed
+- Resolved 7 deprecation warnings in dropdown components across the application
+- Fixed analytics not refreshing when weight units changed in preferences
+
 ## [1.3.0] - 2025-12-30
 
 ### Added
