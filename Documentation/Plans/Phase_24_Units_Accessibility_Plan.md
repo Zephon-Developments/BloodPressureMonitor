@@ -21,6 +21,7 @@
 - Implement responsive landscape layouts for all screens (adaptive layouts for tablet/phone landscape).
 - Ensure charts, forms, and list views work well in both portrait and landscape orientations.
 - Unit and widget tests for units preference, accessibility features, and landscape layouts.
+- Ensure that all screens have the navigation bar at the bottom
 
 ## Architecture & Components
 
@@ -73,7 +74,7 @@
 **Modified File**: `lib/views/appearance_view.dart` OR new `lib/views/units_settings_view.dart`
 - Add "Units" section to Settings (or create separate Units settings page).
 - Weight unit selector: Radio buttons or dropdown (kg / lbs).
-- Temperature unit selector: Radio buttons or dropdown (°C / °F) - greyed out with "Coming soon" if temp tracking not implemented.
+- Temperature unit selector: Radio buttons or dropdown (°C / °F) - greyed out 
 - Save preference on selection; apply immediately.
 
 ### 5. Weight UI Updates
@@ -502,3 +503,6 @@ testWidgets('BP form uses two-column layout in landscape', (tester) async {
 **Reviewer**: Clive (Review Specialist)  
 **Estimated Effort**: 5-7 days (including accessibility audit, landscape implementation, testing, and review)  
 **Target Completion**: TBD based on sprint schedule
+## Storage Convention
+- All values are stored internally in SI units (e.g., weight in kg, temperature in °C).
+- Non-SI units (e.g., lbs, °F) are used only for user display and input conversion; conversions are performed on-the-fly without altering stored data.

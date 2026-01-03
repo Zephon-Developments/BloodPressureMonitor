@@ -39,33 +39,8 @@ class _AnalyticsViewState extends State<AnalyticsView> {
   Widget build(BuildContext context) {
     return Consumer<AnalyticsViewModel>(
       builder: (context, viewModel, _) {
-        if (viewModel.isLoading && !viewModel.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (viewModel.error != null && !viewModel.hasData) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(viewModel.error!),
-                const SizedBox(height: 8),
-                ElevatedButton(
-                  onPressed: () => viewModel.loadData(forceRefresh: true),
-                  child: const Text('Retry'),
-                ),
-              ],
-            ),
-          );
-        }
-
-        if (!viewModel.hasData) {
-          return const AnalyticsEmptyState();
-        }
-
-        final HealthStats stats = viewModel.stats!;
-        final ChartDataSet chartData = viewModel.chartData!;
-
+        // Always show the time range selector and content area
+        // Keep selector visible even when no data is available
         return RefreshIndicator(
           onRefresh: () => viewModel.loadData(
             forceRefresh: true,
@@ -77,43 +52,84 @@ class _AnalyticsViewState extends State<AnalyticsView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // Time range selector - always visible
                 const TimeRangeSelector(),
                 const SizedBox(height: 16),
-                StatsCardGrid(stats: stats),
-                const SizedBox(height: 24),
-                ChartLegend(
-                  isSampled: chartData.isSampled,
-                  sleepCorrelation: viewModel.sleepCorrelation,
-                ),
-                const SizedBox(height: 12),
-                BpLineChart(
-                  dataSet: chartData,
-                  sleepCorrelation: viewModel.showSleepOverlay
-                      ? viewModel.sleepCorrelation
-                      : null,
-                ),
-                const SizedBox(height: 24),
-                PulseLineChart(dataSet: chartData),
-                const SizedBox(height: 24),
-                if (viewModel.showSleepOverlay &&
-                    viewModel.sleepStages != null &&
-                    !(viewModel.sleepStages?.isEmpty ?? true))
-                  SleepStackedAreaChart(series: viewModel.sleepStages!),
-                if (viewModel.showSleepOverlay) const SizedBox(height: 24),
-                MorningEveningCard(split: stats.split),
-                if (viewModel.lastUpdated != null) ...[
-                  const SizedBox(height: 12),
-                  Text(
-                    'Last updated: '
-                    '${viewModel.lastUpdated!.toLocal()}',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ],
+
+                // Content area - show loading, error, empty state or data
+                if (viewModel.isLoading && !viewModel.hasData)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 64.0),
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                else if (viewModel.error != null && !viewModel.hasData)
+                  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 32),
+                        Text(
+                          viewModel.error!,
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton.icon(
+                          onPressed: () =>
+                              viewModel.loadData(forceRefresh: true),
+                          icon: const Icon(Icons.refresh),
+                          label: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  )
+                else if (!viewModel.hasData)
+                  const AnalyticsEmptyState()
+                else
+                  ..._buildDataContent(viewModel),
               ],
             ),
           ),
         );
       },
     );
+  }
+
+  /// Builds the data content when data is available.
+  List<Widget> _buildDataContent(AnalyticsViewModel viewModel) {
+    final HealthStats stats = viewModel.stats!;
+    final ChartDataSet chartData = viewModel.chartData!;
+
+    return [
+      StatsCardGrid(stats: stats),
+      const SizedBox(height: 24),
+      ChartLegend(
+        isSampled: chartData.isSampled,
+        sleepCorrelation: viewModel.sleepCorrelation,
+      ),
+      const SizedBox(height: 12),
+      BpLineChart(
+        dataSet: chartData,
+        sleepCorrelation:
+            viewModel.showSleepOverlay ? viewModel.sleepCorrelation : null,
+      ),
+      const SizedBox(height: 24),
+      PulseLineChart(dataSet: chartData),
+      const SizedBox(height: 24),
+      if (viewModel.showSleepOverlay &&
+          viewModel.sleepStages != null &&
+          !(viewModel.sleepStages?.isEmpty ?? true))
+        SleepStackedAreaChart(series: viewModel.sleepStages!),
+      if (viewModel.showSleepOverlay) const SizedBox(height: 24),
+      MorningEveningCard(split: stats.split),
+      if (viewModel.lastUpdated != null) ...[
+        const SizedBox(height: 12),
+        Text(
+          'Last updated: '
+          '${viewModel.lastUpdated!.toLocal()}',
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+      ],
+    ];
   }
 }

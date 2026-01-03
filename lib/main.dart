@@ -62,7 +62,11 @@ void main() async {
     databaseService: databaseService,
     readingService: readingService,
   );
-  final weightService = WeightService(databaseService);
+  final weightService = WeightService(databaseService, prefs);
+
+  // Perform one-time migration to SI-only storage
+  await weightService.migrateToSIStorage();
+
   final sleepService = SleepService(databaseService);
   final medicationService = MedicationService(databaseService);
   final intakeService = MedicationIntakeService(databaseService);
