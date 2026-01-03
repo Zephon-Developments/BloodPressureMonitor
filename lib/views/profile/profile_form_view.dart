@@ -246,8 +246,6 @@ class _ProfileFormViewState extends State<ProfileFormView> {
               items: const [
                 DropdownMenuItem<String>(value: 'mmHg', child: Text('mmHg')),
                 DropdownMenuItem<String>(value: 'kPa', child: Text('kPa')),
-                DropdownMenuItem<String>(value: 'mmHg', child: Text('mmHg')),
-                DropdownMenuItem<String>(value: 'kPa', child: Text('kPa')),
               ],
               onChanged: (value) => setState(() => _selectedUnits = value!),
             ),
