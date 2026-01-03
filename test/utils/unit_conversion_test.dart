@@ -7,7 +7,7 @@ void main() {
     group('weight conversions', () {
       group('kgToLbs', () {
         test('converts 0 kg correctly', () {
-          expect(UnitConversion.kgToLbs(0), 0.0);
+          expect(UnitConversion.kgToLbs(00), 0.0);
         });
 
         test('converts 1 kg correctly', () {
