@@ -1,37 +1,49 @@
-# Handoff: Clive to Claudette
+# Handoff: Clive → Claudette
+## Phase 24D – Accessibility Pass Review Refinements
 
-## Context
-Approval of Phase 24B (Units Preference) Implementation Plan.
+**Date:** 2026-01-03  
+**From:** Clive (Review Specialist)  
+**To:** Claudette (Implementation)  
+**Status:** Review Pending (Blockers Found)
 
-## Status
-**APPROVED**
+---
 
-## Scope
-Implementation of app-wide units preference (kg/lbs) with mandatory SI-only storage normalization.
+## Review Summary
 
-## Key Tasks (Refer to Phase_24B_Units_Preference_Spec.md for details)
-1.  **Data Migration:** Implement a one-time, idempotent migration in `WeightService` to convert all existing `lbs` entries to `kg` and normalize the database schema/metadata.
-2.  **Units Service:** Create `UnitsPreferenceService` (SharedPreferences) and `UnitsPreference` model.
-3.  **Conversion Utils:** Implement robust `unit_conversion.dart` with full test coverage.
-4.  **UI Updates:**
-    *   Add global unit selection to Settings (Appearance or new Units view).
-    *   Remove per-entry unit toggle from `AddWeightView`.
-    *   Update all weight displays (History, Analytics) to respect the global preference.
-5.  **Integration:** Ensure immediate UI updates upon preference change using `Provider`.
+The implementation of Phase 24D is solid in terms of coverage and testing, but there is a critical accessibility regression in the TimeRangeSelector and some minor redundancy issues in other widgets.
 
-## Standards & Requirements
-- **SI Storage Only:** All data persisted to the database MUST be in `kg`. No exceptions.
-- **Test Coverage:** 
-    - Services/Utils: ≥85%
-    - Widgets: ≥70%
-- **Documentation:** All new public classes and methods must have JSDoc.
-- **Formatting:** Run `dart format` before submission.
+## Required Refinements
 
-## Reference Documents
-- [Phase_24B_Units_Preference_Spec.md](../Plans/Phase_24B_Units_Preference_Spec.md)
-- [CODING_STANDARDS.md](../Standards/CODING_STANDARDS.md)
+### 1. Fix TimeRangeSelector (BLOCKER)
+- **File:** lib/views/analytics/widgets/time_range_selector.dart
+- **Action:** Remove xcludeSemantics: true.
+- **Reason:** It hides the interactive segments from screen readers.
+- **Recommendation:** Use label: 'Time range selector' and container: true instead of a summary label that includes the current value, as the segments will announce their own state.
 
-## Next Steps
-1. Initialize the feature branch `feature/units-preference`.
-2. Begin with the migration logic and tests as the foundation.
-3. Proceed through the sequenced task breakdown in the spec.
+### 2. Optimize ProfileSwitcher
+- **File:** lib/widgets/profile_switcher.dart
+- **Action:** Add xcludeSemantics: true to the Semantics wrapper.
+- **Reason:** Prevents redundant announcement of the profile name which is already in the summary label.
+
+### 3. Optimize FABs
+- **Files:** 
+    - lib/views/weight/weight_history_view.dart
+    - lib/views/sleep/sleep_history_view.dart
+    - lib/views/medication/medication_list_view.dart
+    - lib/views/medication/medication_group_list_view.dart
+- **Action:** Add xcludeSemantics: true to the Semantics wrappers around FABs.
+- **Reason:** Prevents redundant announcements of the FAB's internal label or tooltip.
+
+### 4. Update Tests
+- **File:** 	est/views/analytics/widgets/time_range_selector_test.dart
+- **Action:** Add a test case to verify that individual segments are still discoverable by semantics (e.g., using ind.bySemanticsLabel).
+
+---
+
+## Quality Gates
+- [ ] Blocker resolved in TimeRangeSelector
+- [ ] Redundancy optimized in ProfileSwitcher and FABs
+- [ ] All 1047 tests passing
+- [ ] Static analysis clean
+
+Please implement these refinements and hand back to me for final approval.

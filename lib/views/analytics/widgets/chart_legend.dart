@@ -59,20 +59,24 @@ class _LegendEntry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
+    return Semantics(
+      label: label,
+      excludeSemantics: true,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 12,
+            height: 12,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+            ),
           ),
-        ),
-        const SizedBox(width: 6),
-        Text(label),
-      ],
+          const SizedBox(width: 6),
+          Text(label),
+        ],
+      ),
     );
   }
 }

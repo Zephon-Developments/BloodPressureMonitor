@@ -63,10 +63,15 @@ class _MedicationListViewState extends State<MedicationListView> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _navigateToAddMedication(context),
-        tooltip: 'Add Medication',
-        child: const Icon(Icons.add),
+      floatingActionButton: Semantics(
+        label: 'Add new medication',
+        button: true,
+        excludeSemantics: true,
+        child: FloatingActionButton(
+          onPressed: () => _navigateToAddMedication(context),
+          tooltip: 'Add Medication',
+          child: const Icon(Icons.add),
+        ),
       ),
     );
   }
