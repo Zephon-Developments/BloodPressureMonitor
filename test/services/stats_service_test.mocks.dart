@@ -221,6 +221,16 @@ class MockWeightService extends _i1.Mock implements _i7.WeightService {
   }
 
   @override
+  _i5.Future<void> migrateToSIStorage() => (super.noSuchMethod(
+        Invocation.method(
+          #migrateToSIStorage,
+          [],
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
+
+  @override
   _i5.Future<_i2.WeightEntry> createWeightEntry(_i2.WeightEntry? entry) =>
       (super.noSuchMethod(
         Invocation.method(

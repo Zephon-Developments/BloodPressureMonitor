@@ -4,6 +4,7 @@ import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 
 import 'package:blood_pressure_monitor/models/health_data.dart';
+import 'package:blood_pressure_monitor/models/units_preference.dart';
 import 'package:blood_pressure_monitor/viewmodels/weight_viewmodel.dart';
 import 'package:blood_pressure_monitor/views/weight/add_weight_view.dart';
 
@@ -11,15 +12,25 @@ import '../../test_mocks.mocks.dart';
 
 void main() {
   late MockWeightService mockWeightService;
+  late MockUnitsPreferenceService mockUnitsService;
   late WeightViewModel viewModel;
   late WeightEntry sampleEntry;
   late MockActiveProfileViewModel mockActiveProfileViewModel;
 
   setUp(() {
     mockWeightService = MockWeightService();
+    mockUnitsService = MockUnitsPreferenceService();
     mockActiveProfileViewModel = MockActiveProfileViewModel();
+
     when(mockActiveProfileViewModel.activeProfileId).thenReturn(1);
-    viewModel = WeightViewModel(mockWeightService, mockActiveProfileViewModel);
+    when(mockUnitsService.getUnitsPreference())
+        .thenAnswer((_) async => const UnitsPreference());
+
+    viewModel = WeightViewModel(
+      mockWeightService,
+      mockActiveProfileViewModel,
+      mockUnitsService,
+    );
     sampleEntry = WeightEntry(
       id: 5,
       profileId: 1,
@@ -66,7 +77,7 @@ void main() {
 
     await _pumpAddWeightView(tester, viewModel);
 
-    final weightField = find.widgetWithText(TextFormField, 'Weight');
+    final weightField = find.widgetWithText(TextFormField, 'Weight (kg)');
     await tester.enterText(weightField, '72.4');
 
     final saveButton = find.text('Save Weight Entry');
@@ -91,7 +102,7 @@ void main() {
 
     expect(find.text('Edit Weight Entry'), findsOneWidget);
 
-    final weightField = find.widgetWithText(TextFormField, 'Weight');
+    final weightField = find.widgetWithText(TextFormField, 'Weight (kg)');
     final textField = tester.widget<TextFormField>(weightField);
     expect(textField.controller!.text, '70.0');
 
