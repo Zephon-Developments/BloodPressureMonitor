@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -153,10 +152,17 @@ void main() {
       // Act
       await tester.pumpWidget(createTestWidget());
 
-      // Assert
-      final semantics = tester.getSemantics(find.byType(ProfileSwitcher));
-      final data = semantics.getSemanticsData();
-      expect(data.flags & SemanticsFlag.isButton.index, isNonZero);
+      // Assert - find the Semantics widget by label
+      final semanticsWidget = tester
+          .widgetList<Semantics>(
+            find.byType(Semantics),
+          )
+          .firstWhere(
+            (widget) =>
+                widget.properties.label == 'Switch profile, current: John Doe',
+          );
+
+      expect(semanticsWidget.properties.button, isTrue);
     });
 
     testWidgets('works with large text scaling at 2.0x',
