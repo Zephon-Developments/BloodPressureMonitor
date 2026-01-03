@@ -135,7 +135,7 @@ class _UnitComboBoxState extends State<UnitComboBox> {
             prefixIcon: Icon(Icons.straighten),
           ),
           items: _commonUnits.map((unit) {
-            return DropdownMenuItem(
+            return DropdownMenuItem<String>(
               value: unit,
               child: Text(unit == 'Custom' ? 'Custom...' : unit),
             );

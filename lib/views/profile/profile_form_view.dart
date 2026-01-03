@@ -244,8 +244,8 @@ class _ProfileFormViewState extends State<ProfileFormView> {
                 prefixIcon: Icon(Icons.straighten),
               ),
               items: const [
-                DropdownMenuItem(value: 'mmHg', child: Text('mmHg')),
-                DropdownMenuItem(value: 'kPa', child: Text('kPa')),
+                DropdownMenuItem<String>(value: 'mmHg', child: Text('mmHg')),
+                DropdownMenuItem<String>(value: 'kPa', child: Text('kPa')),
               ],
               onChanged: (value) => setState(() => _selectedUnits = value!),
             ),
@@ -258,8 +258,14 @@ class _ProfileFormViewState extends State<ProfileFormView> {
                 prefixIcon: Icon(Icons.monitor_weight),
               ),
               items: const [
-                DropdownMenuItem(value: 'kg', child: Text('Kilograms (kg)')),
-                DropdownMenuItem(value: 'lbs', child: Text('Pounds (lbs)')),
+                DropdownMenuItem<String>(
+                  value: 'kg',
+                  child: Text('Kilograms (kg)'),
+                ),
+                DropdownMenuItem<String>(
+                  value: 'lbs',
+                  child: Text('Pounds (lbs)'),
+                ),
               ],
               onChanged: (value) =>
                   setState(() => _selectedWeightUnit = value!),

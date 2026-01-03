@@ -25,6 +25,8 @@
 
 ## Architecture & Components
 
+**Unit enum source**: Reuse the existing WeightUnit from lib/models/health_data.dart and add TemperatureUnit alongside it (or in a shared units file) to avoid duplicate enums. All references in the plan below assume a single shared enum definition.
+
 ### 1. Units Preference Model
 **New File**: `lib/models/units_preference.dart`
 - Model:
@@ -76,6 +78,7 @@
 - Weight unit selector: Radio buttons or dropdown (kg / lbs).
 - Temperature unit selector: Radio buttons or dropdown (°C / °F) - greyed out 
 - Save preference on selection; apply immediately.
+ - Consider passive confirmation (state update) instead of a snackbar on every tap to avoid toast spam; if feedback is needed, batch confirmation on page exit.
 
 ### 5. Weight UI Updates
 **Modified Files**:
@@ -149,30 +152,24 @@
 2. Add temperature unit selector (greyed out with "Coming soon" tooltip).
 3. Load current preference on init (call `UnitsPreferenceService.getUnitsPreference`).
 4. On selection change, save preference (call `UnitsPreferenceService.saveUnitsPreference`).
-5. Display success snackbar: "Units preference saved".
+5. Provide feedback without spamming: prefer in-place state change; if snackbar is used, throttle to once per screen session.
 
 **Estimated Changes**: +60 lines.
 
-### Task 4: Weight UI Updates
+### Task 4: Weight UI Updates (ViewModel-driven conversions)
+**Modified File**: `lib/viewmodels/weight_viewmodel.dart`
+**Subtasks**:
+1. Inject `UnitsPreferenceService` (or an exposed `UnitsPreference` stream) into the ViewModel.
+2. Expose display-ready weights by converting from kg using the preferred unit.
+3. Accept user-entered weight in the preferred unit and convert to kg before calling `WeightService`.
+4. Notify listeners when unit preference changes to trigger UI rebuilds.
+
 **Modified File**: `lib/views/weight/add_edit_weight_view.dart`
 **Subtasks**:
-1. Load units preference on init.
-2. Display unit suffix on weight input field: "kg" or "lbs".
-3. On save, convert input to kg (canonical unit) before storing:
-   ```dart
-   final weightInKg = unitsPreference.weightUnit == WeightUnit.lbs
-       ? lbsToKg(double.parse(weightController.text))
-       : double.parse(weightController.text);
-   ```
-4. On edit, convert stored kg to display unit:
-   ```dart
-   final displayWeight = unitsPreference.weightUnit == WeightUnit.lbs
-       ? kgToLbs(weightEntry.weight)
-       : weightEntry.weight;
-   weightController.text = displayWeight.toStringAsFixed(1);
-   ```
+1. Remove conversion logic from the view; consume display-ready values and submit through the ViewModel.
+2. Keep only presentation concerns (unit label/suffix).
 
-**Estimated Changes**: +30 lines.
+**Estimated Changes**: +20 lines in ViewModel; minimal in view.
 
 **Modified File**: `lib/views/history/weight_full_history_view.dart`
 **Subtasks**:
@@ -189,7 +186,15 @@
 
 **Estimated Changes**: +20 lines.
 
-### Task 5: Semantic Labels Audit
+### Task 5: Analytics Selector Resilience (Phase 24C)
+**Modified Files**: `lib/views/analytics/analytics_view.dart`, `lib/viewmodels/analytics_viewmodel.dart`
+**Subtasks**:
+1. Keep `TimeRangeSelector` rendered regardless of data availability.
+2. Ensure empty states do not short-circuit selector rendering.
+3. Persist last-selected range even when result sets are empty.
+4. Add widget test covering empty dataset with visible selector.
+
+### Task 6: Semantic Labels Audit
 **Files to Audit**: All views and widgets with interactive elements.
 **Pattern**: Wrap icons-only buttons with `Semantics`:
 ```dart
@@ -207,7 +212,7 @@ Semantics(
 
 **Estimated Changes**: ~10-15 lines per widget × ~20 widgets = ~250 lines.
 
-### Task 6: Color Contrast Verification
+### Task 7: Color Contrast Verification
 **Process**:
 1. Use Flutter DevTools accessibility inspector.
 2. Check all text/background combinations.
@@ -220,7 +225,7 @@ Semantics(
 
 **Estimated Changes**: ~20 lines (color adjustments).
 
-### Task 7: High-Contrast Mode Support
+### Task 8: High-Contrast Mode Support
 **Testing**:
 1. Enable high-contrast mode on Android/iOS.
 2. Navigate through app; identify readability issues.
@@ -231,7 +236,7 @@ Semantics(
 
 **Estimated Changes**: +30 lines (high-contrast theme adjustments).
 
-### Task 8: Large Text Scaling Audit
+### Task 9: Large Text Scaling Audit
 **Process**:
 1. Enable large text scaling (1.5x, 2x) in system settings.
 2. Navigate through app; identify layout breaks (text overflow, button clipping).
@@ -240,11 +245,11 @@ Semantics(
 **Files to Modify**: Any views with layout issues.
 **Estimated Changes**: ~10 lines per view × ~10 views = ~100 lines.
 
-### Task 9: Landscape Mode Support
+### Task 10: Landscape Mode Support
 **Objective**: Ensure all screens adapt sensibly to landscape orientation.
 
 **Strategy**:
-1. Use `OrientationBuilder` or `MediaQuery.of(context).orientation` to detect orientation.
+1. Use `MediaQuery.of(context).orientation` at top-level layout decisions; use `LayoutBuilder` for width breakpoints (e.g., tablet vs phone). Avoid wrapping everything in `OrientationBuilder` unnecessarily.
 2. Use `LayoutBuilder` to get available screen dimensions.
 3. Adapt layouts based on width/height ratio.
 
