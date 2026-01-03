@@ -177,7 +177,7 @@ class _AppearanceViewState extends State<AppearanceView> {
                 labelText: 'Weight Unit',
                 border: OutlineInputBorder(),
               ),
-              value: currentPreference.weightUnit,
+              initialValue: currentPreference.weightUnit,
               items: const [
                 DropdownMenuItem<WeightUnit>(
                   value: WeightUnit.kg,
@@ -194,16 +194,19 @@ class _AppearanceViewState extends State<AppearanceView> {
                       currentPreference.copyWith(weightUnit: value);
                   await unitsService.saveUnitsPreference(newPreference);
 
-                  if (mounted) {
-                    setState(() {
-                      _currentUnitsPreference = newPreference;
-                    });
+                  if (!context.mounted) return;
 
-                    // Refresh analytics data to update charts with new unit
+                  setState(() {
+                    _currentUnitsPreference = newPreference;
+                  });
+
+                  // Refresh analytics data to update charts with new unit
+                  if (context.mounted) {
                     try {
                       final analyticsViewModel =
                           context.read<AnalyticsViewModel>();
-                      await analyticsViewModel.loadData();
+                      // Fire and forget - don't await to avoid additional async gap
+                      analyticsViewModel.loadData();
                     } catch (e) {
                       // Analytics view model may not be available in all contexts
                     }
@@ -218,7 +221,7 @@ class _AppearanceViewState extends State<AppearanceView> {
                 border: OutlineInputBorder(),
                 helperText: 'Coming soon - for body temperature tracking',
               ),
-              value: currentPreference.temperatureUnit,
+              initialValue: currentPreference.temperatureUnit,
               items: const [
                 DropdownMenuItem<TemperatureUnit>(
                   value: TemperatureUnit.celsius,
