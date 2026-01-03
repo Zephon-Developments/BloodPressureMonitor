@@ -16,13 +16,13 @@ The implementation of Phase 24D is solid in terms of coverage and testing, but t
 
 ### 1. Fix TimeRangeSelector (BLOCKER)
 - **File:** lib/views/analytics/widgets/time_range_selector.dart
-- **Action:** Remove xcludeSemantics: true.
+- **Action:** Remove excludeSemantics: true.
 - **Reason:** It hides the interactive segments from screen readers.
 - **Recommendation:** Use label: 'Time range selector' and container: true instead of a summary label that includes the current value, as the segments will announce their own state.
 
 ### 2. Optimize ProfileSwitcher
 - **File:** lib/widgets/profile_switcher.dart
-- **Action:** Add xcludeSemantics: true to the Semantics wrapper.
+- **Action:** Add excludeSemantics: true to the Semantics wrapper.
 - **Reason:** Prevents redundant announcement of the profile name which is already in the summary label.
 
 ### 3. Optimize FABs
@@ -31,12 +31,12 @@ The implementation of Phase 24D is solid in terms of coverage and testing, but t
     - lib/views/sleep/sleep_history_view.dart
     - lib/views/medication/medication_list_view.dart
     - lib/views/medication/medication_group_list_view.dart
-- **Action:** Add xcludeSemantics: true to the Semantics wrappers around FABs.
+- **Action:** Add excludeSemantics: true to the Semantics wrappers around FABs.
 - **Reason:** Prevents redundant announcements of the FAB's internal label or tooltip.
 
 ### 4. Update Tests
-- **File:** 	est/views/analytics/widgets/time_range_selector_test.dart
-- **Action:** Add a test case to verify that individual segments are still discoverable by semantics (e.g., using ind.bySemanticsLabel).
+- **File:** test/views/analytics/widgets/time_range_selector_test.dart
+- **Action:** Add a test case to verify that individual segments are still discoverable by semantics (e.g., using find.bySemanticsLabel).
 
 ---
 
