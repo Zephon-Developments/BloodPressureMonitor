@@ -1,33 +1,154 @@
-# Handoff: Steve → Tracy
-## Phase 24B Implementation Spec Request: Units Preference
+# Steve to Tracy Handoff: Phase 24D Planning
 
-**Date:** 2026-01-02  
-**From:** Steve (Project Manager / Lead)  
-**To:** Tracy (Planning & Architecture)
+**Date:** 2026-01-03  
+**From:** Steve (Project Manager)  
+**To:** Tracy (Planning & Architecture)  
+**Phase:** 24D – Accessibility Pass  
+**Status:** 🟡 **READY FOR PLANNING**
 
 ---
 
 ## Context
 
-Phase 24A (Navigation & Date Range Selector Resilience) has been **successfully completed** and approved by Clive. All tests are passing (939 tests), and the analytics view now maintains the TimeRangeSelector visibility across all states.
+Phase 24C (Units UI Integration & Analytics Resilience) has been successfully completed and committed to the feature branch. All PR comments have been addressed, and the implementation is ready for merge.
 
-We are now proceeding to **Phase 24B: Units Preference Implementation**.
+We are now ready to begin Phase 24D: Accessibility Pass.
+
+---
+
+## Phase 24C Completion Summary
+
+### What Was Delivered
+- ✅ Weight unit selector (kg/lbs) in Settings → Appearance
+- ✅ SI storage convention with automatic conversion
+- ✅ Analytics auto-refresh on unit change
+- ✅ StatefulWidget pattern with proper state management
+- ✅ MVVM compliance (conversion logic in ViewModel)
+- ✅ All deprecation warnings resolved
+- ✅ BuildContext async gap warnings resolved
+
+### Quality Metrics
+- **Tests**: 1041/1041 passing (100%)
+- **Static Analysis**: 0 errors, 0 warnings, 0 hints
+- **PR Comments**: All 3 Copilot reviewer comments addressed
+- **Code Review**: Approved by Clive
+
+### Key Files Modified
+- [lib/views/appearance_view.dart](../../lib/views/appearance_view.dart) – Converted to StatefulWidget
+- [lib/viewmodels/weight_viewmodel.dart](../../lib/viewmodels/weight_viewmodel.dart) – Added display conversion
+- [lib/views/weight/add_weight_view.dart](../../lib/views/weight/add_weight_view.dart) – MVVM compliance
 
 ---
 
-## Objective for Phase 24B
+## Phase 24D: Accessibility Pass
 
-Implement app-wide units preference system that allows users to select their preferred weight units (kg vs lbs) with future support for temperature units (°C vs °F).
+### Scope (from Phase 24 Implementation Spec)
 
-### Key Requirements:
-1. **Storage Convention**: All data stored internally in SI units (kg, °C) — never convert storage layer
-2. **Display Conversion**: Convert to user's preferred units only at display/input boundaries
-3. **User Settings**: Add units preference UI in Settings (likely extending appearance_view.dart)
-4. **Persistence**: Use SharedPreferences for preference storage
-5. **Accuracy**: Conversion must be precise and reversible
-6. **Future-Ready**: Architecture should accommodate temperature units when needed
+**Objective**: Ensure comprehensive accessibility support across the application.
+
+**Key Tasks**:
+1. **Semantic Labels Audit**
+   - Add semantic labels to all icons-only buttons
+   - Add labels to quick actions, chart toggles, FABs
+   - Add labels to navigation icons
+   - Add labels to form action buttons
+
+2. **Color Contrast Verification**
+   - Audit chart zones for WCAG AA compliance (4.5:1 normal, 3:1 large)
+   - Check text-on-surface combinations
+   - Verify button states (enabled/disabled/pressed)
+   - Test with theme variations (light/dark/high-contrast)
+
+3. **High-Contrast Mode Support**
+   - Test with system high-contrast enabled (Android/iOS)
+   - Add theme adjustments if needed
+   - Ensure borders and focus indicators are visible
+   - Verify background/foreground contrast
+
+4. **Large Text Scaling Audit**
+   - Test at 1.5x and 2x system font scaling
+   - Fix text overflow issues
+   - Ensure layouts adapt (use Flexible/Expanded/Wrap)
+   - Add SingleChildScrollView where needed
 
 ---
+
+## Existing Foundation
+
+### Already Implemented (Phase 17)
+- High-contrast mode toggle in Appearance settings
+- Font scaling selector (Normal/Large/XL)
+- Theme system with Material 3 ColorScheme
+- ThemeViewModel for centralized theme management
+
+### Potential Gaps
+- Semantic labels may be missing on many interactive elements
+- Color contrast not formally verified against WCAG AA
+- High-contrast mode toggle exists but theme adjustments may be incomplete
+- Large text scaling may cause layout breaks in some views
+
+---
+
+## Planning Requirements
+
+Tracy, please create a detailed implementation plan for Phase 24D that includes:
+
+1. **Audit Scope**
+   - List all views/widgets that need semantic label review
+   - Identify critical user flows to prioritize
+   - Define color contrast audit process (tools, standards)
+
+2. **Implementation Tasks**
+   - Break down by widget/view category
+   - Prioritize by user impact (critical flows first)
+   - Include test requirements for each task
+
+3. **Testing Strategy**
+   - Widget tests for semantic labels
+   - Manual testing procedure for screen readers
+   - Color contrast verification process
+   - Large text scaling test matrix
+
+4. **Acceptance Criteria**
+   - Specific WCAG compliance targets
+   - Screen reader test coverage
+   - Supported text scaling ranges
+   - High-contrast mode verification checklist
+
+5. **Risk Assessment**
+   - Identify views most likely to have layout issues
+   - Flag any breaking changes to existing widgets
+   - Note any dependencies on external libraries
+
+---
+
+## Reference Documents
+
+- [Phase 24 Implementation Spec](../Plans/Phase_24_Implementation_Spec.md)
+- [Phase 24 Units Accessibility Plan](../Plans/Phase_24_Units_Accessibility_Plan.md)
+- [CODING_STANDARDS.md](../Standards/CODING_STANDARDS.md)
+
+---
+
+## Timeline Expectations
+
+- **Planning**: 1 day (Tracy)
+- **Implementation**: 2-3 days (Claudette/Georgina)
+- **Review**: 1 day (Clive)
+- **Total**: ~4-5 days
+
+---
+
+## Next Steps
+
+1. Tracy: Create detailed Phase 24D implementation plan
+2. Tracy: Hand off to Claudette for implementation
+3. Steve: Monitor progress and coordinate reviews
+
+---
+
+**Steve**  
+Project Manager
 
 ## Scope Reference Documents
 

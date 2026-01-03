@@ -39,16 +39,21 @@ class _SleepHistoryViewState extends State<SleepHistoryView> {
         onRefresh: () => viewModel.loadEntries(),
         child: _buildContent(viewModel),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => const AddSleepView(),
-            ),
-          );
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('Log Sleep'),
+      floatingActionButton: Semantics(
+        label: 'Add new sleep entry',
+        button: true,
+        excludeSemantics: true,
+        child: FloatingActionButton.extended(
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (context) => const AddSleepView(),
+              ),
+            );
+          },
+          icon: const Icon(Icons.add),
+          label: const Text('Add Sleep'),
+        ),
       ),
     );
   }

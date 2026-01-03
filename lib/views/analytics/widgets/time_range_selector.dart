@@ -12,27 +12,31 @@ class TimeRangeSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AnalyticsViewModel>(
       builder: (context, viewModel, _) {
-        return SegmentedButton<TimeRange>(
-          segments: TimeRange.values
-              .map(
-                (range) => ButtonSegment<TimeRange>(
-                  value: range,
-                  label: Text(range.label),
-                ),
-              )
-              .toList(),
-          selected: <TimeRange>{viewModel.selectedRange},
-          onSelectionChanged: (selection) {
-            final chosen = selection.first;
-            if (chosen == viewModel.selectedRange) {
-              return;
-            }
-            viewModel.setTimeRange(chosen);
-            viewModel.loadData(
-              forceRefresh: true,
-              forceOverlayRefresh: viewModel.showSleepOverlay,
-            );
-          },
+        return Semantics(
+          label: 'Time range selector',
+          container: true,
+          child: SegmentedButton<TimeRange>(
+            segments: TimeRange.values
+                .map(
+                  (range) => ButtonSegment<TimeRange>(
+                    value: range,
+                    label: Text(range.label),
+                  ),
+                )
+                .toList(),
+            selected: <TimeRange>{viewModel.selectedRange},
+            onSelectionChanged: (selection) {
+              final chosen = selection.first;
+              if (chosen == viewModel.selectedRange) {
+                return;
+              }
+              viewModel.setTimeRange(chosen);
+              viewModel.loadData(
+                forceRefresh: true,
+                forceOverlayRefresh: viewModel.showSleepOverlay,
+              );
+            },
+          ),
         );
       },
     );

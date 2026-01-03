@@ -1,69 +1,70 @@
 # Handoff: Tracy → Claudette
-## Phase 24C/D/E – Units UI, Accessibility, Landscape (Post-Clive Review)
+## Phase 24D – Accessibility Pass (Semantics, Contrast, High-Contrast, Large Text)
 
 **Date:** 2026-01-03  
 **From:** Tracy (Planning & Architecture)  
-**To:** Claudette (Implementation)
+**To:** Claudette (Implementation)  
+**Branch Base:** main (merge readiness assumed after 24C)
 
 ---
 
-## What Changed After Clive's Review
-- Added explicit Analytics selector resilience task (keep `TimeRangeSelector` visible/usable on empty datasets; persist last range).
-- Moved unit conversion responsibilities into `WeightViewModel` (views become presentation-only).
-- Standardized `WeightUnit` to the existing definition in `lib/models/health_data.dart`; add `TemperatureUnit` alongside it or in a shared units file—no duplicate enums.
-- Orientation guidance: use `MediaQuery.of(context).orientation` + `LayoutBuilder` for breakpoints; avoid wrapping whole trees in `OrientationBuilder`.
-- Snackbar guidance: avoid per-tap snackbars for unit selection; prefer passive confirmation or throttled feedback.
-- Added widget test requirement for Analytics selector empty-state resilience.
+## Objectives
+- Add comprehensive accessibility support across the app: semantic labels, WCAG AA contrast, high-contrast mode verification, and large text scaling up to 2.0x.
+- Keep behavior/regressions minimal; no functional changes beyond accessibility.
+
+## Scope (What to Cover)
+1) **Semantic Labels** (screen reader): all icons-only buttons, FABs, quick actions, chart toggles, navigation icons, and form action buttons. 
+2) **Color Contrast (WCAG AA)**: charts (band zones, lines), buttons (normal/disabled/pressed), text-on-surface in light/dark/high-contrast themes.
+3) **High-Contrast Mode**: verify system HC (Android/iOS) plus in-app HC toggle; ensure focus/border/foreground visibility.
+4) **Large Text Scaling**: validate at 1.5x and 2.0x; fix overflows with Flexible/Expanded/Wrap/scroll; ensure critical CTAs remain visible.
+
+## Key Files / Areas (priority order)
+- Home/Quick actions: lib/views/home_view.dart, lib/views/home/widgets/quick_actions.dart
+- Navigation/Shell: bottom nav container, app bars with icons (ensure semantics)
+- Appearance/Settings: lib/views/appearance_view.dart (already units work; add semantics/contrast checks)
+- Analytics: lib/views/analytics/analytics_view.dart, analytics/widgets/* (selectors, toggles, chart legends)
+- History: lib/views/history/history_home_view.dart, bp_full_history_view.dart, weight_full_history_view.dart, sleep_history_view.dart
+- Forms: lib/views/blood_pressure/add_edit_bp_view.dart, lib/views/weight/add_weight_view.dart, lib/views/sleep/add_sleep_view.dart, medication add/edit/log views
+- Reusable widgets: buttons, icon buttons, FABs, toggles, chips, dropdowns, segmented buttons, chart legends
+
+## Implementation Tasks
+1) **Semantic Labels Audit & Fixes**
+   - Add Semantics/Tooltip/aria-style labels to icons-only controls (use concise, action-oriented labels).
+   - Verify quick actions, FABs, chart toggles, navigation icons, and form submit/cancel buttons.
+2) **Contrast Verification & Adjustments**
+   - Audit with light/dark/high-contrast themes; adjust colors to meet WCAG AA (4.5:1 normal, 3:1 large).
+   - Pay special attention to chart band fills/lines, disabled states, chip text, icon contrasts.
+3) **High-Contrast Mode Pass**
+   - With system HC enabled + in-app HC toggle, ensure borders/focus/foreground remain legible; add conditional borders/backgrounds if needed.
+4) **Large Text Scaling Pass**
+   - Test at 1.5x and 2.0x; fix overflows with Flexible/Expanded/Wrap or SingleChildScrollView where appropriate.
+   - Ensure primary CTAs remain visible without clipping; avoid fixed heights where possible.
+5) **Tests**
+   - Add widget tests for: (a) semantics labels on critical controls, (b) selectors remain visible with large text (MediaQuery textScaleFactor), (c) high-contrast theme renders key elements (snapshot/semantics assertions where feasible).
+
+## Acceptance Criteria
+- Semantic labels on all interactive controls (icons-only + key buttons).
+- WCAG AA contrast met for text/buttons/charts in light/dark/HC.
+- High-contrast mode usable: borders/focus visible; no invisible icons/text.
+- App remains usable at 1.5x and 2.0x text scaling with no blocking overflows on critical flows (home, add/edit forms, analytics selectors, history sections).
+- Tests updated/passing; analyzer clean per CODING_STANDARDS (§2 formatting, §3 Dart/Flutter, §8 testing).
+
+## Risks & Mitigations
+- **Layout breaks at 2.0x**: prioritize critical screens; add scroll/flex wrappers judiciously.
+- **Contrast tweaks affecting brand palette**: confine changes to on-surface/foreground where possible; prefer minimal adjustments.
+- **HC mode variability (platform differences)**: gate HC-specific tweaks with platform checks if needed; prefer theme-based toggles.
+
+## Deliverables
+- Code updates for semantics, contrast tweaks, HC safeguards, and large-text resilience.
+- Widget tests for semantics/large-text/HC where practical.
+- Brief update to Implementation_Schedule (Phase 24D status) after completion.
+
+## References
+- Plan: [Documentation/Plans/Phase_24_Implementation_Spec.md](../Plans/Phase_24_Implementation_Spec.md)
+- Plan: [Documentation/Plans/Phase_24_Units_Accessibility_Plan.md](../Plans/Phase_24_Units_Accessibility_Plan.md)
+- Standards: [Documentation/Standards/CODING_STANDARDS.md](../Standards/CODING_STANDARDS.md)
 
 ---
 
-## Key Files (Plan Alignments)
-- Updated plans: [Documentation/Plans/Phase_24_Units_Accessibility_Plan.md](../Plans/Phase_24_Units_Accessibility_Plan.md), [Documentation/Plans/Phase_24_Implementation_Spec.md](../Plans/Phase_24_Implementation_Spec.md)
-- Existing model/service/utils from 24B: `lib/models/units_preference.dart`, `lib/services/units_preference_service.dart`, `lib/utils/unit_conversion.dart`
-
----
-
-## Implementation Tasks (Actionable)
-1) **Analytics Selector Resilience (24C)**
-   - Files: `lib/views/analytics/analytics_view.dart`, `lib/viewmodels/analytics_viewmodel.dart`
-   - Keep `TimeRangeSelector` rendered regardless of data; retain last-selected range even when results are empty.
-   - Add widget test: empty dataset still shows selector and allows range change.
-
-2) **Units Conversion in ViewModels (24C)**
-   - Files: `lib/viewmodels/weight_viewmodel.dart`, `lib/views/weight/add_edit_weight_view.dart`
-   - Inject `UnitsPreferenceService` into the ViewModel; expose display-ready values and accept preferred-unit input, converting to kg before `WeightService`.
-   - Remove conversion logic from the view; keep only unit labels/suffixes.
-
-3) **Enum Unification (24C foundation)**
-   - Files: `lib/models/health_data.dart`, `lib/models/units_preference.dart` (and any imports)
-   - Use single `WeightUnit` definition (from `health_data.dart`); relocate/add `TemperatureUnit` alongside it or in a shared `units.dart`. Update imports accordingly.
-
-4) **Settings UI Feedback (24C)**
-   - Files: `lib/views/appearance_view.dart` or `lib/views/units_settings_view.dart`
-   - Avoid per-tap snackbars; consider passive state change or throttled confirmation.
-
-5) **Orientation Strategy (24E)**
-   - Files: layouts touched for landscape
-   - Use `MediaQuery.of(context).orientation` for top-level decisions and `LayoutBuilder` for width breakpoints; avoid wrapping whole trees in `OrientationBuilder`.
-
-6) **Existing Accessibility Tasks (24D)**
-   - Semantics, contrast, high-contrast mode, large text—unchanged but proceed per plan.
-
----
-
-## Tests to Add/Update
-- Widget: Analytics view empty dataset keeps `TimeRangeSelector` visible/usable.
-- Widget: Units settings selector interaction (no snackbar spam) still persists preference.
-- ViewModel: WeightViewModel converts input/output according to `UnitsPreference` and stores kg via `WeightService`.
-
-Coverage targets remain per Coding Standards: Services ≥85%, Utils ≥90%, Widgets ≥70%.
-
----
-
-## Notes / Risks
-- Ensure migration from 24B remains idempotent; do not reintroduce per-entry units.
-- When unifying enums, watch for imports in tests and services to avoid name clashes.
-
----
-
-Please start implementation on 24C tasks once the above is acknowledged; 24D/24E can follow in sequence per the plan.
+## Next Step
+Proceed with implementation on the `feature/phase-24c-units-ui-integration` (or new 24D branch from latest main) incorporating the tasks above, then hand back to Clive for review.

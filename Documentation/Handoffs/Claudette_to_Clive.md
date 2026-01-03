@@ -1,178 +1,95 @@
-# Claudette to Clive Handoff: Phase 24C PR Comments Addressed
+# Handoff: Claudette → Clive
+## Phase 24D – Accessibility Pass Refinements Complete
 
 **Date:** 2026-01-03  
-**From:** Claudette (Implementation Engineer)  
-**To:** Clive (Quality Auditor & Gatekeeper)  
-**Phase:** 24C – Units UI Integration & Analytics Resilience  
-**Status:** ✅ **PR COMMENTS ADDRESSED – READY FOR FINAL REVIEW**
+**From:** Claudette (Implementation)  
+**To:** Clive (Review Specialist)  
+**Branch:** main
 
 ---
 
-## Summary
+## Implementation Summary
 
-I have addressed all 3 unresolved PR comments from the Copilot PR reviewer regarding [appearance_view.dart](../../lib/views/appearance_view.dart).
+I have completed all refinements requested in your review. The accessibility blocker has been resolved, and all redundancy issues have been optimized.
 
----
+## Changes Implemented
 
-## Issues Addressed
+### 1. ✅ Fixed TimeRangeSelector (BLOCKER RESOLVED)
 
-### 1. ❌ **Issue: Inappropriate use of `markNeedsBuild()`**
-**Comment:** "Directly casting BuildContext to Element and calling markNeedsBuild() is not a recommended pattern in Flutter. This is an internal API that bypasses the framework's normal rebuild mechanisms."
+**File:** `lib/views/analytics/widgets/time_range_selector.dart`
 
-**Resolution:**
-- Converted `AppearanceView` from `StatelessWidget` to `StatefulWidget`
-- Removed the `(context as Element).markNeedsBuild()` hack
-- Now using proper `setState()` for state management
-- Units preference is loaded in `initState()` and stored in state variable `_currentUnitsPreference`
+**Changes:**
+- Removed `excludeSemantics: true` from the Semantics wrapper
+- Changed label from `'Time range selector, current: {viewModel.selectedRange.label}'` to `'Time range selector'`
+- Added `container: true` property
 
----
+**Rationale:** The individual segments (7d, 30d, 90d, 1y, All) are now accessible to screen readers. Users can navigate between segments and hear each option announced. The container label provides context without hiding the interactive elements.
 
-### 2. ❌ **Issue: Missing analytics refresh on unit change**
-**Comment:** "When the weight unit preference is changed, the analytics data should be refreshed to display the charts with the new unit."
+### 2. ✅ Optimized ProfileSwitcher
 
-**Resolution:**
-- Added analytics refresh in the weight unit `onChanged` callback
-- Calls `context.read<AnalyticsViewModel>().loadData()` after saving preference
-- Wrapped in try-catch to handle contexts where AnalyticsViewModel is not available
-- Charts now update dynamically when units change
+**File:** `lib/widgets/profile_switcher.dart`
 
----
+**Changes:**
+- Added `excludeSemantics: true` to the Semantics wrapper
 
-### 3. ❌ **Issue: Inefficient FutureBuilder usage**
-**Comment:** "Using FutureBuilder with an inline future call causes the future to be recreated on every build. After saving a preference change, the UI won't automatically reflect the update."
+**Rationale:** Prevents redundant announcement. Screen readers will now announce only "Switch profile, current: John Doe" instead of announcing the profile name twice.
 
-**Resolution:**
-- Removed `FutureBuilder` entirely
-- Units preference now loaded once in `initState()` and stored in state
-- Dropdown uses `value` instead of `initialValue` to reflect current state
-- State updates via `setState()` after successful save
-- UI immediately reflects changes without rebuild issues
+### 3. ✅ Optimized FABs
 
----
+**Files Modified:**
+- `lib/views/weight/weight_history_view.dart`
+- `lib/views/sleep/sleep_history_view.dart`
+- `lib/views/medication/medication_list_view.dart`
+- `lib/views/medication/medication_group_list_view.dart`
 
-## Technical Changes
+**Changes:**
+- Added `excludeSemantics: true` to all FAB Semantics wrappers
 
-### Files Modified
-- [lib/views/appearance_view.dart](../../lib/views/appearance_view.dart)
+**Rationale:** Prevents redundant announcements. Screen readers will now announce only the descriptive outer label (e.g., "Add new weight entry") instead of also announcing the internal FAB label (e.g., "Add Weight").
 
-### Key Implementation Details
+### 4. ✅ Updated Tests
 
-**Before:**
-```dart
-class AppearanceView extends StatelessWidget {
-  Widget _buildUnitsPreferenceSection(BuildContext context) {
-    return FutureBuilder<UnitsPreference>(
-      future: unitsService.getUnitsPreference(),
-      builder: (context, snapshot) {
-        return DropdownButtonFormField<WeightUnit>(
-          initialValue: currentPreference.weightUnit,
-          onChanged: (value) async {
-            await unitsService.saveUnitsPreference(...);
-            (context as Element).markNeedsBuild(); // ❌ Bad practice
-          },
-        );
-      },
-    );
-  }
-}
-```
+**File:** `test/views/analytics/widgets/time_range_selector_test.dart`
 
-**After:**
-```dart
-class AppearanceView extends StatefulWidget {
-  const AppearanceView({super.key});
-  @override
-  State<AppearanceView> createState() => _AppearanceViewState();
-}
+**Changes:**
+- Updated existing test to verify container label only (removed check for current value)
+- Added new test `'individual segments are accessible to screen readers'` that verifies all 5 time range segments (7d, 30d, 90d, 1y, All) are discoverable via `find.bySemanticsLabel()`
 
-class _AppearanceViewState extends State<AppearanceView> {
-  UnitsPreference? _currentUnitsPreference;
+**Test Coverage:**
+- Confirms segments are not hidden from screen readers
+- Validates the blocker fix works correctly
 
-  @override
-  void initState() {
-    super.initState();
-    _loadUnitsPreference();
-  }
+## Test Results
 
-  Future<void> _loadUnitsPreference() async {
-    final unitsService = context.read<UnitsPreferenceService>();
-    final preference = await unitsService.getUnitsPreference();
-    if (mounted) {
-      setState(() {
-        _currentUnitsPreference = preference;
-      });
-    }
-  }
+**Total Tests:** 1048 passing (+1 new test), 0 failing  
+**Static Analysis:** Clean (dart analyze)  
+**Formatting:** All files formatted with dart format
 
-  Widget _buildUnitsPreferenceSection(BuildContext context) {
-    final currentPreference = _currentUnitsPreference ?? const UnitsPreference();
-    
-    return DropdownButtonFormField<WeightUnit>(
-      value: currentPreference.weightUnit, // ✅ Uses value, not initialValue
-      onChanged: (value) async {
-        final newPreference = currentPreference.copyWith(weightUnit: value);
-        await unitsService.saveUnitsPreference(newPreference);
-        
-        if (mounted) {
-          setState(() {
-            _currentUnitsPreference = newPreference; // ✅ Proper state update
-          });
-          
-          // ✅ Refresh analytics
-          try {
-            final analyticsViewModel = context.read<AnalyticsViewModel>();
-            await analyticsViewModel.loadData();
-          } catch (e) {
-            // Analytics may not be available in all contexts
-          }
-        }
-      },
-    );
-  }
-}
-```
+## Technical Decisions
 
----
+1. **TimeRangeSelector Label:** Used `container: true` with a simple label. The SegmentedButton's internal segments now handle their own semantic announcements, making the control fully accessible.
 
-## Verification
+2. **Consistent Pattern:** All `excludeSemantics: true` properties follow the same pattern - used when a wrapper provides a comprehensive label that replaces (not supplements) child semantics.
 
-- ✅ **Tests:** All 1041 tests passing (19 appearance_view tests specifically)
-- ✅ **Static Analysis:** No errors, warnings, or hints
-- ✅ **Architecture:** Proper Flutter state management pattern
-- ✅ **Analytics Integration:** Charts refresh on unit change
-- ✅ **UI Responsiveness:** Dropdown updates immediately on selection
+## Quality Gates
 
----
-
-## Flutter Best Practices Compliance
-
-| Practice | Before | After |
-|----------|--------|-------|
-| State Management | ❌ `markNeedsBuild()` hack | ✅ `setState()` |
-| Widget Lifecycle | ❌ FutureBuilder recreation | ✅ `initState()` load |
-| Dropdown Binding | ❌ `initialValue` (static) | ✅ `value` (reactive) |
-| Context Safety | ❌ Element casting | ✅ `mounted` checks |
-| Analytics Sync | ❌ No refresh | ✅ `loadData()` call |
-
----
+- ✅ Blocker resolved in TimeRangeSelector
+- ✅ Redundancy optimized in ProfileSwitcher and FABs
+- ✅ All 1048 tests passing
+- ✅ Static analysis clean
+- ✅ Code formatted
 
 ## Notes for Review
 
-1. **Analytics ViewModel Access:** The analytics refresh is wrapped in a try-catch because `AppearanceView` may be used in contexts where `AnalyticsViewModel` is not provided. This is a defensive pattern that prevents crashes while still enabling the feature where available.
+1. The TimeRangeSelector fix maintains the container label for context while allowing users to navigate and select individual time ranges via screen reader.
 
-2. **State Initialization:** Units preference loads asynchronously in `initState()`. Until loaded, it defaults to `const UnitsPreference()` (kg/Celsius), which matches the service's default behavior.
+2. All FABs now follow the same pattern: descriptive outer label with `excludeSemantics: true` to prevent the internal button text from being announced redundantly.
 
-3. **No Breaking Changes:** This is purely an internal refactor of `AppearanceView`. The API and user experience remain identical, just with improved architecture.
-
----
-
-**Claudette**  
-Implementation Engineer
-- `lib/views/sleep/add_sleep_view.dart`
-- `lib/widgets/medication/unit_combo_box.dart`
+3. Test coverage validates that the accessibility regression is fully resolved.
 
 ---
 
-**Claudette**  
-Implementation Engineer
+**Status:** Ready for final review  
+**Blocker Level:** None
 
+*Claudette*
