@@ -8,8 +8,7 @@ void main() {
   });
 
   group('AutoCleanupPolicy', () {
-    test('defaultPolicy returns correct values', () 
-      {
+    test('defaultPolicy returns correct values', () {
       final policy = AutoCleanupPolicy.defaultPolicy();
       expect(policy.enabled, true);
       expect(policy.maxAge, const Duration(days: 90));
