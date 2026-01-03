@@ -1,0 +1,1063 @@
+00:00 +0: loading D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/auto_cleanup_policy_test.dart
+00:00 +0: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/auto_cleanup_policy_test.dart: AutoCleanupPolicy defaultPolicy returns correct values
+00:00 +1: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/auto_cleanup_policy_test.dart: AutoCleanupPolicy disabled creates disabled policy
+00:00 +2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/auto_cleanup_policy_test.dart: AutoCleanupPolicy save and load roundtrip
+00:00 +3: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/auto_cleanup_policy_test.dart: AutoCleanupPolicy load with no saved values returns defaults
+00:00 +4: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/auto_cleanup_policy_test.dart: AutoCleanupPolicy copyWith creates modified copy
+00:00 +5: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/managed_file_test.dart: FileKind displayName returns correct values
+00:00 +6: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/managed_file_test.dart: FileKind extension returns correct values
+00:00 +7: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/managed_file_test.dart: ManagedFile formattedSize formats bytes correctly
+00:00 +8: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/managed_file_test.dart: ManagedFile shareText returns correct text for each kind
+00:00 +9: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/medication_test.dart: Medication creates medication with required fields
+00:01 +10: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/medication_test.dart: Medication creates medication with all fields
+00:01 +11: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/medication_test.dart: Medication toMap converts to database map correctly
+00:01 +12: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/medication_test.dart: Medication fromMap creates medication from database map
+00:01 +13: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/medication_test.dart: Medication round-trip serialization preserves data
+00:01 +14: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/medication_test.dart: Medication copyWith creates new instance with updated fields
+00:01 +15: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/medication_test.dart: Medication equality compares all fields
+00:01 +16: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/medication_test.dart: MedicationGroup creates group with required fields
+00:01 +17: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/medication_test.dart: MedicationGroup normalizes member IDs by sorting and deduplicating
+00:01 +18: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/medication_test.dart: MedicationGroup toMap converts to database map with JSON array
+00:01 +19: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/medication_test.dart: MedicationGroup fromMap creates group from database map
+00:01 +20: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/medication_test.dart: MedicationGroup fromMap handles empty member list
+00:01 +21: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/medication_test.dart: MedicationGroup round-trip serialization preserves data
+00:01 +22: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/medication_test.dart: MedicationGroup copyWith creates new instance with updated fields
+00:01 +23: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/medication_test.dart: MedicationGroup equality compares all fields including member list
+00:01 +24: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/medication_test.dart: MedicationIntake creates intake with required fields
+00:01 +25: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/medication_test.dart: MedicationIntake creates intake with all fields
+00:01 +26: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/medication_test.dart: MedicationIntake toMap converts to database map correctly
+00:01 +27: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/medication_test.dart: MedicationIntake fromMap creates intake from database map
+00:01 +28: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/medication_test.dart: MedicationIntake round-trip serialization preserves data
+00:01 +29: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/medication_test.dart: MedicationIntake copyWith creates new instance with updated fields
+00:01 +30: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/medication_test.dart: MedicationIntake equality compares all fields
+00:01 +31: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests Profile creation with all fields
+00:01 +32: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests Profile creation with minimum required fields
+00:01 +33: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests toMap serialization includes all fields
+00:01 +34: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests toMap serialization excludes null id
+00:01 +35: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests fromMap deserialization with all fields
+00:01 +36: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests fromMap deserialization with null optional fields
+00:01 +37: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests copyWith creates new instance with updated fields
+00:01 +38: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests copyWith with no changes returns equivalent instance
+00:01 +39: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests equality operator works correctly for identical profiles
+00:01 +40: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests equality operator returns false for different profiles
+00:01 +41: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests equality considers all fields
+00:01 +42: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests round-trip serialization preserves data
+00:01 +43: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests preferredUnits defaults to mmHg
+00:01 +44: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests supports kPa units
+00:01 +45: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests Medical Metadata Tests Profile creation with all medical metadata fields
+00:01 +46: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests Medical Metadata Tests Profile creation with null medical metadata fields
+00:01 +47: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests Medical Metadata Tests toMap serialization includes medical metadata
+00:01 +48: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests Medical Metadata Tests toMap serialization handles null medical metadata
+00:01 +49: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests Medical Metadata Tests fromMap deserialization with medical metadata
+00:01 +50: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests Medical Metadata Tests fromMap deserialization with null medical metadata
+00:01 +51: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests Medical Metadata Tests copyWith updates medical metadata fields
+00:01 +52: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests Medical Metadata Tests equality considers medical metadata fields
+00:01 +53: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests Medical Metadata Tests inequality when medical metadata differs
+00:01 +54: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests Medical Metadata Tests round-trip serialization preserves medical metadata
+00:01 +55: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests Medical Metadata Tests copyWith can explicitly set medical metadata to null
+00:01 +56: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/profile_test.dart: Profile Model Tests Medical Metadata Tests copyWith preserves unspecified medical metadata
+00:01 +57: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: Reading Model Tests Reading creation with all fields
+00:02 +58: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: Reading Model Tests Reading creation with minimum required fields
+00:02 +59: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: Reading Model Tests toMap serialization includes all fields
+00:02 +60: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: Reading Model Tests toMap serialization excludes null id
+00:02 +61: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: Reading Model Tests toMap handles null tags
+00:02 +62: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: Reading Model Tests toMap handles empty tags string
+00:02 +63: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: Reading Model Tests fromMap deserialization with all fields
+00:02 +64: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: Reading Model Tests fromMap handles null optional fields
+00:02 +65: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: Reading Model Tests fromMap handles empty tags string
+00:02 +66: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: Reading Model Tests copyWith creates new instance with updated fields
+00:02 +67: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: Reading Model Tests equality operator works correctly for identical readings
+00:02 +68: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: Reading Model Tests equality operator returns false for different readings
+00:02 +69: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: Reading Model Tests round-trip serialization preserves data
+00:02 +70: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: Reading Model Tests irregularFlag defaults to false
+00:02 +71: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: Reading Model Tests supports valid systolic range 70-250
+00:02 +72: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: Reading Model Tests supports valid diastolic range 40-150
+00:02 +73: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: Reading Model Tests supports valid pulse range 30-200
+00:02 +74: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: ReadingGroup Model Tests ReadingGroup creation with all fields
+00:02 +75: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: ReadingGroup Model Tests ReadingGroup creation with minimum required fields
+00:02 +76: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: ReadingGroup Model Tests toMap serialization includes all fields
+00:02 +77: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: ReadingGroup Model Tests fromMap deserialization with all fields
+00:02 +78: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: ReadingGroup Model Tests copyWith creates new instance with updated fields
+00:02 +79: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: ReadingGroup Model Tests equality operator works correctly
+00:02 +80: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: ReadingGroup Model Tests round-trip serialization preserves data
+00:02 +81: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: ReadingGroup Model Tests windowMinutes defaults to 30
+00:02 +82: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: ReadingGroup Model Tests handles single member reading
+00:02 +83: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/reading_test.dart: ReadingGroup Model Tests handles multiple member readings
+00:02 +84: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/sleep_entry_test.dart: SleepSource toDbString returns correct values
+00:02 +85: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/sleep_entry_test.dart: SleepSource fromDbString parses correctly
+00:02 +86: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/sleep_entry_test.dart: SleepSource fromDbString defaults to manual for unknown values
+00:02 +87: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/sleep_entry_test.dart: SleepEntry creates instance with required fields and auto-calculates duration
+00:02 +88: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/sleep_entry_test.dart: SleepEntry creates instance with explicit duration (no endedAt)
+00:02 +89: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/sleep_entry_test.dart: SleepEntry creates instance with all optional fields
+00:02 +90: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/sleep_entry_test.dart: SleepEntry explicit duration overrides auto-calculation
+00:02 +91: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/sleep_entry_test.dart: SleepEntry duration defaults to 0 when neither endedAt nor duration provided
+00:02 +92: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/sleep_entry_test.dart: SleepEntry toMap includes all fields
+00:02 +93: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/sleep_entry_test.dart: SleepEntry toMap excludes null id
+00:02 +94: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/sleep_entry_test.dart: SleepEntry toMap handles null endedAt
+00:02 +95: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/sleep_entry_test.dart: SleepEntry fromMap reconstructs entry correctly
+00:02 +96: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/sleep_entry_test.dart: SleepEntry fromMap handles null optional fields
+00:02 +97: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/sleep_entry_test.dart: SleepEntry round-trip serialization preserves data
+00:02 +98: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/sleep_entry_test.dart: SleepEntry copyWith creates new instance with updated fields
+00:02 +99: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/sleep_entry_test.dart: SleepEntry copyWith preserves original when no fields specified
+00:02 +100: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/sleep_entry_test.dart: SleepEntry equality works correctly
+00:02 +101: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/sleep_entry_test.dart: SleepEntry hashCode is consistent
+00:02 +102: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/sleep_entry_test.dart: SleepEntry toString includes key information
+00:02 +103: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/theme_settings_test.dart: ThemeSettings creates with default values
+00:02 +104: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/theme_settings_test.dart: ThemeSettings creates with custom values
+00:02 +105: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/theme_settings_test.dart: ThemeSettings copyWith creates new instance with modified values
+00:02 +106: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/theme_settings_test.dart: ThemeSettings toJson serializes correctly
+00:02 +107: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/theme_settings_test.dart: ThemeSettings fromJson deserializes correctly
+00:02 +108: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/theme_settings_test.dart: ThemeSettings fromJson handles missing fields with defaults
+00:02 +109: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/theme_settings_test.dart: ThemeSettings fromJson handles invalid enum values with defaults
+00:02 +110: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/theme_settings_test.dart: ThemeSettings equality works correctly
+00:02 +111: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/theme_settings_test.dart: ThemeSettings hashCode works correctly
+00:03 +112: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/theme_settings_test.dart: ThemeSettings toString returns formatted string
+00:03 +113: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/theme_settings_test.dart: AccentColorExtension toColor returns correct Material colors
+00:03 +114: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/theme_settings_test.dart: AccentColorExtension toColor returns custom colors for emerald and turquoise
+00:03 +115: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/theme_settings_test.dart: AccentColorExtension displayName returns correct names
+00:03 +116: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/theme_settings_test.dart: FontScaleOptionExtension scaleFactor returns correct values
+00:03 +117: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/theme_settings_test.dart: FontScaleOptionExtension displayName returns correct names
+00:03 +118: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/theme_settings_test.dart: AppThemeModeExtension displayName returns correct names
+00:03 +119: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: WeightUnit has correct enum values
+00:03 +120: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: TemperatureUnit has correct enum values
+00:03 +121: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference constructor creates instance with default SI units when no parameters provided
+00:03 +122: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference constructor creates instance with specified units
+00:03 +123: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference fromJson parses valid JSON correctly
+00:03 +124: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference fromJson parses lbs weight unit correctly
+00:03 +125: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference fromJson parses fahrenheit temperature unit correctly
+00:03 +126: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference fromJson handles case-insensitive unit strings
+00:03 +127: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference fromJson returns defaults for invalid weight unit
+00:03 +128: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference fromJson returns defaults for invalid temperature unit
+00:03 +129: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference fromJson returns defaults for missing fields
+00:03 +130: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference fromJson returns defaults for null values
+00:03 +131: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference fromJson returns defaults for corrupt JSON
+00:03 +132: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference toJson serializes kg and celsius correctly
+00:03 +133: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference toJson serializes lbs and fahrenheit correctly
+00:03 +134: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference round-trip JSON serialization preserves kg and celsius
+00:03 +135: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference round-trip JSON serialization preserves lbs and fahrenheit
+00:03 +136: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference copyWith creates copy with updated weight unit
+00:03 +137: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference copyWith creates copy with updated temperature unit
+00:03 +138: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference copyWith creates copy with both units updated
+00:03 +139: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference copyWith preserves original when no parameters provided
+00:03 +140: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference equality identical instances are equal
+00:03 +141: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference equality instances with same values are equal
+00:03 +142: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference equality instances with different weight units are not equal
+00:03 +143: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference equality instances with different temperature units are not equal
+00:03 +144: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference toString formats kg and celsius correctly
+00:03 +145: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/units_preference_test.dart: UnitsPreference toString formats lbs and fahrenheit correctly
+00:03 +146: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/weight_entry_test.dart: WeightUnit toKg converts kg correctly
+00:03 +147: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/weight_entry_test.dart: WeightUnit toKg converts lbs to kg correctly
+00:03 +148: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/weight_entry_test.dart: WeightUnit fromKg converts kg correctly
+00:04 +149: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/weight_entry_test.dart: WeightUnit fromKg converts kg to lbs correctly
+00:04 +150: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/weight_entry_test.dart: WeightUnit toDbString returns correct values
+00:04 +151: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/weight_entry_test.dart: WeightUnit fromDbString parses correctly
+00:04 +152: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/weight_entry_test.dart: WeightUnit fromDbString defaults to kg for unknown values
+00:04 +153: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/weight_entry_test.dart: WeightEntry creates instance with required fields
+00:04 +154: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/weight_entry_test.dart: WeightEntry creates instance with all optional fields
+00:04 +155: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/weight_entry_test.dart: WeightEntry weightInKg returns correct value for kg
+00:04 +156: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/weight_entry_test.dart: WeightEntry weightInKg converts lbs to kg
+00:04 +157: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/weight_entry_test.dart: WeightEntry weightInLbs returns correct value for lbs
+00:04 +158: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/weight_entry_test.dart: WeightEntry weightInLbs converts kg to lbs
+00:04 +159: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/weight_entry_test.dart: WeightEntry toMap includes all fields
+00:04 +160: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/weight_entry_test.dart: WeightEntry toMap excludes null id
+00:04 +161: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/weight_entry_test.dart: WeightEntry fromMap reconstructs entry correctly
+00:04 +162: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/weight_entry_test.dart: WeightEntry fromMap handles null optional fields
+00:04 +163: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/weight_entry_test.dart: WeightEntry round-trip serialization preserves data
+00:04 +164: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/weight_entry_test.dart: WeightEntry copyWith creates new instance with updated fields
+00:04 +165: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/weight_entry_test.dart: WeightEntry copyWith preserves original when no fields specified
+00:04 +166: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/weight_entry_test.dart: WeightEntry equality works correctly
+00:04 +167: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/weight_entry_test.dart: WeightEntry hashCode is consistent
+00:04 +168: D:/Development/Zephon-Developments/BloodPressureMonitor/test/models/weight_entry_test.dart: WeightEntry toString includes key information
+00:04 +169: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/analytics_service_test.dart: calculateStats aggregates min/avg/max and variability
+00:04 +170: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/analytics_service_test.dart: calculateStats returns zeros for empty dataset
+00:04 +171: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/analytics_service_test.dart: classifyByTimeOfDay splits by cutoff
+00:04 +172: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/analytics_service_test.dart: getChartData downsamples when range is long
+00:04 +173: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/analytics_service_test.dart: getSleepStageSeries flags incomplete entries
+00:04 +174: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/analytics_service_test.dart: getSleepCorrelation aligns sleep with morning readings
+00:04 +175: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: PIN Management isPinSet returns false when no PIN is stored
+00:05 +176: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: PIN Management isPinSet returns true when PIN is stored
+00:05 +177: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: PIN Management setPin stores hash and salt in secure storage
+00:05 +178: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: PIN Management setPin resets failed attempts
+00:05 +179: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: PIN Management verifyPin returns true for correct PIN
+00:05 +180: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: PIN Management verifyPin returns false for incorrect PIN
+00:05 +181: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: PIN Management verifyPin increments failed attempts on failure
+00:05 +182: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/averaging_service_test.dart: createOrUpdateGroupsForReading single reading creates group of 1
+00:06 +183: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: PIN Management verifyPin resets failed attempts on success
+00:06 +184: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: PIN Management verifyPin resets failed attempts on success
+00:06 +185: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: PIN Management verifyPin resets failed attempts on success
+00:06 +186: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: PIN Management verifyPin resets failed attempts on success
+00:06 +187: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: PIN Management verifyPin resets failed attempts on success
+00:06 +188: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/averaging_service_test.dart: createOrUpdateGroupsForReading reading outside 30-minute window creates new group
+00:06 +189: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/averaging_service_test.dart: createOrUpdateGroupsForReading reading outside 30-minute window creates new group
+00:06 +190: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Lockout Policy isLockedOut returns false when no lockout is active
+00:06 +191: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/averaging_service_test.dart: createOrUpdateGroupsForReading back-dated reading recomputes groups correctly
+00:06 +192: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/averaging_service_test.dart: createOrUpdateGroupsForReading back-dated reading recomputes groups correctly
+00:06 +193: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/averaging_service_test.dart: createOrUpdateGroupsForReading back-dated reading recomputes groups correctly
+00:06 +194: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/averaging_service_test.dart: createOrUpdateGroupsForReading back-dated reading recomputes groups correctly
+00:06 +195: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Lockout Policy 5 failed attempts triggers 30 second lockout
+00:06 +196: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Lockout Policy 5 failed attempts triggers 30 second lockout
+00:06 +197: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Lockout Policy 5 failed attempts triggers 30 second lockout
+00:06 +198: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Lockout Policy 5 failed attempts triggers 30 second lockout
+00:06 +199: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Lockout Policy 5 failed attempts triggers 30 second lockout
+00:06 +200: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Lockout Policy 5 failed attempts triggers 30 second lockout
+00:06 +201: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Lockout Policy 5 failed attempts triggers 30 second lockout
+00:06 +202: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Lockout Policy 5 failed attempts triggers 30 second lockout
+00:06 +203: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Lockout Policy 5 failed attempts triggers 30 second lockout
+00:06 +204: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Lockout Policy 5 failed attempts triggers 30 second lockout
+00:06 +205: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/export_service_test.dart: ExportService exportToJson writes metadata and data sections
+00:06 +206: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Lockout Policy 10 failed attempts triggers 5 minute lockout
+00:06 +207: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/export_service_test.dart: ExportService exportToCsv emits section headers
+00:06 +208: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Lockout Policy 15+ failed attempts triggers 30 minute lockout
+00:06 +209: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Lockout Policy 15+ failed attempts triggers 30 minute lockout
+00:06 +210: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Lockout Policy 15+ failed attempts triggers 30 minute lockout
+00:06 +211: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Lockout Policy 15+ failed attempts triggers 30 minute lockout
+00:06 +212: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService listFiles finds and parses export JSON files
+00:06 +213: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Lockout Policy getLockoutExpiry returns null when not locked out
+00:06 +214: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService listFiles finds and parses export CSV files
+00:06 +215: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Lockout Policy getLockoutExpiry returns correct timestamp during lockout
+00:06 +216: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService listFiles finds and parses PDF report files
+00:06 +217: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Biometric Authentication canCheckBiometrics returns true when available
+00:06 +218: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService listFiles ignores non-matching files
+00:06 +219: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService listFiles ignores non-matching files
+00:06 +220: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService listFiles ignores non-matching files
+00:06 +221: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Biometric Authentication getAvailableBiometrics returns list of biometric types
+00:06 +222: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService listFiles filters by profileName
+00:06 +223: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService listFiles filters by profileName
+00:06 +224: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Biometric Authentication isBiometricEnabled returns false when not enabled
+00:06 +225: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService listFiles sorts by creation date, newest first
+00:06 +226: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService listFiles sorts by creation date, newest first
+00:06 +227: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Biometric Authentication isBiometricEnabled disables if no biometrics available
+00:06 +228: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService deleteFile deletes existing file
+00:06 +229: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService deleteFile deletes existing file
+00:06 +230: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Biometric Authentication authenticateWithBiometrics returns true on successful auth
+Attempting biometric authentication...
+Biometric authentication result: true
+00:06 +231: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService deleteFile returns false for non-existent file
+00:06 +232: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Biometric Authentication authenticateWithBiometrics returns false when not enabled
+Biometric authentication skipped: not enabled
+00:06 +233: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService deleteFiles removes multiple files
+00:06 +233: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: Biometric Authentication authenticateWithBiometrics returns false on exception
+Attempting biometric authentication...
+Biometric authentication error: Exception: Auth failed
+00:06 +234: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService deleteFiles removes multiple files
+00:06 +235: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: PBKDF2 Implementation PIN hashing uses different salts for same PIN
+00:07 +236: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: PBKDF2 Implementation PIN hashing uses different salts for same PIN
+00:07 +237: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: PBKDF2 Implementation PIN hashing uses different salts for same PIN
+00:07 +238: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: PBKDF2 Implementation PIN hashing uses different salts for same PIN
+00:07 +239: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/auth_service_test.dart: PBKDF2 Implementation PIN hashing uses different salts for same PIN
+00:07 +240: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService runAutoCleanup keeps most recent N files per type
+00:07 +241: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService runAutoCleanup keeps most recent N files per type
+00:07 +242: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService runAutoCleanup keeps most recent N files per type
+00:07 +243: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService runAutoCleanup keeps most recent N files per type
+00:07 +244: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService runAutoCleanup keeps most recent N files per type
+00:07 +245: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService runAutoCleanup keeps most recent N files per type
+00:07 +246: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService runAutoCleanup keeps most recent N files per type
+00:07 +247: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService runAutoCleanup keeps most recent N files per type
+00:07 +248: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService runAutoCleanup keeps most recent N files per type
+00:07 +249: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService runAutoCleanup keeps most recent N files per type
+00:07 +250: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService runAutoCleanup keeps most recent N files per type
+00:07 +251: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService runAutoCleanup keeps most recent N files per type
+00:07 +252: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/file_manager_service_test.dart: FileManagerService runAutoCleanup keeps most recent N files per type
+00:07 +253: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:08 +254: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:08 +255: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:08 +256: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:08 +257: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:08 +258: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:08 +259: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:08 +260: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +261: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +262: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +263: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +264: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +265: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +266: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +267: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +268: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +269: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +270: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +271: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +272: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +273: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +274: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +275: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +276: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +277: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +278: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +279: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +280: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +281: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +282: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +283: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +284: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management stopMonitoring cancels the idle timer
+00:09 +285: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/medication_intake_service_test.dart: MedicationIntakeService - List and Filter filters intakes by medication
+00:09 +286: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/medication_service_test.dart: MedicationService - Create creates medication with all fields
+00:09 +287: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/medication_service_test.dart: MedicationService - Create creates medication with all fields
+00:09 +288: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/medication_service_test.dart: MedicationService - Create creates medication with all fields
+00:09 +289: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/medication_service_test.dart: MedicationService - Create creates medication with all fields
+00:09 +290: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:09 +291: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:09 +292: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:09 +293: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:09 +294: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:09 +295: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:09 +296: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:09 +297: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:09 +298: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:09 +299: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:09 +300: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:09 +301: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:09 +302: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:09 +303: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:09 +304: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:09 +305: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:09 +306: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:09 +307: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:09 +308: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:09 +309: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:09 +310: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:09 +311: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:10 +312: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:10 +313: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:10 +314: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:10 +315: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:10 +316: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:10 +317: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:10 +318: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:10 +319: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:10 +319: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/pdf_report_service_test.dart: generateReport fetches data and creates pdf file
+Helvetica-Bold has no Unicode support see https://github.com/DavBfr/dart_pdf/wiki/Fonts-Management
+Helvetica has no Unicode support see https://github.com/DavBfr/dart_pdf/wiki/Fonts-Management
+00:10 +320: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:10 +321: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:10 +322: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:10 +323: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:10 +324: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:10 +325: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:10 +326: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management recordActivity resets the idle timer
+00:10 +327: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/sleep_service_test.dart: SleepService - Create throws on invalid times (end before start)
+00:10 +328: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Timer Management idle timeout triggers callback after configured duration
+00:10 +329: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/sleep_service_test.dart: SleepService - Read getSleepEntry retrieves existing entry
+00:10 +330: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/sleep_service_test.dart: SleepService - Read getSleepEntry retrieves existing entry
+00:10 +331: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/sleep_service_test.dart: SleepService - Read getSleepEntry retrieves existing entry
+00:10 +332: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/sleep_service_test.dart: SleepService - Read getSleepEntry retrieves existing entry
+00:10 +333: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange locks on hidden state
+00:10 +334: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/sleep_service_test.dart: SleepService - Read getSleepEntry returns null for non-existent entry
+00:10 +335: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/sleep_service_test.dart: SleepService - Read getSleepEntry returns null for non-existent entry
+00:10 +336: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:10 +337: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:10 +338: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:10 +339: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:10 +340: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:10 +341: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:10 +342: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:10 +343: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +344: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +345: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +346: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +347: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +348: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +349: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +350: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +351: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +352: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +353: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +354: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +355: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +356: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +357: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +358: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +359: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +360: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +361: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +362: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +363: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +364: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +365: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +366: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +367: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +368: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +369: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +370: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +371: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +372: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +373: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +374: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +375: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +376: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +377: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +378: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +379: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +380: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +381: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +382: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +383: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +384: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +385: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +386: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +387: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +388: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +389: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +390: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:11 +391: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +392: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +393: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +394: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +395: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +396: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +397: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +398: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +399: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +400: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +401: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +402: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +403: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +404: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +405: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +406: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +407: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +408: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +409: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +410: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +411: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +412: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +413: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +414: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +415: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +416: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +417: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +418: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +419: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +420: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +421: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +422: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +423: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +424: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +425: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +426: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +427: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +428: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +429: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +430: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +431: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +432: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +433: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +434: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Lifecycle Handling handleLifecycleChange stops monitoring when backgrounded
+00:12 +435: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/weight_service_test.dart: WeightService - Read getLatestWeightEntry returns most recent entry
+00:12 +436: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:12 +437: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:12 +438: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:12 +439: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:12 +440: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:12 +441: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:12 +442: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:12 +443: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:12 +444: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:12 +445: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +446: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +447: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +448: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +449: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +450: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +451: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +452: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +453: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +454: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +455: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +456: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +457: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +458: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +459: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +460: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +461: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +462: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +463: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +464: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +465: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +466: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +467: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +468: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +469: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +470: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +471: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +472: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +473: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +474: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +475: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +476: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +477: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +478: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +479: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +480: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +481: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +482: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +483: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +484: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +485: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +486: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +487: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +488: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +489: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +490: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +491: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +492: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +493: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +494: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +495: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +496: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +497: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +498: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +499: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +500: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +501: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +502: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +503: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +504: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +505: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +506: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +507: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +508: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +509: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +510: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +511: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +512: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +513: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +514: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +515: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +516: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +517: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +518: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +519: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +520: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +521: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +522: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +523: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +524: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple startMonitoring calls reset timer
+00:13 +525: D:/Development/Zephon-Developments/BloodPressureMonitor/test/utils/validators_test.dart: validateBloodPressure boundary values systolic boundary at 69 (error)
+00:13 +526: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:13 +527: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:13 +528: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:13 +529: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:13 +530: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:13 +531: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:13 +532: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +533: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +534: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +535: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +536: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +537: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +538: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +539: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +540: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +541: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +542: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +543: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +544: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +545: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +546: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +547: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +548: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +549: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +550: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +551: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +552: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +553: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +554: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +555: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +556: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +557: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +558: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +559: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +560: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +561: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +562: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +563: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +564: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +565: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +566: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +567: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +568: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +569: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +570: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +571: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +572: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +573: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +574: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +575: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +576: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +577: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +578: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +579: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +580: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +581: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +582: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +583: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +584: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +585: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +586: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +587: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +588: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +589: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +590: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +591: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +592: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +593: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +594: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +595: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +596: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +597: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +598: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +599: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +600: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +601: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +602: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +603: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:14 +604: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:15 +605: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:15 +606: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:15 +607: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases dispose stops monitoring
+00:15 +608: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases multiple dispose calls are safe
+00:15 +609: D:/Development/Zephon-Developments/BloodPressureMonitor/test/services/idle_timer_service_test.dart: Edge Cases stopMonitoring when not monitoring is safe
+00:16 +610: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/blood_pressure_viewmodel_test.dart: BloodPressureViewModel loadReadings loads readings successfully
+00:16 +611: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/blood_pressure_viewmodel_test.dart: BloodPressureViewModel loadReadings sets isLoading during operation
+00:16 +612: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/blood_pressure_viewmodel_test.dart: BloodPressureViewModel addReading adds valid reading and triggers averaging
+00:16 +613: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/blood_pressure_viewmodel_test.dart: BloodPressureViewModel addReading adds valid reading and triggers averaging
+00:16 +614: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel loadBPStats loads successfully
+00:16 +615: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/blood_pressure_viewmodel_test.dart: BloodPressureViewModel addReading blocks error-level reading without persistence
+00:16 +615: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel loadBPStats handles errors
+Error loading BP stats: Exception: Test error
+00:16 +616: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/blood_pressure_viewmodel_test.dart: BloodPressureViewModel addReading blocks error-level reading without persistence
+00:16 +617: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/blood_pressure_viewmodel_test.dart: BloodPressureViewModel addReading blocks error-level reading without persistence
+00:16 +617: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel loadWeightStats handles errors
+Error loading weight stats: Exception: Test error
+00:16 +618: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/blood_pressure_viewmodel_test.dart: BloodPressureViewModel addReading blocks error-level reading without persistence
+00:16 +619: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/blood_pressure_viewmodel_test.dart: BloodPressureViewModel addReading blocks error-level reading without persistence
+00:16 +619: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel loadSleepStats handles errors
+Error loading sleep stats: Exception: Test error
+00:16 +620: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/blood_pressure_viewmodel_test.dart: BloodPressureViewModel addReading blocks error-level reading without persistence
+00:16 +621: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel loadMedicationStats loads successfully
+00:16 +622: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/blood_pressure_viewmodel_test.dart: BloodPressureViewModel addReading blocks warning-level reading without override
+00:16 +622: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel loadMedicationStats handles errors
+Error loading medication stats: Exception: Test error
+00:16 +623: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/blood_pressure_viewmodel_test.dart: BloodPressureViewModel addReading blocks warning-level reading without override
+00:16 +624: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/blood_pressure_viewmodel_test.dart: BloodPressureViewModel addReading blocks warning-level reading without override
+00:16 +624: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel loadAllStats continues loading other categories when one fails
+Error loading BP stats: Exception: BP error
+00:16 +625: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/blood_pressure_viewmodel_test.dart: BloodPressureViewModel addReading blocks warning-level reading without override
+00:16 +626: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel isLoading combined getter returns true when BP is loading
+00:16 +627: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel isLoading combined getter returns true when BP is loading
+00:16 +628: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel isLoading combined getter returns true when BP is loading
+00:16 +629: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/blood_pressure_viewmodel_test.dart: BloodPressureViewModel addReading validates multiple types of warnings
+00:16 +630: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel isLoading combined getter returns true when Weight is loading
+00:16 +631: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel isLoading combined getter returns true when Weight is loading
+00:16 +632: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/blood_pressure_viewmodel_test.dart: BloodPressureViewModel updateReading updates valid reading and triggers averaging
+00:16 +633: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel isLoading combined getter returns true when Sleep is loading
+00:16 +634: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel isLoading combined getter returns true when Sleep is loading
+00:16 +635: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel isLoading combined getter returns true when Sleep is loading
+00:16 +636: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/blood_pressure_viewmodel_test.dart: BloodPressureViewModel updateReading allows warning-level update with override
+00:16 +637: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_viewmodel_test.dart: loadInitial loads averaged groups
+00:16 +638: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_viewmodel_test.dart: loadInitial loads averaged groups
+00:16 +639: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_viewmodel_test.dart: loadInitial loads averaged groups
+00:16 +640: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel isLoading combined getter returns true when Medication is loading
+00:16 +641: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/blood_pressure_viewmodel_test.dart: BloodPressureViewModel getters returns correct defaults
+00:16 +642: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/blood_pressure_viewmodel_test.dart: BloodPressureViewModel getters returns correct defaults
+00:16 +643: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel refresh clears all stats and reloads
+00:16 +644: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_viewmodel_test.dart: toggleGroupExpansion loads members once
+00:16 +644: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel refresh clears errors when refreshing
+Error loading BP stats: Exception: Test error
+00:16 +645: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_viewmodel_test.dart: toggleGroupExpansion loads members once
+00:16 +646: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel profile change handling clears stats and reloads when active profile notifies
+00:16 +647: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel profile change handling clears stats and reloads when active profile notifies
+00:16 +648: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_viewmodel_test.dart: loadInitial surfaces service errors
+00:16 +649: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel profile change handling listener is properly registered on construction
+00:16 +650: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_viewmodel_test.dart: loadMore surfaces errors and resets loading flag
+00:16 +651: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel profile change handling listener is removed on dispose
+00:16 +652: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_viewmodel_test.dart: applyPreset updates filters with expected window
+00:16 +653: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel profile change handling _onProfileChanged clears stats and reloads data
+00:16 +654: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel profile change handling _onProfileChanged clears stats and reloads data
+00:16 +655: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/history_home_viewmodel_test.dart: HistoryHomeViewModel profile change handling _onProfileChanged clears stats and reloads data
+00:17 +656: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: Initialization initial state is unlocked when no PIN is set
+00:17 +657: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: Initialization initial state is locked when PIN is set
+00:17 +658: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: Initialization loads biometric availability on init
+00:17 +659: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: Initialization loads failed attempts and lockout state on init
+00:17 +660: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: Initialization loads idle timeout setting on init
+00:17 +661: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: PIN Unlock unlockWithPin succeeds with correct PIN
+00:17 +662: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: PIN Unlock unlockWithPin fails with incorrect PIN
+00:17 +663: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: PIN Unlock unlockWithPin updates lockout state on failure
+00:17 +664: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: PIN Unlock unlockWithPin starts idle monitoring on success
+00:17 +665: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: Biometric Unlock unlockWithBiometric succeeds when enabled
+00:17 +666: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: Biometric Unlock unlockWithBiometric fails when not enabled
+00:17 +667: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: Biometric Unlock unlockWithBiometric fails when auth is cancelled
+00:17 +668: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: Biometric Unlock unlockWithBiometric starts idle monitoring on success
+00:17 +669: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: Lock Management lock sets state to locked
+00:17 +670: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: Lock Management lock stops idle monitoring
+00:17 +671: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: PIN Management setPin updates state
+00:17 +672: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: PIN Management changePin succeeds with correct old PIN
+00:17 +673: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: PIN Management changePin fails with incorrect old PIN
+00:17 +674: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: Biometric Settings setBiometricEnabled enables biometric when available
+00:17 +675: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: Biometric Settings setBiometricEnabled does nothing when not available
+00:17 +676: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: Biometric Settings setBiometricEnabled disables biometric
+00:17 +677: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: Idle Timeout setIdleTimeout updates state and persists
+00:17 +678: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: Idle Timeout recordActivity is safe when locked
+00:17 +679: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: Idle Timeout recordActivity resets timer when unlocked
+00:17 +680: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: Biometric Refresh refreshBiometricAvailability updates state
+00:17 +681: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: Biometric Refresh refreshBiometricAvailability detects removed biometrics
+00:17 +682: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/lock_viewmodel_test.dart: Notification state changes trigger notifyListeners
+00:17 +683: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/medication_group_viewmodel_test.dart: MedicationGroupViewModel initial state is empty and not loading
+00:17 +684: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/medication_group_viewmodel_test.dart: MedicationGroupViewModel loadGroups updates state correctly
+00:17 +685: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/medication_group_viewmodel_test.dart: MedicationGroupViewModel loadGroups sets error on failure
+Error loading medication groups: Exception: Test error
+00:17 +686: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/medication_group_viewmodel_test.dart: MedicationGroupViewModel createGroup calls service and reloads
+00:17 +687: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/medication_group_viewmodel_test.dart: MedicationGroupViewModel updateGroup calls service and reloads
+00:17 +688: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/medication_group_viewmodel_test.dart: MedicationGroupViewModel deleteGroup calls service and reloads
+00:17 +689: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/medication_group_viewmodel_test.dart: MedicationGroupViewModel reloads when active profile changes
+00:17 +690: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/medication_viewmodel_test.dart: MedicationViewModel initial state is empty and not loading
+00:18 +691: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/medication_viewmodel_test.dart: MedicationViewModel loadMedications updates state correctly
+00:18 +692: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/medication_viewmodel_test.dart: MedicationViewModel loadMedications sets error on failure
+Error loading medications: Exception: Test error
+00:18 +693: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/medication_viewmodel_test.dart: MedicationViewModel search updates search term and reloads
+00:18 +694: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/medication_viewmodel_test.dart: MedicationViewModel toggleShowInactive toggles flag and reloads
+00:18 +695: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/medication_viewmodel_test.dart: MedicationViewModel createMedication creates and reloads
+00:18 +696: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/medication_viewmodel_test.dart: MedicationViewModel updateMedication updates and reloads
+00:18 +697: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/medication_viewmodel_test.dart: MedicationViewModel deleteMedication soft deletes and reloads
+00:18 +698: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/medication_viewmodel_test.dart: MedicationViewModel clearError clears error message
+Error loading medications: Exception: Test error
+00:18 +699: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/sleep_viewmodel_test.dart: loadEntries populates sessions on success
+00:18 +700: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/sleep_viewmodel_test.dart: saveSleepEntry creates session and reloads list
+00:18 +701: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/sleep_viewmodel_test.dart: saveSleepEntry surfaces validation errors
+00:18 +702: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/sleep_viewmodel_test.dart: deleteSleepEntry returns user facing message on failure
+00:18 +703: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/theme_viewmodel_test.dart: ThemeViewModel initializes with default settings
+00:19 +704: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/theme_viewmodel_test.dart: ThemeViewModel loads settings from persistence on initialization
+00:19 +705: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/theme_viewmodel_test.dart: ThemeViewModel materialThemeMode converts AppThemeMode correctly
+00:19 +706: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/theme_viewmodel_test.dart: ThemeViewModel setThemeMode updates theme mode and persists
+00:19 +707: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/theme_viewmodel_test.dart: ThemeViewModel setAccentColor updates accent color and persists
+00:19 +708: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/theme_viewmodel_test.dart: ThemeViewModel setFontScale updates font scale and persists
+00:19 +709: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/theme_viewmodel_test.dart: ThemeViewModel toggleHighContrastMode toggles state and persists
+00:19 +710: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/theme_viewmodel_test.dart: ThemeViewModel resetToDefaults restores default settings and persists
+00:19 +711: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/theme_viewmodel_test.dart: ThemeViewModel lightTheme generates valid ThemeData
+00:19 +712: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/theme_viewmodel_test.dart: ThemeViewModel darkTheme generates valid ThemeData
+00:19 +713: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/theme_viewmodel_test.dart: ThemeViewModel lightTheme uses selected accent color
+00:19 +714: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/theme_viewmodel_test.dart: ThemeViewModel darkTheme uses selected accent color
+00:19 +715: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/theme_viewmodel_test.dart: ThemeViewModel lightTheme applies high contrast when enabled
+00:19 +716: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/theme_viewmodel_test.dart: ThemeViewModel darkTheme applies high contrast when enabled
+00:19 +717: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/theme_viewmodel_test.dart: ThemeViewModel lightTheme applies font scaling
+00:19 +718: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/theme_viewmodel_test.dart: ThemeViewModel darkTheme applies font scaling
+00:19 +719: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/theme_viewmodel_test.dart: ThemeViewModel themes have consistent Material 3 structure
+00:19 +720: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/weight_viewmodel_test.dart: loadEntries populates entries on success
+00:19 +721: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/weight_viewmodel_test.dart: loadEntries populates entries on success
+00:19 +722: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/weight_viewmodel_test.dart: loadEntries populates entries on success
+00:19 +723: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/weight_viewmodel_test.dart: loadEntries populates entries on success
+00:19 +724: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/weight_viewmodel_test.dart: loadEntries captures service errors
+00:19 +725: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/weight_viewmodel_test.dart: saveWeightEntry creates entry and refreshes list
+00:19 +726: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/weight_viewmodel_test.dart: saveWeightEntry surfaces validation errors
+00:19 +727: D:/Development/Zephon-Developments/BloodPressureMonitor/test/viewmodels/weight_viewmodel_test.dart: deleteWeightEntry returns user-friendly errors
+00:19 +728: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/about_view_test.dart: AboutView displays app name and version info
+00:21 +729: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/add_edit_medication_group_view_test.dart: AddEditMedicationGroupView Widget Tests should display "Add Group" title when creating
+00:21 +730: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/add_edit_medication_group_view_test.dart: AddEditMedicationGroupView Widget Tests should display "Add Group" title when creating
+00:21 +731: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/add_edit_medication_group_view_test.dart: AddEditMedicationGroupView Widget Tests should display "Add Group" title when creating
+00:21 +732: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/add_edit_medication_group_view_test.dart: AddEditMedicationGroupView Widget Tests should display "Add Group" title when creating
+00:21 +733: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/add_edit_medication_group_view_test.dart: AddEditMedicationGroupView Widget Tests should display "Add Group" title when creating
+00:21 +734: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/add_edit_medication_group_view_test.dart: AddEditMedicationGroupView Widget Tests should display "Add Group" title when creating
+00:21 +735: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/analytics/analytics_view_test.dart: AnalyticsView Widget Tests shows TimeRangeSelector even when no data is present
+00:21 +736: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/analytics/analytics_view_test.dart: AnalyticsView Widget Tests shows TimeRangeSelector even when no data is present
+00:21 +737: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/analytics/analytics_view_test.dart: AnalyticsView Widget Tests shows TimeRangeSelector even when no data is present
+00:21 +738: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/analytics/analytics_view_test.dart: AnalyticsView Widget Tests shows TimeRangeSelector even when no data is present
+00:21 +739: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/appearance_view_test.dart: AppearanceView displays title and reset button
+00:21 +740: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/appearance_view_test.dart: AppearanceView displays title and reset button
+00:21 +741: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/appearance_view_test.dart: AppearanceView displays title and reset button
+00:21 +742: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/appearance_view_test.dart: AppearanceView displays title and reset button
+00:21 +743: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/appearance_view_test.dart: AppearanceView displays title and reset button
+00:22 +744: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/history/history_home_view_test.dart: HistoryHomeView renders app bar with correct title
+00:22 +745: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/history/history_home_view_test.dart: HistoryHomeView renders app bar with correct title
+00:22 +746: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/history/history_view_test.dart: preset chip reloads with expected window
+00:22 +747: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/history/history_view_test.dart: preset chip reloads with expected window
+00:22 +748: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/history/history_view_test.dart: preset chip reloads with expected window
+00:22 +749: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/history/history_view_test.dart: preset chip reloads with expected window
+00:22 +750: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/history/history_view_test.dart: preset chip reloads with expected window
+00:22 +751: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/history/history_view_test.dart: preset chip reloads with expected window
+00:22 +752: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/history/history_view_test.dart: preset chip reloads with expected window
+00:22 +753: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/history/history_view_test.dart: preset chip reloads with expected window
+00:22 +754: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/history/history_view_test.dart: preset chip reloads with expected window
+00:22 +755: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/history/history_view_test.dart: preset chip reloads with expected window
+00:22 +756: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/history/history_view_test.dart: preset chip reloads with expected window
+00:22 +757: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/history/history_view_test.dart: preset chip reloads with expected window
+00:22 +758: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/history/history_view_test.dart: preset chip reloads with expected window
+00:22 +759: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/history/history_view_test.dart: preset chip reloads with expected window
+00:22 +760: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/history/history_view_test.dart: preset chip reloads with expected window
+00:22 +761: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/history/history_view_test.dart: preset chip reloads with expected window
+00:22 +762: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/history/history_view_test.dart: preset chip reloads with expected window
+00:22 +763: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/history/history_view_test.dart: preset chip reloads with expected window
+00:22 +764: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/add_edit_medication_group_view_test.dart: AddEditMedicationGroupView Widget Tests should open medication picker when Select Medications tapped
+00:22 +765: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:22 +766: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:22 +767: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:22 +768: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:23 +769: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:23 +770: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:23 +771: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:23 +772: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:23 +773: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:23 +774: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:23 +775: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:23 +776: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:23 +777: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:23 +778: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:23 +779: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:23 +780: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:23 +781: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:23 +782: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:23 +783: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:23 +784: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:23 +785: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:23 +786: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:23 +787: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:23 +788: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:23 +789: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/home_view_test.dart: HomeView Widget Tests renders app bar with title
+00:23 +790: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/medication_group_list_view_test.dart: MedicationGroupListView Widget Tests should display title in app bar
+00:23 +791: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/medication_group_list_view_test.dart: MedicationGroupListView Widget Tests should display title in app bar
+00:23 +792: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/medication_group_list_view_test.dart: MedicationGroupListView Widget Tests should display title in app bar
+00:23 +793: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/medication_group_list_view_test.dart: MedicationGroupListView Widget Tests should display title in app bar
+00:23 +794: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/medication_group_list_view_test.dart: MedicationGroupListView Widget Tests should display title in app bar
+00:23 +795: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/medication_group_list_view_test.dart: MedicationGroupListView Widget Tests should display title in app bar
+00:23 +796: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/medication_group_list_view_test.dart: MedicationGroupListView Widget Tests should display title in app bar
+00:23 +797: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/medication_group_list_view_test.dart: MedicationGroupListView Widget Tests should display title in app bar
+00:24 +798: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/medication_group_list_view_test.dart: MedicationGroupListView Widget Tests should display title in app bar
+00:24 +799: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/medication_group_list_view_test.dart: MedicationGroupListView Widget Tests should display title in app bar
+00:24 +800: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/medication_group_list_view_test.dart: MedicationGroupListView Widget Tests should display title in app bar
+00:24 +801: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/medication_group_list_view_test.dart: MedicationGroupListView Widget Tests should display title in app bar
+00:24 +802: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +803: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +804: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +805: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +806: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +807: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +808: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +809: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +810: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +811: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +812: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +813: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +814: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +815: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +816: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +817: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +818: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +819: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +820: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +821: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +822: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +823: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +824: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +825: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +826: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +827: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +828: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +829: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +830: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should display empty form for new profile
+00:24 +831: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/add_reading_view_test.dart: AddReadingView Widget Tests renders app bar with title
+00:24 +832: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/add_reading_view_test.dart: AddReadingView Widget Tests renders app bar with title
+00:24 +833: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/add_reading_view_test.dart: AddReadingView Widget Tests renders app bar with title
+00:25 +834: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/add_reading_view_test.dart: AddReadingView Widget Tests renders app bar with title
+00:25 +835: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/add_reading_view_test.dart: AddReadingView Widget Tests renders app bar with title
+00:25 +836: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/add_reading_view_test.dart: AddReadingView Widget Tests renders app bar with title
+00:25 +837: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/add_reading_view_test.dart: AddReadingView Widget Tests renders app bar with title
+00:25 +838: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/add_reading_view_test.dart: AddReadingView Widget Tests renders app bar with title
+00:25 +839: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/add_reading_view_test.dart: AddReadingView Widget Tests renders app bar with title
+00:25 +840: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/add_reading_view_test.dart: AddReadingView Widget Tests renders app bar with title
+00:25 +841: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/add_reading_view_test.dart: AddReadingView Widget Tests renders app bar with title
+00:25 +842: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/add_reading_view_test.dart: AddReadingView Widget Tests renders app bar with title
+00:25 +843: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/add_reading_view_test.dart: AddReadingView Widget Tests renders app bar with title
+00:25 +844: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/add_reading_view_test.dart: AddReadingView Widget Tests renders app bar with title
+00:25 +845: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/add_reading_view_test.dart: AddReadingView Widget Tests renders app bar with title
+00:25 +846: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/add_reading_view_test.dart: AddReadingView Widget Tests renders app bar with title
+00:25 +847: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/add_reading_view_test.dart: AddReadingView Widget Tests renders app bar with title
+00:25 +848: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/add_reading_view_test.dart: AddReadingView Widget Tests renders app bar with title
+00:25 +849: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/widgets/reading_form_advanced_test.dart: ReadingFormAdvanced Widget Tests renders all labels
+00:25 +850: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/widgets/reading_form_advanced_test.dart: ReadingFormAdvanced Widget Tests renders all labels
+00:25 +851: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/widgets/reading_form_advanced_test.dart: ReadingFormAdvanced Widget Tests renders all labels
+00:25 +852: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/widgets/reading_form_advanced_test.dart: ReadingFormAdvanced Widget Tests renders all labels
+00:25 +853: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/widgets/reading_form_basic_test.dart: ReadingFormBasic Widget Tests renders all labels
+00:25 +854: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/widgets/reading_form_basic_test.dart: ReadingFormBasic Widget Tests renders all labels
+00:25 +855: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/widgets/reading_form_basic_test.dart: ReadingFormBasic Widget Tests renders all labels
+00:25 +856: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/widgets/reading_form_basic_test.dart: ReadingFormBasic Widget Tests renders all labels
+00:25 +857: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/widgets/reading_form_basic_test.dart: ReadingFormBasic Widget Tests renders all labels
+00:25 +858: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/widgets/reading_form_basic_test.dart: ReadingFormBasic Widget Tests renders all labels
+00:25 +859: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/widgets/reading_form_basic_test.dart: ReadingFormBasic Widget Tests renders all labels
+00:25 +860: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/widgets/reading_form_basic_test.dart: ReadingFormBasic Widget Tests renders all labels
+00:25 +861: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/widgets/reading_form_basic_test.dart: ReadingFormBasic Widget Tests renders all labels
+00:25 +862: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/readings/widgets/reading_form_basic_test.dart: ReadingFormBasic Widget Tests renders all labels
+00:25 +863: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should call createProfile when valid form is submitted
+00:25 +864: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should call createProfile when valid form is submitted
+00:26 +865: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should call createProfile when valid form is submitted
+00:26 +866: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should call createProfile when valid form is submitted
+00:26 +867: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should call createProfile when valid form is submitted
+00:26 +868: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should call createProfile when valid form is submitted
+00:26 +869: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should call createProfile when valid form is submitted
+00:26 +870: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should call createProfile when valid form is submitted
+00:26 +871: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/profile/profile_form_view_test.dart: ProfileFormView should call createProfile when valid form is submitted
+00:26 +872: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/settings/security_settings_view_test.dart: SecuritySettingsView displays title in app bar
+00:26 +873: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/settings/security_settings_view_test.dart: SecuritySettingsView displays title in app bar
+00:26 +874: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/settings/security_settings_view_test.dart: SecuritySettingsView displays title in app bar
+00:26 +875: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/settings/security_settings_view_test.dart: SecuritySettingsView displays title in app bar
+00:26 +876: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/settings/security_settings_view_test.dart: SecuritySettingsView displays title in app bar
+00:26 +877: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/settings/security_settings_view_test.dart: SecuritySettingsView displays title in app bar
+00:26 +878: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/settings/security_settings_view_test.dart: SecuritySettingsView displays title in app bar
+00:26 +879: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/settings/security_settings_view_test.dart: SecuritySettingsView displays title in app bar
+00:26 +880: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/settings/security_settings_view_test.dart: SecuritySettingsView displays title in app bar
+00:26 +881: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/settings/security_settings_view_test.dart: SecuritySettingsView displays title in app bar
+00:26 +882: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/settings/security_settings_view_test.dart: SecuritySettingsView displays title in app bar
+00:26 +883: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/settings/security_settings_view_test.dart: SecuritySettingsView displays title in app bar
+00:26 +884: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/settings/security_settings_view_test.dart: SecuritySettingsView displays title in app bar
+00:26 +885: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/settings/security_settings_view_test.dart: SecuritySettingsView displays title in app bar
+00:26 +886: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/settings/security_settings_view_test.dart: SecuritySettingsView displays title in app bar
+00:26 +887: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/settings/security_settings_view_test.dart: SecuritySettingsView displays title in app bar
+00:26 +888: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/settings/security_settings_view_test.dart: SecuritySettingsView displays title in app bar
+00:26 +889: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/settings/security_settings_view_test.dart: SecuritySettingsView displays title in app bar
+00:26 +890: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/settings/security_settings_view_test.dart: SecuritySettingsView displays title in app bar
+00:26 +891: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/settings/security_settings_view_test.dart: SecuritySettingsView displays title in app bar
+00:27 +892: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/sleep/add_sleep_view_test.dart: validates notes character limit
+00:27 +893: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/sleep/add_sleep_view_test.dart: validates notes character limit
+00:27 +894: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/sleep/add_sleep_view_test.dart: validates notes character limit
+00:27 +895: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/sleep/add_sleep_view_test.dart: validates notes character limit
+00:27 +896: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/sleep/add_sleep_view_test.dart: validates notes character limit
+00:27 +897: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/sleep/add_sleep_view_test.dart: validates notes character limit
+00:27 +898: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/sleep/add_sleep_view_test.dart: validates notes character limit
+00:27 +899: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/sleep/add_sleep_view_test.dart: validates notes character limit
+00:27 +900: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/sleep/add_sleep_view_test.dart: validates notes character limit
+00:27 +901: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/sleep/add_sleep_view_test.dart: validates notes character limit
+00:27 +902: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/sleep/add_sleep_view_test.dart: validates notes character limit
+00:27 +903: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/sleep/add_sleep_view_test.dart: validates notes character limit
+00:27 +904: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/sleep/add_sleep_view_test.dart: validates notes character limit
+00:27 +905: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/sleep/add_sleep_view_test.dart: validates notes character limit
+00:27 +906: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/sleep/add_sleep_view_test.dart: validates notes character limit
+00:27 +907: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/sleep/add_sleep_view_test.dart: validates notes character limit
+00:27 +908: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/sleep/add_sleep_view_test.dart: validates notes character limit
+00:27 +909: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/sleep/add_sleep_view_test.dart: validates notes character limit
+00:27 +910: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/sleep/add_sleep_view_test.dart: validates notes character limit
+00:27 +911: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/sleep/add_sleep_view_test.dart: validates notes character limit
+00:28 +912: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/sleep/add_sleep_view_test.dart: validates notes character limit
+00:28 +913: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/sleep/add_sleep_view_test.dart: validates notes character limit
+00:28 +914: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/weight/add_weight_view_test.dart: requires weight value before submission
+00:28 +915: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/weight/add_weight_view_test.dart: requires weight value before submission
+00:28 +916: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/weight/add_weight_view_test.dart: requires weight value before submission
+00:28 +916 ~1: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/weight/add_weight_view_test.dart: requires weight value before submission
+00:28 +916 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/weight/add_weight_view_test.dart: requires weight value before submission
+00:28 +917 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/weight/add_weight_view_test.dart: requires weight value before submission
+00:28 +918 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/weight/add_weight_view_test.dart: requires weight value before submission
+00:28 +919 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/weight/add_weight_view_test.dart: requires weight value before submission
+00:28 +920 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/weight/add_weight_view_test.dart: requires weight value before submission
+00:28 +921 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/views/weight/add_weight_view_test.dart: requires weight value before submission
+00:28 +922 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/custom_text_field_test.dart: CustomTextField Widget Tests displays label and helper text
+00:28 +923 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/expandable_section_test.dart: ExpandableSection Widget Tests initially collapsed when initiallyExpanded is false
+00:28 +924 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/expandable_section_test.dart: ExpandableSection Widget Tests initially collapsed when initiallyExpanded is false
+00:28 +925 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/expandable_section_test.dart: ExpandableSection Widget Tests initially collapsed when initiallyExpanded is false
+00:28 +926 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/expandable_section_test.dart: ExpandableSection Widget Tests initially collapsed when initiallyExpanded is false
+00:28 +927 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/loading_button_test.dart: LoadingButton Widget Tests displays child text when not loading
+00:28 +928 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/loading_button_test.dart: LoadingButton Widget Tests displays child text when not loading
+00:28 +929 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/loading_button_test.dart: LoadingButton Widget Tests displays child text when not loading
+00:28 +930 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/loading_button_test.dart: LoadingButton Widget Tests displays child text when not loading
+00:28 +931 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/loading_button_test.dart: LoadingButton Widget Tests displays child text when not loading
+00:28 +932 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/loading_button_test.dart: LoadingButton Widget Tests displays child text when not loading
+00:28 +933 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/loading_button_test.dart: LoadingButton Widget Tests displays child text when not loading
+00:28 +934 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/loading_button_test.dart: LoadingButton Widget Tests displays child text when not loading
+00:28 +935 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/loading_button_test.dart: LoadingButton Widget Tests displays child text when not loading
+00:28 +936 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/loading_button_test.dart: LoadingButton Widget Tests displays child text when not loading
+00:28 +937 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/validation_message_widget_test.dart: ValidationMessageWidget Tests displays error state correctly
+00:28 +938 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/validation_message_widget_test.dart: ValidationMessageWidget Tests displays error state correctly
+00:28 +939 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/validation_message_widget_test.dart: ValidationMessageWidget Tests displays error state correctly
+00:28 +940 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/validation_message_widget_test.dart: ValidationMessageWidget Tests displays error state correctly
+00:28 +941 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/validation_message_widget_test.dart: ValidationMessageWidget Tests displays error state correctly
+00:28 +942 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/validation_message_widget_test.dart: ValidationMessageWidget Tests displays error state correctly
+00:28 +943 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/validation_message_widget_test.dart: ValidationMessageWidget Tests displays error state correctly
+00:28 +944 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/validation_message_widget_test.dart: ValidationMessageWidget Tests displays error state correctly
+00:28 +945 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/validation_message_widget_test.dart: ValidationMessageWidget Tests displays error state correctly
+00:29 +946 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/common/validation_message_widget_test.dart: ValidationMessageWidget Tests displays error state correctly
+00:29 +947 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/medication_list_view_log_intake_test.dart: should display log intake button for active medications
+00:29 +948 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/medication_list_view_log_intake_test.dart: should display log intake button for active medications
+00:29 +949 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/medication_list_view_log_intake_test.dart: should display log intake button for active medications
+00:29 +950 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/medication_list_view_log_intake_test.dart: should display log intake button for active medications
+00:29 +951 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/medication_list_view_log_intake_test.dart: should display log intake button for active medications
+00:29 +952 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/medication_list_view_log_intake_test.dart: should display log intake button for active medications
+00:29 +953 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/medication_list_view_log_intake_test.dart: should display log intake button for active medications
+00:29 +954 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/medication_list_view_log_intake_test.dart: should display log intake button for active medications
+00:29 +955 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/medication_list_view_log_intake_test.dart: should display log intake button for active medications
+00:29 +956 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/medication_list_view_log_intake_test.dart: should display log intake button for active medications
+00:29 +957 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/medication_list_view_log_intake_test.dart: should display log intake button for active medications
+00:29 +958 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/medication_list_view_log_intake_test.dart: should display log intake button for active medications
+00:30 +959 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/medication_list_view_log_intake_test.dart: should display log intake button for active medications
+00:30 +960 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/medication_list_view_log_intake_test.dart: should display log intake button for active medications
+00:30 +961 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/medication_list_view_log_intake_test.dart: should display log intake button for active medications
+00:30 +962 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should display title and action buttons
+00:30 +963 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should display title and action buttons
+00:30 +964 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should display title and action buttons
+00:30 +965 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should display title and action buttons
+00:30 +966 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should display title and action buttons
+00:30 +967 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should display title and action buttons
+00:30 +968 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should display title and action buttons
+00:30 +969 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should display title and action buttons
+00:30 +970 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should display title and action buttons
+00:30 +971 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should display title and action buttons
+00:30 +972 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should display title and action buttons
+00:30 +973 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should display title and action buttons
+00:30 +974 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should display title and action buttons
+00:30 +975 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should display title and action buttons
+00:30 +976 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should display title and action buttons
+00:30 +977 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should display title and action buttons
+00:30 +978 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should display title and action buttons
+00:30 +979 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should display title and action buttons
+00:30 +980 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should display title and action buttons
+00:30 +981 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should display title and action buttons
+00:30 +982 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should display title and action buttons
+00:30 +983 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should display title and action buttons
+00:30 +984 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/profile_switcher_test.dart: ProfileSwitcher should display active profile name
+00:30 +985 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/profile_switcher_test.dart: ProfileSwitcher should display active profile name
+00:30 +986 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/theme_widgets_test.dart: ThemePalettePicker displays all accent colors
+00:30 +987 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/theme_widgets_test.dart: ThemePalettePicker displays all accent colors
+00:30 +988 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/theme_widgets_test.dart: ThemePalettePicker displays all accent colors
+00:30 +989 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/theme_widgets_test.dart: ThemePalettePicker displays all accent colors
+00:31 +990 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should display initial value if provided
+00:31 +991 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should display initial value if provided
+00:31 +992 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should display initial value if provided
+00:31 +993 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should display initial value if provided
+00:31 +994 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should display initial value if provided
+00:31 +995 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should display initial value if provided
+00:31 +996 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should display initial value if provided
+00:31 +997 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should display initial value if provided
+00:31 +998 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should display initial value if provided
+00:31 +999 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should display initial value if provided
+00:31 +1000 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should display initial value if provided
+00:31 +1001 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should display initial value if provided
+00:31 +1002 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should display initial value if provided
+00:31 +1003 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should display initial value if provided
+00:31 +1004 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should display initial value if provided
+00:31 +1005 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should display initial value if provided
+00:31 +1006 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should display initial value if provided
+00:31 +1007 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should display initial value if provided
+00:31 +1008 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/medication_picker_dialog_test.dart: should return selected group when group is tapped
+00:31 +1009 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should filter medications based on search text
+00:31 +1010 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should filter medications based on search text
+00:31 +1011 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should filter medications based on search text
+00:31 +1012 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should filter medications based on search text
+00:32 +1013 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should filter medications based on search text
+00:32 +1014 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should filter medications based on search text
+00:32 +1015 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should filter medications based on search text
+00:32 +1016 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should filter medications based on search text
+00:32 +1017 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should filter medications based on search text
+00:32 +1018 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should show all predefined units in dropdown
+00:32 +1019 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should show all predefined units in dropdown
+00:32 +1020 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should show all predefined units in dropdown
+00:32 +1021 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should show all predefined units in dropdown
+00:32 +1022 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should show all predefined units in dropdown
+00:32 +1023 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should clear search when clear button is tapped
+00:32 +1024 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should call onChanged when unit is selected
+00:33 +1025 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should call onChanged when unit is selected
+00:33 +1026 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should show empty state when search has no results
+00:33 +1027 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should show custom text field when Custom is selected
+00:33 +1028 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should return selected IDs when Done is tapped
+00:34 +1029 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should call onChanged with custom unit text
+00:34 +1030 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should call onChanged with custom unit text
+00:34 +1031 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should maintain selection count display
+00:34 +1032 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/multi_select_medication_picker_test.dart: MultiSelectMedicationPicker Widget Tests should maintain selection count display
+00:34 +1033 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should clear custom text when switching back to preset
+00:34 +1034 ~2: D:/Development/Zephon-Developments/BloodPressureMonitor/test/widgets/unit_combo_box_test.dart: UnitComboBox Widget Tests should show initial custom value if not in preset list
+00:35 +1035 ~2: All tests passed!
