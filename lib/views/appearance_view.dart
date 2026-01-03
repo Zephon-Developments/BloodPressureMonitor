@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:blood_pressure_monitor/models/health_data.dart';
 import 'package:blood_pressure_monitor/models/theme_settings.dart';
+import 'package:blood_pressure_monitor/models/units_preference.dart';
+import 'package:blood_pressure_monitor/services/units_preference_service.dart';
+import 'package:blood_pressure_monitor/viewmodels/analytics_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/theme_viewmodel.dart';
 import 'package:blood_pressure_monitor/widgets/theme_widgets.dart';
 
@@ -8,8 +12,31 @@ import 'package:blood_pressure_monitor/widgets/theme_widgets.dart';
 ///
 /// Allows users to customize theme mode, accent color, font scaling, and
 /// high-contrast mode. Changes are immediately applied and persisted.
-class AppearanceView extends StatelessWidget {
+class AppearanceView extends StatefulWidget {
   const AppearanceView({super.key});
+
+  @override
+  State<AppearanceView> createState() => _AppearanceViewState();
+}
+
+class _AppearanceViewState extends State<AppearanceView> {
+  UnitsPreference? _currentUnitsPreference;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUnitsPreference();
+  }
+
+  Future<void> _loadUnitsPreference() async {
+    final unitsService = context.read<UnitsPreferenceService>();
+    final preference = await unitsService.getUnitsPreference();
+    if (mounted) {
+      setState(() {
+        _currentUnitsPreference = preference;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,6 +114,10 @@ class AppearanceView extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
 
+                // Units Preference Section
+                _buildUnitsPreferenceSection(context),
+                const SizedBox(height: 16),
+
                 // High Contrast Toggle
                 ContrastToggleTile(
                   isEnabled: themeViewModel.highContrastMode,
@@ -115,6 +146,98 @@ class AppearanceView extends StatelessWidget {
       case AppThemeMode.system:
         return 'Follow system theme setting';
     }
+  }
+
+  Widget _buildUnitsPreferenceSection(BuildContext context) {
+    final theme = Theme.of(context);
+    final unitsService = context.read<UnitsPreferenceService>();
+    final currentPreference =
+        _currentUnitsPreference ?? const UnitsPreference();
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Units',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Choose your preferred measurement units',
+              style: theme.textTheme.bodySmall,
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<WeightUnit>(
+              decoration: const InputDecoration(
+                labelText: 'Weight Unit',
+                border: OutlineInputBorder(),
+              ),
+              initialValue: currentPreference.weightUnit,
+              items: const [
+                DropdownMenuItem<WeightUnit>(
+                  value: WeightUnit.kg,
+                  child: Text('Kilograms (kg)'),
+                ),
+                DropdownMenuItem<WeightUnit>(
+                  value: WeightUnit.lbs,
+                  child: Text('Pounds (lbs)'),
+                ),
+              ],
+              onChanged: (value) async {
+                if (value != null) {
+                  final newPreference =
+                      currentPreference.copyWith(weightUnit: value);
+                  await unitsService.saveUnitsPreference(newPreference);
+
+                  if (!context.mounted) return;
+
+                  setState(() {
+                    _currentUnitsPreference = newPreference;
+                  });
+
+                  // Refresh analytics data to update charts with new unit
+                  if (context.mounted) {
+                    try {
+                      final analyticsViewModel =
+                          context.read<AnalyticsViewModel>();
+                      // Fire and forget - don't await to avoid additional async gap
+                      analyticsViewModel.loadData();
+                    } catch (e) {
+                      // Analytics view model may not be available in all contexts
+                    }
+                  }
+                }
+              },
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<TemperatureUnit>(
+              decoration: const InputDecoration(
+                labelText: 'Temperature Unit',
+                border: OutlineInputBorder(),
+                helperText: 'Coming soon - for body temperature tracking',
+              ),
+              initialValue: currentPreference.temperatureUnit,
+              items: const [
+                DropdownMenuItem<TemperatureUnit>(
+                  value: TemperatureUnit.celsius,
+                  child: Text('Celsius (°C)'),
+                ),
+                DropdownMenuItem<TemperatureUnit>(
+                  value: TemperatureUnit.fahrenheit,
+                  child: Text('Fahrenheit (°F)'),
+                ),
+              ],
+              onChanged: null, // Disabled for now
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildPreviewSection(

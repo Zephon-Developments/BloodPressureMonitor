@@ -1,20 +1,4 @@
-/// Weight unit enumeration for measurement preferences.
-enum WeightUnit {
-  /// Kilograms (SI unit)
-  kg,
-
-  /// Pounds (imperial unit)
-  lbs,
-}
-
-/// Temperature unit enumeration for measurement preferences.
-enum TemperatureUnit {
-  /// Celsius (SI unit)
-  celsius,
-
-  /// Fahrenheit (imperial unit)
-  fahrenheit,
-}
+import 'package:blood_pressure_monitor/models/health_data.dart';
 
 /// User preferences for display units throughout the application.
 ///

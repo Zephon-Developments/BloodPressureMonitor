@@ -49,8 +49,9 @@
 - **New model**: lib/models/units_preference.dart (WeightUnit, TemperatureUnit, UnitsPreference with toJson/fromJson).
 - **New service**: lib/services/units_preference_service.dart using SharedPreferences; defaults: kg + Celsius.
 - **New utils**: lib/utils/unit_conversion.dart (kg↔lbs, °C↔°F, format helpers) with unit tests.
-- **UI integration**: add Units section in settings/appearance (radio/dropdown). Temperature control can be disabled/"coming soon".
-- **Data flow**: Service → ViewModel (settings + consumers) → Views/widgets. Store internal weight in kg; convert at display/input.
+- **UI integration**: add Units section in settings/appearance (radio/dropdown). Temperature control can be disabled/"coming soon". Avoid snackbar spam on every selection; prefer passive confirmation unless the user exits the screen.
+- **Data flow**: Service → ViewModel (settings + consumers) → Views/widgets. Store internal weight in kg; convert at display/input in the ViewModel (not in views). Inject UnitsPreferenceService into WeightViewModel and other consumers to provide display-ready values and accept preferred-unit input.
+- **Enums**: Use a single WeightUnit definition (existing in lib/models/health_data.dart); add TemperatureUnit alongside it or in a shared units file to avoid duplication.
 - **Touchpoints to update**: weight add/edit, weight history, analytics weight chart, any summaries/reports.
 
 ## Accessibility
@@ -58,6 +59,7 @@
 - **Contrast**: Audit chart zones, buttons, text-on-surfaces for WCAG AA. Adjust theme colors if any fail (<4.5:1 normal, <3:1 large).
 - **High-Contrast Mode**: Provide theme adjustments or conditional styling if system HC enabled (borders, backgrounds, focus states).
 - **Large Text**: Verify at 1.5x/2x; fix overflows with Flexible/Expanded/Wrap/SingleChildScrollView.
+- **Analytics resilience**: Keep TimeRangeSelector visible and interactive even when datasets are empty; ensure viewmodel retains last-selected range.
 
 ## Landscape Responsiveness
 - **Utilities**: Add lib/utils/responsive_utils.dart with helpers (isTablet, isLandscape, shouldUseTwoColumns) if not existing.
@@ -67,14 +69,17 @@
   - Analytics: horizontal layout for selector + legend; adjust chart height/padding; legends may move to side.
   - History lists: grid on tablets in landscape; single column on phones.
 - **Charts**: Allow chart widgets to accept orientation/layout hints to adjust padding/legend placement.
+- **Strategy**: Prefer MediaQuery.of(context).orientation for top-level decisions; use LayoutBuilder for width breakpoints. Avoid wrapping entire screens in OrientationBuilder unless needed.
 
 ## Files to Create/Modify
 - **New**: lib/models/units_preference.dart; lib/services/units_preference_service.dart; lib/utils/unit_conversion.dart; lib/utils/responsive_utils.dart; test/utils/unit_conversion_test.dart; test/services/units_preference_service_test.dart; test/models/units_preference_test.dart; (optional) test/views/units_settings_view_test.dart.
 - **Modify** (indicative):
   - Navigation shell/bottom nav container; ensure persistence across routes.
   - appearance_view.dart or settings_view.dart (+ potential units_settings_view.dart)
+  - viewmodels/weight_viewmodel.dart to own conversions based on UnitsPreferenceService
   - views/weight/add_edit_weight_view.dart; views/history/weight_full_history_view.dart; analytics/widgets/weight_chart.dart
   - analytics_view.dart (selector resilience + layout)
+  - viewmodels/analytics_viewmodel.dart (retain selector state when empty)
   - history views with date filters (keep selectors visible)
   - bp/weight charts/widgets for landscape + semantics
   - theme_viewmodel.dart if contrast/HC adjustments needed
@@ -86,6 +91,7 @@
 - **Date selectors**: widget tests ensuring selectors remain visible on empty data; empty-state messaging.
 - **Accessibility**: semantics tests for key widgets; snapshot contrast verification where feasible.
 - **Landscape**: widget tests using MediaQuery overrides for landscape/tablet to assert two-column layouts and absence of overflow.
+- **Analytics resilience**: widget test where analytics dataset is empty but TimeRangeSelector remains visible and usable.
 
 ## Risks & Mitigations
 - Navigation regressions: add focused widget tests on critical flows (home → detail → back).
