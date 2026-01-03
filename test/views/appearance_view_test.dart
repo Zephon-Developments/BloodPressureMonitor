@@ -4,15 +4,18 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 import 'package:blood_pressure_monitor/models/theme_settings.dart';
+import 'package:blood_pressure_monitor/models/units_preference.dart';
+import 'package:blood_pressure_monitor/services/units_preference_service.dart';
 import 'package:blood_pressure_monitor/viewmodels/theme_viewmodel.dart';
 import 'package:blood_pressure_monitor/views/appearance_view.dart';
 
 import 'appearance_view_test.mocks.dart';
 
-@GenerateMocks([ThemeViewModel])
+@GenerateMocks([ThemeViewModel, UnitsPreferenceService])
 void main() {
   group('AppearanceView', () {
     late MockThemeViewModel mockViewModel;
+    late MockUnitsPreferenceService mockUnitsService;
 
     setUp(() {
       mockViewModel = MockThemeViewModel();
@@ -25,11 +28,23 @@ void main() {
       when(mockViewModel.setFontScale(any)).thenAnswer((_) async {});
       when(mockViewModel.toggleHighContrastMode()).thenAnswer((_) async {});
       when(mockViewModel.resetToDefaults()).thenAnswer((_) async {});
+
+      mockUnitsService = MockUnitsPreferenceService();
+      when(mockUnitsService.getUnitsPreference())
+          .thenAnswer((_) async => const UnitsPreference());
+      when(mockUnitsService.saveUnitsPreference(any)).thenAnswer((_) async {});
     });
 
     Widget buildTestWidget() {
-      return ChangeNotifierProvider<ThemeViewModel>.value(
-        value: mockViewModel,
+      return MultiProvider(
+        providers: [
+          ChangeNotifierProvider<ThemeViewModel>.value(
+            value: mockViewModel,
+          ),
+          Provider<UnitsPreferenceService>.value(
+            value: mockUnitsService,
+          ),
+        ],
         child: const MaterialApp(
           home: AppearanceView(),
         ),
