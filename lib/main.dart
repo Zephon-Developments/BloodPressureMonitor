@@ -22,6 +22,7 @@ import 'package:blood_pressure_monitor/services/import_service.dart';
 import 'package:blood_pressure_monitor/services/pdf_report_service.dart';
 import 'package:blood_pressure_monitor/services/app_info_service.dart';
 import 'package:blood_pressure_monitor/services/theme_persistence_service.dart';
+import 'package:blood_pressure_monitor/services/units_preference_service.dart';
 import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/analytics_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
@@ -116,6 +117,9 @@ void main() async {
   final themePersistenceService = ThemePersistenceService(prefs);
   final themeViewModel = ThemeViewModel(themePersistenceService);
 
+  // Initialize units preference service
+  final unitsPreferenceService = UnitsPreferenceService(prefs);
+
   // Initialize profile service
   final profileService = ProfileService();
 
@@ -150,6 +154,7 @@ void main() async {
         Provider<SharedPreferences>.value(value: prefs),
         Provider<AuthService>.value(value: authService),
         Provider<ThemePersistenceService>.value(value: themePersistenceService),
+        Provider<UnitsPreferenceService>.value(value: unitsPreferenceService),
         ChangeNotifierProvider<ThemeViewModel>.value(value: themeViewModel),
         ChangeNotifierProvider<ActiveProfileViewModel>.value(
           value: activeProfileViewModel,
@@ -183,6 +188,7 @@ void main() async {
           create: (context) => WeightViewModel(
             context.read<WeightService>(),
             context.read<ActiveProfileViewModel>(),
+            context.read<UnitsPreferenceService>(),
           ),
         ),
         ChangeNotifierProvider<SleepViewModel>(

@@ -3,11 +3,14 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i5;
-import 'dart:ui' as _i6;
+import 'dart:async' as _i6;
+import 'dart:ui' as _i7;
 
 import 'package:blood_pressure_monitor/models/theme_settings.dart' as _i2;
-import 'package:blood_pressure_monitor/viewmodels/theme_viewmodel.dart' as _i4;
+import 'package:blood_pressure_monitor/models/units_preference.dart' as _i4;
+import 'package:blood_pressure_monitor/services/units_preference_service.dart'
+    as _i8;
+import 'package:blood_pressure_monitor/viewmodels/theme_viewmodel.dart' as _i5;
 import 'package:flutter/material.dart' as _i3;
 import 'package:mockito/mockito.dart' as _i1;
 
@@ -50,10 +53,21 @@ class _FakeThemeData_1 extends _i1.SmartFake implements _i3.ThemeData {
       super.toString();
 }
 
+class _FakeUnitsPreference_2 extends _i1.SmartFake
+    implements _i4.UnitsPreference {
+  _FakeUnitsPreference_2(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
 /// A class which mocks [ThemeViewModel].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockThemeViewModel extends _i1.Mock implements _i4.ThemeViewModel {
+class MockThemeViewModel extends _i1.Mock implements _i5.ThemeViewModel {
   MockThemeViewModel() {
     _i1.throwOnMissingStub(this);
   }
@@ -122,59 +136,59 @@ class MockThemeViewModel extends _i1.Mock implements _i4.ThemeViewModel {
       ) as bool);
 
   @override
-  _i5.Future<void> setThemeMode(_i2.AppThemeMode? mode) => (super.noSuchMethod(
+  _i6.Future<void> setThemeMode(_i2.AppThemeMode? mode) => (super.noSuchMethod(
         Invocation.method(
           #setThemeMode,
           [mode],
         ),
-        returnValue: _i5.Future<void>.value(),
-        returnValueForMissingStub: _i5.Future<void>.value(),
-      ) as _i5.Future<void>);
+        returnValue: _i6.Future<void>.value(),
+        returnValueForMissingStub: _i6.Future<void>.value(),
+      ) as _i6.Future<void>);
 
   @override
-  _i5.Future<void> setAccentColor(_i2.AccentColor? color) =>
+  _i6.Future<void> setAccentColor(_i2.AccentColor? color) =>
       (super.noSuchMethod(
         Invocation.method(
           #setAccentColor,
           [color],
         ),
-        returnValue: _i5.Future<void>.value(),
-        returnValueForMissingStub: _i5.Future<void>.value(),
-      ) as _i5.Future<void>);
+        returnValue: _i6.Future<void>.value(),
+        returnValueForMissingStub: _i6.Future<void>.value(),
+      ) as _i6.Future<void>);
 
   @override
-  _i5.Future<void> setFontScale(_i2.FontScaleOption? scale) =>
+  _i6.Future<void> setFontScale(_i2.FontScaleOption? scale) =>
       (super.noSuchMethod(
         Invocation.method(
           #setFontScale,
           [scale],
         ),
-        returnValue: _i5.Future<void>.value(),
-        returnValueForMissingStub: _i5.Future<void>.value(),
-      ) as _i5.Future<void>);
+        returnValue: _i6.Future<void>.value(),
+        returnValueForMissingStub: _i6.Future<void>.value(),
+      ) as _i6.Future<void>);
 
   @override
-  _i5.Future<void> toggleHighContrastMode() => (super.noSuchMethod(
+  _i6.Future<void> toggleHighContrastMode() => (super.noSuchMethod(
         Invocation.method(
           #toggleHighContrastMode,
           [],
         ),
-        returnValue: _i5.Future<void>.value(),
-        returnValueForMissingStub: _i5.Future<void>.value(),
-      ) as _i5.Future<void>);
+        returnValue: _i6.Future<void>.value(),
+        returnValueForMissingStub: _i6.Future<void>.value(),
+      ) as _i6.Future<void>);
 
   @override
-  _i5.Future<void> resetToDefaults() => (super.noSuchMethod(
+  _i6.Future<void> resetToDefaults() => (super.noSuchMethod(
         Invocation.method(
           #resetToDefaults,
           [],
         ),
-        returnValue: _i5.Future<void>.value(),
-        returnValueForMissingStub: _i5.Future<void>.value(),
-      ) as _i5.Future<void>);
+        returnValue: _i6.Future<void>.value(),
+        returnValueForMissingStub: _i6.Future<void>.value(),
+      ) as _i6.Future<void>);
 
   @override
-  void addListener(_i6.VoidCallback? listener) => super.noSuchMethod(
+  void addListener(_i7.VoidCallback? listener) => super.noSuchMethod(
         Invocation.method(
           #addListener,
           [listener],
@@ -183,7 +197,7 @@ class MockThemeViewModel extends _i1.Mock implements _i4.ThemeViewModel {
       );
 
   @override
-  void removeListener(_i6.VoidCallback? listener) => super.noSuchMethod(
+  void removeListener(_i7.VoidCallback? listener) => super.noSuchMethod(
         Invocation.method(
           #removeListener,
           [listener],
@@ -208,4 +222,51 @@ class MockThemeViewModel extends _i1.Mock implements _i4.ThemeViewModel {
         ),
         returnValueForMissingStub: null,
       );
+}
+
+/// A class which mocks [UnitsPreferenceService].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockUnitsPreferenceService extends _i1.Mock
+    implements _i8.UnitsPreferenceService {
+  MockUnitsPreferenceService() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i6.Future<_i4.UnitsPreference> getUnitsPreference() => (super.noSuchMethod(
+        Invocation.method(
+          #getUnitsPreference,
+          [],
+        ),
+        returnValue:
+            _i6.Future<_i4.UnitsPreference>.value(_FakeUnitsPreference_2(
+          this,
+          Invocation.method(
+            #getUnitsPreference,
+            [],
+          ),
+        )),
+      ) as _i6.Future<_i4.UnitsPreference>);
+
+  @override
+  _i6.Future<void> saveUnitsPreference(_i4.UnitsPreference? preference) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #saveUnitsPreference,
+          [preference],
+        ),
+        returnValue: _i6.Future<void>.value(),
+        returnValueForMissingStub: _i6.Future<void>.value(),
+      ) as _i6.Future<void>);
+
+  @override
+  _i6.Future<void> clearUnitsPreference() => (super.noSuchMethod(
+        Invocation.method(
+          #clearUnitsPreference,
+          [],
+        ),
+        returnValue: _i6.Future<void>.value(),
+        returnValueForMissingStub: _i6.Future<void>.value(),
+      ) as _i6.Future<void>);
 }

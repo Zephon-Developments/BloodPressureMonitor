@@ -28,7 +28,6 @@ class _AddWeightViewState extends State<AddWeightView> {
   final _weightController = TextEditingController();
   final _notesController = TextEditingController();
   DateTime _recordedAt = DateTime.now();
-  WeightUnit _unit = WeightUnit.kg;
   String? _saltLevel;
   String? _exerciseLevel;
   int? _stressRating;
@@ -55,7 +54,6 @@ class _AddWeightViewState extends State<AddWeightView> {
       // Editing - dirty if any field differs from original
       return editing.weightValue.toString() != _weightController.text ||
           (editing.notes ?? '') != _notesController.text ||
-          editing.unit != _unit ||
           !_isSameDateTime(editing.takenAt, _recordedAt) ||
           editing.saltIntake != _saltLevel ||
           editing.exerciseLevel != _exerciseLevel ||
@@ -108,8 +106,10 @@ class _AddWeightViewState extends State<AddWeightView> {
     final editing = widget.editingEntry;
     if (editing != null) {
       _recordedAt = editing.takenAt;
-      _unit = editing.unit;
-      _weightController.text = editing.weightValue.toString();
+      // Convert from kg (storage) to preferred unit for display
+      final viewModel = context.read<WeightViewModel>();
+      final displayWeight = viewModel.getDisplayWeight(editing.weightValue);
+      _weightController.text = displayWeight.toStringAsFixed(1);
       _notesController.text = editing.notes ?? '';
       _saltLevel = editing.saltIntake;
       _exerciseLevel = editing.exerciseLevel;
@@ -160,7 +160,9 @@ class _AddWeightViewState extends State<AddWeightView> {
                   ),
                 const SizedBox(height: 12),
                 CustomTextField(
-                  label: 'Weight',
+                  label: viewModel.preferredWeightUnit == WeightUnit.kg
+                      ? 'Weight (kg)'
+                      : 'Weight (lbs)',
                   controller: _weightController,
                   keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
@@ -170,7 +172,7 @@ class _AddWeightViewState extends State<AddWeightView> {
                       RegExp(r'^[0-9]*[.]?[0-9]*'),
                     ),
                   ],
-                  helperText: _unit == WeightUnit.kg
+                  helperText: viewModel.preferredWeightUnit == WeightUnit.kg
                       ? 'Enter value in kilograms (25-310 kg)'
                       : 'Enter value in pounds (55-670 lbs)',
                   validator: (value) {
@@ -181,33 +183,16 @@ class _AddWeightViewState extends State<AddWeightView> {
                     if (parsed == null) {
                       return 'Invalid number';
                     }
-                    final validation =
-                        validateWeight(parsed, _unit.toDbString());
+                    final validation = validateWeight(
+                      parsed,
+                      viewModel.preferredWeightUnit == WeightUnit.kg
+                          ? 'kg'
+                          : 'lbs',
+                    );
                     if (validation.level == ValidationLevel.error) {
                       return validation.message ?? 'Invalid weight';
                     }
                     return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                Text('Unit', style: Theme.of(context).textTheme.labelLarge),
-                const SizedBox(height: 8),
-                SegmentedButton<WeightUnit>(
-                  segments: const <ButtonSegment<WeightUnit>>[
-                    ButtonSegment<WeightUnit>(
-                      value: WeightUnit.kg,
-                      label: Text('Kilograms'),
-                    ),
-                    ButtonSegment<WeightUnit>(
-                      value: WeightUnit.lbs,
-                      label: Text('Pounds'),
-                    ),
-                  ],
-                  selected: <WeightUnit>{_unit},
-                  onSelectionChanged: (selection) {
-                    setState(() {
-                      _unit = selection.first;
-                    });
                   },
                 ),
                 const SizedBox(height: 16),
@@ -374,7 +359,6 @@ class _AddWeightViewState extends State<AddWeightView> {
     final error = await viewModel.saveWeightEntry(
       id: widget.editingEntry?.id,
       weightValue: parsedWeight,
-      unit: _unit,
       recordedAt: _recordedAt,
       notes: _notesController.text,
       saltIntake: _saltLevel,
