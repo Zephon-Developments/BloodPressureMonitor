@@ -274,10 +274,15 @@ class _MedicationGroupListViewState extends State<MedicationGroupListView> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _addNewGroup,
-        icon: const Icon(Icons.add),
-        label: const Text('Add Group'),
+      floatingActionButton: Semantics(
+        label: 'Add new medication group',
+        button: true,
+        excludeSemantics: true,
+        child: FloatingActionButton.extended(
+          onPressed: _addNewGroup,
+          icon: const Icon(Icons.add),
+          label: const Text('Add Group'),
+        ),
       ),
     );
   }

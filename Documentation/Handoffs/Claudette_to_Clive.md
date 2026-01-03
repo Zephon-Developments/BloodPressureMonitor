@@ -1,161 +1,95 @@
-# Handoff: Claudette to Clive
+# Handoff: Claudette → Clive
+## Phase 24D – Accessibility Pass Refinements Complete
 
-## Context
-Implementation of Phase 24B (Units Preference) with SI-only storage migration.
-
-## Status
-**COMPLETE - Ready for Review**
-
-## Implementation Summary
-
-### 1. Core Components Delivered
-
-#### Models
-- **`lib/models/units_preference.dart`**: UnitsPreference model with WeightUnit (kg/lbs) and TemperatureUnit (celsius/fahrenheit) enums
-  - Full JSON serialization/deserialization with robust error handling
-  - Defaults to SI units (kg, Celsius)
-  - 100% test coverage (72 tests passing)
-
-#### Services
-- **`lib/services/units_preference_service.dart`**: SharedPreferences-backed preference persistence
-  - Graceful degradation to defaults on corruption
-  - Idempotent operations
-  - Clear/save/get operations (16 tests)
-
-- **`lib/utils/unit_conversion.dart`**: Conversion utilities
-  - Weight: kg ↔ lbs (factor: 2.20462262185)
-  - Temperature: °C ↔ °F  
-  - Formatting helpers for display
-  - Round-trip conversion symmetry verified (30 tests)
-
-#### Migration & Storage
-- **`lib/services/weight_service.dart`**: Enhanced with migration and SI enforcement
-  - `migrateToSIStorage()`: One-time idempotent migration converting all lbs entries to kg
-  - `createWeightEntry()`: Auto-converts lbs input to kg before storage
-  - `updateWeightEntry()`: Auto-converts lbs input to kg before storage
-  - Migration logged in SharedPreferences (`weight_si_migration_v1_completed`)
-
-- **`lib/main.dart`**: Migration executed at app startup after database initialization
-
-### 2. Test Coverage
-
-#### New Tests Created
-- `test/models/units_preference_test.dart`: 72 tests
-  - Constructor, JSON serialization, copyWith, equality, edge cases
-- `test/utils/unit_conversion_test.dart`: 30 tests
-  - Weight/temperature conversions, formatting, round-trip symmetry
-- `test/services/units_preference_service_test.dart`: 16 tests
-  - Save/load, defaults, corruption handling, persistence
-
-#### Existing Tests Updated
-- `test/services/weight_service_test.dart`: Added 9 new migration/enforcement tests
-  - Migration from lbs to kg
-  - Idempotency verification
-  - Mixed unit handling
-  - SI storage enforcement on create/update
-
-### 3. Test Results
-- **Total Tests:** 1035 passed, 2 skipped
-- **New Components:** 118 tests (all passing)
-- **No Regressions:** All existing tests pass with updated weight service behavior
-
-### 4. Technical Decisions
-
-#### SI Storage Enforcement
-- All weight entries are now stored exclusively in kg (SI units)
-- Conversion happens only at the presentation layer (UI)
-- Migration is automatic and idempotent (safe to rerun)
-
-#### Backward Compatibility
-- WeightService constructor accepts optional SharedPreferences (for testing)
-- Migration skips if already completed (via SharedPreferences flag)
-- Legacy lbs data is preserved during migration (converted to kg)
-
-#### Error Handling
-- UnitsPreference falls back to SI defaults on corrupt data
-- Migration is non-blocking (logs errors but doesn't crash)
-- SharedPreferences failures surface gracefully
-
-### 5. Files Modified
-- `lib/main.dart`: Added migration call, updated WeightService initialization
-- `lib/services/weight_service.dart`: Migration logic, SI enforcement
-- `test/services/weight_service_test.dart`: Updated for new behavior, added migration tests
-
-### 6. Files Created
-- `lib/models/units_preference.dart`
-- `lib/services/units_preference_service.dart`
-- `lib/utils/unit_conversion.dart`
-- `test/models/units_preference_test.dart`
-- `test/services/units_preference_service_test.dart`
-- `test/utils/unit_conversion_test.dart`
-
-### 7. Quality Gates
-✅ `flutter analyze`: No issues  
-✅ `dart format`: All files formatted  
-✅ `flutter test`: 1035/1035 tests passing  
-✅ Test coverage: Services/Utils >85%, Models >90%  
-✅ JSDoc documentation: All public APIs documented
-
-### 8. Remaining Work (Out of Scope for This Phase)
-The following items are UI-layer changes that require design decisions and will be handled in a follow-up phase:
-
-- **UI Integration**: Settings page to select units preference
-- **ViewModel**: Units preference viewmodel for state management
-- **Display Updates**: Weight history/analytics UI to use preference for conversion
-- **Per-Entry Toggle Removal**: Remove unit selector from AddWeightView
-- **Provider Wiring**: Inject UnitsPreferenceService into app composition root
-
-## Notes for Clive
-
-### Migration Validation
-Migration logic has been extensively tested with:
-- Pure lbs entries (convert to kg) ✅
-- Pure kg entries (no change) ✅
-- Mixed units (convert lbs only) ✅
-- Idempotency (safe reruns) ✅
-- Edge cases (missing/unexpected unit data) ✅
-
-### API Changes
-**Breaking Change:** `WeightService` constructor signature
-- **Old:** `WeightService(DatabaseService)`
-- **New:** `WeightService(DatabaseService, [SharedPreferences?])`
-- Made optional for backward compatibility with existing tests
-- Production code in `main.dart` passes SharedPreferences
-
-### Performance
-- Migration runs once at startup (< 100ms for typical dataset)
-- Conversion calculations are simple arithmetic (no performance impact)
-- SharedPreferences lookups are cached in memory
-
-### Security
-- Units preference uses SharedPreferences (non-sensitive data, acceptable)
-- Weight data remains encrypted in SQLCipher database
-- No sensitive data exposed in new code
-
-### Code Quality
-- All new code follows [CODING_STANDARDS.md](../Standards/CODING_STANDARDS.md)
-- Proper error handling with graceful degradation
-- Comprehensive JSDoc documentation
-- No linter warnings or errors
-
-## Verification Steps
-1. **Migration**: Check that existing lbs entries are converted to kg
-2. **Storage**: Verify all new weight entries are stored in kg
-3. **Tests**: Confirm 1035 tests pass (118 new tests added)
-4. **Coverage**: Validate coverage meets thresholds (>85% services, >90% models)
-5. **Standards**: Review code against CODING_STANDARDS.md compliance
-
-## Next Steps
-After approval, the next phase will implement:
-1. UnitsViewModel for state management
-2. Settings UI for unit selection
-3. Weight display conversion in history/analytics
-4. Removal of per-entry unit toggle from AddWeightView
-5. Provider wiring for dependency injection
+**Date:** 2026-01-03  
+**From:** Claudette (Implementation)  
+**To:** Clive (Review Specialist)  
+**Branch:** main
 
 ---
 
-**Claudette**  
-Implementation Engineer  
-2026-01-02
+## Implementation Summary
 
+I have completed all refinements requested in your review. The accessibility blocker has been resolved, and all redundancy issues have been optimized.
+
+## Changes Implemented
+
+### 1. ✅ Fixed TimeRangeSelector (BLOCKER RESOLVED)
+
+**File:** `lib/views/analytics/widgets/time_range_selector.dart`
+
+**Changes:**
+- Removed `excludeSemantics: true` from the Semantics wrapper
+- Changed label from `'Time range selector, current: {viewModel.selectedRange.label}'` to `'Time range selector'`
+- Added `container: true` property
+
+**Rationale:** The individual segments (7d, 30d, 90d, 1y, All) are now accessible to screen readers. Users can navigate between segments and hear each option announced. The container label provides context without hiding the interactive elements.
+
+### 2. ✅ Optimized ProfileSwitcher
+
+**File:** `lib/widgets/profile_switcher.dart`
+
+**Changes:**
+- Added `excludeSemantics: true` to the Semantics wrapper
+
+**Rationale:** Prevents redundant announcement. Screen readers will now announce only "Switch profile, current: John Doe" instead of announcing the profile name twice.
+
+### 3. ✅ Optimized FABs
+
+**Files Modified:**
+- `lib/views/weight/weight_history_view.dart`
+- `lib/views/sleep/sleep_history_view.dart`
+- `lib/views/medication/medication_list_view.dart`
+- `lib/views/medication/medication_group_list_view.dart`
+
+**Changes:**
+- Added `excludeSemantics: true` to all FAB Semantics wrappers
+
+**Rationale:** Prevents redundant announcements. Screen readers will now announce only the descriptive outer label (e.g., "Add new weight entry") instead of also announcing the internal FAB label (e.g., "Add Weight").
+
+### 4. ✅ Updated Tests
+
+**File:** `test/views/analytics/widgets/time_range_selector_test.dart`
+
+**Changes:**
+- Updated existing test to verify container label only (removed check for current value)
+- Added new test `'individual segments are accessible to screen readers'` that verifies all 5 time range segments (7d, 30d, 90d, 1y, All) are discoverable via `find.bySemanticsLabel()`
+
+**Test Coverage:**
+- Confirms segments are not hidden from screen readers
+- Validates the blocker fix works correctly
+
+## Test Results
+
+**Total Tests:** 1048 passing (+1 new test), 0 failing  
+**Static Analysis:** Clean (dart analyze)  
+**Formatting:** All files formatted with dart format
+
+## Technical Decisions
+
+1. **TimeRangeSelector Label:** Used `container: true` with a simple label. The SegmentedButton's internal segments now handle their own semantic announcements, making the control fully accessible.
+
+2. **Consistent Pattern:** All `excludeSemantics: true` properties follow the same pattern - used when a wrapper provides a comprehensive label that replaces (not supplements) child semantics.
+
+## Quality Gates
+
+- ✅ Blocker resolved in TimeRangeSelector
+- ✅ Redundancy optimized in ProfileSwitcher and FABs
+- ✅ All 1048 tests passing
+- ✅ Static analysis clean
+- ✅ Code formatted
+
+## Notes for Review
+
+1. The TimeRangeSelector fix maintains the container label for context while allowing users to navigate and select individual time ranges via screen reader.
+
+2. All FABs now follow the same pattern: descriptive outer label with `excludeSemantics: true` to prevent the internal button text from being announced redundantly.
+
+3. Test coverage validates that the accessibility regression is fully resolved.
+
+---
+
+**Status:** Ready for final review  
+**Blocker Level:** None
+
+*Claudette*
