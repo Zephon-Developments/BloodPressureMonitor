@@ -28,7 +28,11 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - [x] Phase 21: Enhanced Sleep Tracking ✅ **COMPLETE** (Jan 2, 2026)
 - [x] Phase 22: History Page Redesign ✅ **COMPLETE** (Jan 2, 2026)
 - [ ] Phase 23: Analytics Graph Overhaul
-- [ ] Phase 24: Units & Accessibility
+- [x] Phase 24A: Navigation & Date-Range Resilience ✅ **COMPLETE** (Jan 3, 2026)
+- [x] Phase 24B: Units Preference Infrastructure ✅ **COMPLETE** (Jan 3, 2026)
+- [x] Phase 24C: Units UI Integration ✅ **COMPLETE** (Jan 3, 2026)
+- [x] Phase 24D: Accessibility Pass ✅ **COMPLETE** (Jan 3, 2026)
+- [ ] Phase 24E: Landscape Responsiveness
 - [ ] Phase 25: PDF Report v2
 - [ ] Phase 26: Encrypted Full-App Backup
 - [ ] Phase 27: Polish & Comprehensive Testing

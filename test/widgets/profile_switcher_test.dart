@@ -119,5 +119,74 @@ void main() {
       final inkWell = tester.widget<InkWell>(find.byType(InkWell));
       expect(inkWell.borderRadius, equals(BorderRadius.circular(24)));
     });
+
+    testWidgets('has semantic label for screen readers',
+        (WidgetTester tester) async {
+      // Arrange
+      when(mockActiveProfileViewModel.activeProfileName).thenReturn('John Doe');
+
+      // Act
+      await tester.pumpWidget(createTestWidget());
+
+      // Assert - verify semantic label by finding the Semantics widget
+      final profileSwitcher = find.byType(ProfileSwitcher);
+      expect(profileSwitcher, findsOneWidget);
+
+      // The Semantics widget should be a descendant of ProfileSwitcher
+      final semanticsFinder = find.descendant(
+        of: profileSwitcher,
+        matching: find.byType(Semantics),
+      );
+      expect(semanticsFinder, findsWidgets);
+
+      final semanticsWidget = tester.widget<Semantics>(semanticsFinder.first);
+      expect(semanticsWidget.properties.label, contains('Switch profile'));
+      expect(semanticsWidget.properties.label, contains('John Doe'));
+    });
+
+    testWidgets('semantic label includes button hint',
+        (WidgetTester tester) async {
+      // Arrange
+      when(mockActiveProfileViewModel.activeProfileName).thenReturn('John Doe');
+
+      // Act
+      await tester.pumpWidget(createTestWidget());
+
+      // Assert - find the Semantics widget by label
+      final semanticsWidget = tester
+          .widgetList<Semantics>(
+            find.byType(Semantics),
+          )
+          .firstWhere(
+            (widget) =>
+                widget.properties.label == 'Switch profile, current: John Doe',
+          );
+
+      expect(semanticsWidget.properties.button, isTrue);
+    });
+
+    testWidgets('works with large text scaling at 2.0x',
+        (WidgetTester tester) async {
+      // Arrange
+      when(mockActiveProfileViewModel.activeProfileName).thenReturn('John Doe');
+
+      // Act
+      await tester.pumpWidget(
+        ChangeNotifierProvider<ActiveProfileViewModel>.value(
+          value: mockActiveProfileViewModel,
+          child: const MaterialApp(
+            home: MediaQuery(
+              data: MediaQueryData(textScaler: TextScaler.linear(2.0)),
+              child: Scaffold(body: ProfileSwitcher()),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Assert - should render without overflow
+      expect(tester.takeException(), isNull);
+      expect(find.byType(ProfileSwitcher), findsOneWidget);
+    });
   });
 }
