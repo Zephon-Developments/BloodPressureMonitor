@@ -2,21 +2,33 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 
 import 'package:blood_pressure_monitor/models/health_data.dart';
+import 'package:blood_pressure_monitor/models/units_preference.dart';
 import 'package:blood_pressure_monitor/viewmodels/weight_viewmodel.dart';
 
 import '../test_mocks.mocks.dart';
 
 void main() {
   late MockWeightService mockWeightService;
+  late MockUnitsPreferenceService mockUnitsService;
   late WeightViewModel viewModel;
   late WeightEntry sampleEntry;
   late MockActiveProfileViewModel mockActiveProfileViewModel;
 
   setUp(() {
     mockWeightService = MockWeightService();
+    mockUnitsService = MockUnitsPreferenceService();
     mockActiveProfileViewModel = MockActiveProfileViewModel();
+
     when(mockActiveProfileViewModel.activeProfileId).thenReturn(1);
-    viewModel = WeightViewModel(mockWeightService, mockActiveProfileViewModel);
+    when(mockUnitsService.getUnitsPreference())
+        .thenAnswer((_) async => const UnitsPreference());
+
+    viewModel = WeightViewModel(
+      mockWeightService,
+      mockActiveProfileViewModel,
+      mockUnitsService,
+    );
+
     sampleEntry = WeightEntry(
       id: 1,
       profileId: 1,
@@ -81,8 +93,7 @@ void main() {
     ).thenAnswer((_) async => <WeightEntry>[sampleEntry]);
 
     final result = await viewModel.saveWeightEntry(
-      weightValue: 70,
-      unit: WeightUnit.kg,
+      weightValue: 70.0,
       recordedAt: DateTime.parse('2025-01-02T07:00:00Z'),
     );
 
@@ -97,8 +108,7 @@ void main() {
     );
 
     final result = await viewModel.saveWeightEntry(
-      weightValue: 10,
-      unit: WeightUnit.kg,
+      weightValue: 10.0,
       recordedAt: DateTime.now(),
     );
 
