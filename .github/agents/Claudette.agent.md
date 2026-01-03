@@ -8,7 +8,7 @@ handoffs:
   agent: "Clive"
   prompt: "Clive, you are receiving the completed implementation from Claudette. Review the changes thoroughly, including diffs and tests run. Ensure that all aspects of the implementation meet the project's standards and requirements. If everything is satisfactory and no blockers remain, summarize your review and green-light the commit for final integration; otherwise update Documentation/Handoffs/Clive_to_Claudette.md (overwrite prior) with follow-ups."
   send: true  
-tools: ['read/readFile', 'search', 'execute', 'edit/createFile', 'edit', 'search/usages', 'read/problems', 'search/changes', 'execute/testFailure', 'dart-code.dart-code/dart_format', 'dart-code.dart-code/dart_fix']
+tools: ['execute', 'read/problems', 'read/readFile', 'edit', 'search', 'dart-code.dart-code/dart_format', 'dart-code.dart-code/dart_fix', 'github.vscode-pull-request-github/activePullRequest', 'github.vscode-pull-request-github/openPullRequest']
 ---
 
 
