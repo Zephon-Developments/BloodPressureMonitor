@@ -8,7 +8,7 @@
 
 ### Blood Pressure Chart
 
-**Major Issue** Blood Pressure chart shows Systolic and Diastolic on the sane banding
+**Major Issue** Blood Pressure chart shows Systolic and Diastolic on the same banding
 
 The chart for Blood Pressure is supposed to have an X axis in the middle, and systolic values above the line with diastolic values below the line. Each of the charts (above and below the line) should be coloured per NICE guidelines.
 
