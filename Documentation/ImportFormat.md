@@ -171,7 +171,7 @@ systolic,diastolic,pulse,takenAt,localOffsetMinutes,posture,arm,medsContext,irre
 - `posture`: String (optional) - Posture during measurement
 - `arm`: String (optional) - Arm used
 - `medsContext`: String (optional) - Comma-separated medication intake IDs
-- `irregularFlag`: Integer - 1 if irregular heartbeat detected, 0 otherwise
+- `irregularFlag`: Integer - Whether irregular heartbeat was detected (1 = irregular heartbeat detected, 0 = no irregular heartbeat). In the JSON format this field is a Boolean (`true`/`false`).
 - `tags`: String (optional) - Comma-separated tags (escape commas with backslash)
 - `note`: String (optional) - Additional notes
 
