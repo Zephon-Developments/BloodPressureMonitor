@@ -8,13 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- **Units Preferences UI** (Phase 24C)
-  - User-configurable weight units (kg/lbs) in Settings → Appearance
-  - SI storage convention: all weight data stored in kg, converted for display only
-  - One-time migration of existing weight data to kg storage format
-  - ViewModel-driven unit conversion using `UnitConversion` utility
-  - Analytics resilience: charts and statistics update dynamically on unit change
-  - Temperature unit selector (UI-only, reserved for future body temperature tracking)
+- **Split Blood Pressure Chart** (Phase 23)
+  - Implemented dual-axis layout with center baseline at 0 mmHg.
+  - Systolic readings plotted above (positive) and Diastolic below (negative).
+  - NICE guideline color zones (background bands) for home monitoring.
+  - Adaptive X-axis date labeling to prevent overlap on long time ranges.
+  - Reversed-negation tooltips to show actual positive mmHg values for all series.
+- **App Rebranding**
+  - Renamed application from "HyperTrack" to "HealthLog" across all platforms.
+  - Updated Android manifest, iOS Info.plist, and all in-app branding/documentation.
 
 ### Changed
 - **MVVM Architecture Improvements** (Phase 24C)

@@ -1,4 +1,4 @@
-/// Profile model representing a user in the HyperTrack app.
+/// Profile model representing a user in the HealthLog app.
 ///
 /// Each profile can have multiple readings, medications, and other health data.
 /// Profiles are isolated from each other to support multi-user tracking.
