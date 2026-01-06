@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:blood_pressure_monitor/models/analytics.dart';
 import 'package:blood_pressure_monitor/viewmodels/analytics_viewmodel.dart';
 import 'package:blood_pressure_monitor/views/analytics/widgets/analytics_empty_state.dart';
-import 'package:blood_pressure_monitor/views/analytics/widgets/bp_line_chart.dart';
+import 'package:blood_pressure_monitor/views/analytics/widgets/bp_dual_axis_chart.dart';
 import 'package:blood_pressure_monitor/views/analytics/widgets/chart_legend.dart';
 import 'package:blood_pressure_monitor/views/analytics/widgets/morning_evening_card.dart';
 import 'package:blood_pressure_monitor/views/analytics/widgets/pulse_line_chart.dart';
@@ -99,6 +99,7 @@ class _AnalyticsViewState extends State<AnalyticsView> {
   List<Widget> _buildDataContent(AnalyticsViewModel viewModel) {
     final HealthStats stats = viewModel.stats!;
     final ChartDataSet chartData = viewModel.chartData!;
+    final DualAxisBpData? dualAxisData = viewModel.dualAxisBpData;
 
     return [
       StatsCardGrid(stats: stats),
@@ -108,11 +109,14 @@ class _AnalyticsViewState extends State<AnalyticsView> {
         sleepCorrelation: viewModel.sleepCorrelation,
       ),
       const SizedBox(height: 12),
-      BpLineChart(
-        dataSet: chartData,
-        sleepCorrelation:
-            viewModel.showSleepOverlay ? viewModel.sleepCorrelation : null,
-      ),
+      if (dualAxisData != null && dualAxisData.hasData)
+        BpDualAxisChart(
+          dataSet: dualAxisData,
+          sleepCorrelation:
+              viewModel.showSleepOverlay ? viewModel.sleepCorrelation : null,
+        )
+      else
+        const SizedBox.shrink(),
       const SizedBox(height: 24),
       PulseLineChart(dataSet: chartData),
       const SizedBox(height: 24),

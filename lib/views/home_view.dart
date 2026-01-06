@@ -113,7 +113,7 @@ class _HomeViewState extends State<HomeView> {
   String _getTitle() {
     switch (_selectedIndex) {
       case 0:
-        return 'HyperTrack';
+        return 'HealthLog';
       case 1:
         return 'History';
       case 2:
@@ -121,7 +121,7 @@ class _HomeViewState extends State<HomeView> {
       case 3:
         return 'Settings';
       default:
-        return 'HyperTrack';
+        return 'HealthLog';
     }
   }
 

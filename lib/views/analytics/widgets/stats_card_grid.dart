@@ -118,13 +118,13 @@ class _VariabilityCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Variability (SD / CV)',
+              'Variability',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 8),
-            _variabilityRow('Systolic', stats.systolicStdDev, stats.systolicCv),
+            _variabilityRow('Sys', stats.systolicStdDev, stats.systolicCv),
             _variabilityRow(
-              'Diastolic',
+              'Dia',
               stats.diastolicStdDev,
               stats.diastolicCv,
             ),
@@ -141,8 +141,18 @@ class _VariabilityCard extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label),
-          Text('${stdDev.toStringAsFixed(1)} / ${cv.toStringAsFixed(1)}%'),
+          Expanded(
+            flex: 2,
+            child: Text(label),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text(
+              'SD: ${stdDev.toStringAsFixed(1)} / CV: ${cv.toStringAsFixed(1)}%',
+              style: const TextStyle(fontSize: 12),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         ],
       ),
     );

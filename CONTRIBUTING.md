@@ -1,6 +1,6 @@
-# Contributing to HyperTrack
+# Contributing to HealthLog
 
-Thank you for your interest in contributing to the HyperTrack project! This document provides guidelines for contributing to this project.
+Thank you for your interest in contributing to the HealthLog project! This document provides guidelines for contributing to this project.
 
 ## Code of Conduct
 

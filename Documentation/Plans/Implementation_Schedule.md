@@ -1,4 +1,4 @@
-# HyperTrack - Phased Implementation Schedule
+# HealthLog - Phased Implementation Schedule
 
 ## Purpose
 Break the implementation into sprint-sized phases with clear tasks, dependencies, acceptance criteria, and a simple progress tracker. Each phase should be reviewable/mergeable independently.
@@ -18,7 +18,7 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - [x] Phase 11: Medication Records UI ✅ **COMPLETE** (Dec 31, 2025)
 - [x] Phase 12: Medication Intake Recording UI ✅ **COMPLETE** (Dec 31, 2025)
 - [x] Phase 13: File Management & Export Sharing ✅ **COMPLETE** (Dec 31, 2025)
-- [x] Phase 14: App Rebrand (HyperTrack) ✅ **COMPLETE** (Dec 31, 2025)
+- [x] Phase 14: App Rebrand (HealthLog) ✅ **COMPLETE** (Dec 31, 2025)
 - [x] Phase 15: Reminder Removal ✅ **COMPLETE** (Dec 31, 2025)
 - [x] Phase 16: Profile-Centric UI Redesign ✅ **COMPLETE** (Dec 31, 2025)
 - [x] Phase 17: Zephon Branding & Appearance Settings ✅ **COMPLETE** (Jan 1, 2026)
@@ -307,16 +307,16 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - Profile isolation via filename parsing
 **Status**: Merged to main (Dec 31, 2025)
 
-### Phase 14: App Rebrand (HyperTrack)
+### Phase 14: App Rebrand (HealthLog)
 **Scope**: Rename product end-to-end while keeping install continuity.
 **Tasks**
 - Update app name strings in pubspec, Android manifest, iOS Info.plist, and user-facing UI copy.
 - Keep existing package/bundle IDs to preserve upgrade path unless a breaking change is approved.
-- Refresh documentation (README, QUICKSTART, CHANGELOG) and About text with HyperTrack branding.
+- Refresh documentation (README, QUICKSTART, CHANGELOG) and About text with HealthLog branding.
 - Run full build/analyze/test to verify no regressions in platform configs.
 **Dependencies**: Completed core features through Phase 13.
 **Acceptance**
-- All user-visible references show "HyperTrack"; installs/upgrades succeed on Android/iOS.
+- All user-visible references show "HealthLog"; installs/upgrades succeed on Android/iOS.
 - Analyzer/tests/CI green; store-facing disclaimers updated.
 
 ### Phase 15: Reminder Removal
@@ -350,7 +350,7 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 **Completion Date**: Jan 1, 2026
 **Status**: ✅ **COMPLETE** - Merged to main (PR pending)
 **Tasks**
-- ✅ Add Settings → About HyperTrack with app name/version, Zephon link/tagline, and medical disclaimer.
+- ✅ Add Settings → About HealthLog with app name/version, Zephon link/tagline, and medical disclaimer.
 - ✅ Add Settings → Appearance: theme mode (light/dark/system), 8 accent colors, font scaling (normal/large/XL), high-contrast toggle.
 - ✅ Centralize theming in ThemeViewModel with Material 3 ColorScheme.fromSeed; persist settings in SharedPreferences.
 - ✅ Widget tests for all theme components and persistence
@@ -567,7 +567,7 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 **Scope**: Passphrase-protected backup/restore of the full encrypted database.
 **Tasks**
 - Export SQLCipher DB as a single blob with an added AES layer using a user passphrase; name
-  files `hypertrack_backup_YYYYMMDD_HHMM.htb`.
+  files `HealthLog_backup_YYYYMMDD_HHMM.htb`.
 - Backup/Restore UI in Settings with progress, warnings, and passphrase entry.
 - Restore modes: replace all (default) with rollback on failure; merge mode optional if feasible.
 - Version stamps and checksums to validate compatibility and corruption.

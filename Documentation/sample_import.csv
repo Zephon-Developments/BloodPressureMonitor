@@ -1,0 +1,4 @@
+# READINGS
+systolic,diastolic,pulse,takenAt,localOffsetMinutes,posture,arm,medsContext,irregularFlag,tags,note
+120,80,72,2024-01-15T08:00:00.000Z,0,sitting,left,,0,morning\,fasting,Normal morning reading
+125,85,75,2024-01-15T20:00:00.000Z,0,sitting,left,1\,2,0,evening,Slightly elevated after dinner

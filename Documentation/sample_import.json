@@ -1,0 +1,87 @@
+{
+    "readings": [
+        {
+            "systolic": 120,
+            "diastolic": 80,
+            "pulse": 72,
+            "takenAt": "2024-01-15T08:00:00.000Z",
+            "localOffsetMinutes": 0,
+            "posture": "sitting",
+            "arm": "left",
+            "irregularFlag": false,
+            "tags": "morning,fasting",
+            "note": "Normal morning reading"
+        },
+        {
+            "systolic": 125,
+            "diastolic": 85,
+            "pulse": 75,
+            "takenAt": "2024-01-15T20:00:00.000Z",
+            "localOffsetMinutes": 0,
+            "posture": "sitting",
+            "arm": "left",
+            "irregularFlag": false,
+            "tags": "evening",
+            "note": "Slightly elevated after dinner"
+        }
+    ],
+    "weight": [
+        {
+            "takenAt": "2024-01-15T07:00:00.000Z",
+            "localOffsetMinutes": 0,
+            "weightValue": 70.5,
+            "unit": "kg",
+            "notes": "Morning weight before breakfast",
+            "saltIntake": "moderate",
+            "exerciseLevel": "light",
+            "stressLevel": "low",
+            "sleepQuality": "good"
+        }
+    ],
+    "sleep": [
+        {
+            "startedAt": "2024-01-14T22:30:00.000Z",
+            "endedAt": "2024-01-15T06:30:00.000Z",
+            "durationMinutes": 480,
+            "quality": 4,
+            "deepMinutes": 120,
+            "lightMinutes": 300,
+            "remMinutes": 60,
+            "awakeMinutes": 0,
+            "localOffsetMinutes": 0,
+            "notes": "Good night's sleep"
+        }
+    ],
+    "medications": [
+        {
+            "name": "Lisinopril",
+            "dosage": "10",
+            "unit": "mg",
+            "frequency": "once daily",
+            "scheduleMetadata": "{\"v\":1,\"frequency\":\"daily\",\"times\":[\"08:00\"],\"daysOfWeek\":[1,2,3,4,5,6,7],\"graceMinutesLate\":15,\"graceMinutesMissed\":60}"
+        },
+        {
+            "name": "Aspirin",
+            "dosage": "81",
+            "unit": "mg",
+            "frequency": "once daily",
+            "scheduleMetadata": "{\"v\":1,\"frequency\":\"daily\",\"times\":[\"08:00\"],\"daysOfWeek\":[1,2,3,4,5,6,7],\"graceMinutesLate\":15,\"graceMinutesMissed\":60}"
+        }
+    ],
+    "medicationIntakes": [
+        {
+            "medicationId": 1,
+            "takenAt": "2024-01-15T08:00:00.000Z",
+            "localOffsetMinutes": 0,
+            "scheduledFor": "2024-01-15T08:00:00.000Z",
+            "note": "Taken with breakfast"
+        },
+        {
+            "medicationId": 2,
+            "takenAt": "2024-01-15T08:05:00.000Z",
+            "localOffsetMinutes": 0,
+            "scheduledFor": "2024-01-15T08:00:00.000Z",
+            "note": "Taken with breakfast"
+        }
+    ]
+}
