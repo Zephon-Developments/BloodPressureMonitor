@@ -308,7 +308,7 @@ class _HistoryHomeViewState extends State<HistoryHomeView> {
 
     switch (metricType.toLowerCase()) {
       case 'bp':
-        destinationView = const HistoryView();
+        destinationView = const HistoryScreen();
         break;
       case 'weight':
         destinationView = const WeightHistoryView();
