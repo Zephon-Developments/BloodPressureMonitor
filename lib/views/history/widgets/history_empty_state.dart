@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 
 /// Friendly empty-state displayed when no history exists.
 class HistoryEmptyState extends StatelessWidget {
-  const HistoryEmptyState({super.key, required this.onAddReading});
-
-  final VoidCallback onAddReading;
+  const HistoryEmptyState({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,15 +27,9 @@ class HistoryEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Add a blood pressure reading to start building your history.',
+              'No readings match the current filters. Try adjusting your date range or clearing tag filters.',
               style: Theme.of(context).textTheme.bodyMedium,
               textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            FilledButton.icon(
-              onPressed: onAddReading,
-              icon: const Icon(Icons.add),
-              label: const Text('Add Reading'),
             ),
           ],
         ),

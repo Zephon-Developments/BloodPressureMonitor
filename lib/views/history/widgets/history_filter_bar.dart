@@ -23,85 +23,88 @@ class HistoryFilterBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.all(16),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Filters',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                _presetChip(
-                  context,
-                  label: '7 days',
-                  preset: HistoryRangePreset.sevenDays,
-                ),
-                _presetChip(
-                  context,
-                  label: '30 days',
-                  preset: HistoryRangePreset.thirtyDays,
-                ),
-                _presetChip(
-                  context,
-                  label: '90 days',
-                  preset: HistoryRangePreset.ninetyDays,
-                ),
-                _presetChip(
-                  context,
-                  label: 'All',
-                  preset: HistoryRangePreset.all,
-                ),
-                OutlinedButton.icon(
-                  onPressed: () {
-                    onCustomRange();
-                  },
-                  icon: const Icon(Icons.date_range),
-                  label: Text(
-                    filters.startDate == null || filters.endDate == null
-                        ? 'Custom range'
-                        : _formatRange(),
+    return SafeArea(
+      bottom: false,
+      child: Card(
+        margin: const EdgeInsets.all(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Filters',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  _presetChip(
+                    context,
+                    label: '7 days',
+                    preset: HistoryRangePreset.sevenDays,
                   ),
-                ),
-                OutlinedButton.icon(
-                  onPressed: () {
-                    onEditTags();
-                  },
-                  icon: const Icon(Icons.label),
-                  label: Text(_tagLabel()),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            SegmentedButton<HistoryViewMode>(
-              segments: const [
-                ButtonSegment<HistoryViewMode>(
-                  value: HistoryViewMode.averaged,
-                  icon: Icon(Icons.analytics_outlined),
-                  label: Text('Averaged'),
-                ),
-                ButtonSegment<HistoryViewMode>(
-                  value: HistoryViewMode.raw,
-                  icon: Icon(Icons.view_list),
-                  label: Text('Raw'),
-                ),
-              ],
-              selected: <HistoryViewMode>{filters.viewMode},
-              onSelectionChanged: (selection) {
-                if (selection.isEmpty) {
-                  return;
-                }
-                onModeChanged(selection.first);
-              },
-            ),
-          ],
+                  _presetChip(
+                    context,
+                    label: '30 days',
+                    preset: HistoryRangePreset.thirtyDays,
+                  ),
+                  _presetChip(
+                    context,
+                    label: '90 days',
+                    preset: HistoryRangePreset.ninetyDays,
+                  ),
+                  _presetChip(
+                    context,
+                    label: 'All',
+                    preset: HistoryRangePreset.all,
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      onCustomRange();
+                    },
+                    icon: const Icon(Icons.date_range),
+                    label: Text(
+                      filters.startDate == null || filters.endDate == null
+                          ? 'Custom range'
+                          : _formatRange(),
+                    ),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      onEditTags();
+                    },
+                    icon: const Icon(Icons.label),
+                    label: Text(_tagLabel()),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              SegmentedButton<HistoryViewMode>(
+                segments: const [
+                  ButtonSegment<HistoryViewMode>(
+                    value: HistoryViewMode.averaged,
+                    icon: Icon(Icons.analytics_outlined),
+                    label: Text('Averaged'),
+                  ),
+                  ButtonSegment<HistoryViewMode>(
+                    value: HistoryViewMode.raw,
+                    icon: Icon(Icons.view_list),
+                    label: Text('Raw'),
+                  ),
+                ],
+                selected: <HistoryViewMode>{filters.viewMode},
+                onSelectionChanged: (selection) {
+                  if (selection.isEmpty) {
+                    return;
+                  }
+                  onModeChanged(selection.first);
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

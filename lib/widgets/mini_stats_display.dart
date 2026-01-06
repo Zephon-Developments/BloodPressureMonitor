@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:blood_pressure_monitor/models/mini_stats.dart';
 
-/// Displays mini-statistics with trend indicators.
+/// Displays mini-statistics for health metrics.
 ///
-/// Shows the latest value, 7-day average, and a visual trend indicator
-/// (up, down, stable, or insufficient data). The widget adapts to compact
-/// mode for use in collapsed section headers.
-///
-/// Colors and icons for trends are context-appropriate based on the metric type.
+/// Shows the latest value and 7-day average without any trend analysis
+/// or medical inference. The widget adapts to compact mode for use in
+/// collapsed section headers.
 class MiniStatsDisplay extends StatelessWidget {
   /// Creates a mini-stats display widget.
   ///
@@ -33,106 +31,39 @@ class MiniStatsDisplay extends StatelessWidget {
   /// In compact mode, the layout is condensed for use in section headers.
   final bool compact;
 
-  /// Gets the color for the trend indicator based on direction and metric type.
-  Color _getTrendColor(BuildContext context, TrendDirection trend) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    switch (trend) {
-      case TrendDirection.up:
-        // For BP and Weight, up is concerning (red)
-        // For Sleep and Medication adherence, up is good (green)
-        if (metricType == 'BP' || metricType == 'Weight') {
-          return colorScheme.error;
-        }
-        return Colors.green;
-      case TrendDirection.down:
-        // For BP and Weight, down is good (green)
-        // For Sleep and Medication adherence, down is concerning (red)
-        if (metricType == 'BP' || metricType == 'Weight') {
-          return Colors.green;
-        }
-        return colorScheme.error;
-      case TrendDirection.stable:
-        return Colors.blue;
-    }
-  }
-
-  /// Gets the icon for the trend indicator.
-  IconData _getTrendIcon(TrendDirection trend) {
-    switch (trend) {
-      case TrendDirection.up:
-        return Icons.trending_up;
-      case TrendDirection.down:
-        return Icons.trending_down;
-      case TrendDirection.stable:
-        return Icons.trending_flat;
-    }
-  }
-
-  /// Gets a human-readable label for the trend.
-  String _getTrendLabel(TrendDirection trend) {
-    switch (trend) {
-      case TrendDirection.up:
-        return 'Increasing';
-      case TrendDirection.down:
-        return 'Decreasing';
-      case TrendDirection.stable:
-        return 'Stable';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final trendColor = _getTrendColor(context, miniStats.trend);
-    final trendIcon = _getTrendIcon(miniStats.trend);
-    final trendLabel = _getTrendLabel(miniStats.trend);
 
     if (compact) {
-      return _buildCompactLayout(theme, trendColor, trendIcon, trendLabel);
+      return _buildCompactLayout(theme);
     }
 
-    return _buildFullLayout(theme, trendColor, trendIcon, trendLabel);
+    return _buildFullLayout(theme);
   }
 
   Widget _buildCompactLayout(
     ThemeData theme,
-    Color trendColor,
-    IconData trendIcon,
-    String trendLabel,
   ) {
     return Semantics(
       label:
-          'Latest: ${miniStats.latestValue}, 7-day average: ${miniStats.weekAverage}, Trend: $trendLabel',
+          'Latest: ${miniStats.latestValue}, 7-day average: ${miniStats.weekAverage}',
       excludeSemantics: true,
-      child: Row(
-        children: [
-          Text(
-            miniStats.latestValue,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Icon(
-            trendIcon,
-            size: 16,
-            color: trendColor,
-          ),
-        ],
+      child: Text(
+        miniStats.latestValue,
+        style: theme.textTheme.bodyMedium?.copyWith(
+          fontWeight: FontWeight.w500,
+        ),
       ),
     );
   }
 
   Widget _buildFullLayout(
     ThemeData theme,
-    Color trendColor,
-    IconData trendIcon,
-    String trendLabel,
   ) {
     return Semantics(
       label:
-          'Latest: ${miniStats.latestValue}, 7-day average: ${miniStats.weekAverage}, Trend: $trendLabel',
+          'Latest: ${miniStats.latestValue}, 7-day average: ${miniStats.weekAverage}',
       excludeSemantics: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -167,25 +98,6 @@ class MiniStatsDisplay extends StatelessWidget {
               Text(
                 miniStats.weekAverage,
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          // Trend Indicator
-          Row(
-            children: [
-              Icon(
-                trendIcon,
-                size: 20,
-                color: trendColor,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                trendLabel,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: trendColor,
                   fontWeight: FontWeight.w500,
                 ),
               ),

@@ -108,7 +108,7 @@ class _AboutViewState extends State<AboutView> {
 
                   // App Name
                   Text(
-                    'HyperTrack',
+                    'HealthLog',
                     style: theme.textTheme.headlineMedium?.copyWith(
                       color: colorScheme.primary,
                       fontWeight: FontWeight.bold,
@@ -133,7 +133,7 @@ class _AboutViewState extends State<AboutView> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'About HyperTrack',
+                            'About HealthLog',
                             style: theme.textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
@@ -206,7 +206,7 @@ class _AboutViewState extends State<AboutView> {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'HyperTrack is not a medical device and is not intended to diagnose, treat, cure, or prevent any disease or health condition.\n\n'
+                            'HealthLog is not a medical device and is not intended to diagnose, treat, cure, or prevent any disease or health condition.\n\n'
                             'It is a personal health data logging tool designed solely to help you record, organize, and collate your blood pressure readings, medication intake, weight, sleep, and related notes.\n\n'
                             'All generated charts, averages, correlations, and PDF reports are for informational purposes only and are intended to support discussions with your healthcare professional.\n\n'
                             'The app provides no medical advice, recommendations, alerts, or interpretations. All medical decisions and treatment remain the sole responsibility of you and your doctor.\n\n'

@@ -7,8 +7,8 @@ void main() {
   setUp(() {
     // Mock package_info_plus
     PackageInfo.setMockInitialValues(
-      appName: 'HyperTrack',
-      packageName: 'com.zephondevelopments.hypertrack',
+      appName: 'HealthLog',
+      packageName: 'com.zephondevelopments.healthlog',
       version: '1.3.0',
       buildNumber: '3',
       buildSignature: '',
@@ -27,15 +27,15 @@ void main() {
       // Wait for async data to load
       await tester.pumpAndSettle();
 
-      // Should show HyperTrack title
-      expect(find.text('HyperTrack'), findsAtLeastNWidgets(1));
+      // Should show HealthLog title
+      expect(find.text('HealthLog'), findsAtLeastNWidgets(1));
 
       // Should show version and build number
       expect(find.textContaining('Version'), findsOneWidget);
       expect(find.textContaining('Build'), findsOneWidget);
     });
 
-    testWidgets('displays About HyperTrack section', (tester) async {
+    testWidgets('displays About HealthLog section', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: AboutView(),
@@ -44,7 +44,7 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.text('About HyperTrack'), findsOneWidget);
+      expect(find.text('About HealthLog'), findsOneWidget);
       expect(
         find.textContaining('A private, offline health data logger'),
         findsOneWidget,
@@ -79,7 +79,7 @@ void main() {
 
       expect(find.text('Medical Disclaimer'), findsOneWidget);
       expect(
-        find.textContaining('HyperTrack is not a medical device'),
+        find.textContaining('HealthLog is not a medical device'),
         findsOneWidget,
       );
       expect(

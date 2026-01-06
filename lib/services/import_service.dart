@@ -10,6 +10,7 @@ import 'package:blood_pressure_monitor/services/weight_service.dart';
 import 'package:blood_pressure_monitor/services/sleep_service.dart';
 import 'package:blood_pressure_monitor/services/medication_service.dart';
 import 'package:blood_pressure_monitor/services/medication_intake_service.dart';
+import 'package:blood_pressure_monitor/services/averaging_service.dart';
 
 /// Service for importing health data from CSV and JSON formats.
 class ImportService {
@@ -18,6 +19,7 @@ class ImportService {
   final SleepService _sleepService;
   final MedicationService _medicationService;
   final MedicationIntakeService _intakeService;
+  final AveragingService _averagingService;
 
   ImportService({
     required ReadingService readingService,
@@ -25,11 +27,13 @@ class ImportService {
     required SleepService sleepService,
     required MedicationService medicationService,
     required MedicationIntakeService intakeService,
+    AveragingService? averagingService,
   })  : _readingService = readingService,
         _weightService = weightService,
         _sleepService = sleepService,
         _medicationService = medicationService,
-        _intakeService = intakeService;
+        _intakeService = intakeService,
+        _averagingService = averagingService ?? AveragingService();
 
   /// Imports data from a JSON file.
   Future<ImportResult> importFromJson({
@@ -188,6 +192,11 @@ class ImportService {
       }
     }
 
+    // Recompute reading groups if any readings were imported
+    if (readingsImported > 0) {
+      await _averagingService.recomputeGroupsForProfile(profileId);
+    }
+
     return ImportResult(
       readingsImported: readingsImported,
       weightsImported: weightsImported,
@@ -281,6 +290,11 @@ class ImportService {
       }
     }
 
+    // Recompute reading groups if any readings were imported
+    if (readingsImported > 0) {
+      await _averagingService.recomputeGroupsForProfile(profileId);
+    }
+
     return ImportResult(
       readingsImported: readingsImported,
       weightsImported: weightsImported,
@@ -293,12 +307,19 @@ class ImportService {
   }
 
   Reading _parseReadingFromCsvMap(Map<String, dynamic> map, int profileId) {
+    // Normalize timestamp format: accept both `.` and `,` for milliseconds
+    final rawTimestamp = map['takenAt'] as String;
+    final normalizedTimestamp = rawTimestamp.replaceAll(
+      RegExp(r'(\d{2}:\d{2}:\d{2}),(\d{3}[Zz]?)'),
+      r'$1.$2',
+    );
+
     return Reading(
       profileId: profileId,
       systolic: map['systolic'] as int,
       diastolic: map['diastolic'] as int,
       pulse: map['pulse'] as int,
-      takenAt: DateTime.parse(map['takenAt'] as String),
+      takenAt: DateTime.parse(normalizedTimestamp),
       localOffsetMinutes: map['localOffsetMinutes'] as int,
       posture: map['posture']?.toString(),
       arm: map['arm']?.toString(),

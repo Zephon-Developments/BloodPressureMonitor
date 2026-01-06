@@ -231,16 +231,8 @@ class _HistoryViewState extends State<HistoryView> {
         controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.only(bottom: 32),
-        children: [
-          HistoryEmptyState(
-            onAddReading: () {
-              Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (context) => const AddReadingView(),
-                ),
-              );
-            },
-          ),
+        children: const [
+          HistoryEmptyState(),
         ],
       );
     }

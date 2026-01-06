@@ -69,7 +69,7 @@ class _LockScreenViewState extends State<LockScreenView>
 
                 // Title
                 Text(
-                  'HyperTrack',
+                  'HealthLog',
                   style: Theme.of(context).textTheme.headlineSmall,
                   textAlign: TextAlign.center,
                 ),

@@ -102,6 +102,7 @@ void main() async {
     sleepService: sleepService,
     medicationService: medicationService,
     intakeService: intakeService,
+    averagingService: averagingService,
   );
   final pdfReportService = PdfReportService(
     analyticsService: analyticsService,
@@ -260,7 +261,7 @@ class MyApp extends StatelessWidget {
     final themeViewModel = context.watch<ThemeViewModel>();
 
     return MaterialApp(
-      title: 'HyperTrack',
+      title: 'HealthLog',
       theme: themeViewModel.lightTheme,
       darkTheme: themeViewModel.darkTheme,
       themeMode: themeViewModel.materialThemeMode,
@@ -411,7 +412,7 @@ class _LockGateState extends State<_LockGate> with WidgetsBindingObserver {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'HyperTrack',
+                    'HealthLog',
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
                 ],

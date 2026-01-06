@@ -55,10 +55,10 @@ void main() {
       expect(find.textContaining('7-day avg:'), findsOneWidget);
     });
 
-    testWidgets('shows correct trend indicator for TrendDirection.up',
+    testWidgets('displays values without trend indicators (zero inference)',
         (tester) async {
-      // Arrange
-      const stats = MiniStats(
+      // Arrange - test with various trend directions
+      const statsUp = MiniStats(
         latestValue: '140/90',
         weekAverage: '130/85',
         trend: TrendDirection.up,
@@ -69,207 +69,22 @@ void main() {
         const MaterialApp(
           home: Scaffold(
             body: MiniStatsDisplay(
-              miniStats: stats,
+              miniStats: statsUp,
               metricType: 'BP',
             ),
           ),
         ),
       );
 
-      // Assert
-      expect(find.byIcon(Icons.trending_up), findsOneWidget);
-      expect(find.text('Increasing'), findsOneWidget);
-    });
-
-    testWidgets('shows correct trend indicator for TrendDirection.down',
-        (tester) async {
-      // Arrange
-      const stats = MiniStats(
-        latestValue: '120/78',
-        weekAverage: '130/85',
-        trend: TrendDirection.down,
-      );
-
-      // Act
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: MiniStatsDisplay(
-              miniStats: stats,
-              metricType: 'BP',
-            ),
-          ),
-        ),
-      );
-
-      // Assert
-      expect(find.byIcon(Icons.trending_down), findsOneWidget);
-      expect(find.text('Decreasing'), findsOneWidget);
-    });
-
-    testWidgets('shows correct trend indicator for TrendDirection.stable',
-        (tester) async {
-      // Arrange
-      const stats = MiniStats(
-        latestValue: '130/85',
-        weekAverage: '130/85',
-        trend: TrendDirection.stable,
-      );
-
-      // Act
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: MiniStatsDisplay(
-              miniStats: stats,
-              metricType: 'BP',
-            ),
-          ),
-        ),
-      );
-
-      // Assert
-      expect(find.byIcon(Icons.trending_flat), findsOneWidget);
-      expect(find.text('Stable'), findsOneWidget);
-    });
-
-    testWidgets('applies correct colors for BP trends - up is red',
-        (tester) async {
-      // Arrange
-      const stats = MiniStats(
-        latestValue: '150/95',
-        weekAverage: '135/88',
-        trend: TrendDirection.up,
-      );
-
-      // Act
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: MiniStatsDisplay(
-              miniStats: stats,
-              metricType: 'BP',
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      // Assert
-      final icon = tester.widget<Icon>(find.byIcon(Icons.trending_up));
-      final colorScheme =
-          Theme.of(tester.element(find.byType(Scaffold))).colorScheme;
-      expect(icon.color, colorScheme.error);
-    });
-
-    testWidgets('applies correct colors for BP trends - down is green',
-        (tester) async {
-      // Arrange
-      const stats = MiniStats(
-        latestValue: '115/75',
-        weekAverage: '130/85',
-        trend: TrendDirection.down,
-      );
-
-      // Act
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: MiniStatsDisplay(
-              miniStats: stats,
-              metricType: 'BP',
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      // Assert
-      final icon = tester.widget<Icon>(find.byIcon(Icons.trending_down));
-      expect(icon.color, Colors.green);
-    });
-
-    testWidgets('applies correct colors for Weight trends - up is red',
-        (tester) async {
-      // Arrange
-      const stats = MiniStats(
-        latestValue: '80 kg',
-        weekAverage: '75 kg',
-        trend: TrendDirection.up,
-      );
-
-      // Act
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: MiniStatsDisplay(
-              miniStats: stats,
-              metricType: 'Weight',
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      // Assert
-      final icon = tester.widget<Icon>(find.byIcon(Icons.trending_up));
-      final colorScheme =
-          Theme.of(tester.element(find.byType(Scaffold))).colorScheme;
-      expect(icon.color, colorScheme.error);
-    });
-
-    testWidgets('applies correct colors for Sleep trends - up is green',
-        (tester) async {
-      // Arrange
-      const stats = MiniStats(
-        latestValue: '8.5 hrs',
-        weekAverage: '7.2 hrs',
-        trend: TrendDirection.up,
-      );
-
-      // Act
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: MiniStatsDisplay(
-              miniStats: stats,
-              metricType: 'Sleep',
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      // Assert
-      final icon = tester.widget<Icon>(find.byIcon(Icons.trending_up));
-      expect(icon.color, Colors.green);
-    });
-
-    testWidgets('applies correct colors for stable trend - blue',
-        (tester) async {
-      // Arrange
-      const stats = MiniStats(
-        latestValue: '130/85',
-        weekAverage: '130/85',
-        trend: TrendDirection.stable,
-      );
-
-      // Act
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: MiniStatsDisplay(
-              miniStats: stats,
-              metricType: 'BP',
-            ),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      // Assert
-      final icon = tester.widget<Icon>(find.byIcon(Icons.trending_flat));
-      expect(icon.color, Colors.blue);
+      // Assert - NO trend indicators should be present
+      expect(find.byIcon(Icons.trending_up), findsNothing);
+      expect(find.byIcon(Icons.trending_down), findsNothing);
+      expect(find.byIcon(Icons.trending_flat), findsNothing);
+      expect(find.text('Increasing'), findsNothing);
+      expect(find.text('Decreasing'), findsNothing);
+      // Should only show the data values
+      expect(find.text('140/90'), findsOneWidget);
+      expect(find.textContaining('7-day avg:'), findsOneWidget);
     });
 
     testWidgets('compact mode renders differently than normal mode',
@@ -294,10 +109,10 @@ void main() {
         ),
       );
 
-      // Assert - normal mode shows labels
+      // Assert - normal mode shows labels, no trend indicators
       expect(find.text('Latest: '), findsOneWidget);
       expect(find.textContaining('7-day avg:'), findsOneWidget);
-      expect(find.text('Decreasing'), findsOneWidget);
+      expect(find.byIcon(Icons.trending_down), findsNothing);
 
       // Act - compact mode
       await tester.pumpWidget(
@@ -316,7 +131,6 @@ void main() {
       // Assert - compact mode doesn't show labels
       expect(find.text('Latest: '), findsNothing);
       expect(find.textContaining('7-day avg:'), findsNothing);
-      expect(find.text('Decreasing'), findsNothing);
       // But still shows the value
       expect(find.text('128/82'), findsOneWidget);
     });
@@ -393,10 +207,10 @@ void main() {
         ),
       );
 
-      // Assert - verify semantic label is present
+      // Assert - verify semantic label is present (no trend info)
       expect(
         find.bySemanticsLabel(
-          'Latest: 128/82, 7-day average: 130/85, Trend: Decreasing',
+          'Latest: 128/82, 7-day average: 130/85',
         ),
         findsOneWidget,
       );
@@ -423,10 +237,10 @@ void main() {
         ),
       );
 
-      // Assert - verify semantic label is present
+      // Assert - verify semantic label is present (no trend info)
       expect(
         find.bySemanticsLabel(
-          'Latest: 75 kg, 7-day average: 76 kg, Trend: Increasing',
+          'Latest: 75 kg, 7-day average: 76 kg',
         ),
         findsOneWidget,
       );

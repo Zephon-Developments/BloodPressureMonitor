@@ -7,6 +7,7 @@ import 'package:blood_pressure_monitor/models/medication.dart';
 import 'package:blood_pressure_monitor/models/reading.dart';
 import 'package:blood_pressure_monitor/services/analytics_service.dart';
 import 'package:blood_pressure_monitor/services/app_info_service.dart';
+import 'package:blood_pressure_monitor/services/averaging_service.dart';
 import 'package:blood_pressure_monitor/services/medication_intake_service.dart';
 import 'package:blood_pressure_monitor/services/medication_service.dart';
 import 'package:blood_pressure_monitor/services/reading_service.dart';
@@ -324,4 +325,28 @@ class MockAnalyticsService extends Mock implements AnalyticsService {
           ),
         ),
       ) as Future<HealthStats>);
+}
+
+class MockAveragingService extends Mock implements AveragingService {
+  @override
+  Future<void> createOrUpdateGroupsForReading(Reading reading) =>
+      (super.noSuchMethod(
+        Invocation.method(#createOrUpdateGroupsForReading, [reading]),
+        returnValue: Future<void>.value(),
+        returnValueForMissingStub: Future<void>.value(),
+      ) as Future<void>);
+
+  @override
+  Future<void> recomputeGroupsForProfile(int profileId) => (super.noSuchMethod(
+        Invocation.method(#recomputeGroupsForProfile, [profileId]),
+        returnValue: Future<void>.value(),
+        returnValueForMissingStub: Future<void>.value(),
+      ) as Future<void>);
+
+  @override
+  Future<void> deleteGroupsForReading(int readingId) => (super.noSuchMethod(
+        Invocation.method(#deleteGroupsForReading, [readingId]),
+        returnValue: Future<void>.value(),
+        returnValueForMissingStub: Future<void>.value(),
+      ) as Future<void>);
 }

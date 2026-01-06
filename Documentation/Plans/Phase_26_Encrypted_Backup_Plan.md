@@ -11,7 +11,7 @@
 ## Tasks
 1) Backup Export
 - Implement backup service to copy DB to temp, then encrypt with AES-GCM using key from PBKDF2/Argon2 (salted).
-- Name files `hypertrack_backup_YYYYMMDD_HHMM.htb`; store in app docs or user-picked path.
+- Name files `healthlog_backup_YYYYMMDD_HHMM.htb`; store in app docs or user-picked path.
 
 2) Restore Import
 - Prompt for file + passphrase; decrypt and validate version/checksum.
