@@ -39,46 +39,51 @@ class ProfileSwitcher extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ActiveProfileViewModel>(
       builder: (context, viewModel, _) {
-        return InkWell(
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (context) => const ProfilePickerView(),
-              ),
-            );
-          },
-          borderRadius: BorderRadius.circular(24),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircleAvatar(
-                  radius: 16,
-                  backgroundColor:
-                      Theme.of(context).colorScheme.primaryContainer,
-                  child: Text(
-                    viewModel.activeProfileName.isNotEmpty
-                        ? viewModel.activeProfileName[0].toUpperCase()
-                        : '?',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+        return Semantics(
+          label: 'Switch profile, current: ${viewModel.activeProfileName}',
+          button: true,
+          excludeSemantics: true,
+          child: InkWell(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (context) => const ProfilePickerView(),
+                ),
+              );
+            },
+            borderRadius: BorderRadius.circular(24),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircleAvatar(
+                    radius: 16,
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                    child: Text(
+                      viewModel.activeProfileName.isNotEmpty
+                          ? viewModel.activeProfileName[0].toUpperCase()
+                          : '?',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 100),
-                  child: Text(
-                    viewModel.activeProfileName,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    overflow: TextOverflow.ellipsis,
+                  const SizedBox(width: 8),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 100),
+                    child: Text(
+                      viewModel.activeProfileName,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ),
-                const Icon(Icons.arrow_drop_down, size: 20),
-              ],
+                  const Icon(Icons.arrow_drop_down, size: 20),
+                ],
+              ),
             ),
           ),
         );

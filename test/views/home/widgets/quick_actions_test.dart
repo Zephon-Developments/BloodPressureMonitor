@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'package:blood_pressure_monitor/views/home/widgets/quick_actions.dart';
 import 'package:blood_pressure_monitor/views/readings/add_reading_view.dart';
+import 'package:blood_pressure_monitor/viewmodels/medication_group_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/medication_viewmodel.dart';
 import 'package:blood_pressure_monitor/widgets/medication/medication_picker_dialog.dart';
 
@@ -12,6 +13,7 @@ import '../../../test_mocks.mocks.dart';
 
 void main() {
   late MockMedicationViewModel mockMedicationViewModel;
+  late MockMedicationGroupViewModel mockGroupViewModel;
 
   setUp(() {
     mockMedicationViewModel = MockMedicationViewModel();
@@ -20,11 +22,24 @@ void main() {
     when(mockMedicationViewModel.medications).thenReturn([]);
     when(mockMedicationViewModel.loadMedications()).thenAnswer((_) async {});
     when(mockMedicationViewModel.search(any)).thenAnswer((_) async {});
+
+    mockGroupViewModel = MockMedicationGroupViewModel();
+    when(mockGroupViewModel.isLoading).thenReturn(false);
+    when(mockGroupViewModel.errorMessage).thenReturn(null);
+    when(mockGroupViewModel.groups).thenReturn([]);
+    when(mockGroupViewModel.loadGroups()).thenAnswer((_) async {});
   });
 
   Widget createWidgetUnderTest() {
-    return ChangeNotifierProvider<MedicationViewModel>.value(
-      value: mockMedicationViewModel,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<MedicationViewModel>.value(
+          value: mockMedicationViewModel,
+        ),
+        ChangeNotifierProvider<MedicationGroupViewModel>.value(
+          value: mockGroupViewModel,
+        ),
+      ],
       child: const MaterialApp(
         home: Scaffold(
           body: QuickActions(),

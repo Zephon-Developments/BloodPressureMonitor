@@ -1,106 +1,170 @@
-# Handoff: Steve to User - Phase 16 Extension Ready for PR Merge
+# Handoff: Steve → User
 
-## Status: ✅ AWAITING MANUAL PR MERGE
-
-## Summary
-Phase 16 Extension (Profile Management CRUD with Full Reactivity) has been successfully prepared, tested, reviewed, and committed to the `feature/phase-16-profile-ui` branch. All automated checks have passed, and the code has been approved by Clive (automated reviewer).
-
-**The feature branch is ready for integration into `main` via Pull Request.**
-
-## What Has Been Completed
-1. ✅ **Implementation**: All CRUD operations for profiles completed
-2. ✅ **Reactivity Fixes**: All ViewModels now properly listen to profile changes
-3. ✅ **Testing**: 686/686 tests passing (100% success rate)
-4. ✅ **Code Quality**: Zero lint issues, zero compiler warnings
-5. ✅ **Code Review**: Approved by Clive with zero blockers
-6. ✅ **Git Commit**: Changes committed to feature branch
-7. ✅ **Git Push**: Feature branch pushed to remote repository
-
-## Required Action: Manual PR Merge
-
-Due to branch protection rules on the `main` branch, direct merges are not permitted. You must manually create and merge a Pull Request through GitHub:
-
-### Step 1: Create Pull Request
-Navigate to the PR creation URL:
-```
-https://github.com/Zephon-Development/BloodPressureMonitor/pull/new/feature/phase-16-profile-ui
-```
-
-Or use the GitHub CLI:
-```bash
-gh pr create --base main --head feature/phase-16-profile-ui --title "Phase 16 Extension: Profile Management CRUD" --body-file reviews/2025-12-31-clive-phase-16-extension-review-v2.md
-```
-
-### Step 2: Review PR Details
-- **Base Branch**: `main`
-- **Compare Branch**: `feature/phase-16-profile-ui`
-- **Title**: Phase 16 Extension: Profile Management CRUD
-- **Description**: (See review documentation or commit message)
-
-### Step 3: Verify CI/CD Checks
-Wait for all automated checks to complete:
-- ✅ Build status
-- ✅ Test suite (should show 686 passing)
-- ✅ Linting
-- ✅ Code coverage
-
-### Step 4: Merge Pull Request
-1. Click "Merge pull request" button in GitHub
-2. Choose merge strategy (recommend "Squash and merge" for clean history)
-3. Confirm merge
-4. Delete the feature branch after successful merge
-
-### Step 5: Local Cleanup (After PR Merge)
-```bash
-git checkout main
-git pull origin main
-git branch -d feature/phase-16-profile-ui
-git remote prune origin
-```
-
-## Changes Included in This PR
-
-### New Features
-- Profile CRUD operations (Create, Read, Update, Delete)
-- ProfileFormView for data entry and editing
-- Enhanced ProfilePickerView with management actions
-- Conditional back button for mandatory vs optional selection
-
-### Critical Fixes
-- **Reactivity Gaps**: Added listeners to Analytics, MedicationIntake, MedicationGroup, FileManager ViewModels
-- **LockGate Race Condition**: Fixed with `_hasCheckedProfiles` flag
-- **Data Isolation**: All ViewModels now properly invalidate cache on profile switch
-
-### Updated Architecture
-- ActiveProfileViewModel is now the single source of truth for profile state
-- All data-scoped ViewModels dynamically use `activeProfileViewModel.activeProfileId`
-- Implemented consistent `_onProfileChanged()` pattern across all ViewModels
-
-## Quality Assurance
-- **Tests**: 686/686 passing (100%)
-- **Coverage**: Meets ≥80% threshold per CODING_STANDARDS.md
-- **Lint**: 0 issues reported by `flutter analyze`
-- **Compilation**: No errors or warnings
-- **Code Review**: Approved by Clive (zero blockers)
-
-## Documentation Updated
-- [Phase 16 Extension Deployment Summary](../implementation-summaries/Phase-16-Extension-Deployment.md)
-- [Clive's Final Review](../../reviews/2025-12-31-clive-phase-16-extension-review-v2.md)
-- [Claudette's Handoff](Claudette_to_Clive_Phase16Extension.md)
-
-## Next Steps After PR Merge
-1. **Verify Deployment**: Confirm main branch has all changes
-2. **Update Tracking**: Mark Phase 16 Extension as complete in Implementation_Schedule.md
-3. **Archive Artifacts**: Move handoff notes to archive folder
-4. **Initiate Phase 17**: Begin Settings & Preferences UI development
-
-## Support
-If you encounter any issues during the PR merge process:
-1. Check the GitHub Actions logs for CI/CD failure details
-2. Review the [Deployment Summary](../implementation-summaries/Phase-16-Extension-Deployment.md) for technical details
-3. Consult [Clive's Review](../../reviews/2025-12-31-clive-phase-16-extension-review-v2.md) for approval confirmation
+**Date**: 2026-01-06  
+**From**: Steve (Deployment Manager)  
+**To**: User  
+**Status**: ✅ DEPLOYMENT COMPLETE
 
 ---
-**Workflow Conductor**: Steve  
-**Status**: ✅ Ready for Manual PR Merge  
-**PR URL**: https://github.com/Zephon-Development/BloodPressureMonitor/pull/new/feature/phase-16-profile-ui
+
+## Deployment Summary
+
+All critical fixes have been successfully integrated and are ready for use. The issues you reported have been resolved:
+
+### ✅ Issue 1: Medical Inference Removed
+**Your Report**: "The BP card currently shows the label 'stable'"  
+**Resolution**: All trend indicators (labels, arrows, colors) removed from BP card and mini-stats displays. App now shows raw values ONLY.
+
+### ✅ Issue 2: Data Aggregation Fixed (CRITICAL BLOCKER)
+**Your Report**: "No data in averaged mode, no charts despite 84 readings"  
+**Resolution**: Import service now triggers background aggregation automatically. This populates:
+- Averaged history mode
+- All analytics charts
+- Statistical summaries
+
+### ✅ Issue 3: CSV Import Fixed
+**Your Report**: (Discovered during investigation) CSV imports failed  
+**Resolution**: Timestamp normalization added to handle both comma and period formats backward-compatibly.
+
+### ✅ Issue 4: History View UI Fixed
+**Your Report**: "Black background, filters overflow, wrong button, missing navigation"  
+**Resolution**: 
+- Correct theme background applied
+- Filters card properly positioned with SafeArea
+- "Add Reading" button removed from history context
+- Navigation structure corrected
+
+---
+
+## ⚠️ IMPORTANT: Action Required
+
+**To see the fixes, you must re-import your CSV file.**
+
+### Why?
+The blocker was in the import pipeline. Your previous import created the 84 readings but didn't trigger the aggregation step (this was the bug). Re-importing with the fixed code will:
+1. Import the readings (duplicate skip will prevent duplicates)
+2. **Trigger aggregation** ← This is the new step that was missing
+3. Populate the ReadingGroup table
+4. Enable averaged mode and charts
+
+### Steps to Re-Import:
+1. Open the app
+2. Go to: **Settings → Import/Export**
+3. Select your CSV file: `testData/export_20250106-1310.csv`
+4. Choose: **Append** mode (not Overwrite)
+5. Wait for confirmation: "84 readings imported" (may show 0 if duplicates detected)
+6. Navigate to: **History** tab
+7. Switch to: **Averaged** mode
+8. **Verify**: You should now see grouped readings (~28 groups for your 14-day span)
+9. Navigate to: **Analytics/Charts** tab
+10. **Verify**: Charts should render with data points
+
+---
+
+## What Changed
+
+### Zero Medical Inference
+- **Before**: BP card showed "Stable" label with trend arrows
+- **After**: Shows ONLY latest value + 7-day average + last update time
+- **Why**: App is a data logger, not a medical advisor (as stated in About screen)
+
+### Data Aggregation
+- **Before**: Import saved readings but didn't create aggregated groups
+- **After**: Import saves readings AND triggers 30-minute rolling window aggregation
+- **Impact**: Averaged history and charts now work immediately after import
+
+### CSV Compatibility
+- **Before**: Comma in milliseconds broke import (e.g., `2025-12-23T20:05:30,030Z`)
+- **After**: Accepts both comma and period formats (e.g., both `,030` and `.030`)
+- **Standard**: Exports now use ISO 8601 with period: `2025-12-23T20:05:30.030Z`
+
+### History View
+- **Before**: Black background, layout issues, wrong elements
+- **After**: Correct theme, proper layout, appropriate UI elements only
+
+---
+
+## Verification Checklist
+
+After re-importing, please verify:
+
+- [ ] BP card shows NO status labels (no "stable", no arrows, no colors)
+- [ ] History → **Averaged** mode displays grouped readings
+- [ ] History → **Raw** mode still shows all 84 individual readings
+- [ ] Analytics/Charts tabs render data points
+- [ ] History view has standard theme background (not black)
+- [ ] Filters card is fully visible
+- [ ] No "Add Reading" button appears in history view
+- [ ] Bottom navigation remains visible
+
+---
+
+## Technical Details (Optional)
+
+### Group Aggregation Algorithm
+- Readings within 30 minutes of each other are grouped
+- Averages calculated for systolic, diastolic, pulse
+- Example from your data:
+  ```
+  Group 1: 2025-12-23T20:05-20:07 (3 readings)
+  - Avg systolic: 155, diastolic: 104, pulse: 89
+  
+  Group 2: 2025-12-24T13:15-13:17 (3 readings)
+  - Avg systolic: 139, diastolic: 93, pulse: 84
+  
+  ... (total ~28 groups for your 84 readings)
+  ```
+
+### Database Changes
+- `Reading` table: Contains your 84 individual measurements (unchanged)
+- `ReadingGroup` table: Will contain ~28 aggregated groups (newly populated after re-import)
+
+### Test Coverage
+All changes have been thoroughly tested:
+- 31/31 unit and widget tests passing
+- 0 analyzer errors or warnings
+- Code complies with all project standards
+
+---
+
+## Support
+
+If you encounter any issues after re-importing:
+
+1. **Charts still empty?**
+   - Verify date range filter (try "All Time" selector)
+   - Check active profile matches import profile
+   - Inspect database: `SELECT COUNT(*) FROM ReadingGroup;` (should be ~28)
+
+2. **Averaged mode still shows "No data"?**
+   - Pull down to refresh
+   - Check ReadingGroup table populated
+   - Verify import completed successfully
+
+3. **Import failed?**
+   - Check CSV file format (commas should be field separators)
+   - Verify timestamps match examples in Documentation/ImportFormat.md
+   - Review error messages in import result dialog
+
+---
+
+## Files for Reference
+
+- **Import Format Guide**: [Documentation/ImportFormat.md](Documentation/ImportFormat.md)
+- **Sample CSV**: [Documentation/sample_import.csv](Documentation/sample_import.csv)
+- **Sample JSON**: [Documentation/sample_import.json](Documentation/sample_import.json)
+- **Your Test Data**: [testData/export_20250106-1310.csv](testData/export_20250106-1310.csv)
+
+---
+
+## Deployment Complete ✅
+
+All fixes are live and ready to use. Please re-import your CSV file to activate the aggregation features (averaged mode + charts).
+
+**Thank you for your detailed bug report. Your feedback helped us identify and fix a critical issue in the import pipeline.**
+
+---
+
+**Steve**  
+*Deployment Manager*  
+Zephon HealthLog Development Team

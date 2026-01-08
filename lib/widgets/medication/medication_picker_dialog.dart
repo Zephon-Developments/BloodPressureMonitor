@@ -5,10 +5,11 @@ import 'package:provider/provider.dart';
 
 import 'package:blood_pressure_monitor/models/medication.dart';
 import 'package:blood_pressure_monitor/viewmodels/medication_viewmodel.dart';
+import 'package:blood_pressure_monitor/viewmodels/medication_group_viewmodel.dart';
 
-/// Dialog for picking a medication from the active profile's list.
+/// Dialog for picking a medication or medication group from the active profile's list.
 ///
-/// Returns the selected [Medication] or null if cancelled.
+/// Returns the selected [Medication] or [MedicationGroup], or null if cancelled.
 class MedicationPickerDialog extends StatefulWidget {
   const MedicationPickerDialog({super.key});
 
@@ -26,6 +27,7 @@ class _MedicationPickerDialogState extends State<MedicationPickerDialog> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<MedicationViewModel>().loadMedications();
+      context.read<MedicationGroupViewModel>().loadGroups();
     });
   }
 
@@ -47,7 +49,7 @@ class _MedicationPickerDialogState extends State<MedicationPickerDialog> {
             _buildHeader(),
             _buildSearchBar(),
             Expanded(
-              child: _buildMedicationList(),
+              child: _buildContentList(),
             ),
           ],
         ),
@@ -75,7 +77,7 @@ class _MedicationPickerDialogState extends State<MedicationPickerDialog> {
       child: TextField(
         controller: _searchController,
         decoration: InputDecoration(
-          hintText: 'Search medications...',
+          hintText: 'Search medications and groups...',
           prefixIcon: const Icon(Icons.search),
           suffixIcon: _searchTerm.isNotEmpty
               ? IconButton(
@@ -108,26 +110,26 @@ class _MedicationPickerDialogState extends State<MedicationPickerDialog> {
     );
   }
 
-  Widget _buildMedicationList() {
-    return Consumer<MedicationViewModel>(
-      builder: (context, viewModel, child) {
-        if (viewModel.isLoading) {
+  Widget _buildContentList() {
+    return Consumer2<MedicationViewModel, MedicationGroupViewModel>(
+      builder: (context, medViewModel, groupViewModel, child) {
+        if (medViewModel.isLoading || groupViewModel.isLoading) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (viewModel.errorMessage != null) {
+        if (medViewModel.errorMessage != null) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  viewModel.errorMessage!,
+                  medViewModel.errorMessage!,
                   style: const TextStyle(color: Colors.red),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () => viewModel.loadMedications(),
+                  onPressed: () => medViewModel.loadMedications(),
                   child: const Text('Retry'),
                 ),
               ],
@@ -136,9 +138,20 @@ class _MedicationPickerDialogState extends State<MedicationPickerDialog> {
         }
 
         final activeMedications =
-            viewModel.medications.where((med) => med.isActive).toList();
+            medViewModel.medications.where((med) => med.isActive).toList();
+        final activeGroups = groupViewModel.groups;
 
-        if (activeMedications.isEmpty) {
+        // Filter groups based on search term
+        final filteredGroups = _searchTerm.isEmpty
+            ? activeGroups
+            : activeGroups
+                .where(
+                  (g) =>
+                      g.name.toLowerCase().contains(_searchTerm.toLowerCase()),
+                )
+                .toList();
+
+        if (activeMedications.isEmpty && activeGroups.isEmpty) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -150,7 +163,7 @@ class _MedicationPickerDialogState extends State<MedicationPickerDialog> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'No active medications',
+                  'No active medications or groups',
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.grey[600],
@@ -161,30 +174,80 @@ class _MedicationPickerDialogState extends State<MedicationPickerDialog> {
           );
         }
 
-        return ListView.builder(
-          itemCount: activeMedications.length,
-          itemBuilder: (context, index) {
-            final medication = activeMedications[index];
-            return ListTile(
-              leading: CircleAvatar(
-                backgroundColor: Theme.of(context).primaryColor,
-                child: const Icon(
-                  Icons.medication,
-                  color: Colors.white,
+        return ListView(
+          children: [
+            if (filteredGroups.isNotEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 8.0,
+                ),
+                child: Text(
+                  'Medication Groups',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
               ),
-              title: Text(medication.name),
-              subtitle: medication.dosage != null || medication.unit != null
-                  ? Text(
-                      [
-                        if (medication.dosage != null) medication.dosage,
-                        if (medication.unit != null) medication.unit,
-                      ].join(' '),
-                    )
-                  : null,
-              onTap: () => Navigator.of(context).pop(medication),
-            );
-          },
+              ...filteredGroups.map((group) {
+                final groupMedCount = medViewModel.medications
+                    .where((m) => group.memberMedicationIds.contains(m.id))
+                    .length;
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
+                    child: const Icon(
+                      Icons.folder,
+                      color: Colors.white,
+                    ),
+                  ),
+                  title: Text(group.name),
+                  subtitle: Text(
+                    '$groupMedCount medication${groupMedCount != 1 ? 's' : ''}',
+                  ),
+                  onTap: () => Navigator.of(context).pop(group),
+                );
+              }),
+              if (activeMedications.isNotEmpty) ...[
+                const Divider(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 8.0,
+                  ),
+                  child: Text(
+                    'Individual Medications',
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ),
+              ],
+            ],
+            ...activeMedications.map((medication) {
+              return ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: Theme.of(context).primaryColor,
+                  child: const Icon(
+                    Icons.medication,
+                    color: Colors.white,
+                  ),
+                ),
+                title: Text(medication.name),
+                subtitle: medication.dosage != null || medication.unit != null
+                    ? Text(
+                        [
+                          if (medication.dosage != null) medication.dosage,
+                          if (medication.unit != null) medication.unit,
+                        ].join(' '),
+                      )
+                    : null,
+                onTap: () => Navigator.of(context).pop(medication),
+              );
+            }),
+          ],
         );
       },
     );
@@ -193,9 +256,9 @@ class _MedicationPickerDialogState extends State<MedicationPickerDialog> {
 
 /// Shows the medication picker dialog.
 ///
-/// Returns the selected [Medication] or null if cancelled.
-Future<Medication?> showMedicationPicker(BuildContext context) async {
-  return showDialog<Medication>(
+/// Returns the selected [Medication] or [MedicationGroup], or null if cancelled.
+Future<dynamic> showMedicationPicker(BuildContext context) async {
+  return showDialog<dynamic>(
     context: context,
     builder: (context) => const MedicationPickerDialog(),
   );

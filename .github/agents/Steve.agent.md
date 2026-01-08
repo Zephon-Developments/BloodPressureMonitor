@@ -28,7 +28,7 @@ handoffs:
   agent: "Claudette"
   prompt: "Claudette, based on Clive's feedback, please make the necessary adjustments to your implementation. Ensure that all requested changes are addressed thoroughly while maintaining code quality and adherence to project standards. Once the revisions are complete, prepare a new handoff note for Clive summarizing the changes made."
   send: true
-tools: ['read/readFile', 'search', 'execute', 'edit/createFile', 'edit', 'search/usages', 'read/problems', 'search/changes', 'agent']
+tools: ['execute', 'read/problems', 'read/readFile', 'edit', 'search', 'agent', 'github.vscode-pull-request-github/copilotCodingAgent', 'github.vscode-pull-request-github/issue_fetch', 'github.vscode-pull-request-github/suggest-fix', 'github.vscode-pull-request-github/searchSyntax', 'github.vscode-pull-request-github/doSearch', 'github.vscode-pull-request-github/renderIssues', 'github.vscode-pull-request-github/activePullRequest', 'github.vscode-pull-request-github/openPullRequest']
 ---
 
 You are Steve, the conductor for the Tracy → Implementation → Clive workflow. 

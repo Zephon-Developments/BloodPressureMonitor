@@ -52,6 +52,10 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.debug
+            // Enable minification and shrinking for smaller APK
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
@@ -61,5 +65,5 @@ flutter {
 }
 
 dependencies {
-        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.23"
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.0"
 }

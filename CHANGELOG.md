@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Split Blood Pressure Chart** (Phase 23)
+  - Implemented dual-axis layout with center baseline at 0 mmHg.
+  - Systolic readings plotted above (positive) and Diastolic below (negative).
+  - NICE guideline color zones (background bands) for home monitoring.
+  - Adaptive X-axis date labeling to prevent overlap on long time ranges.
+  - Reversed-negation tooltips to show actual positive mmHg values for all series.
+- **App Rebranding**
+  - Renamed application from "HyperTrack" to "HealthLog" across all platforms.
+  - Updated Android manifest, iOS Info.plist, and all in-app branding/documentation.
+
+### Changed
+- **MVVM Architecture Improvements** (Phase 24C)
+  - Moved all unit conversion logic from View layer to `WeightViewModel`
+  - Added `WeightViewModel.getDisplayWeight()` for centralized SI-to-display conversion
+  - Removed hardcoded conversion constants from UI components
+  - Migrated `DropdownButtonFormField` from deprecated `value` to `initialValue` property (Flutter 3.33+)
+
+### Fixed
+- Resolved 7 deprecation warnings in dropdown components across the application
+- Fixed analytics not refreshing when weight units changed in preferences
+
 ## [1.3.0] - 2025-12-30
 
 ### Added

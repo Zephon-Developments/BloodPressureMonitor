@@ -9,6 +9,7 @@ import 'package:blood_pressure_monitor/models/health_data.dart';
 import 'package:blood_pressure_monitor/models/reading.dart';
 import 'package:blood_pressure_monitor/services/reading_service.dart';
 import 'package:blood_pressure_monitor/services/sleep_service.dart';
+import 'package:blood_pressure_monitor/utils/smoothing.dart';
 import 'package:blood_pressure_monitor/utils/time_range.dart';
 
 /// Service responsible for preparing analytics data for the UI.
@@ -27,6 +28,7 @@ class AnalyticsService {
 
   final ReadingService _readingService;
   final SleepService _sleepService;
+  final Map<String, ChartDataSet> _smoothedCache = {};
 
   /// Calculates aggregated statistics for the provided range.
   Future<HealthStats> calculateStats({
@@ -204,6 +206,134 @@ class AnalyticsService {
       maxDate: aggregates.last.timestamp,
       isSampled: shouldSample,
     );
+  }
+
+  /// Returns a smoothed version of chart data using rolling average.
+  ///
+  /// Applies centered rolling average with 10% window size to systolic,
+  /// diastolic, and pulse series. Edge values are replicated to maintain
+  /// window size consistency. Timestamps are preserved. The result is cached
+  /// per profile and range combination.
+  Future<ChartDataSet> getChartDataSmoothed({
+    required int profileId,
+    required TimeRange range,
+    required DateTime startDate,
+    required DateTime endDate,
+    int maxPoints = 200,
+  }) async {
+    final cacheKey = '${profileId}_${range.name}_$startDate-$endDate';
+    if (_smoothedCache.containsKey(cacheKey)) {
+      return _smoothedCache[cacheKey]!;
+    }
+
+    final rawData = await getChartData(
+      profileId: profileId,
+      range: range,
+      startDate: startDate,
+      endDate: endDate,
+      maxPoints: maxPoints,
+    );
+
+    final smoothedSystolic = Smoothing.rollingAverage(
+      rawData.systolicPoints.map((pt) => pt.value).toList(),
+    );
+    final smoothedDiastolic = Smoothing.rollingAverage(
+      rawData.diastolicPoints.map((pt) => pt.value).toList(),
+    );
+    final smoothedPulse = Smoothing.rollingAverage(
+      rawData.pulsePoints.map((pt) => pt.value).toList(),
+    );
+
+    final systolicPoints = List.generate(
+      rawData.systolicPoints.length,
+      (i) => ChartPoint(
+        timestamp: rawData.systolicPoints[i].timestamp,
+        value: smoothedSystolic[i],
+        isSampled: rawData.systolicPoints[i].isSampled,
+        groupId: rawData.systolicPoints[i].groupId,
+      ),
+    );
+    final diastolicPoints = List.generate(
+      rawData.diastolicPoints.length,
+      (i) => ChartPoint(
+        timestamp: rawData.diastolicPoints[i].timestamp,
+        value: smoothedDiastolic[i],
+        isSampled: rawData.diastolicPoints[i].isSampled,
+        groupId: rawData.diastolicPoints[i].groupId,
+      ),
+    );
+    final pulsePoints = List.generate(
+      rawData.pulsePoints.length,
+      (i) => ChartPoint(
+        timestamp: rawData.pulsePoints[i].timestamp,
+        value: smoothedPulse[i],
+        isSampled: rawData.pulsePoints[i].isSampled,
+        groupId: rawData.pulsePoints[i].groupId,
+      ),
+    );
+
+    final smoothed = ChartDataSet(
+      systolicPoints: systolicPoints,
+      diastolicPoints: diastolicPoints,
+      pulsePoints: pulsePoints,
+      minDate: rawData.minDate,
+      maxDate: rawData.maxDate,
+      isSampled: rawData.isSampled,
+    );
+
+    _smoothedCache[cacheKey] = smoothed;
+    return smoothed;
+  }
+
+  /// Returns dual-axis blood pressure data with systolic and diastolic series.
+  ///
+  /// Designed for rendering dual Y-axis BP charts. Preserves paired
+  /// timestamps to enable vertical connector lines between systolic and
+  /// diastolic points.
+  Future<DualAxisBpData> getDualAxisBpData({
+    required int profileId,
+    required TimeRange range,
+    required DateTime startDate,
+    required DateTime endDate,
+    int maxPoints = 200,
+    bool smoothed = false,
+  }) async {
+    final chartData = smoothed
+        ? await getChartDataSmoothed(
+            profileId: profileId,
+            range: range,
+            startDate: startDate,
+            endDate: endDate,
+            maxPoints: maxPoints,
+          )
+        : await getChartData(
+            profileId: profileId,
+            range: range,
+            startDate: startDate,
+            endDate: endDate,
+            maxPoints: maxPoints,
+          );
+
+    return DualAxisBpData(
+      timestamps: chartData.systolicPoints.map((pt) => pt.timestamp).toList(),
+      systolic: chartData.systolicPoints.map((pt) => pt.value).toList(),
+      diastolic: chartData.diastolicPoints.map((pt) => pt.value).toList(),
+      minDate: chartData.minDate,
+      maxDate: chartData.maxDate,
+    );
+  }
+
+  /// Invalidates cached smoothed data for a profile.
+  ///
+  /// Should be called when readings are added, deleted, or modified for this
+  /// profile.
+  void invalidateSmoothedCache(int profileId) {
+    _smoothedCache.removeWhere((key, _) => key.startsWith('${profileId}_'));
+  }
+
+  /// Clears all cached smoothed data.
+  void clearSmoothedCache() {
+    _smoothedCache.clear();
   }
 
   /// Correlates sleep sessions with morning readings in the range.

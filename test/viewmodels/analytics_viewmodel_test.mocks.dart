@@ -52,9 +52,20 @@ class _FakeChartDataSet_1 extends _i1.SmartFake implements _i2.ChartDataSet {
         );
 }
 
-class _FakeSleepCorrelationData_2 extends _i1.SmartFake
+class _FakeDualAxisBpData_2 extends _i1.SmartFake
+    implements _i2.DualAxisBpData {
+  _FakeDualAxisBpData_2(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
+class _FakeSleepCorrelationData_3 extends _i1.SmartFake
     implements _i2.SleepCorrelationData {
-  _FakeSleepCorrelationData_2(
+  _FakeSleepCorrelationData_3(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -63,9 +74,9 @@ class _FakeSleepCorrelationData_2 extends _i1.SmartFake
         );
 }
 
-class _FakeSleepStageSeries_3 extends _i1.SmartFake
+class _FakeSleepStageSeries_4 extends _i1.SmartFake
     implements _i2.SleepStageSeries {
-  _FakeSleepStageSeries_3(
+  _FakeSleepStageSeries_4(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -74,9 +85,9 @@ class _FakeSleepStageSeries_3 extends _i1.SmartFake
         );
 }
 
-class _FakeTimeOfDayClassification_4 extends _i1.SmartFake
+class _FakeTimeOfDayClassification_5 extends _i1.SmartFake
     implements _i3.TimeOfDayClassification {
-  _FakeTimeOfDayClassification_4(
+  _FakeTimeOfDayClassification_5(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -163,6 +174,99 @@ class MockAnalyticsService extends _i1.Mock implements _i3.AnalyticsService {
       ) as _i4.Future<_i2.ChartDataSet>);
 
   @override
+  _i4.Future<_i2.ChartDataSet> getChartDataSmoothed({
+    required int? profileId,
+    required _i6.TimeRange? range,
+    required DateTime? startDate,
+    required DateTime? endDate,
+    int? maxPoints = 200,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getChartDataSmoothed,
+          [],
+          {
+            #profileId: profileId,
+            #range: range,
+            #startDate: startDate,
+            #endDate: endDate,
+            #maxPoints: maxPoints,
+          },
+        ),
+        returnValue: _i4.Future<_i2.ChartDataSet>.value(_FakeChartDataSet_1(
+          this,
+          Invocation.method(
+            #getChartDataSmoothed,
+            [],
+            {
+              #profileId: profileId,
+              #range: range,
+              #startDate: startDate,
+              #endDate: endDate,
+              #maxPoints: maxPoints,
+            },
+          ),
+        )),
+      ) as _i4.Future<_i2.ChartDataSet>);
+
+  @override
+  _i4.Future<_i2.DualAxisBpData> getDualAxisBpData({
+    required int? profileId,
+    required _i6.TimeRange? range,
+    required DateTime? startDate,
+    required DateTime? endDate,
+    int? maxPoints = 200,
+    bool? smoothed = false,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getDualAxisBpData,
+          [],
+          {
+            #profileId: profileId,
+            #range: range,
+            #startDate: startDate,
+            #endDate: endDate,
+            #maxPoints: maxPoints,
+            #smoothed: smoothed,
+          },
+        ),
+        returnValue: _i4.Future<_i2.DualAxisBpData>.value(_FakeDualAxisBpData_2(
+          this,
+          Invocation.method(
+            #getDualAxisBpData,
+            [],
+            {
+              #profileId: profileId,
+              #range: range,
+              #startDate: startDate,
+              #endDate: endDate,
+              #maxPoints: maxPoints,
+              #smoothed: smoothed,
+            },
+          ),
+        )),
+      ) as _i4.Future<_i2.DualAxisBpData>);
+
+  @override
+  void invalidateSmoothedCache(int? profileId) => super.noSuchMethod(
+        Invocation.method(
+          #invalidateSmoothedCache,
+          [profileId],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void clearSmoothedCache() => super.noSuchMethod(
+        Invocation.method(
+          #clearSmoothedCache,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
   _i4.Future<_i2.SleepCorrelationData> getSleepCorrelation({
     required int? profileId,
     required DateTime? startDate,
@@ -181,7 +285,7 @@ class MockAnalyticsService extends _i1.Mock implements _i3.AnalyticsService {
           },
         ),
         returnValue: _i4.Future<_i2.SleepCorrelationData>.value(
-            _FakeSleepCorrelationData_2(
+            _FakeSleepCorrelationData_3(
           this,
           Invocation.method(
             #getSleepCorrelation,
@@ -213,7 +317,7 @@ class MockAnalyticsService extends _i1.Mock implements _i3.AnalyticsService {
           },
         ),
         returnValue:
-            _i4.Future<_i2.SleepStageSeries>.value(_FakeSleepStageSeries_3(
+            _i4.Future<_i2.SleepStageSeries>.value(_FakeSleepStageSeries_4(
           this,
           Invocation.method(
             #getSleepStageSeries,
@@ -240,7 +344,7 @@ class MockAnalyticsService extends _i1.Mock implements _i3.AnalyticsService {
             cutoff,
           ],
         ),
-        returnValue: _FakeTimeOfDayClassification_4(
+        returnValue: _FakeTimeOfDayClassification_5(
           this,
           Invocation.method(
             #classifyByTimeOfDay,

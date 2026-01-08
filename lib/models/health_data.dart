@@ -1,10 +1,19 @@
 /// Weight unit for measurements.
 enum WeightUnit {
-  /// Kilograms
+  /// Kilograms (SI unit)
   kg,
 
-  /// Pounds
+  /// Pounds (imperial unit)
   lbs,
+}
+
+/// Temperature unit for measurements.
+enum TemperatureUnit {
+  /// Celsius (SI unit)
+  celsius,
+
+  /// Fahrenheit (imperial unit)
+  fahrenheit,
 }
 
 /// Extension on WeightUnit for conversion utilities.

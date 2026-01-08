@@ -1,6 +1,6 @@
 # Quick Start Guide
 
-Welcome to HyperTrack! This guide will help you get started quickly.
+Welcome to HealthLog! This guide will help you get started quickly.
 
 ## Installation
 

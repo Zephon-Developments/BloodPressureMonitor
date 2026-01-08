@@ -18,11 +18,16 @@ class ChartLegend extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const Text(
+          'Blood Pressure Zones (NICE Guidelines)',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+        ),
+        const SizedBox(height: 4),
         const Wrap(
           spacing: 12,
           runSpacing: 8,
           children: [
-            _LegendEntry(label: 'Normal <135/<85', color: Colors.green),
+            _LegendEntry(label: 'Normal', color: Colors.green),
             _LegendEntry(label: 'Stage 1', color: Colors.amber),
             _LegendEntry(label: 'Stage 2', color: Colors.orange),
             _LegendEntry(label: 'Stage 3', color: Colors.red),
@@ -59,20 +64,24 @@ class _LegendEntry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
+    return Semantics(
+      label: label,
+      excludeSemantics: true,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 12,
+            height: 12,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+            ),
           ),
-        ),
-        const SizedBox(width: 6),
-        Text(label),
-      ],
+          const SizedBox(width: 6),
+          Text(label),
+        ],
+      ),
     );
   }
 }

@@ -81,6 +81,10 @@ class SleepViewModel extends ChangeNotifier {
     required DateTime start,
     required DateTime end,
     int? quality,
+    int? deepMinutes,
+    int? lightMinutes,
+    int? remMinutes,
+    int? awakeMinutes,
     String? notes,
   }) async {
     _isSubmitting = true;
@@ -93,6 +97,10 @@ class SleepViewModel extends ChangeNotifier {
         startedAt: start,
         endedAt: end,
         quality: quality,
+        deepMinutes: deepMinutes,
+        lightMinutes: lightMinutes,
+        remMinutes: remMinutes,
+        awakeMinutes: awakeMinutes,
         notes: _normalize(notes),
       );
 

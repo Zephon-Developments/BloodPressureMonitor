@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:blood_pressure_monitor/models/profile.dart';
 import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart';
@@ -25,21 +26,35 @@ class ProfileFormView extends StatefulWidget {
 class _ProfileFormViewState extends State<ProfileFormView> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
-  late int? _selectedYearOfBirth;
+  late TextEditingController _patientIdController;
+  late TextEditingController _doctorNameController;
+  late TextEditingController _clinicNameController;
+  late DateTime? _selectedDateOfBirth;
   late String _selectedUnits;
+  late String _selectedWeightUnit;
   bool _isSubmitting = false;
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.profile?.name ?? '');
-    _selectedYearOfBirth = widget.profile?.yearOfBirth;
+    _patientIdController =
+        TextEditingController(text: widget.profile?.patientId ?? '');
+    _doctorNameController =
+        TextEditingController(text: widget.profile?.doctorName ?? '');
+    _clinicNameController =
+        TextEditingController(text: widget.profile?.clinicName ?? '');
+    _selectedDateOfBirth = widget.profile?.dateOfBirth;
     _selectedUnits = widget.profile?.preferredUnits ?? 'mmHg';
+    _selectedWeightUnit = widget.profile?.preferredWeightUnit ?? 'kg';
   }
 
   @override
   void dispose() {
     _nameController.dispose();
+    _patientIdController.dispose();
+    _doctorNameController.dispose();
+    _clinicNameController.dispose();
     super.dispose();
   }
 
@@ -53,8 +68,18 @@ class _ProfileFormViewState extends State<ProfileFormView> {
       final profile = Profile(
         id: widget.profile?.id,
         name: _nameController.text.trim(),
-        yearOfBirth: _selectedYearOfBirth,
+        dateOfBirth: _selectedDateOfBirth,
+        patientId: _patientIdController.text.trim().isEmpty
+            ? null
+            : _patientIdController.text.trim(),
+        doctorName: _doctorNameController.text.trim().isEmpty
+            ? null
+            : _doctorNameController.text.trim(),
+        clinicName: _clinicNameController.text.trim().isEmpty
+            ? null
+            : _clinicNameController.text.trim(),
         preferredUnits: _selectedUnits,
+        preferredWeightUnit: _selectedWeightUnit,
         colorHex: widget.profile?.colorHex,
         avatarIcon: widget.profile?.avatarIcon,
         createdAt: widget.profile?.createdAt,
@@ -116,43 +141,134 @@ class _ProfileFormViewState extends State<ProfileFormView> {
                 return null;
               },
             ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<int>(
-              initialValue: _selectedYearOfBirth,
-              decoration: const InputDecoration(
-                labelText: 'Year of Birth (Optional)',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.cake),
-              ),
-              items: [
-                const DropdownMenuItem<int>(
-                  value: null,
-                  child: Text('Not specified'),
-                ),
-                ...List.generate(100, (index) {
-                  final year = DateTime.now().year - index;
-                  return DropdownMenuItem(
-                    value: year,
-                    child: Text(year.toString()),
+            const SizedBox(height: 24),
+            Text(
+              'Medical Information',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            InkWell(
+              onTap: () async {
+                final picked = await showDatePicker(
+                  context: context,
+                  initialDate: _selectedDateOfBirth ??
+                      DateTime.now().subtract(const Duration(days: 365)),
+                  firstDate: DateTime(1900),
+                  lastDate: DateTime.now().subtract(const Duration(days: 365)),
+                  helpText: 'Select Date of Birth',
+                );
+                if (picked != null) {
+                  // Normalize to UTC midnight to avoid timezone issues
+                  setState(
+                    () => _selectedDateOfBirth = DateTime.utc(
+                      picked.year,
+                      picked.month,
+                      picked.day,
+                    ),
                   );
-                }),
-              ],
-              onChanged: (value) =>
-                  setState(() => _selectedYearOfBirth = value),
+                }
+              },
+              child: InputDecorator(
+                decoration: const InputDecoration(
+                  labelText: 'Date of Birth (Optional)',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.calendar_today),
+                  suffixIcon: Icon(Icons.arrow_drop_down),
+                ),
+                child: Text(
+                  _selectedDateOfBirth != null
+                      ? DateFormat.yMMMd().format(_selectedDateOfBirth!)
+                      : 'Not specified',
+                  style: TextStyle(
+                    color: _selectedDateOfBirth != null
+                        ? Theme.of(context).textTheme.bodyLarge?.color
+                        : Theme.of(context).textTheme.bodySmall?.color,
+                  ),
+                ),
+              ),
+            ),
+            if (_selectedDateOfBirth != null) ...[
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton.icon(
+                  onPressed: () => setState(() => _selectedDateOfBirth = null),
+                  icon: const Icon(Icons.clear, size: 16),
+                  label: const Text('Clear'),
+                ),
+              ),
+            ],
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _patientIdController,
+              decoration: const InputDecoration(
+                labelText: 'Patient ID (Optional)',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.badge),
+                hintText: 'e.g., NHS number',
+              ),
+              maxLength: 50,
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _doctorNameController,
+              decoration: const InputDecoration(
+                labelText: 'Doctor\'s Name (Optional)',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.medical_information),
+                hintText: 'e.g., Dr. Jane Smith',
+              ),
+              textCapitalization: TextCapitalization.words,
+              maxLength: 100,
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _clinicNameController,
+              decoration: const InputDecoration(
+                labelText: 'Clinic Name (Optional)',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.local_hospital),
+                hintText: 'e.g., City General Hospital',
+              ),
+              textCapitalization: TextCapitalization.words,
+              maxLength: 100,
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
               initialValue: _selectedUnits,
               decoration: const InputDecoration(
-                labelText: 'Preferred Units',
+                labelText: 'Blood Pressure Units',
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.straighten),
               ),
               items: const [
-                DropdownMenuItem(value: 'mmHg', child: Text('mmHg')),
-                DropdownMenuItem(value: 'kPa', child: Text('kPa')),
+                DropdownMenuItem<String>(value: 'mmHg', child: Text('mmHg')),
+                DropdownMenuItem<String>(value: 'kPa', child: Text('kPa')),
               ],
               onChanged: (value) => setState(() => _selectedUnits = value!),
+            ),
+            const SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              initialValue: _selectedWeightUnit,
+              decoration: const InputDecoration(
+                labelText: 'Weight Units',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.monitor_weight),
+              ),
+              items: const [
+                DropdownMenuItem<String>(
+                  value: 'kg',
+                  child: Text('Kilograms (kg)'),
+                ),
+                DropdownMenuItem<String>(
+                  value: 'lbs',
+                  child: Text('Pounds (lbs)'),
+                ),
+              ],
+              onChanged: (value) =>
+                  setState(() => _selectedWeightUnit = value!),
             ),
             const SizedBox(height: 32),
             ElevatedButton(

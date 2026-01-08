@@ -11,6 +11,8 @@ import 'package:blood_pressure_monitor/models/reading.dart' as _i5;
 import 'package:blood_pressure_monitor/utils/validators.dart' as _i2;
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart'
     as _i4;
+import 'package:blood_pressure_monitor/viewmodels/history_home_viewmodel.dart'
+    as _i11;
 import 'package:blood_pressure_monitor/viewmodels/lock_viewmodel.dart' as _i8;
 import 'package:flutter/services.dart' as _i9;
 import 'package:flutter/widgets.dart' as _i10;
@@ -478,6 +480,148 @@ class MockLockViewModel extends _i1.Mock implements _i8.LockViewModel {
   void didChangeAccessibilityFeatures() => super.noSuchMethod(
         Invocation.method(
           #didChangeAccessibilityFeatures,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+}
+
+/// A class which mocks [HistoryHomeViewModel].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockHistoryHomeViewModel extends _i1.Mock
+    implements _i11.HistoryHomeViewModel {
+  MockHistoryHomeViewModel() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  bool get isLoadingBP => (super.noSuchMethod(
+        Invocation.getter(#isLoadingBP),
+        returnValue: false,
+      ) as bool);
+
+  @override
+  bool get isLoadingWeight => (super.noSuchMethod(
+        Invocation.getter(#isLoadingWeight),
+        returnValue: false,
+      ) as bool);
+
+  @override
+  bool get isLoadingSleep => (super.noSuchMethod(
+        Invocation.getter(#isLoadingSleep),
+        returnValue: false,
+      ) as bool);
+
+  @override
+  bool get isLoadingMedication => (super.noSuchMethod(
+        Invocation.getter(#isLoadingMedication),
+        returnValue: false,
+      ) as bool);
+
+  @override
+  bool get isLoading => (super.noSuchMethod(
+        Invocation.getter(#isLoading),
+        returnValue: false,
+      ) as bool);
+
+  @override
+  bool get hasListeners => (super.noSuchMethod(
+        Invocation.getter(#hasListeners),
+        returnValue: false,
+      ) as bool);
+
+  @override
+  void dispose() => super.noSuchMethod(
+        Invocation.method(
+          #dispose,
+          [],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  _i6.Future<void> loadAllStats() => (super.noSuchMethod(
+        Invocation.method(
+          #loadAllStats,
+          [],
+        ),
+        returnValue: _i6.Future<void>.value(),
+        returnValueForMissingStub: _i6.Future<void>.value(),
+      ) as _i6.Future<void>);
+
+  @override
+  _i6.Future<void> loadBPStats() => (super.noSuchMethod(
+        Invocation.method(
+          #loadBPStats,
+          [],
+        ),
+        returnValue: _i6.Future<void>.value(),
+        returnValueForMissingStub: _i6.Future<void>.value(),
+      ) as _i6.Future<void>);
+
+  @override
+  _i6.Future<void> loadWeightStats() => (super.noSuchMethod(
+        Invocation.method(
+          #loadWeightStats,
+          [],
+        ),
+        returnValue: _i6.Future<void>.value(),
+        returnValueForMissingStub: _i6.Future<void>.value(),
+      ) as _i6.Future<void>);
+
+  @override
+  _i6.Future<void> loadSleepStats() => (super.noSuchMethod(
+        Invocation.method(
+          #loadSleepStats,
+          [],
+        ),
+        returnValue: _i6.Future<void>.value(),
+        returnValueForMissingStub: _i6.Future<void>.value(),
+      ) as _i6.Future<void>);
+
+  @override
+  _i6.Future<void> loadMedicationStats() => (super.noSuchMethod(
+        Invocation.method(
+          #loadMedicationStats,
+          [],
+        ),
+        returnValue: _i6.Future<void>.value(),
+        returnValueForMissingStub: _i6.Future<void>.value(),
+      ) as _i6.Future<void>);
+
+  @override
+  _i6.Future<void> refresh() => (super.noSuchMethod(
+        Invocation.method(
+          #refresh,
+          [],
+        ),
+        returnValue: _i6.Future<void>.value(),
+        returnValueForMissingStub: _i6.Future<void>.value(),
+      ) as _i6.Future<void>);
+
+  @override
+  void addListener(_i7.VoidCallback? listener) => super.noSuchMethod(
+        Invocation.method(
+          #addListener,
+          [listener],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void removeListener(_i7.VoidCallback? listener) => super.noSuchMethod(
+        Invocation.method(
+          #removeListener,
+          [listener],
+        ),
+        returnValueForMissingStub: null,
+      );
+
+  @override
+  void notifyListeners() => super.noSuchMethod(
+        Invocation.method(
+          #notifyListeners,
           [],
         ),
         returnValueForMissingStub: null,

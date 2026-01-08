@@ -33,7 +33,7 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest());
 
       expect(find.byIcon(Icons.lock_outline), findsOneWidget);
-      expect(find.text('HyperTrack'), findsOneWidget);
+      expect(find.text('HealthLog'), findsOneWidget);
     });
 
     testWidgets('shows "Enter PIN to unlock" when PIN is set', (tester) async {

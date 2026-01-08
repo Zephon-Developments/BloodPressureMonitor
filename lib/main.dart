@@ -11,6 +11,7 @@ import 'package:blood_pressure_monitor/services/history_service.dart';
 import 'package:blood_pressure_monitor/services/profile_service.dart';
 import 'package:blood_pressure_monitor/services/reading_service.dart';
 import 'package:blood_pressure_monitor/services/sleep_service.dart';
+import 'package:blood_pressure_monitor/services/stats_service.dart';
 import 'package:blood_pressure_monitor/services/weight_service.dart';
 import 'package:blood_pressure_monitor/services/medication_service.dart';
 import 'package:blood_pressure_monitor/services/medication_intake_service.dart';
@@ -20,10 +21,13 @@ import 'package:blood_pressure_monitor/services/file_manager_service.dart';
 import 'package:blood_pressure_monitor/services/import_service.dart';
 import 'package:blood_pressure_monitor/services/pdf_report_service.dart';
 import 'package:blood_pressure_monitor/services/app_info_service.dart';
+import 'package:blood_pressure_monitor/services/theme_persistence_service.dart';
+import 'package:blood_pressure_monitor/services/units_preference_service.dart';
 import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/analytics_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/history_viewmodel.dart';
+import 'package:blood_pressure_monitor/viewmodels/history_home_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/lock_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/sleep_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/weight_viewmodel.dart';
@@ -34,6 +38,7 @@ import 'package:blood_pressure_monitor/viewmodels/report_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/medication_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/medication_intake_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/medication_group_viewmodel.dart';
+import 'package:blood_pressure_monitor/viewmodels/theme_viewmodel.dart';
 import 'package:blood_pressure_monitor/views/home_view.dart';
 import 'package:blood_pressure_monitor/views/lock/lock_screen.dart';
 import 'package:blood_pressure_monitor/views/profile/profile_picker_view.dart';
@@ -58,11 +63,21 @@ void main() async {
     databaseService: databaseService,
     readingService: readingService,
   );
-  final weightService = WeightService(databaseService);
+  final weightService = WeightService(databaseService, prefs);
+
+  // Perform one-time migration to SI-only storage
+  await weightService.migrateToSIStorage();
+
   final sleepService = SleepService(databaseService);
   final medicationService = MedicationService(databaseService);
   final intakeService = MedicationIntakeService(databaseService);
   final medicationGroupService = MedicationGroupService(databaseService);
+  final statsService = StatsService(
+    readingService: readingService,
+    weightService: weightService,
+    sleepService: sleepService,
+    medicationIntakeService: intakeService,
+  );
   const appInfoService = AppInfoService();
   final analyticsService = AnalyticsService(
     readingService: readingService,
@@ -87,6 +102,7 @@ void main() async {
     sleepService: sleepService,
     medicationService: medicationService,
     intakeService: intakeService,
+    averagingService: averagingService,
   );
   final pdfReportService = PdfReportService(
     analyticsService: analyticsService,
@@ -97,6 +113,13 @@ void main() async {
 
   // Initialize auth service
   final authService = AuthService(prefs: prefs);
+
+  // Initialize theme persistence service and view model
+  final themePersistenceService = ThemePersistenceService(prefs);
+  final themeViewModel = ThemeViewModel(themePersistenceService);
+
+  // Initialize units preference service
+  final unitsPreferenceService = UnitsPreferenceService(prefs);
 
   // Initialize profile service
   final profileService = ProfileService();
@@ -118,6 +141,7 @@ void main() async {
         Provider<HistoryService>.value(value: historyService),
         Provider<WeightService>.value(value: weightService),
         Provider<SleepService>.value(value: sleepService),
+        Provider<StatsService>.value(value: statsService),
         Provider<MedicationService>.value(value: medicationService),
         Provider<MedicationIntakeService>.value(value: intakeService),
         Provider<MedicationGroupService>.value(value: medicationGroupService),
@@ -130,6 +154,9 @@ void main() async {
         Provider<PdfReportService>.value(value: pdfReportService),
         Provider<SharedPreferences>.value(value: prefs),
         Provider<AuthService>.value(value: authService),
+        Provider<ThemePersistenceService>.value(value: themePersistenceService),
+        Provider<UnitsPreferenceService>.value(value: unitsPreferenceService),
+        ChangeNotifierProvider<ThemeViewModel>.value(value: themeViewModel),
         ChangeNotifierProvider<ActiveProfileViewModel>.value(
           value: activeProfileViewModel,
         ),
@@ -152,10 +179,17 @@ void main() async {
             context.read<ActiveProfileViewModel>(),
           ),
         ),
+        ChangeNotifierProvider<HistoryHomeViewModel>(
+          create: (context) => HistoryHomeViewModel(
+            context.read<StatsService>(),
+            context.read<ActiveProfileViewModel>(),
+          ),
+        ),
         ChangeNotifierProvider<WeightViewModel>(
           create: (context) => WeightViewModel(
             context.read<WeightService>(),
             context.read<ActiveProfileViewModel>(),
+            context.read<UnitsPreferenceService>(),
           ),
         ),
         ChangeNotifierProvider<SleepViewModel>(
@@ -224,13 +258,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeViewModel = context.watch<ThemeViewModel>();
+
     return MaterialApp(
-      title: 'HyperTrack',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
+      title: 'HealthLog',
+      theme: themeViewModel.lightTheme,
+      darkTheme: themeViewModel.darkTheme,
+      themeMode: themeViewModel.materialThemeMode,
       home: const _LockGate(),
+      builder: (context, child) {
+        // Global activity tracker for idle timeout
+        // Wraps entire app to catch pointer events on all routes
+        final lockViewModel = context.watch<LockViewModel>();
+        return Listener(
+          onPointerDown: (_) => lockViewModel.recordActivity(),
+          onPointerMove: (_) => lockViewModel.recordActivity(),
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
   }
 }
@@ -333,29 +378,19 @@ class _LockGateState extends State<_LockGate> with WidgetsBindingObserver {
 
       // Show ProfilePickerView if multiple profiles exist
       if (_needsProfileSelection) {
-        mainContent = Listener(
-          onPointerDown: (_) => lockViewModel.recordActivity(),
-          onPointerMove: (_) => lockViewModel.recordActivity(),
-          child: ProfilePickerView(
-            allowBack: false,
-            onProfileSelected: () {
-              if (mounted) {
-                setState(() {
-                  _needsProfileSelection = false;
-                });
-              }
-            },
-          ),
+        mainContent = ProfilePickerView(
+          allowBack: false,
+          onProfileSelected: () {
+            if (mounted) {
+              setState(() {
+                _needsProfileSelection = false;
+              });
+            }
+          },
         );
       } else {
-        // Wrap entire app content to track activity globally
-        // This ensures navigation to other screens still records user activity
-        mainContent = Listener(
-          // Listen to all pointer events to catch interactions anywhere in the app
-          onPointerDown: (_) => lockViewModel.recordActivity(),
-          onPointerMove: (_) => lockViewModel.recordActivity(),
-          child: const HomeView(),
-        );
+        // Home view - activity tracking handled by MaterialApp.builder
+        mainContent = const HomeView();
       }
     }
 
@@ -377,7 +412,7 @@ class _LockGateState extends State<_LockGate> with WidgetsBindingObserver {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'HyperTrack',
+                    'HealthLog',
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
                 ],

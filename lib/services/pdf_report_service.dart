@@ -97,7 +97,7 @@ class PdfReportService {
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         pw.Text(
-          'HyperTrack - Doctor Report',
+          'HealthLog - Doctor Report',
           style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
         ),
         pw.SizedBox(height: 10),

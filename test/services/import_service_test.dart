@@ -44,6 +44,7 @@ void main() {
   late MockSleepService sleepService;
   late MockMedicationService medicationService;
   late MockMedicationIntakeService intakeService;
+  late MockAveragingService averagingService;
   late ImportService importService;
   late Directory tempDir;
 
@@ -53,12 +54,14 @@ void main() {
     sleepService = MockSleepService();
     medicationService = MockMedicationService();
     intakeService = MockMedicationIntakeService();
+    averagingService = MockAveragingService();
     importService = ImportService(
       readingService: readingService,
       weightService: weightService,
       sleepService: sleepService,
       medicationService: medicationService,
       intakeService: intakeService,
+      averagingService: averagingService,
     );
     tempDir = Directory.systemTemp.createTempSync('import_service_test');
   });

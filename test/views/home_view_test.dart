@@ -12,13 +12,14 @@ import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart'
 import 'package:blood_pressure_monitor/viewmodels/analytics_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/blood_pressure_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/history_viewmodel.dart';
+import 'package:blood_pressure_monitor/viewmodels/history_home_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/lock_viewmodel.dart';
 import 'package:blood_pressure_monitor/views/home_view.dart';
 import 'package:blood_pressure_monitor/views/readings/add_reading_view.dart';
 import 'package:blood_pressure_monitor/views/settings/security_settings_view.dart';
 import 'package:blood_pressure_monitor/views/analytics/analytics_view.dart';
 
-@GenerateMocks([BloodPressureViewModel, LockViewModel])
+@GenerateMocks([BloodPressureViewModel, LockViewModel, HistoryHomeViewModel])
 import 'home_view_test.mocks.dart';
 import '../test_mocks.mocks.dart'
     show MockHistoryService, MockActiveProfileViewModel;
@@ -32,6 +33,7 @@ void main() {
     late MockHistoryService mockHistoryService;
     late MockAnalyticsService mockAnalyticsService;
     late MockActiveProfileViewModel mockActiveProfileViewModel;
+    late MockHistoryHomeViewModel mockHistoryHomeViewModel;
     late HistoryViewModel historyViewModel;
     late AnalyticsViewModel analyticsViewModel;
 
@@ -41,8 +43,23 @@ void main() {
       mockHistoryService = MockHistoryService();
       mockAnalyticsService = MockAnalyticsService();
       mockActiveProfileViewModel = MockActiveProfileViewModel();
+      mockHistoryHomeViewModel = MockHistoryHomeViewModel();
       when(mockActiveProfileViewModel.activeProfileId).thenReturn(1);
       when(mockActiveProfileViewModel.activeProfileName).thenReturn('Default');
+      when(mockHistoryHomeViewModel.loadAllStats()).thenAnswer((_) async {});
+      when(mockHistoryHomeViewModel.isLoading).thenReturn(false);
+      when(mockHistoryHomeViewModel.bloodPressureStats).thenReturn(null);
+      when(mockHistoryHomeViewModel.weightStats).thenReturn(null);
+      when(mockHistoryHomeViewModel.sleepStats).thenReturn(null);
+      when(mockHistoryHomeViewModel.medicationStats).thenReturn(null);
+      when(mockHistoryHomeViewModel.isLoadingBP).thenReturn(false);
+      when(mockHistoryHomeViewModel.isLoadingWeight).thenReturn(false);
+      when(mockHistoryHomeViewModel.isLoadingSleep).thenReturn(false);
+      when(mockHistoryHomeViewModel.isLoadingMedication).thenReturn(false);
+      when(mockHistoryHomeViewModel.errorBP).thenReturn(null);
+      when(mockHistoryHomeViewModel.errorWeight).thenReturn(null);
+      when(mockHistoryHomeViewModel.errorSleep).thenReturn(null);
+      when(mockHistoryHomeViewModel.errorMedication).thenReturn(null);
       when(mockViewModel.loadReadings()).thenAnswer((_) async {});
       when(mockViewModel.isLoading).thenReturn(false);
       when(mockViewModel.error).thenReturn(null);
@@ -139,6 +156,9 @@ void main() {
           ChangeNotifierProvider<HistoryViewModel>.value(
             value: historyViewModel,
           ),
+          ChangeNotifierProvider<HistoryHomeViewModel>.value(
+            value: mockHistoryHomeViewModel,
+          ),
           ChangeNotifierProvider<AnalyticsViewModel>.value(
             value: analyticsViewModel,
           ),
@@ -153,7 +173,7 @@ void main() {
       await tester.pumpWidget(createWidget());
       await tester.pumpAndSettle();
 
-      expect(find.text('HyperTrack'), findsOneWidget);
+      expect(find.text('HealthLog'), findsOneWidget);
       expect(find.byType(AppBar), findsOneWidget);
     });
 
@@ -209,9 +229,11 @@ void main() {
       await tester.pumpWidget(createWidget());
       await tester.pumpAndSettle();
 
-      // Should show Quick Actions and Recent Readings
-      expect(find.text('Quick Actions'), findsOneWidget);
-      expect(find.text('Recent Readings'), findsOneWidget);
+      // Should show Profile Homepage buttons
+      expect(find.text('Log Blood Pressure / Pulse'), findsOneWidget);
+      expect(find.text('Log Medication'), findsOneWidget);
+      expect(find.text('Log Sleep'), findsOneWidget);
+      expect(find.text('Log Weight'), findsOneWidget);
     });
 
     testWidgets('switches to history tab when tapped',
@@ -223,8 +245,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('History'), findsAtLeastNWidgets(2));
-      expect(find.text('Filters'), findsOneWidget);
-      expect(find.text('No history yet'), findsOneWidget);
+      // HistoryHomeView has sections, not "Filters" and "No history yet"
+      expect(find.text('Blood Pressure'), findsOneWidget);
+      expect(find.text('Weight'), findsOneWidget);
+      expect(find.text('Sleep'), findsOneWidget);
     });
 
     testWidgets('switches to charts tab when tapped',
@@ -266,7 +290,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Initially Home
-      expect(find.text('HyperTrack'), findsOneWidget);
+      expect(find.text('HealthLog'), findsOneWidget);
 
       // Switch to History
       await tester.tap(find.text('History'));
@@ -289,7 +313,7 @@ void main() {
       await tester.pumpWidget(createWidget());
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Add Blood Pressure Reading'));
+      await tester.tap(find.text('Log Blood Pressure / Pulse'));
       await tester.pumpAndSettle();
 
       expect(find.byType(AddReadingView), findsOneWidget);
@@ -303,7 +327,8 @@ void main() {
       // History stub
       await tester.tap(find.text('History'));
       await tester.pumpAndSettle();
-      expect(find.text('No history yet'), findsOneWidget);
+      // HistoryHomeView shows section titles even when empty
+      expect(find.text('Blood Pressure'), findsOneWidget);
 
       // Charts stub
       await tester.tap(find.text('Charts'));
@@ -312,7 +337,8 @@ void main() {
       expect(find.byIcon(Icons.bedtime_outlined), findsOneWidget);
     });
 
-    testWidgets('settings tab items are disabled', (WidgetTester tester) async {
+    testWidgets('settings tab has Appearance and About items enabled',
+        (WidgetTester tester) async {
       await tester.pumpWidget(createWidget());
       await tester.pumpAndSettle();
 
@@ -333,8 +359,9 @@ void main() {
         find.ancestor(of: find.text('About'), matching: find.byType(ListTile)),
       );
 
-      expect(appearanceTile.enabled, isFalse);
-      expect(aboutTile.enabled, isFalse);
+      // Phase 17 enabled these items
+      expect(appearanceTile.enabled, isTrue);
+      expect(aboutTile.enabled, isTrue);
     });
   });
 }

@@ -1,6 +1,6 @@
 # Versioning Guide
 
-This document describes how versioning works in the HyperTrack application.
+This document describes how versioning works in the HealthLog application.
 
 ## Semantic Versioning
 
