@@ -1,3 +1,114 @@
+# Handoff: Steve to Tracy - Phase 17 Planning Required
+
+## Date
+2025-12-31
+
+## Status
+Phase 16 (Profile-Centric UI Redesign) has been successfully completed and merged to main via PR #29. We are now ready to initiate Phase 17: Zephon Branding & Appearance Settings.
+
+## Phase 16 Completion Summary
+- ✅ PR #29 merged to main
+- ✅ Feature branch `feature/phase-16-profile-ui` deleted
+- ✅ All 686 tests passing
+- ✅ Zero lint issues
+- ✅ Full profile CRUD implementation
+- ✅ Complete ViewModel reactivity across all data scopes
+- ✅ Implementation_Schedule.md updated
+
+## Next Phase: Phase 17 - Zephon Branding & Appearance Settings
+
+### Scope (from Implementation_Schedule.md)
+About screen with Zephon branding and customizable appearance.
+
+### Requirements
+1. **About Screen**
+   - Add Settings → About HyperTrack with:
+     - App name/version display
+     - Zephon link/tagline
+     - Privacy disclaimer
+   
+2. **Appearance Settings**
+   - Add Settings → Appearance with:
+     - Theme mode (light/dark/system)
+     - Accent palette selector
+     - Font scaling (normal/large/XL)
+     - Optional high-contrast toggle
+
+3. **Architecture**
+   - Centralize theming in a ThemeViewModel
+   - Persist settings in SharedPreferences
+   - Live theme updates without app restart
+
+### Dependencies
+- ✅ Phase 14 (rebrand complete)
+- ✅ Phase 16 (shell available for settings entry)
+
+### Acceptance Criteria
+- Theme/accent/font changes apply live and persist across restarts
+- About screen shows Zephon branding and opens link safely
+- Widget/unit tests for toggles and persistence
+- Analyzer/tests pass
+
+## Request for Tracy
+
+Please create a comprehensive implementation plan for Phase 17 that includes:
+
+1. **Scope Definition**
+   - Detailed breakdown of About screen requirements
+   - Detailed breakdown of Appearance settings requirements
+   - Success metrics and constraints
+
+2. **Technical Design**
+   - ThemeViewModel architecture and state management
+   - SharedPreferences schema for settings persistence
+   - Theme data models and enumerations
+   - Material 3 theming integration approach
+
+3. **Implementation Tasks**
+   - Models: Theme preferences, accent colors, font scales
+   - Services: Settings persistence service
+   - ViewModels: ThemeViewModel with reactive updates
+   - Views: About screen, Appearance settings screen
+   - Widgets: Theme selector, accent palette picker, font scale slider
+   - Integration: Settings menu structure
+
+4. **Testing Strategy**
+   - Unit tests for ThemeViewModel
+   - Widget tests for settings screens
+   - Integration tests for theme persistence
+   - Accessibility tests for high-contrast mode
+
+5. **Quality Assurance**
+   - Compliance with CODING_STANDARDS.md
+   - Test coverage targets (≥85% ViewModels, ≥70% Widgets)
+   - Documentation requirements (DartDoc for public APIs)
+
+6. **Risk Assessment**
+   - Potential blockers or challenges
+   - Dependencies on third-party packages
+   - Breaking changes or migration needs
+
+Please structure the plan with clear tasks, file changes, and acceptance criteria for Clive's review before implementation begins.
+
+## Reference Documents
+- [Implementation_Schedule.md](../Plans/Implementation_Schedule.md) - Phase 17 overview
+- [CODING_STANDARDS.md](../Standards/CODING_STANDARDS.md) - Quality requirements
+- [Phase 16 Review](../../reviews/2025-12-31-clive-phase-16-extension-review-v2.md) - Recent approval pattern
+
+## Timeline
+Target completion: TBD (pending Tracy's plan and stakeholder approval)
+
+---
+**Workflow Conductor**: Steve  
+**Next Agent**: Tracy (Planning & Architecture)  
+**Suggested User Prompt**: "Tracy, please create the implementation plan for Phase 17 as outlined in the handoff document."
+
+---
+---
+---
+
+# ARCHIVE: Phase 15 Handoff Content
+
 # Handoff: Steve → Tracy
 ## Phase 24E – Landscape Responsiveness
 
