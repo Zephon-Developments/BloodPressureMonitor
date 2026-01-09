@@ -1,41 +1,22 @@
-# Handoff: Clive → Steve
+# Handoff: Clive to Steve
 
-**Date**: 2026-01-06  
-**From**: Clive (Quality Assurance)  
-**To**: Steve (Deployment Manager)  
-**Status**: ✅ **APPROVED FOR DEPLOYMENT**
+## Status
+Phase 26 Service Layer is implemented but facing a **critical blocker** in CI (Linux xHost, Dart 3.11.0-274.0.dev).
 
----
+## Context
+A `Segmentation fault` occurs during test runs, specifically during the compilation/transformation phase of libraries. This is likely due to the massive constant tables in `pointycastle/export.dart` stressing the `dev` SDK's compiler.
 
-## 1. Summary of Changes
-The dual implementation of **Product Rebranding** and **BP Chart Architectural Redesign** is successful and verified.
+## Actions Taken
+- Verified that all Phase 26 tests (10/10) pass on **Stable SDK (3.10.4)**.
+- Attempted import minimization for PointyCastle, but the library structure makes this difficult without significantly more effort.
+- Documented the crash in [reviews/2026-01-09-clive-phase-26-stability-review.md](reviews/2026-01-09-clive-phase-26-stability-review.md).
 
-### Key Deliverables:
-1.  **Rebranding**: The application is now **HealthLog**.
-    - All user-visible strings, app labels, and documentation have been updated.
-    - Historical rebranding artifacts from previous phases were preserved, but all active plans and current app state are synchronized.
-2.  **Split BP Chart**:
-    - **Visual Architecture**: Implemented a center-baseline chart where Systolic values are plotted above (positive) and Diastolic below (negative).
-    - **Clinical Bands**: Background color zones follow NICE Home Monitoring guidelines (v2026 standards).
-    - **UX Enhancements**:
-        - Fixed the X-axis label overlap by implementing adaptive spacing and 30° rotation.
-        - Resolved the Variability (SD/CV) overflow in the analytics summary card by switching to a more flexible flex-column layout.
-    - **Data Integrity**: Maintained the logic that storage remains positive; negation is a visual transform only, reversed in tooltips and axis labels for user clarity.
+## Recommended Next Steps
+1. **Developer Action**: Steve should evaluate the CI environment. If possible, lock the CI to a **Stable Dart SDK**.
+2. **Alternative Implementation**: If the `dev` SDK must be used, refactor `BackupService` to use `sqlcipher_export`. This would remove the `pointycastle` dependency and solve the crash while improving performance.
+3. **UI Implementation**: Do not proceed with Phase 26B UI until the crash is resolved, as it will likely block those tests as well.
 
-## 2. Verification Results
-- **Static Analysis**: `flutter analyze` passed with 0 issues.
-- **Unit/Widget Tests**: 1041/1041 tests passing.
-- **Standards**: Zero medical inference maintained; evaluative labels remain removed.
-- **Formatting**: All files satisfy `dart format`.
-
-## 3. Deployment Readiness
-The code is ready for merge into `main`. 
-
-### Recommendations for Steve:
-- Ensure the user is aware that the "HyperTrack" folder name on their device (if any) or the app icon label will update to "HealthLog" upon installation of this version.
-- Re-running the CSV import is **NOT** required for these visual changes to take effect, as they operate on existing `DualAxisBpData` provider.
-
----
-**Clive**  
-*Dedicated Reviewer*
+## Files to Watch
+- [lib/services/backup_service.dart](lib/services/backup_service.dart)
+- [test/services/backup_service_test.dart](test/services/backup_service_test.dart)
 

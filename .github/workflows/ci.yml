@@ -25,12 +25,12 @@ jobs:
         java-version: '17'
 
     # ---------------------------------------------------------
-    # Flutter SDK (beta channel)
+    # Flutter SDK (stable channel)
     # ---------------------------------------------------------
-    - name: Setup Flutter (beta)
+    - name: Setup Flutter (stable)
       uses: subosito/flutter-action@v2
       with:
-        channel: 'master'
+        channel: 'stable'
         architecture: x64
 
     # ---------------------------------------------------------
