@@ -26,8 +26,6 @@ dependencies:
   # Authentication
   local_auth: ^2.3.0
   shared_preferences: ^2.3.3
-  crypto: ^3.0.3
-  pointycastle: ^3.9.1
   
   # Utilities
   intl: ^0.18.1

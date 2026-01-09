@@ -1,15 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
-import 'dart:typed_data';
 
-import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
-import 'package:pointycastle/export.dart';
+import 'package:sqflite_sqlcipher/sqflite.dart';
 
 import 'package:blood_pressure_monitor/services/app_info_service.dart';
 import 'package:blood_pressure_monitor/services/database_service.dart';
@@ -86,15 +83,12 @@ enum RestoreErrorType {
 
 /// Service for creating and restoring encrypted full-app backups.
 ///
-/// Uses AES-256-GCM for encryption with PBKDF2-HMAC-SHA256 key derivation.
+/// Uses SQLCipher's native backup functionality with AES-256 encryption.
 /// Backups are stored in a custom .htb (HealthLog Backup) format with
-/// header metadata and encrypted SQLCipher database payload.
+/// metadata header and encrypted SQLCipher database.
 class BackupService {
   static const String _backupExtension = '.htb';
-  static const String _magicHeader = 'HTB1';
-  static const int _saltLength = 32;
-  static const int _ivLength = 12;
-  static const int _kdfIterations = 100000;
+  static const String _magicHeader = 'HTB2'; // Version 2 for SQLCipher-native
   static const int _minPassphraseLength = 8;
 
   final AppInfoService _appInfoService;
@@ -110,16 +104,16 @@ class BackupService {
   ///
   /// The backup process:
   /// 1. Validates passphrase strength (min 8 chars)
-  /// 2. Reads the SQLCipher database file
-  /// 3. Computes SHA-256 checksum of plaintext
-  /// 4. Derives encryption key using PBKDF2 (100k iterations)
-  /// 5. Encrypts with AES-256-GCM
-  /// 6. Writes .htb file with header + encrypted payload
+  /// 2. Uses SQLCipher's ATTACH/sqlcipher_export to create encrypted copy
+  /// 3. Wraps the encrypted DB in .htb format with metadata header
+  /// 4. Writes final backup file with header + encrypted database
   ///
-  /// Heavy cryptographic operations run in an isolate to avoid UI jank.
+  /// CRITICAL: Uses SQLCipher's native C-level encryption (AES-256-CBC).
   Future<BackupResult> createBackup({
     required String passphrase,
   }) async {
+    File? tempBackupFile;
+
     try {
       // Validate passphrase strength
       if (passphrase.length < _minPassphraseLength) {
@@ -130,64 +124,91 @@ class BackupService {
         );
       }
 
-      // Get database file path
-      final dbFile = await _getDatabaseFile();
-      if (!await dbFile.exists()) {
-        return const BackupFailure(
-          message: 'Database file not found.',
-          errorType: BackupErrorType.databaseAccess,
-        );
-      }
+      // Get main database
+      final dbService = DatabaseService();
+      final mainDb = await dbService.database;
 
-      // Read database file
-      final Uint8List dbBytes = await dbFile.readAsBytes();
+      // Generate backup filename
+      final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+      final backupDir = await getApplicationDocumentsDirectory();
 
-      // Compute checksum of plaintext
-      final checksumBytes = sha256.convert(dbBytes).bytes;
+      // Create temporary encrypted database
+      final tempBackupPath = path.join(
+        backupDir.path,
+        'temp_backup_$timestamp.db',
+      );
+      tempBackupFile = File(tempBackupPath);
+
+      // Use SQLCipher's native backup: ATTACH + sqlcipher_export
+      await mainDb.execute(
+        'ATTACH DATABASE ? AS backup KEY ?',
+        [tempBackupPath, passphrase],
+      );
+
+      await mainDb.execute('SELECT sqlcipher_export(\'backup\')');
+      await mainDb.execute('DETACH DATABASE backup');
+
+      debugPrint('SQLCipher export completed to $tempBackupPath');
+
+      // Read the encrypted database file
+      final encryptedDbBytes = await tempBackupFile.readAsBytes();
 
       // Get app version
       final appVersion = await _appInfoService.getAppVersion();
 
-      // Prepare encryption parameters
-      final encryptionParams = _EncryptionParams(
-        plaintext: dbBytes,
-        passphrase: passphrase,
+      // Build header
+      final header = _buildHeader(
         appVersion: appVersion,
         schemaVersion: DatabaseService.schemaVersion,
-        plaintextChecksum: Uint8List.fromList(checksumBytes),
+        payloadSize: encryptedDbBytes.length,
       );
 
-      // Run encryption in isolate
-      final encryptedData = await compute(
-        _encryptInIsolate,
-        encryptionParams,
+      // Combine header + encrypted database
+      final finalBackupPath = path.join(
+        backupDir.path,
+        'HealthLog_backup_$timestamp$_backupExtension',
       );
 
-      // Generate backup filename
-      final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
-      final filename = 'HealthLog_backup_$timestamp$_backupExtension';
+      final finalBackupFile = File(finalBackupPath);
+      final sink = finalBackupFile.openWrite();
+      sink.add(header);
+      sink.add(encryptedDbBytes);
+      await sink.flush();
+      await sink.close();
 
-      // Get backup directory
-      final backupDir = await getApplicationDocumentsDirectory();
-      final backupPath = path.join(backupDir.path, filename);
+      // Clean up temp file
+      await tempBackupFile.delete();
 
-      // Write backup file
-      final backupFile = File(backupPath);
-      await backupFile.writeAsBytes(encryptedData, flush: true);
+      final fileSize = await finalBackupFile.length();
 
       return BackupSuccess(
-        filePath: backupPath,
-        sizeBytes: encryptedData.length,
+        filePath: finalBackupPath,
+        sizeBytes: fileSize,
       );
     } on BackupFailure catch (e) {
       return e;
     } catch (e, stackTrace) {
       debugPrint('Unexpected error during backup: $e');
       debugPrint(stackTrace.toString());
+
+      // Clean up temp file
+      if (tempBackupFile != null && await tempBackupFile.exists()) {
+        await tempBackupFile.delete();
+      }
+
       return BackupFailure(
-        message: 'An unexpected error occurred during backup.',
+        message: 'An unexpected error occurred during backup: $e',
         errorType: BackupErrorType.unexpected,
       );
+    } finally {
+      // Ensure backup database is detached
+      try {
+        final dbService = DatabaseService();
+        final mainDb = await dbService.database;
+        await mainDb.execute('DETACH DATABASE backup');
+      } catch (_) {
+        // Ignore detach errors (may not be attached)
+      }
     }
   }
 
@@ -197,16 +218,14 @@ class BackupService {
   /// details on failure.
   ///
   /// The restore process:
-  /// 1. Validates backup file exists and is readable
-  /// 2. Parses header and validates magic/version
+  /// 1. Validates backup file exists and header is valid
+  /// 2. Checks schema compatibility
   /// 3. Checks free space (must be ≥2x backup size)
   /// 4. Creates checkpoint of current database
-  /// 5. Derives decryption key using PBKDF2
-  /// 6. Decrypts payload in isolate
-  /// 7. Validates checksum of decrypted data
-  /// 8. Checks schema compatibility
-  /// 9. Atomically swaps database file
-  /// 10. Rolls back to checkpoint on any failure
+  /// 5. Opens backup file with user passphrase
+  /// 6. Exports to new database file
+  /// 7. Atomically swaps database file
+  /// 8. Rolls back to checkpoint on any failure
   ///
   /// CRITICAL: Existing database is preserved if restore fails.
   Future<RestoreResult> restoreBackup({
@@ -214,6 +233,7 @@ class BackupService {
     required String backupPath,
   }) async {
     File? checkpoint;
+    File? tempRestoreFile;
 
     try {
       // Validate backup file
@@ -225,11 +245,10 @@ class BackupService {
         );
       }
 
-      // Read backup file
+      // Read and parse header
       final backupBytes = await backupFile.readAsBytes();
-
-      // Parse header
       final headerResult = _parseHeader(backupBytes);
+
       if (headerResult is _HeaderParseFailure) {
         return RestoreFailure(
           message: headerResult.message,
@@ -248,7 +267,7 @@ class BackupService {
         );
       }
 
-      // Check free space (need at least 2x backup size)
+      // Check free space
       final documentsDir = await getApplicationDocumentsDirectory();
       final availableSpace = await _getAvailableSpace(documentsDir.path);
       final requiredSpace = backupBytes.length * 2;
@@ -272,41 +291,40 @@ class BackupService {
         debugPrint('Created database checkpoint at $checkpointPath');
       }
 
-      // Extract encrypted payload
-      final payload = backupBytes.sublist(header.headerLength);
+      // Extract encrypted database from backup
+      final encryptedDb = backupBytes.sublist(header.headerLength);
 
-      // Prepare decryption parameters
-      final decryptionParams = _DecryptionParams(
-        encryptedPayload: payload,
-        passphrase: passphrase,
-        saltEnc: header.saltEnc,
-        iv: header.iv,
-        authTag: header.authTag,
-        expectedChecksum: header.checksum,
-      );
+      // Write encrypted DB to temporary file
+      final tempRestorePath = '${dbFile.path}.restore_temp';
+      tempRestoreFile = File(tempRestorePath);
+      await tempRestoreFile.writeAsBytes(encryptedDb, flush: true);
 
-      // Run decryption in isolate
-      final decryptResult = await compute(
-        _decryptInIsolate,
-        decryptionParams,
-      );
+      // Try to open backup database with passphrase
+      Database? testDb;
+      try {
+        testDb = await openDatabase(
+          tempRestorePath,
+          password: passphrase,
+          readOnly: true,
+        );
 
-      if (decryptResult is _DecryptFailure) {
+        // Validate it's a valid SQLCipher database
+        await testDb.rawQuery('SELECT COUNT(*) FROM sqlite_master');
+        await testDb.close();
+      } catch (e) {
+        await testDb?.close();
         return RestoreFailure(
-          message: decryptResult.message,
-          errorType: decryptResult.errorType,
+          message:
+              'Failed to open backup file. Incorrect passphrase or corrupted backup.',
+          errorType: RestoreErrorType.wrongPassphrase,
         );
       }
 
-      final decryptedDb = (decryptResult as _DecryptSuccess).plaintext;
-
-      // Close database connection before swap
+      // Close main database connection before swap
       await DatabaseService.closeDatabase();
 
       // Atomic file swap
-      final tempFile = File('${dbFile.path}.restore_temp');
-      await tempFile.writeAsBytes(decryptedDb, flush: true);
-      await tempFile.rename(dbFile.path);
+      await tempRestoreFile.rename(dbFile.path);
 
       debugPrint('Database restored successfully');
 
@@ -326,6 +344,12 @@ class BackupService {
           debugPrint('Failed to rollback to checkpoint: $rollbackError');
         }
       }
+
+      // Clean up temp restore file
+      if (tempRestoreFile != null && await tempRestoreFile.exists()) {
+        await tempRestoreFile.delete();
+      }
+
       return e;
     } catch (e, stackTrace) {
       debugPrint('Unexpected error during restore: $e');
@@ -343,8 +367,13 @@ class BackupService {
         }
       }
 
+      // Clean up temp restore file
+      if (tempRestoreFile != null && await tempRestoreFile.exists()) {
+        await tempRestoreFile.delete();
+      }
+
       return RestoreFailure(
-        message: 'An unexpected error occurred during restore.',
+        message: 'An unexpected error occurred during restore: $e',
         errorType: RestoreErrorType.unexpected,
       );
     }
@@ -368,6 +397,92 @@ class BackupService {
     } catch (e) {
       debugPrint('Error validating backup: $e');
       return false;
+    }
+  }
+
+  /// Builds a metadata header for the backup file.
+  List<int> _buildHeader({
+    required String appVersion,
+    required int schemaVersion,
+    required int payloadSize,
+  }) {
+    final buffer = <int>[];
+
+    // Magic header (4 bytes)
+    buffer.addAll(utf8.encode(_magicHeader));
+
+    // App version length (4 bytes, little-endian)
+    final appVersionBytes = utf8.encode(appVersion);
+    buffer.addAll(_uint32Bytes(appVersionBytes.length));
+
+    // App version (variable)
+    buffer.addAll(appVersionBytes);
+
+    // Schema version (4 bytes)
+    buffer.addAll(_uint32Bytes(schemaVersion));
+
+    // Created timestamp (8 bytes)
+    final createdMs = DateTime.now().millisecondsSinceEpoch;
+    buffer.addAll(_uint64Bytes(createdMs));
+
+    // Payload length (8 bytes)
+    buffer.addAll(_uint64Bytes(payloadSize));
+
+    return buffer;
+  }
+
+  /// Parses the backup file header.
+  _HeaderParseResult _parseHeader(List<int> data) {
+    try {
+      if (data.length < 30) {
+        return _HeaderParseFailure('File too small to be valid backup');
+      }
+
+      int offset = 0;
+
+      // Magic header (4 bytes)
+      final magic = utf8.decode(data.sublist(offset, offset + 4));
+      offset += 4;
+
+      if (magic != _magicHeader) {
+        return _HeaderParseFailure(
+          'Invalid file format (expected $_magicHeader, got $magic)',
+        );
+      }
+
+      // App version length (4 bytes)
+      final appVersionLength = _readUint32(data, offset);
+      offset += 4;
+
+      // App version (variable)
+      final appVersion =
+          utf8.decode(data.sublist(offset, offset + appVersionLength));
+      offset += appVersionLength;
+
+      // Schema version (4 bytes)
+      final schemaVersion = _readUint32(data, offset);
+      offset += 4;
+
+      // Created timestamp (8 bytes)
+      final createdMs = _readUint64(data, offset);
+      offset += 8;
+
+      // Payload length (8 bytes)
+      final payloadLength = _readUint64(data, offset);
+      offset += 8;
+
+      final header = _BackupHeader(
+        magic: magic,
+        appVersion: appVersion,
+        schemaVersion: schemaVersion,
+        createdAt: DateTime.fromMillisecondsSinceEpoch(createdMs),
+        payloadLength: payloadLength,
+        headerLength: offset,
+      );
+
+      return _HeaderParseSuccess(header);
+    } catch (e) {
+      return _HeaderParseFailure('Header parsing failed: $e');
     }
   }
 
@@ -402,353 +517,58 @@ class BackupService {
     return 1024 * 1024 * 1024;
   }
 
-  /// Parses the backup file header.
-  _HeaderParseResult _parseHeader(Uint8List data) {
-    try {
-      if (data.length < 100) {
-        return _HeaderParseFailure('File too small to be valid backup');
-      }
-
-      int offset = 0;
-
-      // Magic header (4 bytes)
-      final magic = utf8.decode(data.sublist(offset, offset + 4));
-      offset += 4;
-      if (magic != _magicHeader) {
-        return _HeaderParseFailure('Invalid file format (magic: $magic)');
-      }
-
-      // App version length (4 bytes)
-      final appVersionLength = ByteData.sublistView(
-        data,
-        offset,
-        offset + 4,
-      ).getUint32(0, Endian.little);
-      offset += 4;
-
-      // App version (variable)
-      final appVersion =
-          utf8.decode(data.sublist(offset, offset + appVersionLength));
-      offset += appVersionLength;
-
-      // Schema version (4 bytes)
-      final schemaVersion = ByteData.sublistView(
-        data,
-        offset,
-        offset + 4,
-      ).getUint32(0, Endian.little);
-      offset += 4;
-
-      // Created timestamp (8 bytes)
-      final createdMs = ByteData.sublistView(
-        data,
-        offset,
-        offset + 8,
-      ).getUint64(0, Endian.little);
-      offset += 8;
-
-      // Salt for encryption (32 bytes)
-      final saltEnc = Uint8List.fromList(data.sublist(offset, offset + 32));
-      offset += 32;
-
-      // Salt for checksum (32 bytes) - currently unused but reserved
-      offset += 32; // skip saltChk
-
-      // IV/Nonce (12 bytes)
-      final iv = Uint8List.fromList(data.sublist(offset, offset + 12));
-      offset += 12;
-
-      // Auth tag length (4 bytes)
-      final authTagLength = ByteData.sublistView(
-        data,
-        offset,
-        offset + 4,
-      ).getUint32(0, Endian.little);
-      offset += 4;
-
-      // Auth tag (variable, typically 16 bytes for GCM)
-      final authTag =
-          Uint8List.fromList(data.sublist(offset, offset + authTagLength));
-      offset += authTagLength;
-
-      // Checksum (32 bytes SHA-256)
-      final checksum = Uint8List.fromList(data.sublist(offset, offset + 32));
-      offset += 32;
-
-      // Payload length (8 bytes)
-      final payloadLength = ByteData.sublistView(
-        data,
-        offset,
-        offset + 8,
-      ).getUint64(0, Endian.little);
-      offset += 8;
-
-      final header = _BackupHeader(
-        magic: magic,
-        appVersion: appVersion,
-        schemaVersion: schemaVersion,
-        createdAt: DateTime.fromMillisecondsSinceEpoch(createdMs),
-        saltEnc: saltEnc,
-        iv: iv,
-        authTag: authTag,
-        checksum: checksum,
-        payloadLength: payloadLength,
-        headerLength: offset,
-      );
-
-      return _HeaderParseSuccess(header);
-    } catch (e) {
-      return _HeaderParseFailure('Header parsing failed: $e');
-    }
-  }
-
-  /// Encrypts data in an isolate (static top-level function).
-  static Uint8List _encryptInIsolate(_EncryptionParams params) {
-    // Generate random salts and IV
-    final saltEnc = _generateRandomBytes(_saltLength);
-    final saltChk = _generateRandomBytes(_saltLength); // Reserved
-    final iv = _generateRandomBytes(_ivLength);
-
-    // Derive encryption key using PBKDF2
-    final key = _deriveKey(
-      passphrase: params.passphrase,
-      salt: saltEnc,
-      iterations: _kdfIterations,
-    );
-
-    // Encrypt with AES-256-GCM
-    final cipher = GCMBlockCipher(AESEngine())
-      ..init(
-        true,
-        AEADParameters(
-          KeyParameter(key),
-          128, // 128-bit authentication tag
-          iv,
-          Uint8List(0), // No additional authenticated data
-        ),
-      );
-
-    // In GCM mode, process() returns ciphertext + auth tag combined
-    final encryptedWithTag = cipher.process(params.plaintext);
-
-    // Extract auth tag (last 16 bytes) and ciphertext
-    final authTagLength = 16; // 128 bits
-    final ciphertextLength = encryptedWithTag.length - authTagLength;
-    final encrypted = Uint8List.fromList(
-      encryptedWithTag.sublist(0, ciphertextLength),
-    );
-    final authTag = Uint8List.fromList(
-      encryptedWithTag.sublist(ciphertextLength),
-    );
-
-    // Build header
-    final appVersionBytes = utf8.encode(params.appVersion);
-    final createdMs = DateTime.now().millisecondsSinceEpoch;
-
-    final header = BytesBuilder();
-    header.add(utf8.encode(_magicHeader)); // 4 bytes
-    header.add(_uint32Bytes(appVersionBytes.length)); // 4 bytes
-    header.add(appVersionBytes); // variable
-    header.add(_uint32Bytes(params.schemaVersion)); // 4 bytes
-    header.add(_uint64Bytes(createdMs)); // 8 bytes
-    header.add(saltEnc); // 32 bytes
-    header.add(saltChk); // 32 bytes (reserved)
-    header.add(iv); // 12 bytes
-    header.add(_uint32Bytes(authTag.length)); // 4 bytes
-    header.add(authTag); // 16 bytes
-    header.add(params.plaintextChecksum); // 32 bytes
-    header.add(_uint64Bytes(encrypted.length)); // 8 bytes
-
-    // Combine header + payload
-    final result = BytesBuilder();
-    result.add(header.toBytes());
-    result.add(encrypted);
-
-    return result.toBytes();
-  }
-
-  /// Decrypts data in an isolate (static top-level function).
-  static _DecryptResult _decryptInIsolate(_DecryptionParams params) {
-    try {
-      // Derive decryption key
-      final key = _deriveKey(
-        passphrase: params.passphrase,
-        salt: params.saltEnc,
-        iterations: _kdfIterations,
-      );
-
-      // Decrypt with AES-256-GCM
-      final cipher = GCMBlockCipher(AESEngine())
-        ..init(
-          false,
-          AEADParameters(
-            KeyParameter(key),
-            128, // 128-bit authentication tag
-            params.iv,
-            Uint8List(0), // No additional authenticated data
-          ),
-        );
-
-      // For GCM decryption, process() expects ciphertext + auth tag combined
-      final ciphertextWithTag =
-          Uint8List(params.encryptedPayload.length + params.authTag.length);
-      ciphertextWithTag.setRange(
-          0, params.encryptedPayload.length, params.encryptedPayload);
-      ciphertextWithTag.setRange(params.encryptedPayload.length,
-          ciphertextWithTag.length, params.authTag);
-
-      final decrypted = cipher.process(ciphertextWithTag);
-
-      // Verify checksum
-      final actualChecksum = sha256.convert(decrypted).bytes;
-      if (!_bytesEqual(actualChecksum, params.expectedChecksum)) {
-        return _DecryptFailure(
-          message: 'Backup file is corrupted or passphrase is incorrect.',
-          errorType: RestoreErrorType.corruptedFile,
-        );
-      }
-
-      return _DecryptSuccess(plaintext: decrypted);
-    } catch (e) {
-      return _DecryptFailure(
-        message: 'Decryption failed: $e',
-        errorType: RestoreErrorType.decryption,
-      );
-    }
-  }
-
-  /// Derives a cryptographic key using PBKDF2-HMAC-SHA256.
-  static Uint8List _deriveKey({
-    required String passphrase,
-    required Uint8List salt,
-    required int iterations,
-  }) {
-    final passphraseBytes = utf8.encode(passphrase);
-    final hmac = Hmac(sha256, passphraseBytes);
-
-    // PBKDF2 implementation
-    var result = Uint8List(32); // 256 bits
-
-    // Single block for 256-bit key
-    final blockIndex = _uint32BytesBigEndian(1);
-    var u = hmac.convert([...salt, ...blockIndex]).bytes;
-
-    for (var i = 0; i < 32; i++) {
-      result[i] = u[i];
-    }
-
-    for (var iter = 1; iter < iterations; iter++) {
-      u = hmac.convert(u).bytes;
-      for (var i = 0; i < 32; i++) {
-        result[i] ^= u[i];
-      }
-    }
-
-    return result;
-  }
-
-  /// Generates cryptographically secure random bytes.
-  static Uint8List _generateRandomBytes(int length) {
-    final random = Random.secure();
-    return Uint8List.fromList(
-      List.generate(length, (_) => random.nextInt(256)),
-    );
-  }
-
-  /// Compares two byte arrays for equality.
-  static bool _bytesEqual(List<int> a, List<int> b) {
-    if (a.length != b.length) return false;
-    for (var i = 0; i < a.length; i++) {
-      if (a[i] != b[i]) return false;
-    }
-    return true;
-  }
-
   /// Converts uint32 to little-endian bytes.
-  static Uint8List _uint32Bytes(int value) {
-    final data = ByteData(4);
-    data.setUint32(0, value, Endian.little);
-    return data.buffer.asUint8List();
+  List<int> _uint32Bytes(int value) {
+    return [
+      value & 0xFF,
+      (value >> 8) & 0xFF,
+      (value >> 16) & 0xFF,
+      (value >> 24) & 0xFF,
+    ];
   }
 
   /// Converts uint64 to little-endian bytes.
-  static Uint8List _uint64Bytes(int value) {
-    final data = ByteData(8);
-    data.setUint64(0, value, Endian.little);
-    return data.buffer.asUint8List();
+  List<int> _uint64Bytes(int value) {
+    return [
+      value & 0xFF,
+      (value >> 8) & 0xFF,
+      (value >> 16) & 0xFF,
+      (value >> 24) & 0xFF,
+      (value >> 32) & 0xFF,
+      (value >> 40) & 0xFF,
+      (value >> 48) & 0xFF,
+      (value >> 56) & 0xFF,
+    ];
   }
 
-  /// Converts uint32 to big-endian bytes (for PBKDF2).
-  static Uint8List _uint32BytesBigEndian(int value) {
-    final data = ByteData(4);
-    data.setUint32(0, value, Endian.big);
-    return data.buffer.asUint8List();
+  /// Reads uint32 from byte list at offset.
+  int _readUint32(List<int> data, int offset) {
+    return data[offset] |
+        (data[offset + 1] << 8) |
+        (data[offset + 2] << 16) |
+        (data[offset + 3] << 24);
+  }
+
+  /// Reads uint64 from byte list at offset.
+  int _readUint64(List<int> data, int offset) {
+    return data[offset] |
+        (data[offset + 1] << 8) |
+        (data[offset + 2] << 16) |
+        (data[offset + 3] << 24) |
+        (data[offset + 4] << 32) |
+        (data[offset + 5] << 40) |
+        (data[offset + 6] << 48) |
+        (data[offset + 7] << 56);
   }
 }
 
-// Internal classes for encryption/decryption
-
-class _EncryptionParams {
-  final Uint8List plaintext;
-  final String passphrase;
-  final String appVersion;
-  final int schemaVersion;
-  final Uint8List plaintextChecksum;
-
-  const _EncryptionParams({
-    required this.plaintext,
-    required this.passphrase,
-    required this.appVersion,
-    required this.schemaVersion,
-    required this.plaintextChecksum,
-  });
-}
-
-class _DecryptionParams {
-  final Uint8List encryptedPayload;
-  final String passphrase;
-  final Uint8List saltEnc;
-  final Uint8List iv;
-  final Uint8List authTag;
-  final Uint8List expectedChecksum;
-
-  const _DecryptionParams({
-    required this.encryptedPayload,
-    required this.passphrase,
-    required this.saltEnc,
-    required this.iv,
-    required this.authTag,
-    required this.expectedChecksum,
-  });
-}
-
-sealed class _DecryptResult {}
-
-class _DecryptSuccess extends _DecryptResult {
-  final Uint8List plaintext;
-
-  _DecryptSuccess({required this.plaintext});
-}
-
-class _DecryptFailure extends _DecryptResult {
-  final String message;
-  final RestoreErrorType errorType;
-
-  _DecryptFailure({
-    required this.message,
-    required this.errorType,
-  });
-}
+// Internal header types
 
 class _BackupHeader {
   final String magic;
   final String appVersion;
   final int schemaVersion;
   final DateTime createdAt;
-  final Uint8List saltEnc;
-  final Uint8List iv;
-  final Uint8List authTag;
-  final Uint8List checksum;
   final int payloadLength;
   final int headerLength;
 
@@ -757,10 +577,6 @@ class _BackupHeader {
     required this.appVersion,
     required this.schemaVersion,
     required this.createdAt,
-    required this.saltEnc,
-    required this.iv,
-    required this.authTag,
-    required this.checksum,
     required this.payloadLength,
     required this.headerLength,
   });
