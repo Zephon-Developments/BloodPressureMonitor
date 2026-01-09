@@ -164,7 +164,7 @@ class _AddWeightViewState extends State<AddWeightView> {
                   builder: (context, constraints) {
                     final isTwoColumns =
                         ResponsiveUtils.columnsFor(context, maxColumns: 2) > 1;
-                    final spacing = 16.0;
+                    const spacing = 16.0;
                     final fieldWidth = isTwoColumns
                         ? (constraints.maxWidth - spacing) / 2
                         : constraints.maxWidth;

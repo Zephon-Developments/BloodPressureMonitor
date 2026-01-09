@@ -24,7 +24,7 @@ class QuickActions extends StatelessWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final columns = ResponsiveUtils.columnsFor(context, maxColumns: 2);
-          final spacing = 12.0;
+          const spacing = 12.0;
           final availableWidth = constraints.maxWidth;
           final buttonWidth = columns == 1
               ? availableWidth

@@ -111,7 +111,7 @@ class _AnalyticsViewState extends State<AnalyticsView> {
           final isWide =
               ResponsiveUtils.columnsFor(context, maxColumns: 2) > 1 &&
                   constraints.maxWidth >= 720;
-          
+
           // Build widgets once to avoid duplication
           final statsCard = StatsCardGrid(stats: stats);
           final chartLegend = ChartLegend(
