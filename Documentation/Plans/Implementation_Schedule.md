@@ -32,8 +32,8 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - [x] Phase 24B: Units Preference Infrastructure ✅ **COMPLETE** (Jan 3, 2026)
 - [x] Phase 24C: Units UI Integration ✅ **COMPLETE** (Jan 3, 2026)
 - [x] Phase 24D: Accessibility Pass ✅ **COMPLETE** (Jan 3, 2026)
-- [ ] Phase 24E: Landscape Responsiveness
-- [ ] Phase 25: PDF Report v2
+- [x] Phase 24E: Landscape Responsiveness ✅ **COMPLETE** (Jan 9, 2026)
+- [ ] Phase 25: PDF Report v2 ⏸️ **ON HOLD**
 - [ ] Phase 26: Encrypted Full-App Backup
 - [ ] Phase 27: Polish & Comprehensive Testing
 

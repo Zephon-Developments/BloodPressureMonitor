@@ -18,6 +18,12 @@ class DatabaseService {
   static const String _databaseName = 'blood_pressure.db';
   static const int _databaseVersion = 7;
 
+  /// Database filename.
+  static String get databaseName => _databaseName;
+
+  /// Current database schema version.
+  static int get schemaVersion => _databaseVersion;
+
   final Database? _testDatabase;
 
   /// Creates a DatabaseService with optional test database injection.
@@ -25,6 +31,18 @@ class DatabaseService {
   /// Parameters:
   /// - [testDatabase]: Optional database instance for testing (bypasses encryption)
   DatabaseService({Database? testDatabase}) : _testDatabase = testDatabase;
+
+  /// Closes the database connection and resets the singleton.
+  ///
+  /// This is primarily used for backup/restore operations or testing.
+  /// The database will be reopened automatically on next access.
+  static Future<void> closeDatabase() async {
+    if (_database != null) {
+      await _database!.close();
+      _database = null;
+      debugPrint('Database connection closed');
+    }
+  }
 
   /// Gets the singleton database instance, initializing if necessary.
   ///

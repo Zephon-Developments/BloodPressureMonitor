@@ -1,28 +1,27 @@
-# Handoff: Clive to Tracy
+# Handoff: Clive Tracy
 
-## Context
-Review of Phase 24B (Units Preference) Implementation Plan.
+**Date:** January 9, 2026  
+**From:** Clive (Plan Review)  
+**To:** Tracy (Planning & Architecture)  
+**Status:** Revision Required  
+**Phase:** 26 — Encrypted Full-App Backup
 
-## Status
-**REJECTED / NEEDS REVISION**
+## Review Feedback
 
-## Findings
+Tracy, I have received your handoff for Phase 26, but it contains significant amounts of **stale data** from previous phases (specifically Phase 24 "Medical Inference Removal").
 
-### 1. Storage Model Conflict (Blocker)
-- **Current State:** `WeightEntry` in `lib/models/health_data.dart` stores a `WeightUnit`. `WeightService` persists this unit to the database.
-- **Requirement:** Steve's directive: "All data stored internally in SI units (kg, °C) — never convert storage layer."
-- **Spec Issue:** Your spec says "No migration expected." This is incorrect if we are to move to SI-only storage.
-- **Action:** Update the spec to include a migration path (converting existing `lbs` entries to `kg`) or provide a technical justification for maintaining the current per-entry unit storage.
+### Blockers:
+- **Mixed Context:** The document contains questions and criteria regarding "NICE thresholds", "dual-axis BP charts", and "medical inference removal" (starting around line 90). These are irrelevant to the Encrypted Backup phase.
+- **Ambiguity:** It is unclear if some of the "Risks & Mitigations" or "Ready for Review" sections at the bottom were intended to be updated for Phase 26 or if they are entirely leftovers.
+- **Artifacts list:** The "Artifacts to Update" section refers to ImportFormat and CSV samples, which is incorrect for this phase.
 
-### 2. UI Consistency
-- **Current State:** `AddWeightView` has a per-entry unit toggle.
-- **Action:** Explicitly include the removal of this toggle in the "UI Changes" section of the spec.
+### Action Items:
+1. **Sanitize the Handoff:** Remove all references to Phase 24 (medical inference, status text removal, charts, NICE thresholds).
+2. **Consolidate Sections:** Ensure there is only one "Risks & Mitigations", "Open Questions", and "Ready for Review" section, and that all content therein relates strictly to the **Encrypted Full-App Backup** architecture.
+3. **Artifacts List:** Update the "Artifacts to Update" section to reflect Phase 26 requirements (e.g., lib/services/backup_service.dart, lib/views/settings/backup_view_model.dart, 	est/services/backup_service_test.dart, etc.).
 
-### 3. Service Consolidation
-- **Observation:** We already have `ThemePersistenceService` and `ThemeViewModel`.
-- **Recommendation:** Consider if `SettingsService` should eventually absorb `ThemePersistenceService` to avoid fragmented preference management, or confirm they should remain separate.
+Please resubmit the cleaned-up plan for a full architectural and safety review.
 
-## Next Steps
-1. Revise `Phase_24B_Units_Preference_Spec.md` to address the storage migration.
-2. Update the UI section to reflect the removal of per-entry unit selection.
-3. Hand back to Clive for final approval.
+---
+**Clive**  
+Review Specialist
