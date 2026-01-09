@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:blood_pressure_monitor/models/analytics.dart';
+import 'package:blood_pressure_monitor/utils/responsive_utils.dart';
 
 /// Grid summarizing primary min/avg/max statistics and variability.
 class StatsCardGrid extends StatelessWidget {
@@ -13,40 +14,46 @@ class StatsCardGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
-      crossAxisSpacing: 12,
-      mainAxisSpacing: 12,
-      childAspectRatio: 1.4,
-      children: [
-        _StatCard(
-          title: 'Systolic',
-          min: stats.minSystolic,
-          avg: stats.avgSystolic,
-          max: stats.maxSystolic,
-          unit: 'mmHg',
-          color: Colors.red.shade50,
-        ),
-        _StatCard(
-          title: 'Diastolic',
-          min: stats.minDiastolic,
-          avg: stats.avgDiastolic,
-          max: stats.maxDiastolic,
-          unit: 'mmHg',
-          color: Colors.blue.shade50,
-        ),
-        _StatCard(
-          title: 'Pulse',
-          min: stats.minPulse,
-          avg: stats.avgPulse,
-          max: stats.maxPulse,
-          unit: 'bpm',
-          color: Colors.purple.shade50,
-        ),
-        _VariabilityCard(stats: stats),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns = ResponsiveUtils.columnsFor(context, maxColumns: 2);
+        final aspectRatio = columns > 1 ? 1.4 : 1.2;
+        return GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: columns,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: aspectRatio,
+          children: [
+            _StatCard(
+              title: 'Systolic',
+              min: stats.minSystolic,
+              avg: stats.avgSystolic,
+              max: stats.maxSystolic,
+              unit: 'mmHg',
+              color: Colors.red.shade50,
+            ),
+            _StatCard(
+              title: 'Diastolic',
+              min: stats.minDiastolic,
+              avg: stats.avgDiastolic,
+              max: stats.maxDiastolic,
+              unit: 'mmHg',
+              color: Colors.blue.shade50,
+            ),
+            _StatCard(
+              title: 'Pulse',
+              min: stats.minPulse,
+              avg: stats.avgPulse,
+              max: stats.maxPulse,
+              unit: 'bpm',
+              color: Colors.purple.shade50,
+            ),
+            _VariabilityCard(stats: stats),
+          ],
+        );
+      },
     );
   }
 }
@@ -138,20 +145,15 @@ class _VariabilityCard extends StatelessWidget {
   Widget _variabilityRow(String label, double stdDev, double cv) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            flex: 2,
-            child: Text(label),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              'SD: ${stdDev.toStringAsFixed(1)} / CV: ${cv.toStringAsFixed(1)}%',
-              style: const TextStyle(fontSize: 12),
-              overflow: TextOverflow.ellipsis,
-            ),
+          Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+          const SizedBox(height: 2),
+          Text(
+            'SD: ${stdDev.toStringAsFixed(1)} / CV: ${cv.toStringAsFixed(1)}%',
+            style: const TextStyle(fontSize: 12),
+            softWrap: true,
           ),
         ],
       ),

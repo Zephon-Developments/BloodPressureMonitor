@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 import 'package:blood_pressure_monitor/models/analytics.dart';
+import 'package:blood_pressure_monitor/utils/responsive_utils.dart';
 import 'package:blood_pressure_monitor/views/analytics/painters/split_clinical_band_painter.dart';
 
 /// Dual-axis blood pressure chart with split baseline.
@@ -48,11 +49,17 @@ class BpDualAxisChart extends StatelessWidget {
       diastolicSpots.add(FlSpot(x, negatedDiastolic[i]));
     }
 
-    return AspectRatio(
-      aspectRatio: 1.5,
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
+    final chartHeight = ResponsiveUtils.chartHeightFor(
+      context,
+      portraitHeight: 320,
+      landscapeHeight: 240,
+    );
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: SizedBox(
+          height: chartHeight,
           child: Stack(
             children: [
               Positioned.fill(

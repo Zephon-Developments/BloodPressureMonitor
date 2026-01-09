@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 import 'package:blood_pressure_monitor/models/analytics.dart';
+import 'package:blood_pressure_monitor/utils/responsive_utils.dart';
 
 /// Visualizes nightly sleep stage composition as a stacked area chart.
 class SleepStackedAreaChart extends StatelessWidget {
@@ -48,7 +49,11 @@ class SleepStackedAreaChart extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             SizedBox(
-              height: 220,
+              height: ResponsiveUtils.chartHeightFor(
+                context,
+                portraitHeight: 260,
+                landscapeHeight: 200,
+              ),
               child: LineChart(
                 LineChartData(
                   minY: 0,
