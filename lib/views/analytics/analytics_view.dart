@@ -111,33 +111,31 @@ class _AnalyticsViewState extends State<AnalyticsView> {
           final isWide =
               ResponsiveUtils.columnsFor(context, maxColumns: 2) > 1 &&
                   constraints.maxWidth >= 720;
-          final children = <Widget>[
-            Expanded(child: StatsCardGrid(stats: stats)),
-            const SizedBox(width: 16),
-            Expanded(
-              child: ChartLegend(
-                isSampled: chartData.isSampled,
-                sleepCorrelation: viewModel.sleepCorrelation,
-              ),
-            ),
-          ];
+          
+          // Build widgets once to avoid duplication
+          final statsCard = StatsCardGrid(stats: stats);
+          final chartLegend = ChartLegend(
+            isSampled: chartData.isSampled,
+            sleepCorrelation: viewModel.sleepCorrelation,
+          );
 
           if (isWide) {
             return Row(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: children,
+              children: [
+                Expanded(child: statsCard),
+                const SizedBox(width: 16),
+                Expanded(child: chartLegend),
+              ],
             );
           }
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              StatsCardGrid(stats: stats),
+              statsCard,
               const SizedBox(height: 16),
-              ChartLegend(
-                isSampled: chartData.isSampled,
-                sleepCorrelation: viewModel.sleepCorrelation,
-              ),
+              chartLegend,
             ],
           );
         },
