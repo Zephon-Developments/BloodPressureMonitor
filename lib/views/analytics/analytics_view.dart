@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:blood_pressure_monitor/models/analytics.dart';
+import 'package:blood_pressure_monitor/utils/responsive_utils.dart';
 import 'package:blood_pressure_monitor/viewmodels/analytics_viewmodel.dart';
 import 'package:blood_pressure_monitor/views/analytics/widgets/analytics_empty_state.dart';
 import 'package:blood_pressure_monitor/views/analytics/widgets/bp_dual_axis_chart.dart';
@@ -86,7 +87,7 @@ class _AnalyticsViewState extends State<AnalyticsView> {
                 else if (!viewModel.hasData)
                   const AnalyticsEmptyState()
                 else
-                  ..._buildDataContent(viewModel),
+                  ..._buildDataContent(context, viewModel),
               ],
             ),
           ),
@@ -96,17 +97,50 @@ class _AnalyticsViewState extends State<AnalyticsView> {
   }
 
   /// Builds the data content when data is available.
-  List<Widget> _buildDataContent(AnalyticsViewModel viewModel) {
+  List<Widget> _buildDataContent(
+    BuildContext context,
+    AnalyticsViewModel viewModel,
+  ) {
     final HealthStats stats = viewModel.stats!;
     final ChartDataSet chartData = viewModel.chartData!;
     final DualAxisBpData? dualAxisData = viewModel.dualAxisBpData;
 
     return [
-      StatsCardGrid(stats: stats),
-      const SizedBox(height: 24),
-      ChartLegend(
-        isSampled: chartData.isSampled,
-        sleepCorrelation: viewModel.sleepCorrelation,
+      LayoutBuilder(
+        builder: (context, constraints) {
+          final isWide =
+              ResponsiveUtils.columnsFor(context, maxColumns: 2) > 1 &&
+                  constraints.maxWidth >= 720;
+          final children = <Widget>[
+            Expanded(child: StatsCardGrid(stats: stats)),
+            const SizedBox(width: 16),
+            Expanded(
+              child: ChartLegend(
+                isSampled: chartData.isSampled,
+                sleepCorrelation: viewModel.sleepCorrelation,
+              ),
+            ),
+          ];
+
+          if (isWide) {
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: children,
+            );
+          }
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              StatsCardGrid(stats: stats),
+              const SizedBox(height: 16),
+              ChartLegend(
+                isSampled: chartData.isSampled,
+                sleepCorrelation: viewModel.sleepCorrelation,
+              ),
+            ],
+          );
+        },
       ),
       const SizedBox(height: 12),
       if (dualAxisData != null && dualAxisData.hasData)

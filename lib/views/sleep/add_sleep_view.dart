@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:blood_pressure_monitor/models/health_data.dart';
 import 'package:blood_pressure_monitor/utils/date_formats.dart';
 import 'package:blood_pressure_monitor/utils/provider_extensions.dart';
+import 'package:blood_pressure_monitor/utils/responsive_utils.dart';
 import 'package:blood_pressure_monitor/viewmodels/sleep_viewmodel.dart';
 import 'package:blood_pressure_monitor/widgets/common/custom_text_field.dart';
 import 'package:blood_pressure_monitor/widgets/common/loading_button.dart';
@@ -156,55 +157,91 @@ class _AddSleepViewState extends State<AddSleepView> {
                     isError: true,
                   ),
                 const SizedBox(height: 12),
-                _buildPickerTile(
-                  icon: Icons.calendar_today,
-                  title: 'Night of ${DateFormats.longDate.format(_sleepDate)}',
-                  subtitle: 'Tap to change date',
-                  onTap: _pickDate,
-                ),
-                const SizedBox(height: 12),
-                _buildPickerTile(
-                  icon: Icons.bedtime,
-                  title: 'Bedtime: ${_startTime.format(context)}',
-                  subtitle: 'Tap to change start time',
-                  onTap: () => _pickTime(isStart: true),
-                ),
-                const SizedBox(height: 12),
-                _buildPickerTile(
-                  icon: Icons.wb_sunny,
-                  title: 'Wake time: ${_endTime.format(context)}',
-                  subtitle: 'Tap to change wake time',
-                  onTap: () => _pickTime(isStart: false),
-                ),
-                const SizedBox(height: 12),
-                if (durationMinutes != null)
-                  Text(
-                    'Duration: ${durationMinutes ~/ 60}h ${durationMinutes % 60}m',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<int>(
-                  decoration: const InputDecoration(
-                    labelText: 'Sleep Quality (1-5)',
-                    border: OutlineInputBorder(),
-                  ),
-                  initialValue: _quality,
-                  items: List<DropdownMenuItem<int>>.generate(5, (index) {
-                    final value = index + 1;
-                    return DropdownMenuItem<int>(
-                      value: value,
-                      child: Text('$value - ${_qualityLabel(value)}'),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isTwoColumns =
+                        ResponsiveUtils.columnsFor(context, maxColumns: 2) > 1;
+                    final spacing = 16.0;
+                    final tileWidth = isTwoColumns
+                        ? (constraints.maxWidth - spacing) / 2
+                        : constraints.maxWidth;
+
+                    return Wrap(
+                      spacing: spacing,
+                      runSpacing: 12,
+                      children: [
+                        SizedBox(
+                          width: tileWidth,
+                          child: _buildPickerTile(
+                            icon: Icons.calendar_today,
+                            title:
+                                'Night of ${DateFormats.longDate.format(_sleepDate)}',
+                            subtitle: 'Tap to change date',
+                            onTap: _pickDate,
+                          ),
+                        ),
+                        SizedBox(
+                          width: tileWidth,
+                          child: _buildPickerTile(
+                            icon: Icons.bedtime,
+                            title: 'Bedtime: ${_startTime.format(context)}',
+                            subtitle: 'Tap to change start time',
+                            onTap: () => _pickTime(isStart: true),
+                          ),
+                        ),
+                        SizedBox(
+                          width: tileWidth,
+                          child: _buildPickerTile(
+                            icon: Icons.wb_sunny,
+                            title: 'Wake time: ${_endTime.format(context)}',
+                            subtitle: 'Tap to change wake time',
+                            onTap: () => _pickTime(isStart: false),
+                          ),
+                        ),
+                        if (durationMinutes != null)
+                          SizedBox(
+                            width: tileWidth,
+                            child: Text(
+                              'Duration: ${durationMinutes ~/ 60}h ${durationMinutes % 60}m',
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                          ),
+                        SizedBox(
+                          width: tileWidth,
+                          child: DropdownButtonFormField<int>(
+                            decoration: const InputDecoration(
+                              labelText: 'Sleep Quality (1-5)',
+                              border: OutlineInputBorder(),
+                            ),
+                            initialValue: _quality,
+                            items: List<DropdownMenuItem<int>>.generate(5,
+                                (index) {
+                              final value = index + 1;
+                              return DropdownMenuItem<int>(
+                                value: value,
+                                child: Text('$value - ${_qualityLabel(value)}'),
+                              );
+                            }),
+                            onChanged: (value) =>
+                                setState(() => _quality = value),
+                            hint: const Text('Optional'),
+                          ),
+                        ),
+                        SizedBox(
+                          width: tileWidth,
+                          child: SwitchListTile(
+                            title: const Text('Detailed Sleep Tracking'),
+                            subtitle: const Text(
+                              'Track sleep stages (REM, Light, Deep)',
+                            ),
+                            value: _isDetailedMode,
+                            onChanged: (value) =>
+                                setState(() => _isDetailedMode = value),
+                          ),
+                        ),
+                      ],
                     );
-                  }),
-                  onChanged: (value) => setState(() => _quality = value),
-                  hint: const Text('Optional'),
-                ),
-                const SizedBox(height: 16),
-                SwitchListTile(
-                  title: const Text('Detailed Sleep Tracking'),
-                  subtitle: const Text('Track sleep stages (REM, Light, Deep)'),
-                  value: _isDetailedMode,
-                  onChanged: (value) => setState(() => _isDetailedMode = value),
+                  },
                 ),
                 if (_isDetailedMode) ...[
                   const SizedBox(height: 16),
