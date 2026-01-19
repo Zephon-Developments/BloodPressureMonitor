@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:blood_pressure_monitor/models/health_data.dart';
 import 'package:blood_pressure_monitor/utils/date_formats.dart';
 import 'package:blood_pressure_monitor/utils/provider_extensions.dart';
+import 'package:blood_pressure_monitor/utils/responsive_utils.dart';
 import 'package:blood_pressure_monitor/utils/validators.dart';
 import 'package:blood_pressure_monitor/viewmodels/weight_viewmodel.dart';
 import 'package:blood_pressure_monitor/widgets/common/custom_text_field.dart';
@@ -159,97 +160,138 @@ class _AddWeightViewState extends State<AddWeightView> {
                     isError: true,
                   ),
                 const SizedBox(height: 12),
-                CustomTextField(
-                  label: viewModel.preferredWeightUnit == WeightUnit.kg
-                      ? 'Weight (kg)'
-                      : 'Weight (lbs)',
-                  controller: _weightController,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.allow(
-                      RegExp(r'^[0-9]*[.]?[0-9]*'),
-                    ),
-                  ],
-                  helperText: viewModel.preferredWeightUnit == WeightUnit.kg
-                      ? 'Enter value in kilograms (25-310 kg)'
-                      : 'Enter value in pounds (55-670 lbs)',
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Enter a weight value';
-                    }
-                    final parsed = double.tryParse(value);
-                    if (parsed == null) {
-                      return 'Invalid number';
-                    }
-                    final validation = validateWeight(
-                      parsed,
-                      viewModel.preferredWeightUnit == WeightUnit.kg
-                          ? 'kg'
-                          : 'lbs',
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isTwoColumns =
+                        ResponsiveUtils.columnsFor(context, maxColumns: 2) > 1;
+                    const spacing = 16.0;
+                    final fieldWidth = isTwoColumns
+                        ? (constraints.maxWidth - spacing) / 2
+                        : constraints.maxWidth;
+
+                    Widget recordedAtTile = ListTile(
+                      leading: const Icon(Icons.access_time),
+                      title: Text(
+                        DateFormats.shortDateTime.format(_recordedAt),
+                      ),
+                      subtitle: const Text('Tap to change date & time'),
+                      onTap: _pickDateTime,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.outlineVariant,
+                        ),
+                      ),
                     );
-                    if (validation.level == ValidationLevel.error) {
-                      return validation.message ?? 'Invalid weight';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                ListTile(
-                  leading: const Icon(Icons.access_time),
-                  title: Text(DateFormats.shortDateTime.format(_recordedAt)),
-                  subtitle: const Text('Tap to change date & time'),
-                  onTap: _pickDateTime,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(
-                      color: Theme.of(context).colorScheme.outlineVariant,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                _buildDropdown(
-                  label: 'Salt Intake',
-                  value: _saltLevel,
-                  items: _saltLevels,
-                  onChanged: (value) => setState(() => _saltLevel = value),
-                ),
-                const SizedBox(height: 16),
-                _buildDropdown(
-                  label: 'Exercise Level',
-                  value: _exerciseLevel,
-                  items: _exerciseLevels,
-                  onChanged: (value) => setState(() => _exerciseLevel = value),
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<int>(
-                  decoration: const InputDecoration(
-                    labelText: 'Stress Rating',
-                    border: OutlineInputBorder(),
-                  ),
-                  initialValue: _stressRating,
-                  items: List<DropdownMenuItem<int>>.generate(5, (index) {
-                    final value = index + 1;
-                    return DropdownMenuItem<int>(
-                      value: value,
-                      child: Text('$value - ${_stressLabel(value)}'),
+
+                    return Wrap(
+                      spacing: spacing,
+                      runSpacing: 16,
+                      children: [
+                        SizedBox(
+                          width: fieldWidth,
+                          child: CustomTextField(
+                            label:
+                                viewModel.preferredWeightUnit == WeightUnit.kg
+                                    ? 'Weight (kg)'
+                                    : 'Weight (lbs)',
+                            controller: _weightController,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.allow(
+                                RegExp(r'^[0-9]*[.]?[0-9]*'),
+                              ),
+                            ],
+                            helperText:
+                                viewModel.preferredWeightUnit == WeightUnit.kg
+                                    ? 'Enter value in kilograms (25-310 kg)'
+                                    : 'Enter value in pounds (55-670 lbs)',
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Enter a weight value';
+                              }
+                              final parsed = double.tryParse(value);
+                              if (parsed == null) {
+                                return 'Invalid number';
+                              }
+                              final validation = validateWeight(
+                                parsed,
+                                viewModel.preferredWeightUnit == WeightUnit.kg
+                                    ? 'kg'
+                                    : 'lbs',
+                              );
+                              if (validation.level == ValidationLevel.error) {
+                                return validation.message ?? 'Invalid weight';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        SizedBox(
+                          width: fieldWidth,
+                          child: recordedAtTile,
+                        ),
+                        SizedBox(
+                          width: fieldWidth,
+                          child: _buildDropdown(
+                            label: 'Salt Intake',
+                            value: _saltLevel,
+                            items: _saltLevels,
+                            onChanged: (value) =>
+                                setState(() => _saltLevel = value),
+                          ),
+                        ),
+                        SizedBox(
+                          width: fieldWidth,
+                          child: _buildDropdown(
+                            label: 'Exercise Level',
+                            value: _exerciseLevel,
+                            items: _exerciseLevels,
+                            onChanged: (value) =>
+                                setState(() => _exerciseLevel = value),
+                          ),
+                        ),
+                        SizedBox(
+                          width: fieldWidth,
+                          child: DropdownButtonFormField<int>(
+                            decoration: const InputDecoration(
+                              labelText: 'Stress Rating',
+                              border: OutlineInputBorder(),
+                            ),
+                            initialValue: _stressRating,
+                            items: List<DropdownMenuItem<int>>.generate(5,
+                                (index) {
+                              final value = index + 1;
+                              return DropdownMenuItem<int>(
+                                value: value,
+                                child: Text('$value - ${_stressLabel(value)}'),
+                              );
+                            }),
+                            onChanged: (value) =>
+                                setState(() => _stressRating = value),
+                            hint: const Text('Optional'),
+                          ),
+                        ),
+                        SizedBox(
+                          width: constraints.maxWidth,
+                          child: CustomTextField(
+                            label: 'Notes',
+                            controller: _notesController,
+                            maxLines: 4,
+                            helperText:
+                                'Optional context (up to 500 characters)',
+                            validator: (value) {
+                              if (value != null && value.length > 500) {
+                                return 'Notes cannot exceed 500 characters';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                      ],
                     );
-                  }),
-                  onChanged: (value) => setState(() => _stressRating = value),
-                  hint: const Text('Optional'),
-                ),
-                const SizedBox(height: 16),
-                CustomTextField(
-                  label: 'Notes',
-                  controller: _notesController,
-                  maxLines: 4,
-                  helperText: 'Optional context (up to 500 characters)',
-                  validator: (value) {
-                    if (value != null && value.length > 500) {
-                      return 'Notes cannot exceed 500 characters';
-                    }
-                    return null;
                   },
                 ),
                 const SizedBox(height: 24),

@@ -112,17 +112,21 @@ void main() {
       expect(find.text('30-200 bpm'), findsOneWidget);
     });
 
-    testWidgets('fields are laid out in a row for BP',
+    testWidgets('fields use responsive wrap layout for BP',
         (WidgetTester tester) async {
       await tester.pumpWidget(createWidget());
 
-      // Systolic and diastolic should be in the same row
-      final rowFinder = find.ancestor(
+      final wrapFinder = find.ancestor(
         of: find.widgetWithText(TextField, 'Systolic'),
-        matching: find.byType(Row),
+        matching: find.byType(Wrap),
       );
 
-      expect(rowFinder, findsOneWidget);
+      expect(wrapFinder, findsOneWidget);
+
+      final wrap = tester.widget<Wrap>(wrapFinder);
+      expect(wrap.spacing, 16);
+      expect(wrap.runSpacing, 16);
+      expect(wrap.children.length, 4);
     });
   });
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:blood_pressure_monitor/models/medication.dart';
+import 'package:blood_pressure_monitor/utils/responsive_utils.dart';
 import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart';
 import 'package:blood_pressure_monitor/views/readings/add_reading_view.dart';
 import 'package:blood_pressure_monitor/views/weight/add_weight_view.dart';
@@ -44,56 +45,68 @@ class ProfileHomepageView extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final columns =
+                      ResponsiveUtils.columnsFor(context, maxColumns: 3);
+                  final aspectRatio = columns >= 3 ? 1.0 : 1.1;
 
-              // Grid of large buttons
-              GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: 1.1,
-                children: [
-                  _LargeActionButton(
-                    icon: Icons.favorite,
-                    label: 'Log Blood Pressure / Pulse',
-                    color: colorScheme.primary,
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const AddReadingView()),
-                    ),
-                  ),
-                  _LargeActionButton(
-                    icon: Icons.medication,
-                    label: 'Log Medication',
-                    color: colorScheme.secondary,
-                    onTap: () async {
-                      final selected = await showMedicationPicker(context);
-                      if (selected != null && context.mounted) {
-                        if (selected is MedicationGroup) {
-                          showLogGroupIntakeSheet(context, selected);
-                        } else if (selected is Medication) {
-                          showLogIntakeSheet(context, selected);
-                        }
-                      }
-                    },
-                  ),
-                  _LargeActionButton(
-                    icon: Icons.bedtime,
-                    label: 'Log Sleep',
-                    color: Colors.indigo,
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const AddSleepView()),
-                    ),
-                  ),
-                  _LargeActionButton(
-                    icon: Icons.monitor_weight,
-                    label: 'Log Weight',
-                    color: Colors.teal,
-                    onTap: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const AddWeightView()),
-                    ),
-                  ),
-                ],
+                  return GridView.count(
+                    crossAxisCount: columns,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
+                    childAspectRatio: aspectRatio,
+                    children: [
+                      _LargeActionButton(
+                        icon: Icons.favorite,
+                        label: 'Log Blood Pressure / Pulse',
+                        color: colorScheme.primary,
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const AddReadingView(),
+                          ),
+                        ),
+                      ),
+                      _LargeActionButton(
+                        icon: Icons.medication,
+                        label: 'Log Medication',
+                        color: colorScheme.secondary,
+                        onTap: () async {
+                          final selected = await showMedicationPicker(context);
+                          if (selected != null && context.mounted) {
+                            if (selected is MedicationGroup) {
+                              showLogGroupIntakeSheet(context, selected);
+                            } else if (selected is Medication) {
+                              showLogIntakeSheet(context, selected);
+                            }
+                          }
+                        },
+                      ),
+                      _LargeActionButton(
+                        icon: Icons.bedtime,
+                        label: 'Log Sleep',
+                        color: Colors.indigo,
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const AddSleepView(),
+                          ),
+                        ),
+                      ),
+                      _LargeActionButton(
+                        icon: Icons.monitor_weight,
+                        label: 'Log Weight',
+                        color: Colors.teal,
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const AddWeightView(),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ],
           ),

@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 import 'package:blood_pressure_monitor/models/analytics.dart';
+import 'package:blood_pressure_monitor/utils/responsive_utils.dart';
 
 /// Trend chart for pulse measurements.
 class PulseLineChart extends StatelessWidget {
@@ -27,11 +28,17 @@ class PulseLineChart extends StatelessWidget {
         )
         .toList();
 
-    return AspectRatio(
-      aspectRatio: 1.5,
-      child: Card(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
+    final chartHeight = ResponsiveUtils.chartHeightFor(
+      context,
+      portraitHeight: 280,
+      landscapeHeight: 210,
+    );
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: SizedBox(
+          height: chartHeight,
           child: LineChart(
             LineChartData(
               minY: 40,
