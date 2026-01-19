@@ -1,143 +1,52 @@
-# Handoff: Steve to Tracy - Phase 17 Planning Required
-
-## Date
-2025-12-31
-
-## Status
-Phase 16 (Profile-Centric UI Redesign) has been successfully completed and merged to main via PR #29. We are now ready to initiate Phase 17: Zephon Branding & Appearance Settings.
-
-## Phase 16 Completion Summary
-- ✅ PR #29 merged to main
-- ✅ Feature branch `feature/phase-16-profile-ui` deleted
-- ✅ All 686 tests passing
-- ✅ Zero lint issues
-- ✅ Full profile CRUD implementation
-- ✅ Complete ViewModel reactivity across all data scopes
-- ✅ Implementation_Schedule.md updated
-
-## Next Phase: Phase 17 - Zephon Branding & Appearance Settings
-
-### Scope (from Implementation_Schedule.md)
-About screen with Zephon branding and customizable appearance.
-
-### Requirements
-1. **About Screen**
-   - Add Settings → About HyperTrack with:
-     - App name/version display
-     - Zephon link/tagline
-     - Privacy disclaimer
-   
-2. **Appearance Settings**
-   - Add Settings → Appearance with:
-     - Theme mode (light/dark/system)
-     - Accent palette selector
-     - Font scaling (normal/large/XL)
-     - Optional high-contrast toggle
-
-3. **Architecture**
-   - Centralize theming in a ThemeViewModel
-   - Persist settings in SharedPreferences
-   - Live theme updates without app restart
-
-### Dependencies
-- ✅ Phase 14 (rebrand complete)
-- ✅ Phase 16 (shell available for settings entry)
-
-### Acceptance Criteria
-- Theme/accent/font changes apply live and persist across restarts
-- About screen shows Zephon branding and opens link safely
-- Widget/unit tests for toggles and persistence
-- Analyzer/tests pass
-
-## Request for Tracy
-
-Please create a comprehensive implementation plan for Phase 17 that includes:
-
-1. **Scope Definition**
-   - Detailed breakdown of About screen requirements
-   - Detailed breakdown of Appearance settings requirements
-   - Success metrics and constraints
-
-2. **Technical Design**
-   - ThemeViewModel architecture and state management
-   - SharedPreferences schema for settings persistence
-   - Theme data models and enumerations
-   - Material 3 theming integration approach
-
-3. **Implementation Tasks**
-   - Models: Theme preferences, accent colors, font scales
-   - Services: Settings persistence service
-   - ViewModels: ThemeViewModel with reactive updates
-   - Views: About screen, Appearance settings screen
-   - Widgets: Theme selector, accent palette picker, font scale slider
-   - Integration: Settings menu structure
-
-4. **Testing Strategy**
-   - Unit tests for ThemeViewModel
-   - Widget tests for settings screens
-   - Integration tests for theme persistence
-   - Accessibility tests for high-contrast mode
-
-5. **Quality Assurance**
-   - Compliance with CODING_STANDARDS.md
-   - Test coverage targets (≥85% ViewModels, ≥70% Widgets)
-   - Documentation requirements (DartDoc for public APIs)
-
-6. **Risk Assessment**
-   - Potential blockers or challenges
-   - Dependencies on third-party packages
-   - Breaking changes or migration needs
-
-Please structure the plan with clear tasks, file changes, and acceptance criteria for Clive's review before implementation begins.
-
-## Reference Documents
-- [Implementation_Schedule.md](../Plans/Implementation_Schedule.md) - Phase 17 overview
-- [CODING_STANDARDS.md](../Standards/CODING_STANDARDS.md) - Quality requirements
-- [Phase 16 Review](../../reviews/2025-12-31-clive-phase-16-extension-review-v2.md) - Recent approval pattern
-
-## Timeline
-Target completion: TBD (pending Tracy's plan and stakeholder approval)
-
----
-**Workflow Conductor**: Steve  
-**Next Agent**: Tracy (Planning & Architecture)  
-**Suggested User Prompt**: "Tracy, please create the implementation plan for Phase 17 as outlined in the handoff document."
-
----
----
----
-
-# ARCHIVE: Phase 15 Handoff Content
-
 # Handoff: Steve → Tracy
-## Phase 24E – Landscape Responsiveness
 
-**Date:** January 9, 2026  
-**From:** Steve (Conductor)  
-**To:** Tracy (Planning Specialist)  
-**Workflow Stage:** Scope Definition & Planning
-
----
-
-## Context
-
-We are initiating **Phase 24E: Landscape Responsiveness** from the Implementation Schedule. This phase is the final sub-phase of Phase 24 (Units & Accessibility), following the completion of:
-
-- **Phase 24A:** Navigation & Date-Range Resilience ✅ COMPLETE (Jan 3, 2026)
-- **Phase 24B:** Units Preference Infrastructure ✅ COMPLETE (Jan 3, 2026)
-- **Phase 24C:** Units UI Integration ✅ COMPLETE (Jan 3, 2026)
-- **Phase 24D:** Accessibility Pass ✅ COMPLETE (Jan 3, 2026)
-
-After Phase 24E completion, the remaining phases in the schedule are:
-- **Phase 25:** PDF Report v2
-- **Phase 26:** Encrypted Full-App Backup
-- **Phase 27:** Polish & Comprehensive Testing
+**Date**: 2026-01-06  
+**From**: Steve (Project Conductor)  
+**To**: Tracy (Planning & Architecture)  
+**Status**: Planning Required
 
 ---
 
 ## Objective
 
-Design a detailed implementation plan for **Phase 24E: Landscape Responsiveness** that ensures all major screens in the HealthLog app adapt gracefully to landscape orientation on both phones and tablets
+Address new issues reported for Zephon HealthLog application focusing on:
+1. Rebranding from HyperTrack to HealthLog
+2. Blood Pressure chart architectural redesign
+3. Chart UI/UX improvements
+
+---
+
+## Issue Summary
+
+### Issue 1: Rebranding (Medium Priority)
+**Current State**: Application still references "HyperTrack" in various locations  
+**Required**: Replace all instances with "HealthLog" throughout codebase and documentation
+
+**Scope**:
+- UI strings and labels
+- Documentation files (README, guides, etc.)
+- Code comments and class documentation
+- Configuration files
+- About/Info screens
+
+### Issue 2: BP Chart Layout (MAJOR - Clinical Standards Violation)
+**Current State**: Systolic and diastolic values share the same Y-axis banding  
+**Required**: Split chart architecture with center baseline
+
+**Critical Requirements**:
+- **Center X-axis baseline** (horizontal line through middle)
+- **Systolic above center line** (positive Y values)
+- **Diastolic below center line** (negative Y values)
+- **NICE guideline color coding** for each section:
+  - Above line: Systolic zones (likely: green/amber/red based on thresholds)
+  - Below line: Diastolic zones (likely: green/amber/red based on thresholds)
+
+**Clinical Context**:  
+This is a **major issue** because the current chart doesn't follow clinical presentation standards. Healthcare providers expect to see systolic/diastolic separated visually to quickly identify patterns.
+
+### Issue 3: X-Axis Date Label Overlap (Minor)
+**Current State**: Date ticks too close together, labels overlap  
+**Required**: Implement smart label spacing/rotation
 
 **Suggested Solutions**:
 - Reduce label frequency for longer time ranges
@@ -157,199 +66,162 @@ Design a detailed implementation plan for **Phase 24E: Landscape Responsiveness*
 
 ## Constraints & Context
 
-### Project Principles (Reminder).
+### Project Principles (Reminder)
+1. **Zero Medical Inference** - App logs data only, provides no medical advice
+2. **Privacy First** - All data offline, locally encrypted
+3. **User Control** - Users own their data completely
+
+### Technical Constraints
+- Follow [CODING_STANDARDS.md](../Standards/CODING_STANDARDS.md)
+- Maintain test coverage (Services ≥85%, Widgets ≥70%)
+- Ensure backward compatibility with existing data
+- All changes via feature branch → PR → review workflow
+
+### NICE Guidelines Reference
+Tracy, please research NICE (National Institute for Health and Care Excellence) blood pressure thresholds:
+- Likely ranges for systolic: <120 (optimal), 120-139 (elevated), 140-159 (stage 1), 160-179 (stage 2), ≥180 (crisis)
+- Likely ranges for diastolic: <80 (optimal), 80-89 (elevated), 90-99 (stage 1), 100-109 (stage 2), ≥110 (crisis)
+- **Important**: These are for **color zones only**, NOT for providing medical advice/diagnosis
 
 ---
 
-## Scope & Requirements
+## Chart Context & Current Implementation
 
-### Core Requirements (from Implementation_Schedule.md)
+### Suspected Files (Tracy to verify)
+- Chart widgets: `lib/views/analytics/widgets/*`
+- Analytics view: `lib/views/analytics/analytics_view.dart`
+- Chart data provider: `lib/viewmodels/analytics_viewmodel.dart`
+- Possibly using: `fl_chart` package (check `pubspec.yaml`)
 
-**Phase 24E: Landscape Responsiveness**
-- Adapt all major screens to landscape orientation (phone + tablet)
-- Ensure forms, charts, history views, and navigation remain usable in landscape
-- Prevent layout overflow and awkward scrolling
-- Maintain consistency with existing Material 3 theme and accessibility standards
-
-### Technical Foundation (from Phase_24_Implementation_Spec.md)
-
-**Landscape Responsiveness Guidelines:**
-- **Utilities:** Add `lib/utils/responsive_utils.dart` with helpers (`isTablet`, `isLandscape`, `shouldUseTwoColumns`) if not existing
-- **Layouts to adapt:**
-  - **Forms (BP, Weight, Medication):** Two-column in landscape/tablet; scroll-safe with SingleChildScrollView
-  - **Home/quick actions:** Grid in landscape
-  - **Analytics:** Horizontal layout for selector + legend; adjust chart height/padding; legends may move to side
-  - **History lists:** Grid on tablets in landscape; single column on phones
-- **Charts:** Allow chart widgets to accept orientation/layout hints to adjust padding/legend placement
-- **Strategy:** Prefer `MediaQuery.of(context).orientation` for top-level decisions; use `LayoutBuilder` for width breakpoints. Avoid wrapping entire screens in `OrientationBuilder` unless needed
-- **Breakpoints:** Lock breakpoints for landscape/tablet (e.g., `shortestSide >= 600` for tablet; landscape by orientation)
-
-### Standards & Constraints (from CODING_STANDARDS.md)
-
-- **§2 Git Workflow:** All changes via feature branch → PR → main (protected branch)
-- **§3 Dart/Flutter Conventions:** Follow naming, import order, code style (80 char line length, trailing commas)
-- **§8 Testing:** Maintain coverage targets (Models/Utils ≥90%, Services/ViewModels ≥85%, Widgets ≥70%)
-- **CI Requirements:** Zero analyzer warnings, all tests passing, dart format clean, release build succeeds
+### Current Chart Behavior (to investigate)
+- How are systolic/diastolic currently rendered? (LineChart? BarChart?)
+- What's the Y-axis range calculation?
+- How are data points connected?
+- Are there already any color zones or threshold markers?
 
 ---
 
-## Current State
+## Required Deliverables from Tracy
 
-### Completed Phases
+### 1. Rebranding Plan
+- **File Inventory**: Complete list of files containing "HyperTrack"
+  - Use grep/search: `grep -r "HyperTrack" lib/ Documentation/ README.md`
+  - Include: Dart files, Markdown docs, YAML configs, asset references
+- **Replacement Strategy**: 
+  - Simple find/replace or context-sensitive?
+  - Any edge cases (e.g., URLs, package names)?
+- **Testing Impact**: Which tests need string updates?
 
-**Phase 24A–24D** have addressed:
-- Navigation resilience (back affordances, bottom nav persistence)
-- Date-range selector resilience (visible even with empty data)
-- Units preference (kg/lbs with SI storage)
-- Accessibility (semantic labels, large text support up to 2.0x)
+### 2. BP Chart Redesign Specification
+- **Architecture Decision**:
+  - Modify existing chart widget or create new split-axis widget?
+  - Can `fl_chart` support dual-axis layout, or need custom painting?
+  - Data transformation: How to convert to positive/negative Y values?
+  
+- **Visual Design**:
+  - Detailed mockup or ASCII art showing:
+    ```
+    +200 ─────────────────────── Systolic (red zone)
+    +160 ─────────────────────── (amber zone)
+    +120 ─────────────────────── (green zone)
+       0 ═══════════════════════ CENTER BASELINE (X-axis)
+     -80 ─────────────────────── (green zone) Diastolic
+     -90 ─────────────────────── (amber zone)
+    -110 ─────────────────────── (red zone)
+    ```
+  - Color palette (ensure accessibility compliance)
+  - Legend design (clearly labels systolic above, diastolic below)
 
-**Current Test Status (from Phase 24D):**
-- **Total Tests:** 1,024 passing
-- **Coverage Targets:** Models/Utils ≥90%, Services/ViewModels ≥85%, Widgets ≥70%
-- **Analyzer:** Zero warnings/errors
+- **Data Flow**:
+  - How does `AnalyticsViewModel` provide data?
+  - Need separate series for systolic/diastolic?
+  - How to handle averaged vs. raw data modes?
 
-### Existing Responsive Infrastructure
+- **NICE Zone Implementation**:
+  - Background colored regions or threshold lines?
+  - Static zones or dynamic based on data range?
+  - How to avoid "medical advice" appearance (per zero-inference principle)?
 
-From the workspace, we need to determine:
-1. Does `lib/utils/responsive_utils.dart` already exist?
-2. Are there any screens that already implement landscape-aware layouts?
-3. What widgets/views need landscape adaptation?
+### 3. X-Axis Label Spacing Fix
+- **Root Cause Analysis**: Why are labels overlapping?
+  - Fixed label count?
+  - Insufficient horizontal spacing calculation?
+  - Missing rotation parameter?
 
----
+- **Proposed Solution**:
+  - Algorithm for adaptive label frequency
+  - CSS/Flutter rotation angle
+  - Minimum spacing threshold
 
-## Expected Deliverables
+### 4. Variability Overflow Fix
+- **Current Layout**: How is variability text currently positioned?
+- **Container Constraints**: What's limiting the width?
+- **Proposed Solution**:
+  - Layout algorithm
+  - Text abbreviation rules
+  - Alternative placement (if needed)
 
-### 1. Phase 24E Implementation Plan
+### 5. Implementation Sequence
+Recommend priority order:
+1. Rebranding (independent, low-risk, can be done first)
+2. BP chart redesign (major feature, requires most work)
+3. Label spacing + variability overflow (polish items, can be bundled with #2)
 
-Create a comprehensive plan document that includes:
-
-**A. Scope Definition**
-- List of all screens/views requiring landscape adaptation (categorized by priority)
-- Specific layout requirements for each screen type (forms, charts, lists, navigation)
-- Breakpoint definitions (phone portrait, phone landscape, tablet portrait, tablet landscape)
-
-**B. Technical Design**
-- `responsive_utils.dart` specification (helpers, breakpoints, utilities)
-- Layout adaptation patterns for each screen category
-- Chart widget modifications for orientation awareness
-- Navigation shell adjustments (if needed)
-
-**C. Implementation Tasks**
-- Sequenced tasks with clear acceptance criteria
-- File modifications required (create vs. modify)
-- Widget test requirements for responsive layouts
-
-**D. Test Plan**
-- Widget tests using `MediaQuery` overrides for landscape/tablet scenarios
-- Overflow detection tests
-- Accessibility compatibility with landscape layouts
-- Performance considerations for layout recalculation
-
-**E. Success Metrics**
-- All major screens adapt gracefully to landscape orientation
-- No layout overflow errors in landscape mode on phones or tablets
-- Accessibility features (semantic labels, large text) remain functional in landscape
-- Widget test coverage maintained at ≥70%
-- Zero analyzer warnings; all tests passing
-
-**F. Risks & Mitigations**
-- Landscape complexity on small phones (mitigation: breakpoint fallbacks)
-- Chart rendering performance in landscape (mitigation: lazy loading, optimized layouts)
-- Navigation shell conflicts with landscape layouts (mitigation: test early, document patterns)
+### 6. Risk Assessment
+- Breaking changes to existing chart API?
+- Data migration needed?
+- Performance impact of dual-axis rendering?
+- Accessibility concerns (color zones for colorblind users)?
 
 ---
 
 ## Reference Materials
 
-### Key Documents
-
-1. **Implementation Schedule:**  
-   [Documentation/Plans/Implementation_Schedule.md](Documentation/Plans/Implementation_Schedule.md)
-
-2. **Phase 24 Specification:**  
-   [Documentation/Plans/Phase_24_Implementation_Spec.md](Documentation/Plans/Phase_24_Implementation_Spec.md)  
-   (Sections: Landscape Responsiveness, Risks & Mitigations)
-
-3. **Coding Standards:**  
-   [Documentation/Standards/CODING_STANDARDS.md](Documentation/Standards/CODING_STANDARDS.md)  
-   (Sections: §2 Git Workflow, §3 Dart/Flutter Conventions, §8 Testing)
-
-4. **Phase 24D Summary (for context):**  
-   [Documentation/implementation-summaries/Phase_24D_Summary.md](Documentation/implementation-summaries/Phase_24D_Summary.md)  
-   (Note: Recommendations for Phase 24E included in this summary)
-
-### Workspace Structure
-
-Key directories for investigation:
-- `lib/views/` – All UI screens requiring landscape adaptation
-- `lib/views/analytics/` – Charts and analytics widgets
-- `lib/widgets/` – Reusable widgets (forms, cards, lists)
-- `lib/utils/` – Check for existing responsive utilities
-- `test/views/`, `test/widgets/` – Widget test patterns
+- **Charts Library Docs**: Check which charting library is in use (fl_chart? charts_flutter?)
+- **NICE Guidelines**: https://www.nice.org.uk (for blood pressure thresholds)
+- **Current Issues Log**: [User_to_Steve.md](User_to_Steve.md)
+- **Coding Standards**: [CODING_STANDARDS.md](../Standards/CODING_STANDARDS.md)
+- **Previous Deployment**: [Deployment_Summary_2026-01-06.md](../Deployment_Summary_2026-01-06.md)
 
 ---
 
-## Constraints
+## Timeline Expectations
 
-1. **No Breaking Changes:** All existing functionality must continue to work in portrait mode
-2. **Accessibility Preservation:** Phase 24D improvements (semantic labels, large text) must remain functional in landscape
-3. **Material 3 Consistency:** Landscape layouts must respect the existing Material 3 theme and design patterns
-4. **Performance:** Layout recalculation must not introduce noticeable lag or jank
-5. **Test Coverage:** Maintain existing coverage targets (≥70% for widgets)
-
----
-
-## Next Steps for Tracy
-
-1. **Workspace Audit:**
-   - Investigate `lib/views/` to catalog all major screens requiring landscape adaptation
-   - Check if `lib/utils/responsive_utils.dart` already exists (if not, plan creation)
-   - Review existing chart widgets in `lib/views/analytics/` for orientation awareness
-   - Examine form widgets in `lib/views/` (BP, weight, medication) for current layout patterns
-
-2. **Define Breakpoints:**
-   - Confirm breakpoint strategy (e.g., `shortestSide >= 600` for tablet, `Orientation.landscape` for phones)
-   - Document responsive layout patterns (single-column vs. two-column, grid vs. list)
-
-3. **Prioritize Screens:**
-   - High Priority: Forms (BP, weight, medication), Analytics (charts), Home (quick actions)
-   - Medium Priority: History views, Settings/Appearance
-   - Low Priority: About, File Manager (less critical for landscape UX)
-
-4. **Create Phase 24E Plan:**
-   - Save the plan to: `Documentation/Plans/Phase_24E_Landscape_Responsiveness_Plan.md`
-   - Include all sections from "Expected Deliverables" above
-   - Reference CODING_STANDARDS.md patterns for file structure, naming, testing
-
-5. **Handoff to Implementation:**
-   - Once the plan is complete and you have verified it against CODING_STANDARDS.md, hand off to the appropriate implementer (Claudette or Georgina, depending on complexity)
-   - Create a handoff document: `Documentation/Handoffs/Tracy_to_[Implementer].md`
+- **Rebranding**: 1-2 hours (simple search/replace with verification)
+- **Chart Redesign Planning**: 1 day (research + architecture)
+- **Chart Implementation**: 2-3 days (complex widget changes)
+- **Chart Testing**: 1 day (widget tests + visual verification)
+- **Total**: ~4-5 days for complete resolution
 
 ---
 
-## Success Criteria
+## Next Steps
 
-- [ ] Phase 24E plan created with complete scope, technical design, and test strategy
-- [ ] All major screens cataloged with specific landscape adaptation requirements
-- [ ] Breakpoints and responsive patterns documented
-- [ ] Test plan includes widget tests for landscape scenarios using `MediaQuery` overrides
-- [ ] Plan reviewed against CODING_STANDARDS.md for compliance
-- [ ] Risks and mitigations identified
-- [ ] Clear handoff to implementation phase prepared
+1. **Tracy**: Create comprehensive implementation plan addressing all 4 issues
+2. **Tracy**: Research NICE guidelines and chart library capabilities
+3. **Tracy**: Document chart redesign with visual mockups
+4. **Tracy**: When complete, hand off to Clive for plan review
+5. **Steve**: Monitor progress and coordinate reviews
 
 ---
 
-## Notes
+## Open Questions for Tracy
 
-- The user mentioned they are using a release build sideloaded via `flutter install`. For testing landscape responsiveness, they may need a debuggable build or emulator access to rapidly iterate on layout changes.
-- Phase 24D Summary noted that high-contrast mode testing was deferred. If Phase 24E touches theme-related widgets, consider coordinating with any future high-contrast work.
-- This is the final sub-phase of Phase 24. After completion, we move to Phase 25 (PDF Report v2), which will benefit from landscape-aware PDF layout considerations.
+1. What charting library is currently in use? (Check pubspec.yaml)
+2. Are there existing color zones or threshold markers in any charts?
+3. How are systolic/diastolic currently differentiated in the chart? (different colors? different lines?)
+4. Is there existing infrastructure for zone coloring, or will this be new?
+5. What's the current data structure from AnalyticsViewModel? (List<Reading>? List<ReadingGroup>? Time series?)
 
 ---
 
-## Handoff Acknowledgment
+**Next Agent**: Tracy (Planning & Architecture)  
+**After Tracy**: Clive (Plan Review)  
+**After Clive**: Claudette or Georgina (Implementation)
 
-Tracy, please acknowledge receipt of this handoff by beginning your workspace audit and plan creation. Once the plan is ready, create the handoff document for the implementer and notify the user with a suggested prompt to continue the workflow.
+---
 
-**Suggested User Prompt After Plan Completion:**  
-> "@Tracy has completed the Phase 24E plan. Please review and hand off to [Implementer] for implementation."
+**Steve**  
+*Project Conductor*  
+Workflow: Tracy → Clive → Implementation → Final Review → Deployment
+

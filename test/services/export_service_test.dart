@@ -8,6 +8,7 @@ import 'package:path_provider_platform_interface/path_provider_platform_interfac
 import 'package:blood_pressure_monitor/models/health_data.dart';
 import 'package:blood_pressure_monitor/models/medication.dart';
 import 'package:blood_pressure_monitor/models/reading.dart';
+import 'package:blood_pressure_monitor/models/result.dart';
 import 'package:blood_pressure_monitor/services/export_service.dart';
 import '../helpers/service_mocks.dart';
 import '../helpers/test_path_provider.dart';
@@ -131,10 +132,13 @@ void main() {
     test('exportToJson writes metadata and data sections', () async {
       stubServices();
 
-      final file = await exportService.exportToJson(
+      final result = await exportService.exportToJson(
         profileId: 1,
         profileName: 'Primary User',
       );
+
+      expect(result, isA<Success<File>>());
+      final file = (result as Success<File>).value;
 
       final jsonContent =
           jsonDecode(await file.readAsString()) as Map<String, dynamic>;
@@ -149,157 +153,38 @@ void main() {
       expect((jsonContent['medicationIntakes'] as List).length, 1);
     });
 
-    test('exportToCsv emits section headers', () async {
+    test('exportToJson uses indented JSON formatting', () async {
       stubServices();
 
-      final file = await exportService.exportToCsv(
+      final result = await exportService.exportToJson(
         profileId: 1,
         profileName: 'Primary User',
       );
 
+      expect(result, isA<Success<File>>());
+      final file = (result as Success<File>).value;
       final contents = await file.readAsString();
-      expect(contents.contains('# READINGS'), isTrue);
-      expect(contents.contains('# WEIGHT'), isTrue);
-      expect(contents.contains('# SLEEP'), isTrue);
-      expect(contents.contains('# MEDICATIONS'), isTrue);
-      expect(contents.contains('# MEDICATION_INTAKES'), isTrue);
+
+      // Verify indented formatting (should have newlines and spaces)
+      expect(contents.contains('\n'), isTrue);
+      expect(contents.contains('  "metadata"'), isTrue);
     });
 
-    test('exportToCsv sanitizes formula injection attempts', () async {
-      // Create readings with malicious formula-like content
-      final maliciousReading = Reading(
-        id: 1,
+    test('exportToJson returns Failure on file system error', () async {
+      stubServices();
+
+      // Use a path that will trigger a failure
+      PathProviderPlatform.instance =
+          TestPathProviderPlatform('/invalid/path/that/does/not/exist');
+
+      final result = await exportService.exportToJson(
         profileId: 1,
-        systolic: 120,
-        diastolic: 75,
-        pulse: 70,
-        takenAt: DateTime.utc(2024, 1, 1, 12),
-        localOffsetMinutes: 0,
-        note: '=SUM(A1:A10)',
-        tags: '+HYPERLINK("evil.com","click")',
+        profileName: 'Primary User',
       );
 
-      final maliciousMedication = Medication(
-        id: 4,
-        profileId: 1,
-        name: '@cmd|calc',
-        dosage: '-2+2',
-      );
-
-      when(appInfoService.getAppVersion()).thenAnswer((_) async => '9.9.9');
-      when(
-        readingService.getReadingsByProfile(
-          1,
-          limit: anyNamed('limit'),
-        ),
-      ).thenAnswer((_) async => [maliciousReading]);
-      when(
-        medicationService.listMedicationsByProfile(
-          1,
-          includeInactive: true,
-        ),
-      ).thenAnswer((_) async => [maliciousMedication]);
-      when(
-        weightService.listWeightEntries(
-          profileId: 1,
-          from: anyNamed('from'),
-          to: anyNamed('to'),
-        ),
-      ).thenAnswer((_) async => []);
-      when(
-        sleepService.listSleepEntries(
-          profileId: 1,
-          from: anyNamed('from'),
-          to: anyNamed('to'),
-        ),
-      ).thenAnswer((_) async => []);
-      when(
-        intakeService.listIntakes(
-          profileId: 1,
-          from: anyNamed('from'),
-          to: anyNamed('to'),
-          medicationId: anyNamed('medicationId'),
-          groupId: anyNamed('groupId'),
-        ),
-      ).thenAnswer((_) async => []);
-
-      final file = await exportService.exportToCsv(
-        profileId: 1,
-        profileName: 'TestUser',
-      );
-
-      final contents = await file.readAsString();
-
-      // Verify that formula characters are escaped with single quote prefix
-      expect(contents.contains("'=SUM(A1:A10)"), isTrue);
-      expect(contents.contains("'+HYPERLINK"), isTrue);
-      expect(contents.contains("'@cmd|calc"), isTrue);
-      expect(contents.contains("'-2+2"), isTrue);
-    });
-
-    test('exportToCsv preserves normal text without sanitization', () async {
-      final normalReading = Reading(
-        id: 1,
-        profileId: 1,
-        systolic: 120,
-        diastolic: 75,
-        pulse: 70,
-        takenAt: DateTime.utc(2024, 1, 1, 12),
-        localOffsetMinutes: 0,
-        note: 'Normal note with numbers 123',
-        tags: 'tag1,tag2',
-      );
-
-      when(appInfoService.getAppVersion()).thenAnswer((_) async => '9.9.9');
-      when(
-        readingService.getReadingsByProfile(
-          1,
-          limit: anyNamed('limit'),
-        ),
-      ).thenAnswer((_) async => [normalReading]);
-      when(
-        weightService.listWeightEntries(
-          profileId: 1,
-          from: anyNamed('from'),
-          to: anyNamed('to'),
-        ),
-      ).thenAnswer((_) async => []);
-      when(
-        sleepService.listSleepEntries(
-          profileId: 1,
-          from: anyNamed('from'),
-          to: anyNamed('to'),
-        ),
-      ).thenAnswer((_) async => []);
-      when(
-        medicationService.listMedicationsByProfile(
-          1,
-          includeInactive: true,
-        ),
-      ).thenAnswer((_) async => []);
-      when(
-        intakeService.listIntakes(
-          profileId: 1,
-          from: anyNamed('from'),
-          to: anyNamed('to'),
-          medicationId: anyNamed('medicationId'),
-          groupId: anyNamed('groupId'),
-        ),
-      ).thenAnswer((_) async => []);
-
-      final file = await exportService.exportToCsv(
-        profileId: 1,
-        profileName: 'TestUser',
-      );
-
-      final contents = await file.readAsString();
-
-      // Normal content should not be prefixed with quotes
-      expect(contents.contains('Normal note with numbers 123'), isTrue);
-      expect(contents.contains('tag1,tag2'), isTrue);
-      // Should not have quotes added to normal text
-      expect(contents.contains("'Normal note"), isFalse);
-      expect(contents.contains("'tag1"), isFalse);
+      expect(result, isA<Failure<File>>());
+      final failure = result as Failure<File>;
+      expect(failure.error.type, AppErrorType.fileSystem);
     });
   });
 }

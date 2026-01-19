@@ -26,7 +26,6 @@ dependencies:
   # Authentication
   local_auth: ^2.3.0
   shared_preferences: ^2.3.3
-  crypto: ^3.0.3
   
   # Utilities
   intl: ^0.18.1
@@ -37,6 +36,7 @@ dependencies:
   file_picker: ^8.1.0
   package_info_plus: ^8.0.0
   url_launcher: ^6.2.0
+  crypto: ^3.0.7
 
 dev_dependencies:
   flutter_test:

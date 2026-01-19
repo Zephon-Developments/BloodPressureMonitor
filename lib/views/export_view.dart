@@ -33,41 +33,16 @@ class ExportView extends StatelessWidget {
                           leading: Icon(Icons.code),
                           title: Text('JSON Export'),
                           subtitle: Text(
-                            'Best for backups and importing back into this app.',
+                            'Human-readable export for backups and importing back into this app.',
                           ),
                         ),
                         const SizedBox(height: 8),
                         ElevatedButton.icon(
                           onPressed: viewModel.isExporting
                               ? null
-                              : () => _handleExport(context, viewModel, true),
+                              : () => _handleExport(context, viewModel),
                           icon: const Icon(Icons.download),
                           label: const Text('Export to JSON'),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        const ListTile(
-                          leading: Icon(Icons.table_chart),
-                          title: Text('CSV Export'),
-                          subtitle: Text(
-                            'Best for viewing in Excel or other spreadsheet software.',
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        ElevatedButton.icon(
-                          onPressed: viewModel.isExporting
-                              ? null
-                              : () => _handleExport(context, viewModel, false),
-                          icon: const Icon(Icons.download),
-                          label: const Text('Export to CSV'),
                         ),
                       ],
                     ),
@@ -153,20 +128,14 @@ class ExportView extends StatelessWidget {
   Future<void> _handleExport(
     BuildContext context,
     ExportViewModel viewModel,
-    bool isJson,
   ) async {
     // Get active profile from ActiveProfileViewModel
     final activeProfile = context.read<ActiveProfileViewModel>();
 
-    final success = isJson
-        ? await viewModel.exportToJson(
-            profileId: activeProfile.activeProfileId,
-            profileName: activeProfile.activeProfileName,
-          )
-        : await viewModel.exportToCsv(
-            profileId: activeProfile.activeProfileId,
-            profileName: activeProfile.activeProfileName,
-          );
+    final success = await viewModel.exportToJson(
+      profileId: activeProfile.activeProfileId,
+      profileName: activeProfile.activeProfileName,
+    );
     if (success && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Export completed successfully')),

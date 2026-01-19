@@ -1,21 +1,32 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:blood_pressure_monitor/models/result.dart';
 import 'package:blood_pressure_monitor/services/export_service.dart';
 
 /// ViewModel for managing the export process.
+///
+/// Handles the export of health data to JSON files and provides
+/// state management for the export UI.
 class ExportViewModel extends ChangeNotifier {
   final ExportService _exportService;
 
+  /// Creates an [ExportViewModel] with the given [exportService].
   ExportViewModel({required ExportService exportService})
       : _exportService = exportService;
 
   bool _isExporting = false;
+
+  /// Whether an export operation is currently in progress.
   bool get isExporting => _isExporting;
 
   String? _lastExportPath;
+
+  /// The file path of the most recent successful export.
   String? get lastExportPath => _lastExportPath;
 
   String? _errorMessage;
+
+  /// The current error message, if any.
   String? get errorMessage => _errorMessage;
 
   /// Exports data to JSON.
@@ -30,7 +41,7 @@ class ExportViewModel extends ChangeNotifier {
     _setExporting(true);
     _errorMessage = null;
     try {
-      final file = await _exportService.exportToJson(
+      final result = await _exportService.exportToJson(
         profileId: profileId,
         profileName: profileName,
         includeReadings: includeReadings,
@@ -38,41 +49,15 @@ class ExportViewModel extends ChangeNotifier {
         includeSleep: includeSleep,
         includeMedications: includeMedications,
       );
-      _lastExportPath = file.path;
-      return true;
-    } catch (e) {
-      _errorMessage = e.toString();
-      return false;
-    } finally {
-      _setExporting(false);
-    }
-  }
 
-  /// Exports data to CSV.
-  Future<bool> exportToCsv({
-    required int profileId,
-    required String profileName,
-    bool includeReadings = true,
-    bool includeWeight = true,
-    bool includeSleep = true,
-    bool includeMedications = true,
-  }) async {
-    _setExporting(true);
-    _errorMessage = null;
-    try {
-      final file = await _exportService.exportToCsv(
-        profileId: profileId,
-        profileName: profileName,
-        includeReadings: includeReadings,
-        includeWeight: includeWeight,
-        includeSleep: includeSleep,
-        includeMedications: includeMedications,
-      );
-      _lastExportPath = file.path;
-      return true;
-    } catch (e) {
-      _errorMessage = e.toString();
-      return false;
+      switch (result) {
+        case Success(:final value):
+          _lastExportPath = value.path;
+          return true;
+        case Failure(:final error):
+          _errorMessage = error.userMessage;
+          return false;
+      }
     } finally {
       _setExporting(false);
     }
@@ -83,12 +68,15 @@ class ExportViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Clears the current error message.
   void clearError() {
     _errorMessage = null;
     notifyListeners();
   }
 
-  /// Shares the last exported file.
+  /// Shares the last exported file using the platform share sheet.
+  ///
+  /// Returns `true` if the share was successful, `false` otherwise.
   Future<bool> shareLastExport() async {
     if (_lastExportPath == null) {
       _errorMessage = 'No file to share';

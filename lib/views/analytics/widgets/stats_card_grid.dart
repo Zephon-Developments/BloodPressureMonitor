@@ -17,7 +17,9 @@ class StatsCardGrid extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final columns = ResponsiveUtils.columnsFor(context, maxColumns: 2);
-        final aspectRatio = columns > 1 ? 1.4 : 1.2;
+        final aspectRatio = columns > 1
+            ? ResponsiveUtils.statsCardAspectRatioMulti
+            : ResponsiveUtils.statsCardAspectRatioSingle;
         return GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),

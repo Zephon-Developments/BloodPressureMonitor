@@ -26,6 +26,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Migrated `DropdownButtonFormField` from deprecated `value` to `initialValue` property (Flutter 3.33+)
 
 ### Fixed
+- **Android Import File Picker** (Phase 26 Extension)
+  - Fixed `PlatformException` ("Unsupported filter") when selecting JSON files on Android
+  - Implemented platform-aware fallback from `FileType.custom` to `FileType.any` with manual `.json` validation
+  - Added dependency injection seam (`FilePickerInvoker`) for testable picker logic
+  - Improved error messaging for invalid file extensions and picker failures
 - Resolved 7 deprecation warnings in dropdown components across the application
 - Fixed analytics not refreshing when weight units changed in preferences
 

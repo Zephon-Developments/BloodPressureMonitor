@@ -8,6 +8,7 @@ import 'package:blood_pressure_monitor/models/export_import.dart';
 import 'package:blood_pressure_monitor/models/health_data.dart';
 import 'package:blood_pressure_monitor/models/medication.dart';
 import 'package:blood_pressure_monitor/models/reading.dart';
+import 'package:blood_pressure_monitor/models/result.dart';
 import 'package:blood_pressure_monitor/services/import_service.dart';
 import '../helpers/service_mocks.dart';
 
@@ -78,12 +79,6 @@ void main() {
     return file;
   }
 
-  File writeCsv(List<String> lines) {
-    final file = File('${tempDir.path}/data.csv');
-    file.writeAsStringSync('${lines.join('\r\n')}\r\n');
-    return file;
-  }
-
   const profileId = 42;
   final reading = Reading(
     profileId: profileId,
@@ -148,54 +143,57 @@ void main() {
       verify(medicationService.deleteAllByProfile(profileId)).called(1);
       verify(intakeService.deleteAllByProfile(profileId)).called(1);
 
-      expect(result.errors, isEmpty);
-      expect(result.readingsImported, 1);
-      expect(result.weightsImported, 1);
-      expect(result.sleepLogsImported, 1);
-      expect(result.medicationsImported, 1);
-      expect(result.intakesImported, 1);
+      expect(result, isA<Success<ImportResult>>());
+      final importResult = (result as Success<ImportResult>).value;
+      expect(importResult.errors, isEmpty);
+      expect(importResult.readingsImported, 1);
+      expect(importResult.weightsImported, 1);
+      expect(importResult.sleepLogsImported, 1);
+      expect(importResult.medicationsImported, 1);
+      expect(importResult.intakesImported, 1);
     });
-  });
 
-  group('importFromCsv', () {
-    test('append skips duplicate readings and preserves existing data',
-        () async {
-      readingService.rangeResponder = (
-        profileArg,
-        start,
-        rangeEnd,
-      ) async {
-        final isSameInstant =
-            start == reading.takenAt && rangeEnd == reading.takenAt;
-        if (profileArg == profileId && isSameInstant) {
+    test('append skips duplicate readings', () async {
+      readingService.rangeResponder = (profileArg, start, rangeEnd) async {
+        if (start == reading.takenAt) {
           return [reading.copyWith(profileId: profileId)];
         }
         return <Reading>[];
       };
 
-      final file = writeCsv([
-        '# READINGS',
-        'systolic,diastolic,pulse,takenAt,localOffsetMinutes,posture,arm,medsContext,irregularFlag,tags,note',
-        '120,80,70,2024-01-01T12:00:00.000Z,0,,,,0,,',
-        '130,85,72,2024-01-02T12:00:00.000Z,0,,,,0,,',
-      ]);
+      final file = writeJson({
+        'readings': [
+          reading.toMap(), // Duplicate
+          reading.copyWith(systolic: 140).toMap(), // New
+        ],
+      });
 
-      final result = await importService.importFromCsv(
+      final result = await importService.importFromJson(
         file: file,
         profileId: profileId,
         conflictMode: ImportConflictMode.append,
       );
 
-      verifyNever(readingService.deleteAllByProfile(profileId));
-      expect(result.errors, isEmpty);
-      expect(
-        result.duplicatesSkipped,
-        1,
-        reason:
-            'duplicates:${result.duplicatesSkipped} imported:${result.readingsImported} created:${readingService.createCallCount}',
-      );
+      expect(result, isA<Success<ImportResult>>());
+      final importResult = (result as Success<ImportResult>).value;
+      expect(importResult.readingsImported, 1);
+      expect(importResult.duplicatesSkipped, 1);
       expect(readingService.createCallCount, 1);
-      expect(result.readingsImported, 1);
+    });
+
+    test('returns Failure on invalid JSON', () async {
+      final file = File('${tempDir.path}/invalid.json');
+      file.writeAsStringSync('{ invalid json }');
+
+      final result = await importService.importFromJson(
+        file: file,
+        profileId: profileId,
+        conflictMode: ImportConflictMode.append,
+      );
+
+      expect(result, isA<Failure<ImportResult>>());
+      final failure = result as Failure<ImportResult>;
+      expect(failure.error.type, AppErrorType.validation);
     });
   });
 }

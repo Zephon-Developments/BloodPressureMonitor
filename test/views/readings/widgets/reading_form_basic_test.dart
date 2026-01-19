@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:blood_pressure_monitor/views/readings/widgets/reading_form_basic.dart';
+import 'package:blood_pressure_monitor/widgets/common/custom_text_field.dart';
 
 void main() {
   group('ReadingFormBasic Widget Tests', () {
@@ -127,6 +128,43 @@ void main() {
       expect(wrap.spacing, 16);
       expect(wrap.runSpacing, 16);
       expect(wrap.children.length, 4);
+    });
+
+    testWidgets('verifies expected child widgets are CustomTextFields',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(createWidget());
+
+      // Verify each field is a CustomTextField with correct label
+      expect(
+        find.descendant(
+          of: find.byType(ReadingFormBasic),
+          matching: find.byWidgetPredicate(
+            (widget) => widget is CustomTextField && widget.label == 'Systolic',
+          ),
+        ),
+        findsOneWidget,
+      );
+
+      expect(
+        find.descendant(
+          of: find.byType(ReadingFormBasic),
+          matching: find.byWidgetPredicate(
+            (widget) =>
+                widget is CustomTextField && widget.label == 'Diastolic',
+          ),
+        ),
+        findsOneWidget,
+      );
+
+      expect(
+        find.descendant(
+          of: find.byType(ReadingFormBasic),
+          matching: find.byWidgetPredicate(
+            (widget) => widget is CustomTextField && widget.label == 'Pulse',
+          ),
+        ),
+        findsOneWidget,
+      );
     });
   });
 }

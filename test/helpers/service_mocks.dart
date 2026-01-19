@@ -1,13 +1,19 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:mockito/mockito.dart';
 
 import 'package:blood_pressure_monitor/models/analytics.dart';
+import 'package:blood_pressure_monitor/models/export_import.dart';
 import 'package:blood_pressure_monitor/models/health_data.dart';
 import 'package:blood_pressure_monitor/models/medication.dart';
 import 'package:blood_pressure_monitor/models/reading.dart';
+import 'package:blood_pressure_monitor/models/result.dart';
 import 'package:blood_pressure_monitor/services/analytics_service.dart';
 import 'package:blood_pressure_monitor/services/app_info_service.dart';
 import 'package:blood_pressure_monitor/services/averaging_service.dart';
+import 'package:blood_pressure_monitor/services/export_service.dart';
+import 'package:blood_pressure_monitor/services/import_service.dart';
 import 'package:blood_pressure_monitor/services/medication_intake_service.dart';
 import 'package:blood_pressure_monitor/services/medication_service.dart';
 import 'package:blood_pressure_monitor/services/reading_service.dart';
@@ -349,4 +355,85 @@ class MockAveragingService extends Mock implements AveragingService {
         returnValue: Future<void>.value(),
         returnValueForMissingStub: Future<void>.value(),
       ) as Future<void>);
+}
+
+class MockExportService extends Mock implements ExportService {
+  @override
+  Future<Result<File>> exportToJson({
+    required int profileId,
+    required String profileName,
+    bool includeReadings = true,
+    bool includeWeight = true,
+    bool includeSleep = true,
+    bool includeMedications = true,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #exportToJson,
+          [],
+          {
+            #profileId: profileId,
+            #profileName: profileName,
+            #includeReadings: includeReadings,
+            #includeWeight: includeWeight,
+            #includeSleep: includeSleep,
+            #includeMedications: includeMedications,
+          },
+        ),
+        returnValue: Future.value(Success(File(''))),
+        returnValueForMissingStub: Future.value(Success(File(''))),
+      ) as Future<Result<File>>);
+
+  @override
+  Future<void> shareExport(File file) => (super.noSuchMethod(
+        Invocation.method(#shareExport, [file]),
+        returnValue: Future.value(),
+        returnValueForMissingStub: Future.value(),
+      ) as Future<void>);
+}
+
+class MockImportService extends Mock implements ImportService {
+  @override
+  Future<Result<ImportResult>> importFromJson({
+    required File file,
+    required int profileId,
+    required ImportConflictMode conflictMode,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #importFromJson,
+          [],
+          {
+            #file: file,
+            #profileId: profileId,
+            #conflictMode: conflictMode,
+          },
+        ),
+        returnValue: Future.value(
+          Success(
+            ImportResult(
+              readingsImported: 0,
+              weightsImported: 0,
+              sleepLogsImported: 0,
+              medicationsImported: 0,
+              intakesImported: 0,
+              duplicatesSkipped: 0,
+              errors: [],
+            ),
+          ),
+        ),
+        returnValueForMissingStub: Future.value(
+          Success(
+            ImportResult(
+              readingsImported: 0,
+              weightsImported: 0,
+              sleepLogsImported: 0,
+              medicationsImported: 0,
+              intakesImported: 0,
+              duplicatesSkipped: 0,
+              errors: [],
+            ),
+          ),
+        ),
+      ) as Future<Result<ImportResult>>);
 }

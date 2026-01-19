@@ -13,6 +13,21 @@ class ResponsiveUtils {
   /// Breakpoint for activating two-column layouts on landscape phones.
   static const double twoColumnWidthThreshold = 720;
 
+  /// Standard spacing between responsive layout elements.
+  static const double standardSpacing = 16.0;
+
+  /// Aspect ratio for quick action cards in single-column layout.
+  static const double quickActionAspectRatioSingle = 1.1;
+
+  /// Aspect ratio for quick action cards in multi-column layout.
+  static const double quickActionAspectRatioMulti = 1.0;
+
+  /// Aspect ratio for stats cards in single-column layout.
+  static const double statsCardAspectRatioSingle = 1.2;
+
+  /// Aspect ratio for stats cards in multi-column layout.
+  static const double statsCardAspectRatioMulti = 1.4;
+
   /// Returns true when the provided [context] is currently in landscape.
   static bool isLandscape(BuildContext context) {
     return MediaQuery.orientationOf(context) == Orientation.landscape;
