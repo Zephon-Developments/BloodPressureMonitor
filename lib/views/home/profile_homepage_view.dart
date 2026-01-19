@@ -49,7 +49,9 @@ class ProfileHomepageView extends StatelessWidget {
                 builder: (context, constraints) {
                   final columns =
                       ResponsiveUtils.columnsFor(context, maxColumns: 3);
-                  final aspectRatio = columns >= 3 ? 1.0 : 1.1;
+                  final aspectRatio = columns >= 3
+                      ? ResponsiveUtils.quickActionAspectRatioMulti
+                      : ResponsiveUtils.quickActionAspectRatioSingle;
 
                   return GridView.count(
                     crossAxisCount: columns,

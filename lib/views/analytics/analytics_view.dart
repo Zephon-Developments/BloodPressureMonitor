@@ -108,9 +108,9 @@ class _AnalyticsViewState extends State<AnalyticsView> {
     return [
       LayoutBuilder(
         builder: (context, constraints) {
-          final isWide =
-              ResponsiveUtils.columnsFor(context, maxColumns: 2) > 1 &&
-                  constraints.maxWidth >= 720;
+          final isWide = ResponsiveUtils.columnsFor(context, maxColumns: 2) >
+                  1 &&
+              constraints.maxWidth >= ResponsiveUtils.twoColumnWidthThreshold;
 
           // Build widgets once to avoid duplication
           final statsCard = StatsCardGrid(stats: stats);

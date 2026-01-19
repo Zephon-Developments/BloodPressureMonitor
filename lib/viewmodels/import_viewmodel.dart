@@ -6,7 +6,10 @@ import 'package:blood_pressure_monitor/models/export_import.dart';
 import 'package:blood_pressure_monitor/models/result.dart';
 import 'package:blood_pressure_monitor/services/import_service.dart';
 
-/// ViewModel for managing the import process.
+/// Function signature for invoking the file picker.
+///
+/// This typedef enables dependency injection for testing, allowing tests
+/// to mock file picker behavior without platform channel dependencies.
 typedef FilePickerInvoker = Future<FilePickerResult?> Function({
   required FileType type,
   List<String>? allowedExtensions,

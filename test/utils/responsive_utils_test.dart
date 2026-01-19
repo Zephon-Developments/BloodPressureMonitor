@@ -32,14 +32,21 @@ void main() {
       Future<int> getColumns(Size size) async {
         tester.view.physicalSize = size;
         await tester.pumpWidget(
-          const MaterialApp(
+          MaterialApp(
             home: Scaffold(
-              body: Placeholder(),
+              body: Builder(
+                builder: (context) {
+                  // Capture columns value during build
+                  final columns =
+                      ResponsiveUtils.columnsFor(context, maxColumns: 3);
+                  return Text('$columns');
+                },
+              ),
             ),
           ),
         );
-        final context = tester.element(find.byType(Placeholder));
-        return ResponsiveUtils.columnsFor(context, maxColumns: 3);
+        final text = tester.widget<Text>(find.byType(Text));
+        return int.parse(text.data!);
       }
 
       expect(await getColumns(const Size(400, 800)), 1);
