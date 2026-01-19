@@ -21,7 +21,7 @@ class ImportView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const Text(
-                  'Import data from a previously exported JSON or CSV file.',
+                  'Import data from a previously exported JSON file.',
                   style: TextStyle(fontSize: 16),
                 ),
                 const SizedBox(height: 24),

@@ -1,142 +1,86 @@
-# Handoff: Tracy → Clive
+# Handoff: Tracy → Clive — Import FilePicker Failure (Android)
 
-**Date:** January 9, 2026  
-**From:** Tracy (Planning & Architecture)  
-**To:** Clive (Plan Review)  
-**Status:** Plan Ready for Review  
-**Phase:** 26 — Encrypted Full-App Backup
+## Objectives
+- Restore Import Data so Android users can pick and import JSON backups without crashes.
+- Keep JSON-only import and existing ImportService flow intact.
+- Ensure fixes comply with Coding Standards and do not regress other platforms.
 
----
+## Scope
+- **In**: Android file selection for JSON import (FilePicker usage), error handling/messages, dependency pin/adjustment, permissions/config if needed, validation of selected files, tests/docs updates.
+- **Out**: CSV import (already removed), export flows, iOS-specific changes unless impacted, backup/encryption format changes.
 
-## Objective & Scope
-Deliver a secure, user-friendly full-app backup/restore that exports the SQLCipher database into an encrypted backup file and restores it safely with rollback guarantees.
+## Constraints
+- Adhere to Coding Standards: CI gates clean (`flutter analyze`, `flutter test`, format) per [CODING_STANDARDS.md §2.4–2.5](Documentation/Standards/CODING_STANDARDS.md#L66); import order/style per §3.3; security-first per §1.1; avoid sensitive logging per §7.3.
+- Maintain current JSON import format and service contracts.
+- Android minSdk 21; scoped storage on 10+, SAF norms on 13+.
 
----
+## Success Metrics
+- No PlatformException when selecting a JSON file on Android emulator/device.
+- Only `.json` accepted; invalid extensions rejected with clear UX copy.
+- Import completes using a picked JSON file (manual E2E with sample file).
+- Analyzer/test/format clean; no new crashes/regressions (Android/iOS).
 
-## Constraints & Standards
-- **Coding standards:** Adhere to Documentation/Standards/Coding_Standards.md (import order, const correctness, doc comments, 80-char lines). Coverage targets: Services ≥85%, Widgets ≥70%. Analyzer clean and formatted.
-- **Security:** No passphrase persistence. Require strong passphrase (min 8, recommend 12+). Use authenticated encryption (AES-256-GCM) with KDF (PBKDF2-HMAC-SHA256 ≥100k iterations or Argon2id). Unique salts per backup; separate salts for encryption and checksum.
-- **Compatibility:** Only restore when backup schema version ≤ current app schema. Reject newer-schema backups. Allow restore then migrate if older but compatible.
-- **Data integrity:** Validate checksum before apply. Restore must be transactional with rollback to pre-restore DB on failure.
-- **User safety:** Explicit confirmation before destructive restore; clear errors for wrong passphrase, corruption, version mismatch, insufficient space; progress indicators for long operations.
-- **Performance:** Target <50MB DB, avoid UI thread blocking; heavy crypto/KDF in isolates/compute; stream I/O to avoid memory spikes.
+## Current Flow (failure point)
+- UI: [lib/views/import_view.dart](lib/views/import_view.dart#L13-L84) shows picker and selected file state.
+- VM: [lib/viewmodels/import_viewmodel.dart](lib/viewmodels/import_viewmodel.dart#L37-L75) calls `FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['json'])`; PlatformException `Unsupported filter` on Android.
+- Service: [lib/services/import_service.dart](lib/services/import_service.dart) works once given a valid File.
+- Manifest: only biometric perms today [android/app/src/main/AndroidManifest.xml](android/app/src/main/AndroidManifest.xml#L1-L38); no storage perms.
 
----
+## Hypotheses
+1) `file_picker` 8.1.0 Android regression with `FileType.custom` + extensions.
+2) SAF/content provider rejects custom filter; `FileType.any` needed on Android.
+3) Missing `READ_EXTERNAL_STORAGE` on API ≤32 causing failure before dialog.
+4) Android 13+ MIME handling change for non-media types.
 
-## Architecture & Components
+## Plan
 
-### 1) BackupService (new)
-- **Responsibilities:**
-  - Create backup: read SQLCipher DB file, wrap in container, encrypt with passphrase-derived key, write `.htb` file.
-  - Restore backup: decrypt, validate header/checksum/version, safely swap DB with rollback.
-- **Key APIs (proposed):**
-  - `Future<BackupResult> createBackup({required String passphrase})`
-  - `Future<RestoreResult> restoreBackup({required String passphrase, required Uri source})`
-  - `Future<bool> validateBackup(Uri source)` (header/checksum preflight)
-- **Implementation notes:**
-  - Run KDF + encryption in isolates to keep UI responsive.
-  - Stream file I/O to cap memory.
-  - Salts: `saltEnc` (KDF), `saltChk` (checksum); store non-secret salts in header.
-  - KDF: PBKDF2-HMAC-SHA256 (≥100k) or Argon2id (if acceptable dependency); document parameters.
-  - Encryption: AES-256-GCM; store IV/nonce and auth tag in header.
-  - Checksum: SHA-256 over plaintext DB (preferred) or encrypted payload; verify before apply.
+### Investigation (fast)
+- Reproduce on emulator; capture logcat stack for PlatformException.
+- Try `FileType.any` to confirm the crash ties to `FileType.custom`.
+- Check `file_picker` changelog/issues for 8.x; identify a known-good version (6.x/7.x).
+- Verify if API ≤32 requires `READ_EXTERNAL_STORAGE` despite SAF; validate on API 30 emulator if possible.
 
-### 2) Backup File Format (`.htb`)
-- **Header fields:** magic (`HTB1`), app version, schema version, createdAt, device/model (optional), profile count (optional), `saltEnc`, `saltChk`, iv/nonce, authTag length, checksum, payload length.
-- **Payload:** AES-GCM encrypted SQLCipher DB blob.
-- **Naming:** `HealthLog_backup_YYYYMMDD_HHMM.htb` (24h clock).
+### Solution Options (choose primary, keep fallback)
+- **Option A (fallback)**: Use `FileType.any` on Android; manually validate `.json` (case-insensitive) before accepting.
+- **Option B (version pin)**: Downgrade `file_picker` to stable Android-friendly version and keep `FileType.custom`.
+- **Option C (perm assist)**: Add `READ_EXTERNAL_STORAGE` for API ≤32 and request at runtime; keep SAF for 33+.
 
-### 3) UI/UX (Settings > Backup & Restore)
-- **Backup flow:** passphrase + confirm, strength hint, show/hide toggle; progress indicator; success snackbar with path/share action.
-- **Restore flow:** file picker/managed list; passphrase entry; header/version validation; warning dialog for destructive restore; progress; success prompt to restart/reload; failure shows reason.
-- **States:** idle, validating, encrypting/decrypting, writing, success, error.
+### Proposed Implementation Steps
+1. **Picker wrapper**: Add a small helper (within ImportViewModel or separate service) to encapsulate picker calls, easing testing/mocking.
+2. **Platform-aware pick**:
+   - Attempt `FileType.custom` with `['json']`.
+   - On PlatformException containing `Unsupported filter`, fallback to `FileType.any` on Android.
+   - After selection, validate filename ends with `.json` (case-insensitive); else show friendly error and clear selection.
+3. **Permissions (conditional)**: If investigation shows API ≤32 needs it, add manifest permission and runtime request (guarded by SDK version) before picker.
+4. **Dependency pin (if needed)**: Pin `file_picker` to known-good version; run `flutter pub get` and update lockfile.
+5. **UX copy**: Update error messaging to distinguish picker failure vs invalid file; keep messages non-sensitive (Standards §7.3).
+6. **Docs**: Note Android picker behavior and any permissions in Import docs/CHANGELOG.
 
-### 4) File Management
-- Store backups in app-managed files directory; integrate with FileManagerService (list/delete) if present.
-- Ensure platform-safe paths/permissions (Android/iOS). Optional share sheet to export backup file.
+### Testing
+- **Unit**: New picker helper validates `.json`; rejects invalid extension; handles PlatformException fallback (via injected picker interface or seam).
+- **Integration/manual**:
+  - Android API 34 emulator: pick JSON from Download; ensure no crash and import succeeds with sample `testData/bp_export_Douglas_Reay_20260119_1326.json`.
+  - Android API 30 emulator (if available): same; verify permission prompt if added.
+  - Attempt non-JSON file → expect validation error and no import.
+- **CI**: `flutter analyze`, `flutter test`, `dart format` per Standards §2.4.
 
-### 5) Restore Safety & Rollback
-- Pre-check free space (≥2x backup size) before restore.
-- Create pre-restore checkpoint: copy current DB to temp; revert on failure.
-- Apply restore only after decrypt + checksum + version validation.
-- Prefer atomic swap (move new DB into place) or transactional reopen.
+### Risks & Mitigations
+- Plugin bug persists → fallback to `FileType.any` + validation; or pin older plugin.
+- Added permission annoys users on API ≤32 → only request if proven necessary.
+- iOS regression → keep Android-only fallback path; quick sanity pick on iOS sim.
+- Extension check edge cases → case-insensitive, trim whitespace, allow uppercase `.JSON`.
 
-### 2) Backup File Format (`.htb`)
-- **Header Fields:** magic (`HTB1`), app version, schema version, createdAt, device/model (optional), profile count (optional), saltEnc, saltChk, iv/nonce, authTag length, checksum, payload length.
-- **Payload:** AES-GCM encrypted SQLCipher DB blob.
-- **Naming:** `HealthLog_backup_YYYYMMDD_HHMM.htb` (24h clock).
+### Open Questions
+- Accept making `FileType.any` permanent on Android vs retry `FileType.custom` once plugin stabilizes?
+- Are we okay introducing `permission_handler` dependency if needed for runtime requests?
+- Need to support cloud providers (Drive) explicitly? If yes, SAF-first approach favored.
 
-### 3) UI/UX (Settings > Backup & Restore)
-- **Backup Flow:** passphrase + confirm, strength hint, show/hide toggle; progress indicator; success snackbar with path/share action.
-- **Restore Flow:** file picker/managed list; passphrase entry; header/version validation; warning dialog for destructive restore; progress; success prompt to restart/reload; failure shows reason.
-- **States:** idle, validating, encrypting/decrypting, writing, success, error.
+### Sequencing
+1) Repro + logcat; choose Option A/B/C based on findings.
+2) Implement picker wrapper + fallback + validation.
+3) Add permission handling if required; update manifest.
+4) Pin dependency if chosen; fetch packages.
+5) Update messages/docs; add tests; run analyze/test/format.
 
-### 4) File Management
-- Store backups in managed files directory; integrate with FileManagerService if available for list/delete.
-- Ensure platform-safe paths/permissions (Android/iOS). Optional share sheet to export backup file.
-
-### 5) Restore Safety & Rollback
-- Pre-check free space (>=2x backup size) before restore.
-- Create pre-restore checkpoint: copy current DB to temp; revert on failure.
-- Apply restore only after decrypt + checksum + version validation.
-- Prefer atomic file swap (move new DB into place) or transactionally reopen DB.
-
----
-
-## Testing Strategy
-- **Unit:** KDF determinism and weak-passphrase rejection; AES-GCM round-trip with salts/IV/auth tag; header parse/serialize; checksum validation; version gating (reject newer schema, allow compatible older).
-- **Integration:** Full backup/restore round-trip with sample DB; data equality; wrong passphrase fails with intact DB; corrupt file/bad checksum fails cleanly; insufficient space simulation (if feasible) fails pre-mutation.
-- **Widget/Flow:** Backup UI validation/progress/success; restore UI file selection, confirm dialog, error messaging for wrong passphrase/version mismatch.
-- **Non-functional:** Performance smoke on ~50MB DB; analyzer + format; coverage targets met.
-
----
-
-## Sequencing & Deliverables
-1) Finalize header/KDF parameters and acceptance tests (review checkpoint).
-2) Implement BackupService (format, KDF, AES-GCM, checksum, version gating, rollback hooks).
-3) Integrate Settings UI for backup/restore with progress and confirmations.
-4) File management + optional sharing from managed directory.
-5) Testing pass: unit + integration + widget; performance smoke; analyzer/format compliance.
-
----
-
-## Risks & Mitigations
-- **KDF performance on low-end devices:** Use isolates; tune iterations with benchmarks; document chosen parameters.
-- **Schema incompatibility:** Strict version gating; clear user messaging; refuse newer-schema backups.
-- **Corruption during restore:** Validate checksum pre-apply; atomic swap; rollback to checkpoint.
-- **Passphrase loss:** Warn passphrase unrecoverable; advise secure storage.
-- **Storage constraints:** Pre-flight space check; abort before mutation.
-
----
-
-## Acceptance Criteria
-- Backup uses AES-256-GCM with KDF-derived key; salts/IV/auth tag stored in header.
-- Restore rejects wrong passphrase, corrupt checksum, or newer schema; preserves existing data on failure.
-- Successful round-trip restores data identically (integration test).
-- UI shows progress and confirmations; destructive actions require explicit consent.
-- Analyzer clean; tests/coverage targets met; code formatted per standards.
-
----
-
-**Ready for your review, Clive.**
-
-## Open Questions for Clive
-1) Any objection to PBKDF2-HMAC-SHA256 (≥100k iterations) as the baseline, deferring Argon2id unless benchmarks demand it?
-2) Prefer checksum over plaintext DB (stronger corruption signal) vs. encrypted payload (smaller header leak surface)?
-3) Minimum Android free-space threshold multiplier acceptable (2x vs 2.5x) for restore preflight?
-
----
-
-## Artifacts to Update (Phase 26)
-- lib/services/backup_service.dart
-- lib/viewmodels/settings/backup_view_model.dart (or equivalent ViewModel)
-- lib/views/settings/backup_view.dart (flows for backup/restore)
-- lib/services/file_manager_service.dart (extend if needed for listing/deleting backups)
-- test/services/backup_service_test.dart
-- test/viewmodels/backup_view_model_test.dart
-- test/views/settings/backup_view_test.dart
-- Documentation/Deployment_Summary_2026-01-06.md (add backup feature notes)
-
----
-
-Ready for your review, Clive. Cleaned per feedback—no Phase 24 content remains.
+## Action for Clive
+Please review the plan and confirm the preferred option (A/B/C) after quick repro. Once approved, we’ll proceed to implementation and testing.

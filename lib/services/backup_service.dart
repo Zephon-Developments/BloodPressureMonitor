@@ -117,7 +117,7 @@ class BackupService {
     try {
       // Validate passphrase strength
       if (passphrase.length < _minPassphraseLength) {
-        return BackupFailure(
+        return const BackupFailure(
           message:
               'Passphrase must be at least $_minPassphraseLength characters.',
           errorType: BackupErrorType.weakPassphrase,
@@ -313,7 +313,7 @@ class BackupService {
         await testDb.close();
       } catch (e) {
         await testDb?.close();
-        return RestoreFailure(
+        return const RestoreFailure(
           message:
               'Failed to open backup file. Incorrect passphrase or corrupted backup.',
           errorType: RestoreErrorType.wrongPassphrase,

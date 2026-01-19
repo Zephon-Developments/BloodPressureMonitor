@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:csv/csv.dart';
+
 import 'package:blood_pressure_monitor/models/reading.dart';
 import 'package:blood_pressure_monitor/models/health_data.dart';
 import 'package:blood_pressure_monitor/models/medication.dart';
 import 'package:blood_pressure_monitor/models/export_import.dart';
+import 'package:blood_pressure_monitor/models/result.dart';
 import 'package:blood_pressure_monitor/services/reading_service.dart';
 import 'package:blood_pressure_monitor/services/weight_service.dart';
 import 'package:blood_pressure_monitor/services/sleep_service.dart';
@@ -12,7 +13,9 @@ import 'package:blood_pressure_monitor/services/medication_service.dart';
 import 'package:blood_pressure_monitor/services/medication_intake_service.dart';
 import 'package:blood_pressure_monitor/services/averaging_service.dart';
 
-/// Service for importing health data from CSV and JSON formats.
+/// Service for importing health data from JSON format.
+///
+/// Uses the Result pattern for explicit error handling.
 class ImportService {
   final ReadingService _readingService;
   final WeightService _weightService;
@@ -36,298 +39,205 @@ class ImportService {
         _averagingService = averagingService ?? AveragingService();
 
   /// Imports data from a JSON file.
-  Future<ImportResult> importFromJson({
+  ///
+  /// Returns a [Result] containing the [ImportResult] on success,
+  /// or an [AppError] if the operation fails.
+  Future<Result<ImportResult>> importFromJson({
     required File file,
     required int profileId,
     required ImportConflictMode conflictMode,
   }) async {
-    final content = await file.readAsString();
-    final Map<String, dynamic> data = jsonDecode(content);
+    try {
+      final content = await file.readAsString();
+      final Map<String, dynamic> data = jsonDecode(content);
 
-    final hasReadings = data.containsKey('readings');
-    final hasWeight = data.containsKey('weight');
-    final hasSleep = data.containsKey('sleep');
-    final hasMedications = data.containsKey('medications');
-    final hasIntakes = data.containsKey('medicationIntakes');
+      final hasReadings = data.containsKey('readings');
+      final hasWeight = data.containsKey('weight');
+      final hasSleep = data.containsKey('sleep');
+      final hasMedications = data.containsKey('medications');
+      final hasIntakes = data.containsKey('medicationIntakes');
 
-    if (conflictMode == ImportConflictMode.overwrite) {
-      await _clearExistingData(
-        profileId: profileId,
-        clearReadings: hasReadings,
-        clearWeight: hasWeight,
-        clearSleep: hasSleep,
-        clearMedications: hasMedications,
-        clearMedicationIntakes: hasIntakes,
-      );
-    }
-
-    int readingsImported = 0;
-    int weightsImported = 0;
-    int sleepLogsImported = 0;
-    int medicationsImported = 0;
-    int intakesImported = 0;
-    int duplicatesSkipped = 0;
-    final List<ImportError> errors = [];
-
-    // Handle Readings
-    if (hasReadings) {
-      final List<dynamic> readingsData = data['readings'];
-      for (final rMap in readingsData) {
-        try {
-          final reading = Reading.fromMap(rMap as Map<String, dynamic>);
-          final adjustedReading = reading.copyWith(profileId: profileId);
-
-          if (conflictMode == ImportConflictMode.append) {
-            final existing = await _readingService.getReadingsInTimeRange(
-              profileId,
-              adjustedReading.takenAt,
-              adjustedReading.takenAt,
-            );
-            final isDuplicate = existing.any(
-              (e) =>
-                  e.systolic == adjustedReading.systolic &&
-                  e.diastolic == adjustedReading.diastolic,
-            );
-            if (isDuplicate) {
-              duplicatesSkipped++;
-              continue;
-            }
-          }
-
-          await _readingService.createReading(adjustedReading);
-          readingsImported++;
-        } catch (e) {
-          errors.add(
-            ImportError(
-              row: readingsImported + duplicatesSkipped + errors.length + 1,
-              dataType: 'Reading',
-              message: e.toString(),
-            ),
-          );
-        }
-      }
-    }
-
-    // Handle Weight
-    if (hasWeight) {
-      final List<dynamic> weightData = data['weight'];
-      for (final wMap in weightData) {
-        try {
-          final entry = WeightEntry.fromMap(wMap as Map<String, dynamic>);
-          final adjustedEntry = entry.copyWith(profileId: profileId);
-          await _weightService.createWeightEntry(adjustedEntry);
-          weightsImported++;
-        } catch (e) {
-          errors.add(
-            ImportError(
-              row: weightsImported + errors.length + 1,
-              dataType: 'Weight',
-              message: e.toString(),
-            ),
-          );
-        }
-      }
-    }
-
-    // Handle Sleep
-    if (hasSleep) {
-      final List<dynamic> sleepData = data['sleep'];
-      for (final sMap in sleepData) {
-        try {
-          final entry = SleepEntry.fromMap(sMap as Map<String, dynamic>);
-          final adjustedEntry = entry.copyWith(profileId: profileId);
-          await _sleepService.createSleepEntry(adjustedEntry);
-          sleepLogsImported++;
-        } catch (e) {
-          errors.add(
-            ImportError(
-              row: sleepLogsImported + errors.length + 1,
-              dataType: 'Sleep',
-              message: e.toString(),
-            ),
-          );
-        }
-      }
-    }
-
-    // Handle Medications
-    if (hasMedications) {
-      final List<dynamic> medData = data['medications'];
-      for (final mMap in medData) {
-        try {
-          final med = Medication.fromMap(mMap as Map<String, dynamic>);
-          final adjustedMed = med.copyWith(profileId: profileId);
-          await _medicationService.createMedication(adjustedMed);
-          medicationsImported++;
-        } catch (e) {
-          errors.add(
-            ImportError(
-              row: medicationsImported + errors.length + 1,
-              dataType: 'Medication',
-              message: e.toString(),
-            ),
-          );
-        }
-      }
-    }
-
-    // Handle Medication Intakes
-    if (hasIntakes) {
-      final List<dynamic> intakeData = data['medicationIntakes'];
-      for (final iMap in intakeData) {
-        try {
-          final intake = MedicationIntake.fromMap(iMap as Map<String, dynamic>);
-          final adjustedIntake = intake.copyWith(profileId: profileId);
-          await _intakeService.logIntake(adjustedIntake);
-          intakesImported++;
-        } catch (e) {
-          errors.add(
-            ImportError(
-              row: intakesImported + errors.length + 1,
-              dataType: 'MedicationIntake',
-              message: e.toString(),
-            ),
-          );
-        }
-      }
-    }
-
-    // Recompute reading groups if any readings were imported
-    if (readingsImported > 0) {
-      await _averagingService.recomputeGroupsForProfile(profileId);
-    }
-
-    return ImportResult(
-      readingsImported: readingsImported,
-      weightsImported: weightsImported,
-      sleepLogsImported: sleepLogsImported,
-      medicationsImported: medicationsImported,
-      intakesImported: intakesImported,
-      duplicatesSkipped: duplicatesSkipped,
-      errors: errors,
-    );
-  }
-
-  /// Imports data from a CSV file.
-  Future<ImportResult> importFromCsv({
-    required File file,
-    required int profileId,
-    required ImportConflictMode conflictMode,
-  }) async {
-    final content = await file.readAsString();
-    final List<List<dynamic>> rows =
-        const CsvToListConverter(shouldParseNumbers: true).convert(content);
-
-    if (conflictMode == ImportConflictMode.overwrite) {
-      await _clearExistingData(
-        profileId: profileId,
-        clearReadings: true,
-      );
-    }
-
-    int readingsImported = 0;
-    int weightsImported = 0;
-    int sleepLogsImported = 0;
-    int medicationsImported = 0;
-    int intakesImported = 0;
-    int duplicatesSkipped = 0;
-    final List<ImportError> errors = [];
-
-    String currentSection = '';
-    List<String> headers = [];
-
-    for (int i = 0; i < rows.length; i++) {
-      final row = rows[i];
-      if (row.isEmpty) continue;
-
-      final firstCell = row[0].toString();
-      if (firstCell.startsWith('#')) {
-        currentSection = firstCell.substring(2).trim();
-        headers = [];
-        continue;
-      }
-
-      if (headers.isEmpty) {
-        headers = row.map((e) => e.toString()).toList();
-        continue;
-      }
-
-      try {
-        final map = Map<String, dynamic>.fromIterables(headers, row);
-
-        if (currentSection == 'READINGS') {
-          final reading = _parseReadingFromCsvMap(map, profileId);
-
-          if (conflictMode == ImportConflictMode.append) {
-            final existing = await _readingService.getReadingsInTimeRange(
-              profileId,
-              reading.takenAt,
-              reading.takenAt,
-            );
-            final isDuplicate = existing.any(
-              (e) =>
-                  e.systolic == reading.systolic &&
-                  e.diastolic == reading.diastolic,
-            );
-            if (isDuplicate) {
-              duplicatesSkipped++;
-              continue;
-            }
-          }
-
-          await _readingService.createReading(reading);
-          readingsImported++;
-        }
-        // Additional sections can be appended here as CSV support expands.
-      } catch (e) {
-        errors.add(
-          ImportError(
-            row: i + 1,
-            dataType: currentSection,
-            message: e.toString(),
-          ),
+      if (conflictMode == ImportConflictMode.overwrite) {
+        await _clearExistingData(
+          profileId: profileId,
+          clearReadings: hasReadings,
+          clearWeight: hasWeight,
+          clearSleep: hasSleep,
+          clearMedications: hasMedications,
+          clearMedicationIntakes: hasIntakes,
         );
       }
+
+      int readingsImported = 0;
+      int weightsImported = 0;
+      int sleepLogsImported = 0;
+      int medicationsImported = 0;
+      int intakesImported = 0;
+      int duplicatesSkipped = 0;
+      final List<ImportError> errors = [];
+
+      // Handle Readings
+      if (hasReadings) {
+        final List<dynamic> readingsData = data['readings'];
+        for (final rMap in readingsData) {
+          try {
+            final reading = Reading.fromMap(rMap as Map<String, dynamic>);
+            final adjustedReading = reading.copyWith(profileId: profileId);
+
+            if (conflictMode == ImportConflictMode.append) {
+              final existing = await _readingService.getReadingsInTimeRange(
+                profileId,
+                adjustedReading.takenAt,
+                adjustedReading.takenAt,
+              );
+              final isDuplicate = existing.any(
+                (e) =>
+                    e.systolic == adjustedReading.systolic &&
+                    e.diastolic == adjustedReading.diastolic,
+              );
+              if (isDuplicate) {
+                duplicatesSkipped++;
+                continue;
+              }
+            }
+
+            await _readingService.createReading(adjustedReading);
+            readingsImported++;
+          } catch (e) {
+            errors.add(
+              ImportError(
+                row: readingsImported + duplicatesSkipped + errors.length + 1,
+                dataType: 'Reading',
+                message: e.toString(),
+              ),
+            );
+          }
+        }
+      }
+
+      // Handle Weight
+      if (hasWeight) {
+        final List<dynamic> weightData = data['weight'];
+        for (final wMap in weightData) {
+          try {
+            final entry = WeightEntry.fromMap(wMap as Map<String, dynamic>);
+            final adjustedEntry = entry.copyWith(profileId: profileId);
+            await _weightService.createWeightEntry(adjustedEntry);
+            weightsImported++;
+          } catch (e) {
+            errors.add(
+              ImportError(
+                row: weightsImported + errors.length + 1,
+                dataType: 'Weight',
+                message: e.toString(),
+              ),
+            );
+          }
+        }
+      }
+
+      // Handle Sleep
+      if (hasSleep) {
+        final List<dynamic> sleepData = data['sleep'];
+        for (final sMap in sleepData) {
+          try {
+            final entry = SleepEntry.fromMap(sMap as Map<String, dynamic>);
+            final adjustedEntry = entry.copyWith(profileId: profileId);
+            await _sleepService.createSleepEntry(adjustedEntry);
+            sleepLogsImported++;
+          } catch (e) {
+            errors.add(
+              ImportError(
+                row: sleepLogsImported + errors.length + 1,
+                dataType: 'Sleep',
+                message: e.toString(),
+              ),
+            );
+          }
+        }
+      }
+
+      // Handle Medications
+      if (hasMedications) {
+        final List<dynamic> medData = data['medications'];
+        for (final mMap in medData) {
+          try {
+            final med = Medication.fromMap(mMap as Map<String, dynamic>);
+            final adjustedMed = med.copyWith(profileId: profileId);
+            await _medicationService.createMedication(adjustedMed);
+            medicationsImported++;
+          } catch (e) {
+            errors.add(
+              ImportError(
+                row: medicationsImported + errors.length + 1,
+                dataType: 'Medication',
+                message: e.toString(),
+              ),
+            );
+          }
+        }
+      }
+
+      // Handle Medication Intakes
+      if (hasIntakes) {
+        final List<dynamic> intakeData = data['medicationIntakes'];
+        for (final iMap in intakeData) {
+          try {
+            final intake =
+                MedicationIntake.fromMap(iMap as Map<String, dynamic>);
+            final adjustedIntake = intake.copyWith(profileId: profileId);
+            await _intakeService.logIntake(adjustedIntake);
+            intakesImported++;
+          } catch (e) {
+            errors.add(
+              ImportError(
+                row: intakesImported + errors.length + 1,
+                dataType: 'MedicationIntake',
+                message: e.toString(),
+              ),
+            );
+          }
+        }
+      }
+
+      // Recompute reading groups if any readings were imported
+      if (readingsImported > 0) {
+        await _averagingService.recomputeGroupsForProfile(profileId);
+      }
+
+      return Success(
+        ImportResult(
+          readingsImported: readingsImported,
+          weightsImported: weightsImported,
+          sleepLogsImported: sleepLogsImported,
+          medicationsImported: medicationsImported,
+          intakesImported: intakesImported,
+          duplicatesSkipped: duplicatesSkipped,
+          errors: errors,
+        ),
+      );
+    } on FileSystemException catch (e) {
+      return Failure(
+        AppError.fileSystem(
+          'Failed to read import file: ${e.message}',
+          e,
+        ),
+      );
+    } on FormatException catch (e) {
+      return Failure(
+        AppError.validation(
+          'Invalid JSON format: ${e.message}',
+          e,
+        ),
+      );
+    } catch (e) {
+      return Failure(
+        AppError.unexpected(
+          'Failed to import data: $e',
+          e,
+        ),
+      );
     }
-
-    // Recompute reading groups if any readings were imported
-    if (readingsImported > 0) {
-      await _averagingService.recomputeGroupsForProfile(profileId);
-    }
-
-    return ImportResult(
-      readingsImported: readingsImported,
-      weightsImported: weightsImported,
-      sleepLogsImported: sleepLogsImported,
-      medicationsImported: medicationsImported,
-      intakesImported: intakesImported,
-      duplicatesSkipped: duplicatesSkipped,
-      errors: errors,
-    );
-  }
-
-  Reading _parseReadingFromCsvMap(Map<String, dynamic> map, int profileId) {
-    // Normalize timestamp format: accept both `.` and `,` for milliseconds
-    final rawTimestamp = map['takenAt'] as String;
-    final normalizedTimestamp = rawTimestamp.replaceAll(
-      RegExp(r'(\d{2}:\d{2}:\d{2}),(\d{3}[Zz]?)'),
-      r'$1.$2',
-    );
-
-    return Reading(
-      profileId: profileId,
-      systolic: map['systolic'] as int,
-      diastolic: map['diastolic'] as int,
-      pulse: map['pulse'] as int,
-      takenAt: DateTime.parse(normalizedTimestamp),
-      localOffsetMinutes: map['localOffsetMinutes'] as int,
-      posture: map['posture']?.toString(),
-      arm: map['arm']?.toString(),
-      medsContext: map['medsContext']?.toString(),
-      irregularFlag: map['irregularFlag'] == 1,
-      tags: map['tags']?.toString(),
-      note: map['note']?.toString(),
-    );
   }
 
   Future<void> _clearExistingData({
