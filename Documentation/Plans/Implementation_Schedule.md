@@ -34,7 +34,7 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - [x] Phase 24D: Accessibility Pass ✅ **COMPLETE** (Jan 3, 2026)
 - [x] Phase 24E: Landscape Responsiveness ✅ **COMPLETE** (Jan 9, 2026)
 - [ ] Phase 25: PDF Report v2 ⏸️ **ON HOLD**
-- [ ] Phase 26: Encrypted Full-App Backup
+- [x] Phase 26: Encrypted Full-App Backup ✅ **COMPLETE** (Jan 19, 2026)
 - [ ] Phase 27: Polish & Comprehensive Testing
 
 ---
@@ -575,19 +575,20 @@ Break the implementation into sprint-sized phases with clear tasks, dependencies
 - All tests passing; analyzer clean; coverage ≥85% for services.
 **Rollback point**: Feature-flag new report layout; fall back to existing PDF format if generation issues arise.
 
-### Phase 26: Encrypted Full-App Backup
+### Phase 26: Encrypted Full-App Backup ✅ COMPLETE
 **Scope**: Passphrase-protected backup/restore of the full encrypted database.
 **Tasks**
-- Export SQLCipher DB as a single blob with an added AES layer using a user passphrase; name
+- ✅ Export SQLCipher DB as a single blob with an added AES layer using a user passphrase; name
   files `HealthLog_backup_YYYYMMDD_HHMM.htb`.
-- Backup/Restore UI in Settings with progress, warnings, and passphrase entry.
-- Restore modes: replace all (default) with rollback on failure; merge mode optional if feasible.
-- Version stamps and checksums to validate compatibility and corruption.
+- ✅ Backup/Restore UI in Settings with progress, warnings, and passphrase entry.
+- ✅ Restore modes: replace all (default) with rollback on failure; merge mode optional if feasible.
+- ✅ Version stamps and checksums to validate compatibility and corruption.
 **Dependencies**: Phase 14 naming; stable schema through Phase 25 features.
 **Acceptance**
-- Round-trip backup/restore succeeds with test data; wrong passphrase or corrupt file fails
+- ✅ Round-trip backup/restore succeeds with test data; wrong passphrase or corrupt file fails
   cleanly without partial writes.
-- Service/widget tests for happy path and failure paths; analyzer/tests pass.
+- ✅ Service/widget tests for happy path and failure paths; analyzer/tests pass.
+**Status**: Merged to main Jan 19, 2026 (PR #47)
 
 ### Phase 27: Polish & Comprehensive Testing
 **Scope**: Final lint, coverage, performance, accessibility, and release readiness sweep.
