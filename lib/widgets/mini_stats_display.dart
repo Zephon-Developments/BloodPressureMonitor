@@ -62,8 +62,9 @@ class MiniStatsDisplay extends StatelessWidget {
     ThemeData theme,
   ) {
     return Semantics(
-      label:
-          'Latest: ${miniStats.latestValue}, 7-day average: ${miniStats.weekAverage}',
+      label: miniStats.weekAverage.isEmpty
+          ? 'Latest: ${miniStats.latestValue}'
+          : 'Latest: ${miniStats.latestValue}, 7-day average: ${miniStats.weekAverage}',
       excludeSemantics: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -85,24 +86,26 @@ class MiniStatsDisplay extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          // 7-Day Average
-          Row(
-            children: [
-              Text(
-                '7-day avg: ',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+          // 7-Day Average (only if not empty)
+          if (miniStats.weekAverage.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Text(
+                  '7-day avg: ',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                 ),
-              ),
-              Text(
-                miniStats.weekAverage,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.w500,
+                Text(
+                  miniStats.weekAverage,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+          ],
           // Last Update
           if (miniStats.lastUpdate != null) ...[
             const SizedBox(height: 4),

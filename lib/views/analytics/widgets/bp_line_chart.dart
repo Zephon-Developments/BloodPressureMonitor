@@ -5,6 +5,8 @@ import 'package:blood_pressure_monitor/models/analytics.dart';
 import 'package:blood_pressure_monitor/views/analytics/painters/clinical_band_painter.dart';
 
 /// Combined systolic/diastolic chart with clinical banding and sleep overlay.
+///
+/// @deprecated Use [BpSplitCharts] instead for separate systolic/diastolic charts.
 class BpLineChart extends StatelessWidget {
   const BpLineChart({
     required this.dataSet,
@@ -39,6 +41,7 @@ class BpLineChart extends StatelessWidget {
                   painter: ClinicalBandPainter(
                     minValue: _minY,
                     maxValue: _maxY,
+                    bpType: BpType.systolic, // Default to systolic for legacy
                   ),
                 ),
               ),

@@ -386,29 +386,17 @@ void main() {
       expect(result, isNull);
     });
 
-    test('calculates adherence percentage correctly', () async {
+    test('returns last dose time without adherence (Phase 26)', () async {
       final now = DateTime.now();
       final weekStart = now.subtract(const Duration(days: 7));
 
-      // 5 days with doses = ~71% adherence
+      // Multiple intakes
       final intakes = [
         MedicationIntake(
-          id: 5,
+          id: 1,
           profileId: 1,
           medicationId: 1,
-          takenAt: weekStart.add(const Duration(days: 1)),
-        ),
-        MedicationIntake(
-          id: 4,
-          profileId: 1,
-          medicationId: 1,
-          takenAt: weekStart.add(const Duration(days: 2)),
-        ),
-        MedicationIntake(
-          id: 3,
-          profileId: 1,
-          medicationId: 1,
-          takenAt: weekStart.add(const Duration(days: 3)),
+          takenAt: now.subtract(const Duration(hours: 1)),
         ),
         MedicationIntake(
           id: 2,
@@ -417,10 +405,22 @@ void main() {
           takenAt: weekStart.add(const Duration(days: 4)),
         ),
         MedicationIntake(
-          id: 1,
+          id: 3,
           profileId: 1,
           medicationId: 1,
-          takenAt: now.subtract(const Duration(hours: 1)),
+          takenAt: weekStart.add(const Duration(days: 3)),
+        ),
+        MedicationIntake(
+          id: 4,
+          profileId: 1,
+          medicationId: 1,
+          takenAt: weekStart.add(const Duration(days: 2)),
+        ),
+        MedicationIntake(
+          id: 5,
+          profileId: 1,
+          medicationId: 1,
+          takenAt: weekStart.add(const Duration(days: 1)),
         ),
       ];
 
@@ -435,7 +435,9 @@ void main() {
       final result = await statsService.getMedicationStats(profileId: 1);
 
       expect(result, isNotNull);
-      expect(result!.weekAverage, contains('Adherence: 71%'));
+      // Phase 26: No adherence calculation, weekAverage should be empty
+      expect(result!.weekAverage, isEmpty);
+      expect(result.trend, TrendDirection.stable);
     });
 
     test('shows time since last dose in minutes if less than 1 hour', () async {
@@ -463,63 +465,18 @@ void main() {
       expect(result!.latestValue, contains('min ago'));
     });
 
-    test('detects upward trend (better adherence - improvement)', () async {
+    test('no longer calculates trends (Phase 26 - removed adherence)',
+        () async {
       final now = DateTime.now();
       final weekStart = now.subtract(const Duration(days: 7));
-      final previousWeekStart = weekStart.subtract(const Duration(days: 7));
 
-      // Current week: 6 days with doses = 86% adherence
-      // Previous week: 4 days with doses = 57% adherence
+      // Multiple intakes from current week
       final allIntakes = [
-        // Previous week (4 days)
         MedicationIntake(
-          id: 10,
+          id: 1,
           profileId: 1,
           medicationId: 1,
-          takenAt: previousWeekStart.add(const Duration(days: 1)),
-        ),
-        MedicationIntake(
-          id: 9,
-          profileId: 1,
-          medicationId: 1,
-          takenAt: previousWeekStart.add(const Duration(days: 2)),
-        ),
-        MedicationIntake(
-          id: 8,
-          profileId: 1,
-          medicationId: 1,
-          takenAt: previousWeekStart.add(const Duration(days: 3)),
-        ),
-        MedicationIntake(
-          id: 7,
-          profileId: 1,
-          medicationId: 1,
-          takenAt: previousWeekStart.add(const Duration(days: 4)),
-        ),
-        // Current week (6 days)
-        MedicationIntake(
-          id: 6,
-          profileId: 1,
-          medicationId: 1,
-          takenAt: weekStart.add(const Duration(days: 1)),
-        ),
-        MedicationIntake(
-          id: 5,
-          profileId: 1,
-          medicationId: 1,
-          takenAt: weekStart.add(const Duration(days: 2)),
-        ),
-        MedicationIntake(
-          id: 4,
-          profileId: 1,
-          medicationId: 1,
-          takenAt: weekStart.add(const Duration(days: 3)),
-        ),
-        MedicationIntake(
-          id: 3,
-          profileId: 1,
-          medicationId: 1,
-          takenAt: weekStart.add(const Duration(days: 4)),
+          takenAt: now.subtract(const Duration(hours: 1)),
         ),
         MedicationIntake(
           id: 2,
@@ -528,10 +485,28 @@ void main() {
           takenAt: weekStart.add(const Duration(days: 5)),
         ),
         MedicationIntake(
-          id: 1,
+          id: 3,
           profileId: 1,
           medicationId: 1,
-          takenAt: now.subtract(const Duration(hours: 1)),
+          takenAt: weekStart.add(const Duration(days: 4)),
+        ),
+        MedicationIntake(
+          id: 4,
+          profileId: 1,
+          medicationId: 1,
+          takenAt: weekStart.add(const Duration(days: 3)),
+        ),
+        MedicationIntake(
+          id: 5,
+          profileId: 1,
+          medicationId: 1,
+          takenAt: weekStart.add(const Duration(days: 2)),
+        ),
+        MedicationIntake(
+          id: 6,
+          profileId: 1,
+          medicationId: 1,
+          takenAt: weekStart.add(const Duration(days: 1)),
         ),
       ];
 
@@ -546,7 +521,8 @@ void main() {
       final result = await statsService.getMedicationStats(profileId: 1);
 
       expect(result, isNotNull);
-      expect(result!.trend, TrendDirection.up); // Better adherence, improvement
+      // Phase 26: Trend calculation removed
+      expect(result!.trend, TrendDirection.stable);
     });
   });
 }
