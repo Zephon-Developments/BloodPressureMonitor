@@ -51,6 +51,18 @@ class ImportService {
       final content = await file.readAsString();
       final Map<String, dynamic> data = jsonDecode(content);
 
+      // Parse profile metadata if available
+      ImportProfileInfo? profileInfo;
+      if (data.containsKey('metadata')) {
+        try {
+          final metadata =
+              ExportMetadata.fromMap(data['metadata'] as Map<String, dynamic>);
+          profileInfo = ImportProfileInfo.fromMetadata(metadata);
+        } catch (e) {
+          // Ignore metadata parsing errors for backward compatibility
+        }
+      }
+
       final hasReadings = data.containsKey('readings');
       final hasWeight = data.containsKey('weight');
       final hasSleep = data.containsKey('sleep');
@@ -214,6 +226,7 @@ class ImportService {
           intakesImported: intakesImported,
           duplicatesSkipped: duplicatesSkipped,
           errors: errors,
+          profileInfo: profileInfo,
         ),
       );
     } on FileSystemException catch (e) {

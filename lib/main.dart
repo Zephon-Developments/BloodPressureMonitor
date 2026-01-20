@@ -79,6 +79,10 @@ void main() async {
     medicationIntakeService: intakeService,
   );
   const appInfoService = AppInfoService();
+
+  // Initialize profile service
+  final profileService = ProfileService();
+
   final analyticsService = AnalyticsService(
     readingService: readingService,
     sleepService: sleepService,
@@ -94,6 +98,7 @@ void main() async {
     sleepService: sleepService,
     medicationService: medicationService,
     intakeService: intakeService,
+    profileService: profileService,
     appInfoService: appInfoService,
   );
   final importService = ImportService(
@@ -120,9 +125,6 @@ void main() async {
 
   // Initialize units preference service
   final unitsPreferenceService = UnitsPreferenceService(prefs);
-
-  // Initialize profile service
-  final profileService = ProfileService();
 
   // Initialize and load active profile
   final activeProfileViewModel = ActiveProfileViewModel(

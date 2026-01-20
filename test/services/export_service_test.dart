@@ -7,6 +7,7 @@ import 'package:path_provider_platform_interface/path_provider_platform_interfac
 
 import 'package:blood_pressure_monitor/models/health_data.dart';
 import 'package:blood_pressure_monitor/models/medication.dart';
+import 'package:blood_pressure_monitor/models/profile.dart';
 import 'package:blood_pressure_monitor/models/reading.dart';
 import 'package:blood_pressure_monitor/models/result.dart';
 import 'package:blood_pressure_monitor/services/export_service.dart';
@@ -21,6 +22,7 @@ void main() {
   late MockSleepService sleepService;
   late MockMedicationService medicationService;
   late MockMedicationIntakeService intakeService;
+  late MockProfileService profileService;
   late MockAppInfoService appInfoService;
   late ExportService exportService;
   late Directory tempDir;
@@ -32,6 +34,7 @@ void main() {
     sleepService = MockSleepService();
     medicationService = MockMedicationService();
     intakeService = MockMedicationIntakeService();
+    profileService = MockProfileService();
     appInfoService = MockAppInfoService();
     tempDir = Directory.systemTemp.createTempSync('export_service_test');
     originalPlatform = PathProviderPlatform.instance;
@@ -43,6 +46,7 @@ void main() {
       sleepService: sleepService,
       medicationService: medicationService,
       intakeService: intakeService,
+      profileService: profileService,
       appInfoService: appInfoService,
     );
   });
@@ -91,6 +95,16 @@ void main() {
 
   void stubServices() {
     when(appInfoService.getAppVersion()).thenAnswer((_) async => '9.9.9');
+    when(profileService.getProfile(1)).thenAnswer(
+      (_) async => Profile(
+        id: 1,
+        name: 'Primary User',
+        dateOfBirth: DateTime.utc(1990, 1, 1),
+        patientId: 'P123456',
+        doctorName: 'Dr. Smith',
+        clinicName: 'Test Clinic',
+      ),
+    );
     when(
       readingService.getReadingsByProfile(
         1,
@@ -151,6 +165,29 @@ void main() {
       expect((jsonContent['sleep'] as List).length, 1);
       expect((jsonContent['medications'] as List).length, 1);
       expect((jsonContent['medicationIntakes'] as List).length, 1);
+    });
+
+    test('exportToJson includes profile metadata (name, DOB, patient ID, etc.)',
+        () async {
+      stubServices();
+
+      final result = await exportService.exportToJson(
+        profileId: 1,
+        profileName: 'Primary User',
+      );
+
+      expect(result, isA<Success<File>>());
+      final file = (result as Success<File>).value;
+
+      final jsonContent =
+          jsonDecode(await file.readAsString()) as Map<String, dynamic>;
+      final metadata = jsonContent['metadata'] as Map<String, dynamic>;
+
+      expect(metadata['profileName'], 'Primary User');
+      expect(metadata['dateOfBirth'], '1990-01-01T00:00:00.000Z');
+      expect(metadata['patientId'], 'P123456');
+      expect(metadata['doctorName'], 'Dr. Smith');
+      expect(metadata['clinicName'], 'Test Clinic');
     });
 
     test('exportToJson uses indented JSON formatting', () async {

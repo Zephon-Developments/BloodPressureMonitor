@@ -267,80 +267,38 @@ class StatsService {
   /// Calculates mini-stats for medication adherence.
   ///
   /// Returns null if no medication intake data is available.
+  ///
+  /// Per Phase 26 requirements, only displays the last intake time without
+  /// adherence calculations to keep the card clean and focused.
   Future<MiniStats?> getMedicationStats({
     required int profileId,
     int daysBack = 7,
   }) async {
     final now = DateTime.now();
     final weekStart = now.subtract(Duration(days: daysBack));
-    final previousWeekStart = weekStart.subtract(Duration(days: daysBack));
 
-    // Get all intakes from previous two weeks
-    final allIntakes = await _medicationIntakeService.listIntakes(
+    // Get recent intakes for last dose calculation
+    final recentIntakes = await _medicationIntakeService.listIntakes(
       profileId: profileId,
-      from: previousWeekStart,
+      from: weekStart,
       to: now,
     );
 
-    if (allIntakes.isEmpty) {
+    if (recentIntakes.isEmpty) {
       return null;
     }
 
-    final latest = allIntakes.last; // Most recent
+    final latest = recentIntakes.first; // Most recent (DESC order)
     final timeSince = now.difference(latest.takenAt);
     final hoursSince = timeSince.inHours;
     final latestValue = hoursSince < 1
         ? 'Last dose: ${timeSince.inMinutes} min ago'
         : 'Last dose: ${hoursSince}h ago';
 
-    // Calculate adherence for current week
-    final currentWeekIntakes =
-        allIntakes.where((i) => i.takenAt.isAfter(weekStart)).toList();
-
-    if (currentWeekIntakes.isEmpty) {
-      return MiniStats(
-        latestValue: latestValue,
-        weekAverage: 'No data',
-        trend: TrendDirection.stable,
-        lastUpdate: latest.takenAt,
-      );
-    }
-
-    // For simplicity, calculate adherence as percentage of days with at least one dose
-    final daysWithDoses = currentWeekIntakes
-        .map((i) => DateTime(i.takenAt.year, i.takenAt.month, i.takenAt.day))
-        .toSet()
-        .length;
-    final adherencePercent = (daysWithDoses / daysBack * 100).round();
-
-    // Calculate previous week for trend
-    final previousIntakes = allIntakes
-        .where(
-          (i) =>
-              i.takenAt.isAfter(previousWeekStart) &&
-              i.takenAt.isBefore(weekStart),
-        )
-        .toList();
-
-    TrendDirection trend = TrendDirection.stable;
-    if (previousIntakes.isNotEmpty) {
-      final prevDaysWithDoses = previousIntakes
-          .map((i) => DateTime(i.takenAt.year, i.takenAt.month, i.takenAt.day))
-          .toSet()
-          .length;
-      final prevAdherence = prevDaysWithDoses / daysBack * 100;
-
-      final diff = adherencePercent - prevAdherence;
-      if (diff.abs() >= 5) {
-        // Better adherence is improvement
-        trend = diff > 0 ? TrendDirection.up : TrendDirection.down;
-      }
-    }
-
     return MiniStats(
       latestValue: latestValue,
-      weekAverage: 'Adherence: $adherencePercent%',
-      trend: trend,
+      weekAverage: '', // Removed adherence per Phase 26 requirements
+      trend: TrendDirection.stable,
       lastUpdate: latest.takenAt,
     );
   }

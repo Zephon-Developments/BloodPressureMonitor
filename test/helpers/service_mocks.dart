@@ -7,6 +7,7 @@ import 'package:blood_pressure_monitor/models/analytics.dart';
 import 'package:blood_pressure_monitor/models/export_import.dart';
 import 'package:blood_pressure_monitor/models/health_data.dart';
 import 'package:blood_pressure_monitor/models/medication.dart';
+import 'package:blood_pressure_monitor/models/profile.dart';
 import 'package:blood_pressure_monitor/models/reading.dart';
 import 'package:blood_pressure_monitor/models/result.dart';
 import 'package:blood_pressure_monitor/services/analytics_service.dart';
@@ -16,6 +17,7 @@ import 'package:blood_pressure_monitor/services/export_service.dart';
 import 'package:blood_pressure_monitor/services/import_service.dart';
 import 'package:blood_pressure_monitor/services/medication_intake_service.dart';
 import 'package:blood_pressure_monitor/services/medication_service.dart';
+import 'package:blood_pressure_monitor/services/profile_service.dart';
 import 'package:blood_pressure_monitor/services/reading_service.dart';
 import 'package:blood_pressure_monitor/services/sleep_service.dart';
 import 'package:blood_pressure_monitor/services/weight_service.dart';
@@ -436,4 +438,48 @@ class MockImportService extends Mock implements ImportService {
           ),
         ),
       ) as Future<Result<ImportResult>>);
+}
+
+class MockProfileService extends Mock implements ProfileService {
+  @override
+  Future<int> createProfile(Profile profile) => (super.noSuchMethod(
+        Invocation.method(#createProfile, [profile]),
+        returnValue: Future.value(1),
+        returnValueForMissingStub: Future.value(1),
+      ) as Future<int>);
+
+  @override
+  Future<Profile?> getProfile(int id) => (super.noSuchMethod(
+        Invocation.method(#getProfile, [id]),
+        returnValue: Future.value(null),
+        returnValueForMissingStub: Future.value(null),
+      ) as Future<Profile?>);
+
+  @override
+  Future<List<Profile>> getAllProfiles() => (super.noSuchMethod(
+        Invocation.method(#getAllProfiles, []),
+        returnValue: Future.value(<Profile>[]),
+        returnValueForMissingStub: Future.value(<Profile>[]),
+      ) as Future<List<Profile>>);
+
+  @override
+  Future<int> updateProfile(Profile profile) => (super.noSuchMethod(
+        Invocation.method(#updateProfile, [profile]),
+        returnValue: Future.value(1),
+        returnValueForMissingStub: Future.value(1),
+      ) as Future<int>);
+
+  @override
+  Future<int> deleteProfile(int id) => (super.noSuchMethod(
+        Invocation.method(#deleteProfile, [id]),
+        returnValue: Future.value(1),
+        returnValueForMissingStub: Future.value(1),
+      ) as Future<int>);
+
+  @override
+  Future<int> getProfileCount() => (super.noSuchMethod(
+        Invocation.method(#getProfileCount, []),
+        returnValue: Future.value(0),
+        returnValueForMissingStub: Future.value(0),
+      ) as Future<int>);
 }
