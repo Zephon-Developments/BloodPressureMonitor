@@ -18,12 +18,32 @@ class ExportMetadata {
   /// Local timezone offset in minutes at time of export.
   final int timezoneOffset;
 
+  /// Name of the profile the data belongs to.
+  final String? profileName;
+
+  /// Date of birth of the profile owner (PHI - Protected Health Information).
+  final DateTime? dateOfBirth;
+
+  /// Patient identifier (e.g., NHS number) (PHI - Protected Health Information).
+  final String? patientId;
+
+  /// Primary care doctor's full name (PHI - Protected Health Information).
+  final String? doctorName;
+
+  /// Clinic or hospital name (PHI - Protected Health Information).
+  final String? clinicName;
+
   ExportMetadata({
     required this.version,
     required this.exportedAt,
     required this.appVersion,
     required this.profileId,
     required this.timezoneOffset,
+    this.profileName,
+    this.dateOfBirth,
+    this.patientId,
+    this.doctorName,
+    this.clinicName,
   });
 
   Map<String, dynamic> toMap() {
@@ -33,6 +53,11 @@ class ExportMetadata {
       'appVersion': appVersion,
       'profileId': profileId,
       'timezoneOffset': timezoneOffset,
+      if (profileName != null) 'profileName': profileName,
+      if (dateOfBirth != null) 'dateOfBirth': dateOfBirth!.toIso8601String(),
+      if (patientId != null) 'patientId': patientId,
+      if (doctorName != null) 'doctorName': doctorName,
+      if (clinicName != null) 'clinicName': clinicName,
     };
   }
 
@@ -43,6 +68,13 @@ class ExportMetadata {
       appVersion: map['appVersion'] as String,
       profileId: map['profileId'] as int,
       timezoneOffset: map['timezoneOffset'] as int,
+      profileName: map['profileName'] as String?,
+      dateOfBirth: map['dateOfBirth'] != null
+          ? DateTime.parse(map['dateOfBirth'] as String)
+          : null,
+      patientId: map['patientId'] as String?,
+      doctorName: map['doctorName'] as String?,
+      clinicName: map['clinicName'] as String?,
     );
   }
 }
@@ -70,6 +102,9 @@ class ImportResult {
   /// List of errors encountered during import.
   final List<ImportError> errors;
 
+  /// Profile information from the import file (if available).
+  final ImportProfileInfo? profileInfo;
+
   ImportResult({
     this.readingsImported = 0,
     this.weightsImported = 0,
@@ -78,6 +113,7 @@ class ImportResult {
     this.intakesImported = 0,
     this.duplicatesSkipped = 0,
     this.errors = const [],
+    this.profileInfo,
   });
 
   /// Total number of records successfully imported.
@@ -89,6 +125,43 @@ class ImportResult {
       intakesImported;
 
   bool get hasErrors => errors.isNotEmpty;
+}
+
+/// Profile information extracted from an import file.
+class ImportProfileInfo {
+  /// Name of the profile from the import file.
+  final String? profileName;
+
+  /// Date of birth from the import file.
+  final DateTime? dateOfBirth;
+
+  /// Patient ID from the import file.
+  final String? patientId;
+
+  /// Doctor name from the import file.
+  final String? doctorName;
+
+  /// Clinic name from the import file.
+  final String? clinicName;
+
+  const ImportProfileInfo({
+    this.profileName,
+    this.dateOfBirth,
+    this.patientId,
+    this.doctorName,
+    this.clinicName,
+  });
+
+  /// Creates an [ImportProfileInfo] from export metadata.
+  factory ImportProfileInfo.fromMetadata(ExportMetadata metadata) {
+    return ImportProfileInfo(
+      profileName: metadata.profileName,
+      dateOfBirth: metadata.dateOfBirth,
+      patientId: metadata.patientId,
+      doctorName: metadata.doctorName,
+      clinicName: metadata.clinicName,
+    );
+  }
 }
 
 /// Conflict resolution mode for import.

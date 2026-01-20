@@ -12,7 +12,6 @@ import 'package:blood_pressure_monitor/views/import_view.dart';
 import 'package:blood_pressure_monitor/views/report_view.dart';
 import 'package:blood_pressure_monitor/views/file_manager_view.dart';
 import 'package:blood_pressure_monitor/views/medication/medication_list_view.dart';
-import 'package:blood_pressure_monitor/views/medication/medication_history_view.dart';
 import 'package:blood_pressure_monitor/views/appearance_view.dart';
 import 'package:blood_pressure_monitor/views/about_view.dart';
 import 'package:blood_pressure_monitor/widgets/profile_switcher.dart';
@@ -182,19 +181,6 @@ class _HomeViewState extends State<HomeView> {
             Navigator.of(context).push(
               MaterialPageRoute<void>(
                 builder: (context) => const MedicationListView(),
-              ),
-            );
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.history),
-          title: const Text('Intake History'),
-          subtitle: const Text('View medication intake records'),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (context) => const MedicationHistoryView(),
               ),
             );
           },

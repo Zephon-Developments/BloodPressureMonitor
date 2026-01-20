@@ -8,6 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Phase 26: Blood Pressure Chart Redesign**
+  - Separated blood pressure visualization into two independent charts (Systolic and Diastolic)
+  - Synchronized X-axes (time) across both charts for easy temporal comparison
+  - Applied NICE Home Monitoring Guidelines color-coded bands per chart:
+    - Systolic: Green (90-134), Yellow (135-149), Orange (150-179), Red (≥180 mmHg)
+    - Diastolic: Green (60-84), Yellow (85-94), Orange (95-119), Red (≥120 mmHg)
+  - Centralized clinical constants in `lib/constants/clinical_constants.dart`
+  - Fixed diastolic inversion issue from previous dual-axis implementation
+- **Phase 26: Import Security Enhancements**
+  - Added profile name and medical metadata to export files (JSON)
+  - Implemented profile mismatch warning dialog during import
+  - Warns users if importing data from a different profile before any data is written
+  - Graceful handling of legacy exports without profile metadata
+- **Phase 26: User Interface Refinements**
+  - Simplified medication history statistics (removed 7-day average and adherence rating)
+  - Cleaned up Settings navigation (removed duplicate Intake History link)
+  - Maintained single access path to medication history via History tab
+
+### Changed
 - **Split Blood Pressure Chart** (Phase 23)
   - Implemented dual-axis layout with center baseline at 0 mmHg.
   - Systolic readings plotted above (positive) and Diastolic below (negative).

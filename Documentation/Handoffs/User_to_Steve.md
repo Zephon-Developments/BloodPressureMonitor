@@ -1,17 +1,37 @@
 # **Zephon HealthLog – Issues Log**
 
-## Rebranding
-
-- Replace all instances of "HyperTrack" with "HealthLog" throughout the application
-
 ## Charts
 
 ### Blood Pressure Chart
 
-**Major Issue** Blood Pressure chart shows Systolic and Diastolic on the same banding
+**Major Issue** Blood Pressure chart shows Diastolic inverted
 
-The chart for Blood Pressure is supposed to have an X axis in the middle, and systolic values above the line with diastolic values below the line. Each of the charts (above and below the line) should be coloured per NICE guidelines.
+1. Separate the blood pressure chart into charts for Systolic and for Diastolic
+2. The charts X axes should be identical to each other
+3. Each chart should have the appropriate NICE ranges displayed as colour bands
 
-**Minor Issue** the date ticks across the x-axis are too close together to be readable.
 
-**Minor Issue** The Variability (SD/CV) line overflows the X width of the box, causing it to wrap and push the BP data off the bottom of the box.
+## Settings
+
+### Medication history
+
+1. Remove from settings and leave in history only.
+
+## History
+
+### Medication history
+
+1. The last date for medication is showing the first, not most recent date
+2. Remove the 7 day average and adherence rating from the front card
+
+## Export
+
+1. Include profile name in export
+2. Include profile medical information in export
+
+## Import
+
+1. Include profile name in import
+2. Include profile medical information in import
+3. If the profile name does not match the currently active profile, warn before completing import.
+

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -174,5 +175,39 @@ class ImportViewModel extends ChangeNotifier {
     _importResult = null;
     _errorMessage = null;
     notifyListeners();
+  }
+
+  /// Extracts profile metadata from the selected import file.
+  ///
+  /// Returns the [ImportProfileInfo] if metadata is present, or null otherwise.
+  /// This method allows checking for profile mismatches before importing.
+  Future<Result<ImportProfileInfo?>> getProfileInfoFromFile() async {
+    if (_selectedFile == null) {
+      return Failure(
+        AppError.validation('No file selected'),
+      );
+    }
+
+    try {
+      final content = await _selectedFile!.readAsString();
+      final Map<String, dynamic> data = jsonDecode(content);
+
+      if (!data.containsKey('metadata')) {
+        // Legacy export without metadata
+        return const Success(null);
+      }
+
+      final metadata =
+          ExportMetadata.fromMap(data['metadata'] as Map<String, dynamic>);
+      final profileInfo = ImportProfileInfo.fromMetadata(metadata);
+      return Success(profileInfo);
+    } catch (e) {
+      return Failure(
+        AppError.unexpected(
+          'Failed to parse profile information from import file',
+          e,
+        ),
+      );
+    }
   }
 }

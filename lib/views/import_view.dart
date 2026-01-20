@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/import_viewmodel.dart';
 import 'package:blood_pressure_monitor/models/export_import.dart';
+import 'package:blood_pressure_monitor/models/result.dart';
 
 class ImportView extends StatelessWidget {
   const ImportView({super.key});
@@ -251,7 +252,89 @@ class ImportView extends StatelessWidget {
     // Get active profile from ActiveProfileViewModel before any async operations
     final activeProfile = context.read<ActiveProfileViewModel>();
 
+    // Check for profile name mismatch
+    final profileInfoResult = await viewModel.getProfileInfoFromFile();
+    if (!context.mounted) return;
+
+    if (profileInfoResult is Failure<ImportProfileInfo?>) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Error reading import file: ${(profileInfoResult).error.userMessage}',
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final profileInfo =
+        (profileInfoResult as Success<ImportProfileInfo?>).value;
+    if (profileInfo != null &&
+        profileInfo.profileName != activeProfile.activeProfileName) {
+      // Show profile mismatch warning
+      final confirm = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Profile Mismatch Warning'),
+          content: RichText(
+            text: TextSpan(
+              style: DefaultTextStyle.of(context).style,
+              children: [
+                const TextSpan(
+                  text:
+                      'The data you are importing is from a different profile.\n\n',
+                ),
+                const TextSpan(
+                  text: 'Import data from: ',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                TextSpan(
+                  text: '"${profileInfo.profileName}"\n',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                  ),
+                ),
+                const TextSpan(
+                  text: 'Current active profile: ',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                TextSpan(
+                  text: '"${activeProfile.activeProfileName}"\n\n',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
+                ),
+                const TextSpan(
+                  text: 'Are you sure you want to continue? '
+                      'The imported data will be added to the current profile.',
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: TextButton.styleFrom(foregroundColor: Colors.orange),
+              child: const Text('Continue Anyway'),
+            ),
+          ],
+        ),
+      );
+
+      if (!context.mounted) return;
+      if (confirm != true) return;
+    }
+
+    // Check for overwrite confirmation
     if (viewModel.overwriteExisting) {
+      if (!context.mounted) return;
       final confirm = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
@@ -273,6 +356,7 @@ class ImportView extends StatelessWidget {
         ),
       );
 
+      if (!context.mounted) return;
       if (confirm != true) return;
     }
 
@@ -282,8 +366,10 @@ class ImportView extends StatelessWidget {
           ? ImportConflictMode.overwrite
           : ImportConflictMode.append,
     );
+
+    if (!context.mounted) return;
+
     if (success) {
-      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Import completed successfully')),
       );

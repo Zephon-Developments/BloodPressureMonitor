@@ -9,6 +9,7 @@ import 'package:blood_pressure_monitor/models/result.dart';
 import 'package:blood_pressure_monitor/services/app_info_service.dart';
 import 'package:blood_pressure_monitor/services/medication_intake_service.dart';
 import 'package:blood_pressure_monitor/services/medication_service.dart';
+import 'package:blood_pressure_monitor/services/profile_service.dart';
 import 'package:blood_pressure_monitor/services/reading_service.dart';
 import 'package:blood_pressure_monitor/services/sleep_service.dart';
 import 'package:blood_pressure_monitor/services/weight_service.dart';
@@ -23,20 +24,33 @@ class ExportService {
   final SleepService _sleepService;
   final MedicationService _medicationService;
   final MedicationIntakeService _intakeService;
+  final ProfileService _profileService;
   final AppInfoService _appInfoService;
 
+  /// Creates an instance of [ExportService].
+  ///
+  /// Requires services for accessing:
+  /// - [readingService]: Blood pressure readings
+  /// - [weightService]: Weight entries
+  /// - [sleepService]: Sleep logs
+  /// - [medicationService]: Medications
+  /// - [intakeService]: Medication intake records
+  /// - [profileService]: Profile information for metadata
+  /// - [appInfoService]: Application version (optional, defaults to [AppInfoService])
   const ExportService({
     required ReadingService readingService,
     required WeightService weightService,
     required SleepService sleepService,
     required MedicationService medicationService,
     required MedicationIntakeService intakeService,
+    required ProfileService profileService,
     AppInfoService? appInfoService,
   })  : _readingService = readingService,
         _weightService = weightService,
         _sleepService = sleepService,
         _medicationService = medicationService,
         _intakeService = intakeService,
+        _profileService = profileService,
         _appInfoService = appInfoService ?? const AppInfoService();
 
   /// Generates a standardized filename for export files.
@@ -70,6 +84,9 @@ class ExportService {
     try {
       final data = <String, dynamic>{};
 
+      // Fetch profile data for metadata
+      final profile = await _profileService.getProfile(profileId);
+
       // Add metadata
       final appVersion = await _appInfoService.getAppVersion();
       final metadata = ExportMetadata(
@@ -78,6 +95,11 @@ class ExportService {
         appVersion: appVersion,
         profileId: profileId,
         timezoneOffset: DateTime.now().timeZoneOffset.inMinutes,
+        profileName: profile?.name ?? profileName,
+        dateOfBirth: profile?.dateOfBirth,
+        patientId: profile?.patientId,
+        doctorName: profile?.doctorName,
+        clinicName: profile?.clinicName,
       );
       data['metadata'] = metadata.toMap();
 
