@@ -4,9 +4,32 @@ import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart'
 import 'package:blood_pressure_monitor/viewmodels/import_viewmodel.dart';
 import 'package:blood_pressure_monitor/models/export_import.dart';
 import 'package:blood_pressure_monitor/models/result.dart';
+import 'package:blood_pressure_monitor/viewmodels/lock_viewmodel.dart';
 
-class ImportView extends StatelessWidget {
+class ImportView extends StatefulWidget {
   const ImportView({super.key});
+
+  @override
+  State<ImportView> createState() => _ImportViewState();
+}
+
+class _ImportViewState extends State<ImportView> {
+  bool _hasRegisteredLockExemption = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_hasRegisteredLockExemption) {
+      context.read<LockViewModel>().setBackgroundLockExemption(true);
+      _hasRegisteredLockExemption = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    context.read<LockViewModel>().setBackgroundLockExemption(false);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

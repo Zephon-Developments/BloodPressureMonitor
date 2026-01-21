@@ -17,6 +17,7 @@ class LockViewModel extends ChangeNotifier with WidgetsBindingObserver {
 
   AppLockState _state = AppLockState.initial();
   AppLockState get state => _state;
+  bool _isBackgroundLockExempt = false;
 
   LockViewModel({
     required AuthService authService,
@@ -41,7 +42,27 @@ class LockViewModel extends ChangeNotifier with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (_isBackgroundState(state) && _isBackgroundLockExempt) {
+      _idleTimerService.stopMonitoring();
+      return;
+    }
+
     _idleTimerService.handleLifecycleChange(state);
+
+    if (state == AppLifecycleState.resumed && !_state.isLocked) {
+      _idleTimerService.startMonitoring();
+    }
+  }
+
+  /// Sets whether the app should skip locking when backgrounded.
+  ///
+  /// Used by import/export flows where users must briefly leave the app
+  /// without triggering the lock screen.
+  void setBackgroundLockExemption(bool exempt) {
+    if (_isBackgroundLockExempt == exempt) {
+      return;
+    }
+    _isBackgroundLockExempt = exempt;
   }
 
   /// Loads the initial lock state from persisted settings.
@@ -201,5 +222,12 @@ class LockViewModel extends ChangeNotifier with WidgetsBindingObserver {
       isBiometricEnabled: isBiometricEnabled,
     );
     notifyListeners();
+  }
+
+  bool _isBackgroundState(AppLifecycleState state) {
+    return state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached ||
+        state == AppLifecycleState.hidden;
   }
 }

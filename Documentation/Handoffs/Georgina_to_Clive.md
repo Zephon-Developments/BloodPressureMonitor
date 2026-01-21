@@ -1,31 +1,23 @@
-# Handoff: Georgina → Clive — Import FilePicker Fix
-
-**Date:** 2026-01-19  
-**Branch:** feature/phase-26-encrypted-backup
-
----
+# Georgina → Clive Handoff: Conditional Background Lock Implementation
 
 ## Summary
-- Implemented the Android-safe file picker flow requested in [Clive_to_Georgina.md](Clive_to_Georgina.md).
-- Added a picker invoker seam so the ViewModel logic is testable without needing real platform channels.
-- Added fallback handling for `PlatformException` "Unsupported filter" errors plus manual `.json` validation.
-- Expanded unit tests to cover success, fallback, and invalid-extension paths.
+- Added a background-lock exemption path inside `LockViewModel` guarded by `setBackgroundLockExemption` so Import/Export flows can temporarily avoid automatic locking while the app is backgrounded.
+- Ensured idle monitoring stops whenever the exemption is active and restarts automatically when the app resumes while unlocked, preserving idle-timeout guarantees.
+- Converted both Import and Export screens to `StatefulWidget`s so they can opt in/out of the exemption for the duration of their lifecycle.
+- Expanded the lock ViewModel test suite with regression tests that verify the exemption logic for background transitions.
 
 ## Code Changes
-1. **Picker logic:** [lib/viewmodels/import_viewmodel.dart](lib/viewmodels/import_viewmodel.dart)
-   - Added `FilePickerInvoker` typedef and DI hook.
-   - Wrapped the picker call to attempt `FileType.custom` first, then fallback to `FileType.any` when the unsupported filter exception occurs.
-   - Introduced `_hasJsonExtension` validation and improved error propagation.
-2. **Unit tests:** [test/viewmodels/import_viewmodel_test.dart](test/viewmodels/import_viewmodel_test.dart)
-   - Added temp-file backed success test, fallback test, and invalid-extension test.
-   - Updated imports for `PlatformException`.
-
-_No other files were modified._
+1. **Lock behavior core** — [lib/viewmodels/lock_viewmodel.dart](lib/viewmodels/lock_viewmodel.dart)
+   - Added `_isBackgroundLockExempt`, lifecycle guard, helper, and documented setter `setBackgroundLockExemption`.
+   - Restart idle monitoring automatically when the app resumes while unlocked.
+2. **Import/Export screens** — [lib/views/import_view.dart](lib/views/import_view.dart), [lib/views/export_view.dart](lib/views/export_view.dart)
+   - Converted to `StatefulWidget`s and manage the exemption flag in `didChangeDependencies`/`dispose`.
+3. **Regression tests** — [test/viewmodels/lock_viewmodel_test.dart](test/viewmodels/lock_viewmodel_test.dart)
+   - Added background lifecycle tests and pulled in the `widgets.dart` import for `AppLifecycleState`.
 
 ## Tests
-- `flutter test test/viewmodels/import_viewmodel_test.dart`
-  - ✅ Passes (covers new picker behavior)
+- `flutter test test/viewmodels/lock_viewmodel_test.dart`
 
 ## Notes / Next Steps
-- Manual verification on Android emulator/physical device is recommended (select valid JSON, attempt invalid extension, cancel picker) to confirm UI behavior.
-- No manifest permission changes were necessary based on emulator testing; revisit if QA reports permission-related issues on older devices.
+- Exemption is intentionally scoped to Import/Export; if more routes require this behavior consider centralizing via a Navigator observer.
+- Analyzer and full test suite were not run in this pass; please execute the standard CI checklist before merge.

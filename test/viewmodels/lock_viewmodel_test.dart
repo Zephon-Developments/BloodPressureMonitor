@@ -1,5 +1,6 @@
 import 'package:blood_pressure_monitor/services/auth_service.dart';
 import 'package:blood_pressure_monitor/viewmodels/lock_viewmodel.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:mockito/annotations.dart';
@@ -425,6 +426,72 @@ void main() {
 
       // Should not throw and should reset timer internally
       vm.recordActivity();
+
+      vm.dispose();
+    });
+  });
+
+  group('Background Lock Exemption', () {
+    test('pausing locks app when not exempt', () async {
+      when(mockAuthService.isPinSet()).thenAnswer((_) async => true);
+      when(mockAuthService.verifyPin('1234')).thenAnswer((_) async => true);
+
+      final vm = LockViewModel(
+        authService: mockAuthService,
+        prefs: prefs,
+      );
+      await Future.delayed(Duration.zero);
+
+      await vm.unlockWithPin('1234');
+      expect(vm.state.isLocked, false);
+
+      vm.didChangeAppLifecycleState(AppLifecycleState.paused);
+
+      expect(vm.state.isLocked, true);
+
+      vm.dispose();
+    });
+
+    test('pausing skips lock when exempt', () async {
+      when(mockAuthService.isPinSet()).thenAnswer((_) async => true);
+      when(mockAuthService.verifyPin('1234')).thenAnswer((_) async => true);
+
+      final vm = LockViewModel(
+        authService: mockAuthService,
+        prefs: prefs,
+      );
+      await Future.delayed(Duration.zero);
+
+      await vm.unlockWithPin('1234');
+      vm.setBackgroundLockExemption(true);
+
+      vm.didChangeAppLifecycleState(AppLifecycleState.paused);
+
+      expect(vm.state.isLocked, false);
+
+      vm.dispose();
+    });
+
+    test('lock resumes once exemption cleared', () async {
+      when(mockAuthService.isPinSet()).thenAnswer((_) async => true);
+      when(mockAuthService.verifyPin('1234')).thenAnswer((_) async => true);
+
+      final vm = LockViewModel(
+        authService: mockAuthService,
+        prefs: prefs,
+      );
+      await Future.delayed(Duration.zero);
+
+      await vm.unlockWithPin('1234');
+      vm.setBackgroundLockExemption(true);
+
+      vm.didChangeAppLifecycleState(AppLifecycleState.paused);
+      expect(vm.state.isLocked, false);
+
+      vm.setBackgroundLockExemption(false);
+      vm.didChangeAppLifecycleState(AppLifecycleState.paused);
+
+      expect(vm.state.isLocked, true);
 
       vm.dispose();
     });
