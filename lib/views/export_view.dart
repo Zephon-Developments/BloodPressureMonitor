@@ -20,14 +20,14 @@ class _ExportViewState extends State<ExportView> {
     super.didChangeDependencies();
     if (!_hasRegisteredLockExemption) {
       _lockViewModel = context.read<LockViewModel>();
-      _lockViewModel!.setBackgroundLockExemption(true);
+      _lockViewModel!.setBackgroundLockAllowed(false);
       _hasRegisteredLockExemption = true;
     }
   }
 
   @override
   void dispose() {
-    _lockViewModel?.setBackgroundLockExemption(false);
+    _lockViewModel?.setBackgroundLockAllowed(true);
     super.dispose();
   }
 
