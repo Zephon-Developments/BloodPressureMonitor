@@ -463,7 +463,7 @@ void main() {
       await Future.delayed(Duration.zero);
 
       await vm.unlockWithPin('1234');
-      vm.setBackgroundLockExemption(true);
+      vm.setBackgroundLockAllowed(false);
 
       vm.didChangeAppLifecycleState(AppLifecycleState.paused);
 
@@ -483,12 +483,12 @@ void main() {
       await Future.delayed(Duration.zero);
 
       await vm.unlockWithPin('1234');
-      vm.setBackgroundLockExemption(true);
+      vm.setBackgroundLockAllowed(false);
 
       vm.didChangeAppLifecycleState(AppLifecycleState.paused);
       expect(vm.state.isLocked, false);
 
-      vm.setBackgroundLockExemption(false);
+      vm.setBackgroundLockAllowed(true);
       vm.didChangeAppLifecycleState(AppLifecycleState.paused);
 
       expect(vm.state.isLocked, true);
