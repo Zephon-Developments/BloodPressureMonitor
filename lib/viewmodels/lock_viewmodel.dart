@@ -18,6 +18,9 @@ class LockViewModel extends ChangeNotifier with WidgetsBindingObserver {
   AppLockState _state = AppLockState.initial();
   AppLockState get state => _state;
   bool _isBackgroundLockExempt = false;
+  DateTime? _backgroundTimestamp;
+
+  static const int _maxIdleTimeoutMinutes = 30;
 
   LockViewModel({
     required AuthService authService,
@@ -43,7 +46,27 @@ class LockViewModel extends ChangeNotifier with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (_isBackgroundState(state) && _isBackgroundLockExempt) {
+      _backgroundTimestamp = DateTime.now();
       _idleTimerService.stopMonitoring();
+      return;
+    }
+
+    if (state == AppLifecycleState.resumed && _backgroundTimestamp != null) {
+      // Check if backgrounded time exceeded the limit
+      final backgroundDuration = DateTime.now().difference(_backgroundTimestamp!);
+      final maxBackgroundDuration = _calculateMaxBackgroundDuration();
+      
+      _backgroundTimestamp = null;
+      
+      if (backgroundDuration > maxBackgroundDuration) {
+        // Exceeded time limit - lock the app
+        _idleTimerService.handleLifecycleChange(AppLifecycleState.paused);
+        return;
+      }
+      // Within time limit - continue without locking
+      if (!_state.isLocked) {
+        _idleTimerService.startMonitoring();
+      }
       return;
     }
 
@@ -63,6 +86,9 @@ class LockViewModel extends ChangeNotifier with WidgetsBindingObserver {
       return;
     }
     _isBackgroundLockExempt = exempt;
+    if (!exempt) {
+      _backgroundTimestamp = null;
+    }
   }
 
   /// Loads the initial lock state from persisted settings.
@@ -229,5 +255,19 @@ class LockViewModel extends ChangeNotifier with WidgetsBindingObserver {
         state == AppLifecycleState.inactive ||
         state == AppLifecycleState.detached ||
         state == AppLifecycleState.hidden;
+  }
+
+  /// Calculates the maximum allowed background duration for exempt screens.
+  ///
+  /// Returns the lesser of:
+  /// - Double the selected idle timeout
+  /// - The maximum idle timeout (30 minutes)
+  Duration _calculateMaxBackgroundDuration() {
+    final idleTimeoutMinutes = _state.idleTimeoutMinutes;
+    final doubleIdleTimeout = idleTimeoutMinutes * 2;
+    final maxMinutes = doubleIdleTimeout < _maxIdleTimeoutMinutes
+        ? doubleIdleTimeout
+        : _maxIdleTimeoutMinutes;
+    return Duration(minutes: maxMinutes);
   }
 }

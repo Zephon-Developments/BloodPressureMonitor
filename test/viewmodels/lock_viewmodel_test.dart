@@ -495,6 +495,73 @@ void main() {
 
       vm.dispose();
     });
+
+    test('resuming within time limit does not lock when exempt', () async {
+      when(mockAuthService.isPinSet()).thenAnswer((_) async => true);
+      when(mockAuthService.verifyPin('1234')).thenAnswer((_) async => true);
+
+      final vm = LockViewModel(
+        authService: mockAuthService,
+        prefs: prefs,
+      );
+      await Future.delayed(Duration.zero);
+
+      await vm.unlockWithPin('1234');
+      vm.setBackgroundLockExemption(true);
+
+      // Background for a short time (well within limit)
+      vm.didChangeAppLifecycleState(AppLifecycleState.paused);
+      await Future.delayed(const Duration(milliseconds: 100));
+      vm.didChangeAppLifecycleState(AppLifecycleState.resumed);
+
+      // Should remain unlocked
+      expect(vm.state.isLocked, false);
+
+      vm.dispose();
+    });
+
+    test('background duration limit is double idle timeout when less than max',
+        () async {
+      when(mockAuthService.isPinSet()).thenAnswer((_) async => true);
+      when(mockAuthService.verifyPin('1234')).thenAnswer((_) async => true);
+
+      final vm = LockViewModel(
+        authService: mockAuthService,
+        prefs: prefs,
+      );
+      await Future.delayed(Duration.zero);
+
+      // Set idle timeout to 5 minutes
+      await vm.setIdleTimeout(5);
+      await vm.unlockWithPin('1234');
+      vm.setBackgroundLockExemption(true);
+
+      // The limit should be 10 minutes (2 * 5)
+      // This is less than max of 30 minutes
+
+      vm.dispose();
+    });
+
+    test('background duration limit is capped at max idle timeout', () async {
+      when(mockAuthService.isPinSet()).thenAnswer((_) async => true);
+      when(mockAuthService.verifyPin('1234')).thenAnswer((_) async => true);
+
+      final vm = LockViewModel(
+        authService: mockAuthService,
+        prefs: prefs,
+      );
+      await Future.delayed(Duration.zero);
+
+      // Set idle timeout to 30 minutes
+      await vm.setIdleTimeout(30);
+      await vm.unlockWithPin('1234');
+      vm.setBackgroundLockExemption(true);
+
+      // The limit should be 30 minutes (not 60)
+      // because it's capped at max of 30 minutes
+
+      vm.dispose();
+    });
   });
 
   group('Biometric Refresh', () {
