@@ -52,7 +52,7 @@ class LockViewModel extends ChangeNotifier with WidgetsBindingObserver {
       return;
     }
 
-    // Check if resuming after a background exemption period
+    // Check if resuming after a background lock allowance period
     final backgroundTimestamp = _backgroundTimestamp;
     if (state == AppLifecycleState.resumed && backgroundTimestamp != null) {
       // Check if backgrounded time exceeded the limit
@@ -261,7 +261,7 @@ class LockViewModel extends ChangeNotifier with WidgetsBindingObserver {
         state == AppLifecycleState.hidden;
   }
 
-  /// Calculates the maximum allowed background duration for exempt screens.
+  /// Calculates the maximum allowed background duration when background lock is allowed.
   ///
   /// Returns the lesser of:
   /// - Double the selected idle timeout

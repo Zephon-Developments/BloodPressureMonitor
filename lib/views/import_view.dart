@@ -14,16 +14,16 @@ class ImportView extends StatefulWidget {
 }
 
 class _ImportViewState extends State<ImportView> {
-  bool _hasRegisteredLockExemption = false;
+  bool _hasRegisteredAllowBackgroundLock = false;
   LockViewModel? _lockViewModel;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _lockViewModel ??= context.read<LockViewModel>();
-    if (!_hasRegisteredLockExemption) {
+    if (!_hasRegisteredAllowBackgroundLock) {
       _lockViewModel?.setAllowBackgroundLock(true);
-      _hasRegisteredLockExemption = true;
+      _hasRegisteredAllowBackgroundLock = true;
     }
   }
 
