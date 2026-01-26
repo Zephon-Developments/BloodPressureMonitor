@@ -18,7 +18,7 @@ class LockViewModel extends ChangeNotifier with WidgetsBindingObserver {
 
   AppLockState _state = AppLockState.initial();
   AppLockState get state => _state;
-  bool _isBackgroundLockExempt = false;
+  bool _allowBackgroundLock = false;
   DateTime? _backgroundTimestamp;
 
   static const int _maxIdleTimeoutMinutes = 30;
@@ -46,7 +46,7 @@ class LockViewModel extends ChangeNotifier with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (_isBackgroundState(state) && _isBackgroundLockExempt) {
+    if (_isBackgroundState(state) && _allowBackgroundLock) {
       _backgroundTimestamp = DateTime.now();
       _idleTimerService.stopMonitoring();
       return;
@@ -84,13 +84,13 @@ class LockViewModel extends ChangeNotifier with WidgetsBindingObserver {
   ///
   /// Used by import/export flows where users must briefly leave the app
   /// without triggering the lock screen.
-  void setBackgroundLockExemption(bool exempt) {
-    if (_isBackgroundLockExempt == exempt) {
+  void setAllowBackgroundLock(bool allow) {
+    if (_allowBackgroundLock == allow) {
       return;
     }
-    _isBackgroundLockExempt = exempt;
-    // Clear timestamp when exemption is disabled to prevent stale timestamps
-    if (!exempt) {
+    _allowBackgroundLock = allow;
+    // Clear timestamp when disabled to prevent stale timestamps
+    if (!allow) {
       _backgroundTimestamp = null;
     }
   }

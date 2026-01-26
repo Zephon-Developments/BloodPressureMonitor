@@ -432,7 +432,7 @@ void main() {
   });
 
   group('Background Lock Exemption', () {
-    test('pausing locks app when not exempt', () async {
+    test('pausing locks app when not allowed', () async {
       when(mockAuthService.isPinSet()).thenAnswer((_) async => true);
       when(mockAuthService.verifyPin('1234')).thenAnswer((_) async => true);
 
@@ -452,7 +452,7 @@ void main() {
       vm.dispose();
     });
 
-    test('pausing skips lock when exempt', () async {
+    test('pausing skips lock when allowed', () async {
       when(mockAuthService.isPinSet()).thenAnswer((_) async => true);
       when(mockAuthService.verifyPin('1234')).thenAnswer((_) async => true);
 
@@ -463,7 +463,7 @@ void main() {
       await Future.delayed(Duration.zero);
 
       await vm.unlockWithPin('1234');
-      vm.setBackgroundLockExemption(true);
+      vm.setAllowBackgroundLock(true);
 
       vm.didChangeAppLifecycleState(AppLifecycleState.paused);
 
@@ -472,7 +472,7 @@ void main() {
       vm.dispose();
     });
 
-    test('lock resumes once exemption cleared', () async {
+    test('lock resumes once background lock is disabled', () async {
       when(mockAuthService.isPinSet()).thenAnswer((_) async => true);
       when(mockAuthService.verifyPin('1234')).thenAnswer((_) async => true);
 
@@ -483,12 +483,12 @@ void main() {
       await Future.delayed(Duration.zero);
 
       await vm.unlockWithPin('1234');
-      vm.setBackgroundLockExemption(true);
+      vm.setAllowBackgroundLock(true);
 
       vm.didChangeAppLifecycleState(AppLifecycleState.paused);
       expect(vm.state.isLocked, false);
 
-      vm.setBackgroundLockExemption(false);
+      vm.setAllowBackgroundLock(false);
       vm.didChangeAppLifecycleState(AppLifecycleState.paused);
 
       expect(vm.state.isLocked, true);
@@ -496,7 +496,7 @@ void main() {
       vm.dispose();
     });
 
-    test('resuming within time limit does not lock when exempt', () async {
+    test('resuming within time limit does not lock when allowed', () async {
       when(mockAuthService.isPinSet()).thenAnswer((_) async => true);
       when(mockAuthService.verifyPin('1234')).thenAnswer((_) async => true);
 
@@ -507,7 +507,7 @@ void main() {
       await Future.delayed(Duration.zero);
 
       await vm.unlockWithPin('1234');
-      vm.setBackgroundLockExemption(true);
+      vm.setAllowBackgroundLock(true);
 
       // Background for a short time (well within limit)
       vm.didChangeAppLifecycleState(AppLifecycleState.paused);
@@ -534,7 +534,7 @@ void main() {
       // Set idle timeout to 5 minutes
       await vm.setIdleTimeout(5);
       await vm.unlockWithPin('1234');
-      vm.setBackgroundLockExemption(true);
+      vm.setAllowBackgroundLock(true);
 
       // The limit should be 10 minutes (2 * 5)
       // This is less than max of 30 minutes
@@ -555,7 +555,7 @@ void main() {
       // Set idle timeout to 30 minutes
       await vm.setIdleTimeout(30);
       await vm.unlockWithPin('1234');
-      vm.setBackgroundLockExemption(true);
+      vm.setAllowBackgroundLock(true);
 
       // The limit should be 30 minutes (not 60)
       // because it's capped at max of 30 minutes

@@ -22,14 +22,14 @@ class _ImportViewState extends State<ImportView> {
     super.didChangeDependencies();
     _lockViewModel ??= context.read<LockViewModel>();
     if (!_hasRegisteredLockExemption) {
-      _lockViewModel?.setBackgroundLockExemption(true);
+      _lockViewModel?.setAllowBackgroundLock(true);
       _hasRegisteredLockExemption = true;
     }
   }
 
   @override
   void dispose() {
-    _lockViewModel?.setBackgroundLockExemption(false);
+    _lockViewModel?.setAllowBackgroundLock(false);
     super.dispose();
   }
 
