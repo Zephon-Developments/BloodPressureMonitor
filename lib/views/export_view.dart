@@ -2,9 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:blood_pressure_monitor/viewmodels/active_profile_viewmodel.dart';
 import 'package:blood_pressure_monitor/viewmodels/export_viewmodel.dart';
+import 'package:blood_pressure_monitor/viewmodels/lock_viewmodel.dart';
 
-class ExportView extends StatelessWidget {
+class ExportView extends StatefulWidget {
   const ExportView({super.key});
+
+  @override
+  State<ExportView> createState() => _ExportViewState();
+}
+
+class _ExportViewState extends State<ExportView> {
+  bool _hasRegisteredLockExemption = false;
+  LockViewModel? _lockViewModel;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_hasRegisteredLockExemption) {
+      _lockViewModel = context.read<LockViewModel>();
+      _lockViewModel!.setBackgroundLockAllowed(false);
+      _hasRegisteredLockExemption = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    _lockViewModel?.setBackgroundLockAllowed(true);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
