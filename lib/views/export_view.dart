@@ -12,22 +12,22 @@ class ExportView extends StatefulWidget {
 }
 
 class _ExportViewState extends State<ExportView> {
-  bool _hasRegisteredAllowBackgroundLock = false;
+  bool _hasRegisteredLockExemption = false;
   LockViewModel? _lockViewModel;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (!_hasRegisteredAllowBackgroundLock) {
+    if (!_hasRegisteredLockExemption) {
       _lockViewModel = context.read<LockViewModel>();
-      _lockViewModel!.setAllowBackgroundLock(true);
-      _hasRegisteredAllowBackgroundLock = true;
+      _lockViewModel!.setBackgroundLockAllowed(false);
+      _hasRegisteredLockExemption = true;
     }
   }
 
   @override
   void dispose() {
-    _lockViewModel?.setAllowBackgroundLock(false);
+    _lockViewModel?.setBackgroundLockAllowed(true);
     super.dispose();
   }
 
