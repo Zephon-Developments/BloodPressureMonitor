@@ -1,3 +1,4 @@
+import 'dart:math' show min;
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -51,9 +52,11 @@ class LockViewModel extends ChangeNotifier with WidgetsBindingObserver {
       return;
     }
 
-    if (state == AppLifecycleState.resumed && _backgroundTimestamp != null) {
+    // Check if resuming after a background exemption period
+    final backgroundTimestamp = _backgroundTimestamp;
+    if (state == AppLifecycleState.resumed && backgroundTimestamp != null) {
       // Check if backgrounded time exceeded the limit
-      final backgroundDuration = DateTime.now().difference(_backgroundTimestamp!);
+      final backgroundDuration = DateTime.now().difference(backgroundTimestamp);
       final maxBackgroundDuration = _calculateMaxBackgroundDuration();
       
       _backgroundTimestamp = null;
@@ -86,6 +89,7 @@ class LockViewModel extends ChangeNotifier with WidgetsBindingObserver {
       return;
     }
     _isBackgroundLockExempt = exempt;
+    // Clear timestamp when exemption is disabled to prevent stale timestamps
     if (!exempt) {
       _backgroundTimestamp = null;
     }
@@ -265,9 +269,7 @@ class LockViewModel extends ChangeNotifier with WidgetsBindingObserver {
   Duration _calculateMaxBackgroundDuration() {
     final idleTimeoutMinutes = _state.idleTimeoutMinutes;
     final doubleIdleTimeout = idleTimeoutMinutes * 2;
-    final maxMinutes = doubleIdleTimeout < _maxIdleTimeoutMinutes
-        ? doubleIdleTimeout
-        : _maxIdleTimeoutMinutes;
+    final maxMinutes = min(doubleIdleTimeout, _maxIdleTimeoutMinutes);
     return Duration(minutes: maxMinutes);
   }
 }
